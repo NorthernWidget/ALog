@@ -15,7 +15,7 @@ one-line calls.
 # LICENSE: GNU GPL v3
 
 Logger.h is part of Logger, an Arduino library written by Andrew D. Wickert.
-Copyright (C) 2011-2013, Andrew D. Wickert and Northern Widget LLC
+Copyright (C) 2011-2013, Andrew D. Wickert
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -85,8 +85,9 @@ class Logger {
     
     // Sensors - standard procedure (wake up, log, sleep)
     void thermistorB(float R0,float B,float Rref,float T0degC,int thermPin);
-    void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,boolean writeAll); // Print order: Distance [cm], standard deviation [cm]
+    void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,bool writeAll); // Print order: Distance [cm], standard deviation [cm]
     float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, int maxRange, bool RS232=false);
+    void maxbotixHRXL_WR_analog(int nping=10,int sonicPin=A0,int EX=99,bool writeAll=true); // Print order: Distance [cm], standard deviation [cm]
     void decagon5TE(int excitPin, int dataPin); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
     void vdivR(int pin, float Rref);
     void flex(int flexPin, float Rref, float calib1, float calib2);

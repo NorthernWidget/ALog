@@ -6,7 +6,7 @@ September-October 2011
 # LICENSE: GNU GPL v3
 
 Logger.cpp is part of Logger, an Arduino library written by Andrew D. Wickert.
-Copyright (C) 2011-2013, Andrew D. Wickert and Northern Widget LLC
+Copyright (C) 2011-2013, Andrew D. Wickert
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ const int log_mega=2; // In development
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
   const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
   const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
-#elif(_model == big_log){
+#elif(_model == big_log)
   // SD card: CSpin and protected pins
   const int CLKpin = 7;
   const int MISOpin = 6;
@@ -749,7 +749,7 @@ void Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
 // 1 cm = 1 10-bit ADC interval
 //////////////////////////////////////////////////////////////
 
-void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, boolean writeAll){
+void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool writeAll){
   // Returns distance in cm
   // set EX=99 if you don't need it
   
@@ -780,6 +780,81 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, boolean wr
     delay(100);
     range = analogRead(sonicPin);
     ranges[i-1] = range; // 10-bit ADC value = range in cm
+                         // C is 0-indexed, hence the "-1"
+    if (writeAll){
+      Serial.print(range);
+      Serial.print(F(","));
+      datafile.print(range);
+      datafile.print(",");
+    }
+  sumRange += range;
+  }
+ 
+  // Find mean of range measurements from sumRange and nping
+  meanRange = sumRange/nping;
+  
+  // Find standard deviation
+  float sumsquares = 0;
+  float sigma;
+  for(int i=0;i<nping;i++){
+    // Sum the squares of the differences from the mean
+    sumsquares += square(ranges[i]-meanRange);
+  }
+  // Calculate stdev
+  sigma = sqrt(sumsquares/nping);
+    
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  datafile.print(meanRange);
+  datafile.print(",");
+  datafile.print(sigma);
+  datafile.print(",");
+  // Echo to serial
+  Serial.print(meanRange);
+  Serial.print(F(","));
+  Serial.print(sigma);
+  Serial.print(F(","));
+
+}
+
+void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeAll){
+  // Returns distance in mm, +/- 5 mm
+  // Each 10-bit ADC increment corresponds to 5 mm.
+  // set EX=99 if you don't need it (or leave it clear -- this is default)
+  // Default nping=10 and sonicPin=A0
+  // Basically only differs from older MB sensor function in its range scaling
+  // and its added defaults.
+  
+  float range; // The most recent returned range
+  float ranges[nping]; // Array of returned ranges
+  float sumRange = 0; // The sum of the ranges measured
+  float meanRange; // The average range over all the pings
+  int sp; // analog reading of sonic pin; probably unnecessary, but Arduino warns against having too many fcns w/ artihmetic, I think
+
+  // Get range measurements
+  // Get rid of any trash; Serial.flush() unnecessary; main thing that is important is
+  // getting the 2 pings of junk out of the way
+  Serial.flush();
+  for (int i=1; i<=2; i++){
+    if(EX != 99){
+      digitalWrite(EX,HIGH);
+        delay(1);
+      digitalWrite(EX,LOW);
+      }
+    delay(100);
+    }
+  for(int i=1;i<=nping;i++){
+    if(EX != 99){
+      digitalWrite(EX,HIGH);
+        delay(1);
+      digitalWrite(EX,LOW);
+      }
+    delay(100);
+    sp = analogRead(sonicPin);
+    range = (sp + 1) * 5;
+    ranges[i-1] = range; // 10-bit ADC value (1--1024) * 5 = range in mm
                          // C is 0-indexed, hence the "-1"
     if (writeAll){
       Serial.print(range);
