@@ -1,0 +1,7 @@
+Placing the old code versions here.
+Making modifications for the new LogMega.
+These will include quite a few "if" statements for the new processor, pins, 
+and clock.
+These files are in case anything is messed up in that process.
+
+--ADW, 13 May 2014
