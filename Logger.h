@@ -55,10 +55,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <SdFat.h>
 #include <Wire.h>
-#include <DS3231.h>
 #include <math.h>
 #include <avr/sleep.h>
 #include <stdlib.h> // For turning incoming ASCII character strings into int with atol
+
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
+#include <DS3231.h>
+#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#include <RTClib.h>
+#include <RTC_DS3234.h>
+#endif
 
 // Outside of class definitions
 void wakeUpNow();
@@ -109,8 +115,9 @@ class Logger {
     // Sleep and alarms
     void sleepNow();
     // wakeUpNow defined outside of class; see above
-    void alarm2reset();
-    void alarm2_1min();
+    void DS3231_alarm2reset();
+    void DS3231_alarm2_1min();
+    void DS3234_alarm1_1min();
     
     // LED signals
     void LEDwarn(int nflash);

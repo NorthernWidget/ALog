@@ -68,36 +68,58 @@ const int log_mega=2; // In development
 /////////////////
 
 #if(_model == bottle_logger)
-  // SD card: CSpin and protected pins
+  // SD card: CSpinSD and protected pins
   const int CLKpin = 13;
   const int MISOpin = 12;
   const int MOSIpin = 11;
-  const int CSpin = 10;
-  // Protected I2C pins
+  const int CSpinSD = 10;
+  // Protected clock (I2C) pins
   const int SDApin = A4;
   const int SCLpin = A5;
+  const int CSpinRTC = -1; // not used
   // Digital pins
-  const int SensorPin = 4; // Activates voltage regulator to give power to sensors
+  const int SensorPin3V3 = 4; // Activates voltage regulator to give power to sensors
+  const int SensorPinVCC = -1; // No VCC switch on this board
   const int SDpin = 8; // Turns on voltage source to SD card
   const int LEDpin = 9; // LED to tell user if logger is working properly
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
   const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
   const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
 #elif(_model == big_log)
-  // SD card: CSpin and protected pins
+  // SD card: CSpinSD and protected pins
   const int CLKpin = 7;
   const int MISOpin = 6;
   const int MOSIpin = 5;
-  const int CSpin = 4;
-  // Protected I2C pins
+  const int CSpinSD = 4;
+  // Protected clock (I2C) pins
   const int SDApin = 23;
   const int SCLpin = 22;
+  const int CSpinRTC = -1; // not used
   // Digital pins
-  const int SensorPin = 21; // Activates voltage regulator to give power to sensors
+  const int SensorPin3V3 = 21; // Activates voltage regulator to give power to sensors
+  const int SensorPinVCC = -1; // No VCC switch on this board
   const int SDpin = 22; // Turns on voltage source to SD card
   const int LEDpin = 23; // LED to tell user if logger is working properly
   const int wakePin = 10; // interrupt pin used for waking up via the alarm
   const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
+#elif(_model == log_mega)
+  // SD card: CSpinSD and protected pins
+  const int CLKpin = 52;
+  const int MISOpin = 50;
+  const int MOSIpin = 51;
+  const int CSpinSD = 53;
+  // Protected clock pins -- I2C not protected here
+  // const int SDApin = 20;
+  // const int SCLpin = 21;
+  const int CSpinRTC = 47;
+  // Digital pins
+  const int SensorPin3V3 = 21; // Activates 3.3V voltage regulator to give power to sensors
+  const int SensorPinVCC = 39; // MOSFET to turn on and off VCC power to sensors
+  const int SDpin = 48; // Turns on voltage source to SD card
+  const int LEDpin = 49; // LED to tell user if logger is working properly
+  const int wakePin = 2; // interrupt pin used for waking up via the alarm
+  const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
+  const int manualWakePin = 43; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
 #endif
 
 /////////////////////////////////////////////////
@@ -124,8 +146,14 @@ bool tip = false;
 
 // Both for same clock, but need to create instances of both
 // classes in library (due to my glomming of two libs together)
-RTClib RTC;
-DS3231 Clock;
+// Mega just uses RTClib: put the clock-setting functions inside it
+
+#if(_model == bottle_logger)
+  RTClib RTC;
+  DS3231 Clock;
+#elif(_model == log_mega)
+  RTC RTC;
+#endif
 
 // SD CLASSES
 SdFat sd;
@@ -189,7 +217,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   /////////////////////////////
 
   if (_model == 0 || _model == 1 || _model == 2){
-    Serial.print("Logger model = ");
+    Serial.print(F("Logger model = "));
     Serial.println(_model_name);
   }
   else{
@@ -260,12 +288,12 @@ void Logger::setupLogger(){
   digitalWrite(wakePin,HIGH); // enable internal 20K pull-up
   // Set the rest of the pins: this is my pinModeRunning() function in other code,
   // but really is just as good to plop in here
-  pinMode(CSpin,OUTPUT);
-  pinMode(SensorPin,OUTPUT);
+  pinMode(CSpinSD,OUTPUT);
+  pinMode(SensorPin3V3,OUTPUT);
   pinMode(LEDpin,OUTPUT);
   pinMode(SDpin,OUTPUT);
   // Manual wake pin - only on the new bottle loggers
-  if (_model == bottle_logger){
+  if (_model == bottle_logger || _model == log_mega){
     Serial.println(F("Setting manualWakePin"));
     pinMode(manualWakePin,INPUT);
     digitalWrite(manualWakePin,HIGH); // enable internal 20K pull-up
@@ -275,8 +303,10 @@ void Logger::setupLogger(){
   }
   //Start out with SD, Sensor pins set LOW
   digitalWrite(SDpin,LOW);
-  digitalWrite(SensorPin,LOW);
-
+  digitalWrite(SensorPin3V3,LOW);
+  // Start out with CS pins high -- no data transmission
+  digitalWrite(CSpinSD, HIGH);
+  digitalWrite(CSpinRTC, HIGH);
 
 ////////////
 // SERIAL //
@@ -300,17 +330,20 @@ Wire.begin();
 // Includes check whether you are talking to Python terminal
 startup_sequence();
 
-////////////////
-// SD CARD ON //
-////////////////
-
-digitalWrite(SDpin,HIGH);
-
 /////////////////////////////////////////////////////////////////////
 // Set alarm to go off every time seconds==00 (i.e. once a minute) //
 /////////////////////////////////////////////////////////////////////
 
-alarm2_1min();
+if (_model == bottle_logger)
+{
+  DS3231_alarm2_1min();
+}
+else if (_model == log_mega)
+{
+  DS3234_alarm1_1min(); // Change this to specific minutes later -- but will require a deprecation or bringing-up-to-date decision (DS3231 code)
+                        // So for now just use clunky way of waking every minute.
+}
+
 
 ///////////////////
 // SD CARD SETUP //
@@ -324,11 +357,15 @@ delay(1000);
 
 name();
 Serial.print(F("Initializing SD card..."));
-if (!sd.begin(CSpin, SPI_HALF_SPEED)){
+digitalWrite(SDpin,HIGH); // SD CARD ON
+digitalWrite(CSpinSD, LOW);
+delay(10);
+if (!sd.begin(CSpinSD, SPI_HALF_SPEED)){
   Serial.println(F("Card failed, or not present"));
   LEDwarn(20); // 20 quick flashes of the LED
   sd.initErrorHalt();
 }
+digitalWrite(CSpinSD, HIGH);
 
 Serial.println(F("card initialized."));
 Serial.println();
@@ -341,7 +378,7 @@ Serial.println(F("Logger initialization complete! Ciao bellos."));
 
 delay(50);
 
-digitalWrite(SDpin,LOW);
+digitalWrite(SDpin,LOW); // SD CARD OFF
 
 }
 
@@ -349,12 +386,24 @@ digitalWrite(SDpin,LOW);
 // PRIVATE FUNCTIONS: UTILITIES FOR LOGGER LIBRARY //
 /////////////////////////////////////////////////////
 
+  /*
+  Not using at the moment -- just hope users don't override the utility pin commands!
+  
   void Logger::pinUnavailable(int pin){
     int _errorFlag = 0;
-    char* _pinNameList[9] = {"MISOpin", "MOSIpin", "CSpin", "SensorPin", "SDpin", "LEDpin", "wakePin", "SDApin", "SCLpin"};
-    int _pinList[9] = {MISOpin, MOSIpin, CSpin, SensorPin, SDpin, LEDpin, wakePin, SDApin, SCLpin};
-    
-    for (int i=0; i<9; i++){
+    #define protected_pins_list_length 7
+    if (_model == bottle_logger)
+    {
+      char* _pinNameList[protected_pins_list_length] = {"CSpinSD", "SensorPin3V3", "SDpin", "LEDpin", "wakePin", "SDApin", "SCLpin"};
+      int _pinList[protected_pins_list_length] = {CSpinSD, SensorPin3V3, SDpin, LEDpin, wakePin, SDApin, SCLpin};
+    }
+    else if (_model == log_mega)
+    {
+      char* _pinNameList[protected_pins_list_length] = {"CSpinSD", "SensorPin3V3", "SDpin", "LEDpin", "wakePin", "CSpinRTC", "SensorPinVCC"};
+      int _pinList[protected_pins_list_length] = {MISOpin, MOSIpin, CSpinSD, SensorPin3V3, SDpin, LEDpin, wakePin, CSpinRTC, SensorPinVCC};
+    }
+
+    for (int i=0; i<protected_pins_list_length; i++){
       if (pin == _pinList[i]){
         _errorFlag++;
         Serial.print("Error: trying to alter the state of Pin ");
@@ -373,14 +422,18 @@ digitalWrite(SDpin,LOW);
       while(1){}
     }
   }
+  */
 
   void Logger::sleepNow()         // here we put the arduino to sleep
   {
-
-    alarm2reset();   // Turns alarm 2 off and then turns it back
-                             // on so it will go off again next minute
-                             // NOT BACK ON ANYMORE
-
+    if (_model == bottle_logger)
+    // Wonder if it was pulling low for this whole time?
+    // But interrupt disabled, so maybe not so important...?
+    {
+      DS3231_alarm2reset();   // Turns alarm 2 off and then turns it back
+                               // on so it will go off again next minute
+                               // NOT BACK ON ANYMORE
+    }
 
       /* Now is the time to set the sleep mode. In the Atmega8 datasheet
        * http://www.atmel.com/dyn/resources/prod_documents/doc2486.pdf on page 35
@@ -471,6 +524,14 @@ digitalWrite(SDpin,LOW);
       detachInterrupt(interruptNum);      // disables interrupt so the 
                                // wakeUpNow code will not be executed 
                                // during normal running time.
+                               
+      if (_model == log_mega)
+      // In this case, reset the alarm flag (end pull-down of interrupt pin)
+      {
+        digitalWrite(CSpinRTC, LOW);
+        RTC.clear_alarm_flag(1);
+        digitalWrite(CSpinRTC, HIGH);
+      }
 
       //delay(3); // Slight delay before I feel OK taking readings
 
@@ -509,7 +570,7 @@ digitalWrite(SDpin,LOW);
   }
 
 
-  void Logger::alarm2reset()
+  void Logger::DS3231_alarm2reset()
   {
     // Reset alarm
     Clock.turnOffAlarm(2);
@@ -524,7 +585,7 @@ digitalWrite(SDpin,LOW);
     Clock.checkIfAlarm(2);
   }
 
-  void Logger::alarm2_1min()
+  void Logger::DS3231_alarm2_1min()
   {
     // Sets an alarm that will go off once a minute
     // for intermittent data logging
@@ -533,6 +594,20 @@ digitalWrite(SDpin,LOW);
     Clock.turnOffAlarm(2);
     Clock.setA2Time(1, 0, 0, 0b01110000, false, false, false); // just min mask
     Clock.turnOnAlarm(2);
+  }
+
+  void Logger::DS3234_alarm1_1min()
+  {
+    // Sets an alarm that will go off once a minute
+    // for intermittent data logging
+    // (This will use the AVR interrupt)
+    bool flags[5] = { 0, 1, 1, 1, 1 }; // only care about seconds count
+    int wake_SECOND = 0; // wake on the 00 seconds
+    digitalWrite(CSpinRTC, LOW);
+    RTC.set_alarm_1(wake_SECOND, 0, 0, 0, flags);
+    RTC.enable_alarm(1);
+    RTC.clear_alarm_flag(1);
+    digitalWrite(CSpinRTC, HIGH);
   }
 
   void Logger::LEDwarn(int nflash)
@@ -582,11 +657,15 @@ digitalWrite(SDpin,LOW);
 
   void Logger::unixDatestamp(){
 
+    digitalWrite(CSpinRTC, LOW);
     now = RTC.now();
+    digitalWrite(CSpinRTC, HIGH);
 
     // SD
-    datafile.print(now.unixtime());
+    digitalWrite(CSpinSD, LOW);
+    datafile.print(now.unixtime()); // Should work without clock's CSpinRTC -- digging into object that is already made
     datafile.print(",");
+    digitalWrite(CSpinSD, HIGH);
     // Echo to serial
     Serial.print(now.unixtime());
     Serial.print(F(","));
@@ -595,8 +674,10 @@ digitalWrite(SDpin,LOW);
   void Logger::endLine(){
     // Ends the line in the file; do this at end of recording instance
     // before going back to sleep
+    digitalWrite(CSpinSD, LOW);
     datafile.println();
     Serial.println();
+    digitalWrite(CSpinSD, HIGH);
     }
 
 float Logger::_vdivR(int pin,float Rref){
@@ -661,8 +742,9 @@ void Logger::startLogging(){
   // Initialize logger
   digitalWrite(SDpin,HIGH); // Turn on SD card before writing to it
                             // Delay required after this??
+  digitalWrite(CSpinSD, LOW);
   delay(10);
-  if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
+  if (!sd.begin(CSpinSD, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
@@ -677,6 +759,7 @@ void Logger::startLogging(){
     Serial.println(F(" for write failed"));
   delay(10);
   }
+  digitalWrite(CSpinSD, HIGH);
   // Datestamp the start of the line
   unixDatestamp();
 }
@@ -686,22 +769,27 @@ void Logger::endLogging(){
   endLine();
 
   // close the file: (This does the actual sync() step too - writes buffer)
+  digitalWrite(CSpinSD, LOW);
   datafile.close();
   delay(2);
   digitalWrite(SDpin,LOW); // Turns off SD card
-  alarm2reset();
-  delay(10); // need time to reset alarms?
+  digitalWrite(CSpinSD, HIGH);
+  if (_model == bottle_logger)
+  {
+    DS3231_alarm2reset();
+    delay(10); // need time to reset alarms?
+  }
 }
 
 void Logger::startAnalog(){
   // Turn on power to analog sensors
-  digitalWrite(SensorPin,HIGH);
+  digitalWrite(SensorPin3V3,HIGH);
   delay(2);
 }
 
 void Logger::endAnalog(){
   // Turn off power to analog sensors
-  digitalWrite(SensorPin,LOW);
+  digitalWrite(SensorPin3V3,LOW);
   delay(2);
 }
 
@@ -737,8 +825,10 @@ void Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
   ///////////////
 
   // SD
+  digitalWrite(CSpinSD, LOW);
   datafile.print(T);
   datafile.print(",");
+  digitalWrite(CSpinSD, HIGH);
   // Echo to serial
   Serial.print(T);
   Serial.print(F(","));
@@ -784,8 +874,10 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
     if (writeAll){
       Serial.print(range);
       Serial.print(F(","));
+      digitalWrite(CSpinSD, LOW);
       datafile.print(range);
       datafile.print(",");
+      digitalWrite(CSpinSD, HIGH);
     }
   sumRange += range;
   }
@@ -807,10 +899,12 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   // SAVE DATA //
   ///////////////
 
+  digitalWrite(CSpinSD, LOW);
   datafile.print(meanRange);
   datafile.print(",");
   datafile.print(sigma);
   datafile.print(",");
+  digitalWrite(CSpinSD, HIGH);
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -859,8 +953,10 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
     if (writeAll){
       Serial.print(range);
       Serial.print(F(","));
+      digitalWrite(CSpinSD, LOW);
       datafile.print(range);
       datafile.print(",");
+      digitalWrite(CSpinSD, HIGH);
     }
   sumRange += range;
   }
@@ -882,10 +978,12 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   // SAVE DATA //
   ///////////////
 
+  digitalWrite(CSpinSD, LOW);
   datafile.print(meanRange);
   datafile.print(",");
   datafile.print(sigma);
   datafile.print(",");
+  digitalWrite(CSpinSD, HIGH);
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -938,6 +1036,7 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
     mean_range = -9999;
     standard_deviation = -9999;
   }
+  digitalWrite(CSpinSD, LOW);
   // Write all values if so desired
   if (writeAll){
     for (int i=0; i<npings; i++){
@@ -955,6 +1054,7 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
   datafile.print(",");
   datafile.print(npings_with_real_returns);
   datafile.print(",");
+  digitalWrite(CSpinSD, HIGH);
   // Echo to serial
   Serial.print(mean_range);
   Serial.print(F(","));
@@ -1066,12 +1166,14 @@ void Logger::TippingBucketRainGage(){
   // Then prints date stamp
   pinMode(SDpin,OUTPUT); // Seemed to have forgotten between loops... ?
   digitalWrite(SDpin,HIGH); // might want to use a digitalread for better incorporation into normal logging cycle
+  digitalWrite(CSpinSD, LOW);
   delay(10);
-  if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
+  if (!sd.begin(CSpinSD, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
   }
+  digitalWrite(CSpinSD, HIGH);
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
   end_logging_to_otherfile();
@@ -1082,6 +1184,8 @@ void Logger::TippingBucketRainGage(){
 
 void Logger::start_logging_to_otherfile(char* filename){
   // open the file for write at end like the Native SD library
+  digitalWrite(CSpinSD, LOW);
+  delay(10);
   if (!otherfile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
@@ -1090,14 +1194,19 @@ void Logger::start_logging_to_otherfile(char* filename){
     Serial.println(F(" for write failed"));
   delay(10);
   }
+  digitalWrite(CSpinSD, HIGH);
   // Datestamp the start of the line - modified from unixDateStamp function
+  digitalWrite(CSpinRTC, LOW);
   now = RTC.now();
+  digitalWrite(CSpinRTC, HIGH);
   // SD
   otherfile.print(now.unixtime());
   otherfile.print(",");
   // Echo to serial
+  digitalWrite(CSpinSD, LOW);
   Serial.print(now.unixtime());
   Serial.print(F(","));
+  digitalWrite(CSpinSD, HIGH);
 }
 
 void Logger::end_logging_to_otherfile(){
@@ -1231,8 +1340,10 @@ void Logger::vdivR(int pin, float Rref){
   // SAVE DATA //
   ///////////////
 
+  digitalWrite(CSpinSD, LOW);
   datafile.print(_R);
   datafile.print(",");
+  digitalWrite(CSpinSD, HIGH);
   // Echo to serial
   Serial.print(_R);
   Serial.print(F(","));
@@ -1270,7 +1381,9 @@ void Logger::print_time(){
       exit_flag = 0; // Exit loop once this is done
       // Print times before setting clock
       for (int i=0; i<5; i++){
+        digitalWrite(CSpinRTC, LOW);
         now = RTC.now();
+        digitalWrite(CSpinRTC, HIGH);
         Serial.println(now.unixtime());
         if ( i<4 ){
           // No need to delay on the last time through
@@ -1312,7 +1425,8 @@ void Logger::startup_sequence(){
     }
   }
   name();
-  Serial.println(F("HELLO, COMPUTER."));
+  Serial.print(F("HELLO, COMPUTER. MY CORE IS: "));
+  Serial.println(_model_name);
   delay(500);
   if ( comp ){
     delay(4000); // Give Python time to print
@@ -1323,7 +1437,9 @@ void Logger::startup_sequence(){
     delay(1500);
     name();
     Serial.print(F("UNIX TIME STAMP ON MY WATCH IS: "));
+    digitalWrite(CSpinRTC, LOW);
     now = RTC.now();
+    digitalWrite(CSpinRTC, HIGH);
     unixtime_at_start = now.unixtime();
     Serial.println(unixtime_at_start);
     delay(1500);
@@ -1372,8 +1488,10 @@ void Logger::startup_sequence(){
   }
   else{
     // No serial; just blink
+    digitalWrite(CSpinRTC, LOW);
     now = RTC.now();
     unixtime_at_start = now.unixtime();
+    digitalWrite(CSpinRTC, HIGH);
     // Keep Serial just in case computer is connected w/out Python terminal
     Serial.print(F("Current UNIX time stamp according to logger is: "));
     Serial.println(unixtime_at_start);
@@ -1403,7 +1521,10 @@ void Logger::clockSet(){
   bool h12;
   bool PM;
 
+  // These are all DS3231 functions, so LOW and HIGH just here for thoroughness... and to remind me to make a DS3234 clock-setting function
+  digitalWrite(CSpinRTC, LOW);
   DateTime nowPreSet = RTC.now();  
+  digitalWrite(CSpinRTC, HIGH);
 
 	GetDateStuff(Year, Month, Date, DoW, Hour, Minute, Second);
 
