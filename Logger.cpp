@@ -365,7 +365,7 @@ digitalWrite(SDpin,LOW); // SD CARD OFF
        * sleep mode: SLEEP_MODE_PWR_DOWN
        * 
        */  
-      set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
+      set_sleep_mode(SLEEP_MODE_STANDBY);   // sleep mode is set here
 
   //    setPrescaler(6); // Clock prescaler of 64, slows down to conserve power
       cbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter OFF
@@ -1279,7 +1279,7 @@ void Logger::set_time_main(){
   boolean exit_flag = 1;
   while( exit_flag ){
     if ( Serial.available() ){
-      //clockSet();
+      clockSet();
       exit_flag = 0; // Totally out of loop now
     }
   }
@@ -1380,22 +1380,7 @@ void Logger::startup_sequence(){
   }
 }
 
-// SPI mode library for SD card -- don't want to edit SdFatLib, too much active
-// work by Bill Greiman and a huge pile of code. So will do SPI switches here
-// with these functions
-void Logger::SDstart()
-{
-  SPI.setBitOrder(MSBFIRST);
-  SPI.setDataMode(SPI_MODE0);
-  digitalWrite(CSpinSD, LOW); // CSpinSD is already set to output at the beginning, and this shoudl not change
-}
-
-void Logger::SDend()
-{
-  digitalWrite(CSpinSD, HIGH); // CSpinSD is already set to output at the beginning, and this shoudl not change
-}
-
-/*
+// CLOCK SETTING -- NEED TO REWRITE LIBRARY FOR DS3234
 void Logger::clockSet(){
 
   byte Year;
@@ -1410,40 +1395,30 @@ void Logger::clockSet(){
   bool h12;
   bool PM;
 
-  // These are all DS3231 functions, so LOW and HIGH just here for thoroughness... and to remind me to make a DS3234 clock-setting function
-  digitalWrite(CSpinRTC, LOW);
+  const int len = 32;
+  static char buf[len];
+
   DateTime nowPreSet = RTC.now();  
-  digitalWrite(CSpinRTC, HIGH);
 
 	GetDateStuff(Year, Month, Date, DoW, Hour, Minute, Second);
 
-	Clock.setClockMode(false);	// set to 24h
+	RTC.setClockMode(false);	// set to 24h
 	//setClockMode(true);	// set to 12h
 
-	Clock.setYear(Year);
-	Clock.setMonth(Month);
-	Clock.setDate(Date);
-	Clock.setDoW(DoW);
-	Clock.setHour(Hour);
-	Clock.setMinute(Minute);
-	Clock.setSecond(Second);
+  Serial.println("Setting  time");
+	RTC.setYear(Year);
+	RTC.setMonth(Month);
+	RTC.setDate(Date);
+	RTC.setDoW(DoW);
+	RTC.setHour(Hour);
+	RTC.setMinute(Minute);
+	RTC.setSecond(Second);
 
 	// Give time at next five seconds
-	// Should use a DateTime object for this, b/c rollover is a potential
-	// problem, but this display is not mission-critical
 	for (int i=0; i<5; i++){
 	    delay(1000);
-	    Serial.print(Clock.getYear(), DEC);
-	    Serial.print(F("-"));
-	    Serial.print(Clock.getMonth(Century), DEC);
-	    Serial.print(F("-"));
-	    Serial.print(Clock.getDate(), DEC);
-	    Serial.print(F(" "));
-	    Serial.print(Clock.getHour(h12, PM), DEC); //24-hr
-	    Serial.print(F(":"));
-	    Serial.print(Clock.getMinute(), DEC);
-	    Serial.print(F(":"));
-	    Serial.println(Clock.getSecond(), DEC);
+      DateTime now = RTC.now();
+      Serial.println(now.toString(buf,len));
 	}
   delay(1000);
   unsigned long unixtime_at_receive_string = nowPreSet.unixtime();
@@ -1451,7 +1426,6 @@ void Logger::clockSet(){
   Serial.println(unixtime_at_receive_string);
   Serial.println(F("Clock set!"));
 }
-
 
 void Logger::GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW, 
 		byte& Hour, byte& Minute, byte& Second) {
@@ -1502,5 +1476,20 @@ void Logger::GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW,
 	Temp2 = (byte)InString[12] -48;
 	Second = Temp1*10 + Temp2;
 }
-*/
+
+// SPI mode library for SD card -- don't want to edit SdFatLib, too much active
+// work by Bill Greiman and a huge pile of code. So will do SPI switches here
+// with these functions
+void Logger::SDstart()
+{
+  SPI.setBitOrder(MSBFIRST);
+  SPI.setDataMode(SPI_MODE0);
+  digitalWrite(CSpinSD, LOW); // CSpinSD is already set to output at the beginning, and this shoudl not change
+}
+
+void Logger::SDend()
+{
+  digitalWrite(CSpinSD, HIGH); // CSpinSD is already set to output at the beginning, and this shoudl not change
+}
+
 
