@@ -55,10 +55,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <SdFat.h>
 #include <Wire.h>
-#include <DS3231.h>
+#include <SPI.h>
 #include <math.h>
 #include <avr/sleep.h>
 #include <stdlib.h> // For turning incoming ASCII character strings into int with atol
+
+#include <RTClib.h>
+#include <RTC_DS3234.h>
 
 // Outside of class definitions
 void wakeUpNow();
@@ -109,8 +112,7 @@ class Logger {
     // Sleep and alarms
     void sleepNow();
     // wakeUpNow defined outside of class; see above
-    void alarm2reset();
-    void alarm2_1min();
+    void DS3234_alarm1_1min();
     
     // LED signals
     void LEDwarn(int nflash);
@@ -142,6 +144,13 @@ class Logger {
     void start_logging_to_otherfile(char* filename);
     void end_logging_to_otherfile();
     void endLine();
+    // SD card start/end for multiple SPI devices
+    // Onus is on the other device to change SPI_MODE and bit order back to its 
+    // preference -- as it should be, since I can't anticipate what the other
+    // device will need. This *is* done for the DS3234 clock that is integrated
+    // into the LogMega.
+    void SDstart();
+    void SDend();
 
 };
 
