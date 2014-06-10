@@ -143,6 +143,7 @@ class Logger {
     // Logging
     void start_logging_to_otherfile(char* filename);
     void end_logging_to_otherfile();
+    void readInternalVoltage();
     void endLine();
     // SD card start/end for multiple SPI devices
     // Onus is on the other device to change SPI_MODE and bit order back to its 
