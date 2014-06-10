@@ -58,8 +58,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   // const int SCLpin = 21;
   const int CSpinRTC = 47;
   // Digital pins
-  const int SensorPin3V3 = 21; // Activates 3.3V voltage regulator to give power to sensors
+  const int SensorPin3V3 = 42; // Activates 3.3V voltage regulator to give power to sensors
   const int SensorPinVCC = 39; // MOSFET to turn on and off VCC power to sensors
+  const int ShieldPinVCC_0 = 
   const int SDpin = 48; // Turns on voltage source to SD card
   const int LEDpin = 49; // LED to tell user if logger is working properly
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
@@ -240,64 +241,61 @@ void Logger::setupLogger(){
   digitalWrite(CSpinSD, HIGH);
   digitalWrite(CSpinRTC, HIGH);
 
-////////////
-// SERIAL //
-////////////
+  // Announce start
+  announce_start();
 
-Serial.begin(57600);
+  ///////////////////
+  // SD CARD SETUP //
+  ///////////////////
+  
+  // Had to initialize SD card before using clock, otherwise both SPI devices
+  // clashed.
+  
+  // Bug in which there is a bit of extra hang with the LED on... lessens when 
+  // a serial monitor is present, so is probably related to print statements.
 
-// Announce start
-announce_start();
+  name();
+  Serial.print(F("Initializing SD card..."));
+  pinMode(SDpin,OUTPUT); // Not sure if it forgot...? Including this required for fix!
+  digitalWrite(SDpin,HIGH); // SD CARD ON
+  SDstart();
+  delay(10);
+  if (!sd.begin(CSpinSD, SPI_HALF_SPEED)){
+    delay(10);
+    Serial.println(F("Card failed, or not present"));
+    delay(10);
+    LEDwarn(20); // 20 quick flashes of the LED
+    sd.initErrorHalt();
+  }
+  SDend();
 
-/////////////////
-// CHECK CLOCK //
-/////////////////
+  Serial.println(F("card initialized."));
+  Serial.println();
+  delay(10);
+  LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
 
-// Includes check whether you are talking to Python terminal
-startup_sequence();
+  delay(50);
 
-/////////////////////////////////////////////////////////////////////
-// Set alarm to go off every time seconds==00 (i.e. once a minute) //
-/////////////////////////////////////////////////////////////////////
+  /////////////////
+  // CHECK CLOCK //
+  /////////////////
 
-DS3234_alarm1_1min(); // Change this to specific minutes later -- but will require a deprecation or bringing-up-to-date decision (DS3231 code)
-                      // So for now just use clunky way of waking every minute.
+  // Includes check whether you are talking to Python terminal
+  startup_sequence();
 
+  /////////////////////////////////////////////////////////////////////
+  // Set alarm to go off every time seconds==00 (i.e. once a minute) //
+  /////////////////////////////////////////////////////////////////////
 
-///////////////////
-// SD CARD SETUP //
-///////////////////
+  DS3234_alarm1_1min(); // Change this to specific minutes later -- but will require a deprecation or bringing-up-to-date decision (DS3231 code)
+                        // So for now just use clunky way of waking every minute.
 
-// Initialize SdFat or print a detailed error message and halt
-// Use half speed like the native library.
-// change to SPI_FULL_SPEED for more performance.
+  delay(50);
 
-delay(1000);
+  digitalWrite(SDpin,LOW); // SD CARD OFF
 
-name();
-Serial.print(F("Initializing SD card..."));
-digitalWrite(SDpin,HIGH); // SD CARD ON
-SDstart();
-delay(10);
-if (!sd.begin(CSpinSD, SPI_HALF_SPEED)){
-  Serial.println(F("Card failed, or not present"));
-  LEDwarn(20); // 20 quick flashes of the LED
-  sd.initErrorHalt();
-}
-SDend();
-
-Serial.println(F("card initialized."));
-Serial.println();
-LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
-
-delay(50);
-
-name();
-Serial.println(F("Logger initialization complete! Ciao bellos."));
-
-delay(50);
-
-digitalWrite(SDpin,LOW); // SD CARD OFF
+  name();
+  Serial.println(F("Logger initialization complete! Ciao bellos."));
 
 }
 
@@ -546,6 +544,17 @@ digitalWrite(SDpin,LOW); // SD CARD OFF
     Serial.print(F(","));
   }
 
+  void Logger::readInternalVoltage(){
+    startAnalog();
+    int rawRead = analogRead(A15);
+    endAnalog();
+    float VCC = rawRead/1023. * 3.3 * 2; // equal resistors above and below voltage divider
+    SDstart();
+    datafile.print(VCC); // incidentally fixes problem with previous comma at end of line
+    Serial.print(VCC);
+    SDend();
+  }
+
   void Logger::endLine(){
     // Ends the line in the file; do this at end of recording instance
     // before going back to sleep
@@ -652,6 +661,9 @@ void Logger::startLogging(){
 }
 
 void Logger::endLogging(){
+  // Reads and prints internal voltage
+  readInternalVoltage();
+  
   // Ends line, turns of SD card, and resets alarm: ready to sleep
   endLine();
 
