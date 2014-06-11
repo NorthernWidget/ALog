@@ -48,24 +48,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ASSIGN PINS //
 /////////////////
 
-  // SD card: CSpinSD and protected pins
-  const int CLKpin = 52;
-  const int MISOpin = 50;
-  const int MOSIpin = 51;
-  const int CSpinSD = 53;
-  // Protected clock pins -- I2C not protected here
-  // const int SDApin = 20;
-  // const int SCLpin = 21;
-  const int CSpinRTC = 47;
-  // Digital pins
-  const int SensorPin3V3 = 42; // Activates 3.3V voltage regulator to give power to sensors
-  const int SensorPinVCC = 39; // MOSFET to turn on and off VCC power to sensors
-  const int ShieldPinVCC_0 = 
-  const int SDpin = 48; // Turns on voltage source to SD card
-  const int LEDpin = 49; // LED to tell user if logger is working properly
-  const int wakePin = 2; // interrupt pin used for waking up via the alarm
-  const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
-  const int manualWakePin = 43; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
+// SD card: CSpinSD and protected pins
+const int CLKpin = 52;
+const int MISOpin = 50;
+const int MOSIpin = 51;
+const int CSpinSD = 53;
+// Protected clock pins -- I2C not protected here
+// const int SDApin = 20;
+// const int SCLpin = 21;
+const int CSpinRTC = 47;
+// Digital pins
+const int SensorPin3V3 = 42; // Activates 3.3V voltage regulator to give power to sensors
+const int SensorPinVCC = 39; // MOSFET to turn on and off VCC power to sensors
+// TO DO when board design is fixed!
+//const int Shield1PinVCC = 
+//const int Shield2PinVCC = 
+const int SDpin = 48; // Turns on voltage source to SD card
+const int LEDpin = 49; // LED to tell user if logger is working properly
+const int wakePin = 2; // interrupt pin used for waking up via the alarm
+const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
+const int manualWakePin = 43; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
 
 /////////////////////////////////////////////////
 // GLOBAL VARIABLES DEFINED IN INITIALIZE STEP //
