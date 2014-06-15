@@ -1273,6 +1273,48 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, float i
  */
 
 
+void AtlasScientific(){
+
+}
+
+void StartHardwareSerial(int SerialNumber, int baud){
+  // Starts a hardware serial port on the Arduino Mega style board (LogMega)
+  if (SerialNumber == 0){
+    // Special case: used at 57600 for comms with computer.
+    // So end, and then begin at new baud rate.
+    Serial.end();
+    Serial.begin(baud);
+  }
+  if (SerialNumber == 1){
+    Serial1.begin(baud);
+  }
+  else if (SerialNumber == 2){
+    Serial2.begin(baud);
+  }
+  else if (SerialNumber == 3){
+    Serial3.begin(baud);
+  }
+}
+
+void EndHardwareSerial(int SerialNumber){
+  // Starts a hardware serial port on the Arduino Mega style board (LogMega)
+  if (SerialNumber == 0){
+    // Special case: used at 57600 for comms with computer.
+    // So end, and then begin at 57600 for use outside comms with this sensor.
+    Serial.end();
+    Serial.begin(57600);
+  }
+  if (SerialNumber == 1){
+    Serial1.end();
+  }
+  else if (SerialNumber == 2){
+    Serial2.end();
+  }
+  else if (SerialNumber == 3){
+    Serial3.end();
+  }
+}
+
 
 String inputstring = "";                                                       //a string to hold incoming data from the PC
 String sensorstring = "";                                                      //a string to hold the data from the Atlas Scientific product
