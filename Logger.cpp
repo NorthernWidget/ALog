@@ -1267,7 +1267,7 @@ void Logger::displacementMeasuredByResistance_piecewiseLinear(int analogPin, int
   // x = array of distances in look-up table (units defined as user would like)
   // R = array of resistances in look-up table (in Ohms or whatever Rref uses)
 
-  float R_sensor = _vdivR(analogPin, Rref)
+  float R_sensor = _vdivR(analogPin, Rref);
   
   // Find first value in table that is past measured value -- whether lower or
   // higher (just depending on direction or R change)
@@ -1290,8 +1290,8 @@ void Logger::displacementMeasuredByResistance_piecewiseLinear(int analogPin, int
     }
   }
   // Double-check this!
-  float fraction_along = (R_sensor - R[i-1]) / (R[i] - R[i-1]) // Partial distance over full distance
-  float distance = D[i-1] + ( (D[i] - D[i-1]) * fraction_along )
+  float fraction_along = (R_sensor - R[i-1]) / (R[i] - R[i-1]); // Partial distance over full distance
+  float distance = x[i-1] + ( (x[i] - x[i-1]) * fraction_along );
 
   // Write to file:
   SDstart();
