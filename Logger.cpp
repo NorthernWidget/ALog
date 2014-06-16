@@ -1250,10 +1250,58 @@ void Logger::flex(int flexPin, float Rref, float calib1, float calib2){
 }
 
 void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, float intercept){
+  // Generic resistance-with-distance device that varies linearly
   float _Rpot = _vdivR(linpotPin, Rref);
   float _dist = slope*_Rpot + intercept;
 }
 
+void Logger::displacementMeasuredByResistance_piecewiseLinear(int analogPin, int Rref, float* x, float* R){
+  // Computes a distance displacement as a function of measured resistance
+  // as a piecewise linear function (i.e. linearly interpolating between
+  // values in a look-up table.
+  
+  // INPUT VARIABLES:
+  // analogPin = pin number that resistor is attached to (other end goes
+  //   to a 3V3 pin -- or whatever the reference voltage happens to be)
+  // Rref = resistance of reference resistor (in Ohms or whatever R uses)
+  // x = array of distances in look-up table (units defined as user would like)
+  // R = array of resistances in look-up table (in Ohms or whatever Rref uses)
+
+  float R_sensor = _vdivR(analogPin, Rref)
+  
+  // Find first value in table that is past measured value -- whether lower or
+  // higher (just depending on direction or R change)
+
+  // Declar vars s.t. they will start out on the proper side of the measurement
+  float R_below = R_sensor - 1000;
+  float R_above = R_sensor + 1000;
+  int i = 0;
+  int i_above;
+  int i_below;
+  
+  if (R[0] < R_sensor){
+    while(R[i] < R_sensor){
+      i++; // Will land on the high value (i.e. past the mark)
+    }
+  }
+  else if (R[0] > R_sensor){
+    while(R[i] < R_sensor){
+      i++; // Will land on the low value (i.e. past the mark)
+    }
+  }
+  // Double-check this!
+  float fraction_along = (R_sensor - R[i-1]) / (R[i] - R[i-1]) // Partial distance over full distance
+  float distance = D[i-1] + ( (D[i] - D[i-1]) * fraction_along )
+
+  // Write to file:
+  SDstart();
+  datafile.print(distance); // Should work without clock's CSpinRTC -- digging into object that is already made
+  datafile.print(",");
+  SDend();
+  // Echo to serial
+  Serial.print(distance);
+  Serial.print(F(","));
+}
 
 //////////////////////////////
 // ATLAS SCIENTIFIC SENSORS //

@@ -96,6 +96,7 @@ class Logger {
     void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, float intercept);
     void AtlasScientific(char* command, int SerialNumber=0, int baudRate=38400, bool getReturn=true, bool saveReturn=true);
+    void displacementMeasuredByResistance_piecewiseLinear(int analogPin, int Rref, float* x, float* R);
     
     // Sensors - special
     // Rain gage - will wake logger up and cause it to log to a different file
