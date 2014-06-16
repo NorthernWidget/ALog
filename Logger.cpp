@@ -1234,7 +1234,7 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 // Started from Steve Hicks' code for an LCD reader
 // But now different in many ways (ADW, 16 June 2014)
 
-void Logger::decagon5TE(int exPin, int SerialNumber){
+void Logger::Decagon5TE(int exPin, int SerialNumber){
   // SerialNumber specifies the hardware serial port number
   // We use only the RX pin, since no info is being transmitted.
   // This could be different for SDI-12, talking with Kevin Smith about that
@@ -1249,11 +1249,9 @@ void Logger::decagon5TE(int exPin, int SerialNumber){
 
   pinMode(exPin, OUTPUT);
   digitalWrite(exPin, HIGH);
-  delay(60); // Decagon says Serial stream should be sent by the time that
-             // about 40 ms have elapsed.... so being safe here with the
-             // definition of "about".
-  pinMode(exPin, INPUT);
-  digitalWrite(exPin, LOW);
+  delay(175); // Decagon says 150 ms measurement time, and I have some note
+              // about reading before 200 ms are up, so being safe here
+              // and splitting the difference.
 
   while (AvailableHardwareSerial(SerialNumber)){
     inChar = ReadHardwareSerial(SerialNumber);
@@ -1263,70 +1261,133 @@ void Logger::decagon5TE(int exPin, int SerialNumber){
       // if((c>='0' and c<='9') || c==' '){
       i++;
     }
-
-   // Before turned the excitPin LOW here... leaving a note in case my new 
-   // code doesn't work :)
-
-    // parse the array into 3 integers  (for the 5TM, y is always 0)
-    sscanf (sensorString, "%d %d %d", &Epsilon_Raw, &Sigma_Raw, &T_Raw);     
-
-    // Change measured values into real values, via equations in Decagon 5TE
-    // manual
-
-    // Dielectric permittivity [-unitless-]
-    if (Epsilon_Raw == 4095){
-      // Error alert!
-      Epsilon_a = -9999.99;
-    }
-    else {
-      Epsilon_a = Epsilon_Raw/50.;
-    }
-    // Electrical Conductivity [dS/m]
-    if (Sigma_Raw == 1023){
-      // Error alert!
-      EC = -9999.99;
-    }
-    else if (Sigma_Raw <= 700){
-      EC = Sigma_Raw/100.;
-    }
-    else {
-      // (i.e. Sigma_Raw > 700, but no elif needed so long as input string
-      // parses correctly... hmm, should maybe protect against that)
-      EC = (700. + 5.*(Sigma_Raw- 700.))/100.;
-    }
-    // Temperature [degrees C]
-    // Combined both steps of the operation as given in the manual
-    if (T_Raw == 1023){
-      // Error alert!
-      T = -9999.99;
-    }
-    else if (T_Raw <= 900){
-      T = (T_Raw - 400.) / 10.;
-    }
-    else {
-      // (i.e. T_Raw > 900, but no elif needed so long as input string
-      // parses correctly... hmm, should maybe protect against that)
-      T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
-    }
-    
-    ///////////////
-    // SAVE DATA //
-    ///////////////
-
-    datafile.print(Epsilon_a);
-    datafile.print(",");
-    datafile.print(EC);
-    datafile.print(",");
-    datafile.print(T);
-    datafile.print(",");
-    // Echo to serial
-    Serial.print(Epsilon_a);
-    Serial.print(F(","));
-    Serial.print(EC);
-    Serial.print(F(","));
-    Serial.print(T);
-    Serial.print(F(","));
   }
+
+  // exPin also powers the sensor: so turning LOW here, after communications
+  // are over.
+  pinMode(exPin, INPUT);
+  digitalWrite(exPin, LOW);
+
+  EndHardwareSerial(SerialNumber, 1200);
+
+  // parse the array into 3 integers  (for the 5TM, y is always 0)
+  sscanf (sensorString, "%d %d %d", &Epsilon_Raw, &Sigma_Raw, &T_Raw);     
+
+  // Change measured values into real values, via equations in Decagon 5TE
+  // manual
+
+  // Dielectric permittivity [-unitless-]
+  if (Epsilon_Raw == 4095){
+    // Error alert!
+    Epsilon_a = -9999.99;
+  }
+  else {
+    Epsilon_a = Epsilon_Raw/50.;
+  }
+  // Electrical Conductivity [dS/m]
+  if (Sigma_Raw == 1023){
+    // Error alert!
+    EC = -9999.99;
+  }
+  else if (Sigma_Raw <= 700){
+    EC = Sigma_Raw/100.;
+  }
+  else {
+    // (i.e. Sigma_Raw > 700, but no elif needed so long as input string
+    // parses correctly... hmm, should maybe protect against that)
+    EC = (700. + 5.*(Sigma_Raw- 700.))/100.;
+  }
+  // Temperature [degrees C]
+  // Combined both steps of the operation as given in the manual
+  if (T_Raw == 1023){
+    // Error alert!
+    T = -9999.99;
+  }
+  else if (T_Raw <= 900){
+    T = (T_Raw - 400.) / 10.;
+  }
+  else {
+    // (i.e. T_Raw > 900, but no elif needed so long as input string
+    // parses correctly... hmm, should maybe protect against that)
+    T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
+  }
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  datafile.print(Epsilon_a);
+  datafile.print(",");
+  datafile.print(EC);
+  datafile.print(",");
+  datafile.print(T);
+  datafile.print(",");
+  // Echo to serial
+  Serial.print(Epsilon_a);
+  Serial.print(F(","));
+  Serial.print(EC);
+  Serial.print(F(","));
+  Serial.print(T);
+  Serial.print(F(","));
+}
+
+void Logger::DecagonMPS2(int exPin, int SerialNumber){
+  // SerialNumber specifies the hardware serial port number
+  // We use only the RX pin, since no info is being transmitted.
+  // This could be different for SDI-12, talking with Kevin Smith about that
+  // and Software Serial
+
+  StartHardwareSerial(SerialNumber, 1200);
+
+  char sensorString[20];   // Guessing at length; Decagon manual unhelpful
+  char inChar; // to hold temporary serial input
+  int i=0;
+  unsigned int startMillis; // same comment as right below
+  unsigned int elapsed = 0; // shouldn't overflow on the time scales I'm using
+
+  pinMode(exPin, OUTPUT);
+  digitalWrite(exPin, HIGH);
+  delay(40); // Decagon says Serial stream should be completed by the time that
+             // about 40 ms have elapsed.... so being safe here with the
+             // definition of "about", and deciding that it has at least
+             // started by this time!
+
+  while (AvailableHardwareSerial(SerialNumber)){
+    inChar = ReadHardwareSerial(SerialNumber);
+    // end of transmission on carriage return
+    if (inChar != '\r'){
+      if (inChar == ' '){
+        sensorString[i-1] = ','; // make it directly printable: no need to parse
+      }
+      else {
+       sensorString[i] = inChar; //makes the string readString 
+      }
+      i++;
+    }
+  }
+
+  pinMode(exPin, INPUT);
+  digitalWrite(exPin, LOW);
+
+  EndHardwareSerial(SerialNumber, 1200);
+
+  sensorString[i] = ','; // Comma at end as well - direct printing of data
+
+  // Copy array to remove spaces
+  char sensorOutput[i+1];
+  for (int j=0; j<=i; j++){
+    sensorOutput[j] = sensorString[j];
+  }
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // Unique in that I already have the comma as part of the string!
+  datafile.print(sensorOutput);
+  // Echo to serial
+  Serial.print(sensorOutput);
+
 }
 
 void Logger::vdivR(int pin, float Rref){
