@@ -95,6 +95,7 @@ class Logger {
     void vdivR(int pin, float Rref);
     void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, float intercept);
+    void AtlasScientific(char* command, int SerialNumber=0, int baudRate=38400, bool getReturn=true, bool saveReturn=true);
     
     // Sensors - special
     // Rain gage - will wake logger up and cause it to log to a different file
@@ -152,6 +153,16 @@ class Logger {
     // into the LogMega.
     void SDstart();
     void SDend();
+    
+    // Hardware Serial that allows functions to flexibly define which port
+    // is desired (for LogMega)
+    void StartHardwareSerial(int SerialNumber, int baud);
+    void PrintHardwareSerial(int SerialNumber, char* input);
+    void PrintlnHardwareSerial(int SerialNumber, char* input);
+    char ReadHardwareSerial(int SerialNumber);
+    int AvailableHardwareSerial(int SerialNumber);
+    void EndHardwareSerial(int SerialNumber, int baud=-1); // baud to check if = 57600, so to keep port open for comms with computer'
+    
 
 };
 
