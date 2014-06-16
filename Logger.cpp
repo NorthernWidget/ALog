@@ -1118,6 +1118,7 @@ void Logger::end_logging_to_otherfile(){
 /*
 void Logger::decagon5TE(int excitPin, int dataPin){
 
+  // Seems I should have had a -1 in the below setting instead! (ADW, 16 June 2014)
   NewSoftSerial mySerial(excitPin, dataPin);  //5tm's red wire (serial data out) connected to pin 5, pin 6 goes nowhere
   int Epsilon_Raw, Sigma_Raw, T_Raw;   //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
   char dataStream[14];   // Max 14 characters: 4x3 + 2 spaces
@@ -1128,6 +1129,7 @@ void Logger::decagon5TE(int excitPin, int dataPin){
   unsigned int elapsed = 0; // shouldn't overflow on the time scales I'm using
 
   if(startflag){
+    // What had I been thinking? Isn't set as OUTPUT. Could be problem! (ADW, 16 June 2014)
     digitalWrite(excitPin,HIGH);
     startMillis = millis();
     startflag=0;
@@ -1147,6 +1149,7 @@ void Logger::decagon5TE(int excitPin, int dataPin){
         delay(1);  
       if (mySerial.available() >0) {
     		endflag=1;
+    		// Adding a new byte each time seems like a bad idea (ADW, 16 June 2014)
         char c = mySerial.read();  //gets one byte from serial buffer
           Serial.println(c);
         if((c>='0' and c<='9') || c==' ') {
@@ -1226,6 +1229,105 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 //  }
 //}
 
+
+//reads a 5TE soil moisture probe and prints results to Serial
+// Started from Steve Hicks' code for an LCD reader
+// But now different in many ways (ADW, 16 June 2014)
+
+void Logger::decagon5TE(int exPin, int SerialNumber){
+  // SerialNumber specifies the hardware serial port number
+  // We use only the RX pin, since no info is being transmitted.
+  // This could be different for SDI-12, talking with Kevin Smith about that
+  // and Software Serial
+
+  StartHardwareSerial(SerialNumber, 1200);
+  int Epsilon_Raw, Sigma_Raw, T_Raw; //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
+  float Epsilon_a, EC, T; // Output variables
+  char sensorString[14]; // Max 14 characters: 4x3 + 2 spaces
+  char inChar; // to hold temporary serial input
+  int i=0;
+
+  pinMode(exPin, OUTPUT);
+  digitalWrite(exPin, HIGH);
+  delay(60); // Decagon says Serial stream should be sent by the time that
+             // about 40 ms have elapsed.... so being safe here with the
+             // definition of "about".
+  pinMode(exPin, INPUT);
+  digitalWrite(exPin, LOW);
+
+  while (AvailableHardwareSerial(SerialNumber)){
+    inChar = ReadHardwareSerial(SerialNumber);
+    if (inChar != '\r'){
+      sensorString[i] = inChar;
+      // Had this before, but it basically just needs to avoid the end-of-line carriage return
+      // if((c>='0' and c<='9') || c==' '){
+      i++;
+    }
+
+   // Before turned the excitPin LOW here... leaving a note in case my new 
+   // code doesn't work :)
+
+    // parse the array into 3 integers  (for the 5TM, y is always 0)
+    sscanf (sensorString, "%d %d %d", &Epsilon_Raw, &Sigma_Raw, &T_Raw);     
+
+    // Change measured values into real values, via equations in Decagon 5TE
+    // manual
+
+    // Dielectric permittivity [-unitless-]
+    if (Epsilon_Raw == 4095){
+      // Error alert!
+      Epsilon_a = -9999.99;
+    }
+    else {
+      Epsilon_a = Epsilon_Raw/50.;
+    }
+    // Electrical Conductivity [dS/m]
+    if (Sigma_Raw == 1023){
+      // Error alert!
+      EC = -9999.99;
+    }
+    else if (Sigma_Raw <= 700){
+      EC = Sigma_Raw/100.;
+    }
+    else {
+      // (i.e. Sigma_Raw > 700, but no elif needed so long as input string
+      // parses correctly... hmm, should maybe protect against that)
+      EC = (700. + 5.*(Sigma_Raw- 700.))/100.;
+    }
+    // Temperature [degrees C]
+    // Combined both steps of the operation as given in the manual
+    if (T_Raw == 1023){
+      // Error alert!
+      T = -9999.99;
+    }
+    else if (T_Raw <= 900){
+      T = (T_Raw - 400.) / 10.;
+    }
+    else {
+      // (i.e. T_Raw > 900, but no elif needed so long as input string
+      // parses correctly... hmm, should maybe protect against that)
+      T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
+    }
+    
+    ///////////////
+    // SAVE DATA //
+    ///////////////
+
+    datafile.print(Epsilon_a);
+    datafile.print(",");
+    datafile.print(EC);
+    datafile.print(",");
+    datafile.print(T);
+    datafile.print(",");
+    // Echo to serial
+    Serial.print(Epsilon_a);
+    Serial.print(F(","));
+    Serial.print(EC);
+    Serial.print(F(","));
+    Serial.print(T);
+    Serial.print(F(","));
+  }
+}
 
 void Logger::vdivR(int pin, float Rref){
   float _R = _vdivR(pin, Rref);
