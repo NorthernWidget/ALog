@@ -1255,9 +1255,12 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, float i
 }
 
 
-// ATLAS SCIENTIFIC SENSORS
+//////////////////////////////
+// ATLAS SCIENTIFIC SENSORS //
+//////////////////////////////
 
 /*
+ ADW: NOTE TO SELF -- REWRITE!!!!
  This software was made to demonstrate how to quickly get your Atlas Scientific product running on the Arduino platform.
  An Arduino MEGA 2560 board was used to test this code.
  This code was written in the Arudino 1.0 IDE
@@ -1272,20 +1275,168 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, float i
  Remember, select carriage return from the drop down menu next to the baud rate selection; not "both NL & CR".
  */
 
+/*
 
-void AtlasScientific(){
+///////////////////////////////////////////
+// COMMANDS FOR ATLAS SCIENTIFIC SENSORS //
+///////////////////////////////////////////
+
+The Atlas Scientific sensors operate by receiving a Serial command and then 
+performing the requested action and/or returning a value.
+
+Full documentation of these commands are given in the datasheets on the Atlas 
+Scientific website:
+https://www.atlas-scientific.com
+
+Here, these commands have been copy/pasted into a quick reference section.
+
+Columns:
+Command -- what it does -- default state
+ARGH but it pastes with spaces!
+Will just have to regex first and last spaces into a nice table -- on to-do list.
+-- ADW: 15 June 2014
+
+// Also, do something to enable / disable indicator lights?
+// Perhaps earlier in code if Atlas sensors are present...
+
+
+////////
+// pH //
+////////
+
+There are a total of 14 different commands that can be given to the pH Circuit.
+All commands must be followed by a carriage return <CR>.
+Commands are not case sensitive.
+
+L1 Enables debugging LEDs Enabled
+L0 Disables debugging LEDs Disabled
+R Takes one pH reading N/A
+C Takes continuous pH readings every 378 Milliseconds. N/A
+TT.TT Take temperature dependent reading. 25 C°
+E Stops all readings. Enter standby/quiescent mode. N/A
+S Calibration at pH Seven N/A
+F Calibration at pH Four N/A
+T Calibration at pH Ten N/A
+X Return Circuit to factory settings N/A
+I Information: Type of Circuit • firmware version • firmware creation date N/A
+# (xxxx, !, ?) Set Device ID No ID Set
+Z0 Change baud rate 38,400 bps
+Z(1-8) Set fixed baud rate Z6 (38,400 bps)
+
+
+/////////////////////////////
+// Electrical Conductivity //
+/////////////////////////////
+
+C,<1|0|?> Enable / Disable or Query continuous readings (pg.15) Enabled
+Cal,<type,nnn> Performs calibration (pg.21) User must calibrate
+I Device information (pg.24) N/A
+I2C,<nnn> Sets the I 2 C ID number (pg.30) Not set
+K,<nn.nn|?> Set or Query the probe K constant (pg.17) K=1.0
+L,<1|0|?> Enable / Disable or Query the LEDs (pg.14) LEDs Enabled
+Name,<nnn|?> Set or Query the name of the device (pg.23) Not set
+O, <parameter>,<1|0> Enable / Disable or Query parts of the output string (pg.19) All Enabled
+R Returns a single reading (pg.16) N/A
+Response,<1|0|?> Enable / Disable or Query response code (pg.25) Enabled
+Serial,<nnn> Set the baud rate (pg.28) 38400
+Sleep Enter low power sleep mode (pg.27) N/A
+Status Retrieve status information (pg.26) N/A
+T,<XX.XX|?> Set or Query the temperature compensation (pg.18) 25 ̊C
+X Factory reset (pg.29) N/A
+
+*/
+
+
+void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool getReturn, bool saveReturn){
+  // * "command" is the command sent to the Atlas Scientific product.
+  //   see the data sheet as well as the above quick lists
+  // SerialNumber and baudRate default to 0 and 38400, respectively.
+  // SerialNumber could be changed for Arduino Mega.
+  // baudRate will stay constant insofar as Atlas sensors' baud rates do.
+  // getReturn determines whether you care about the Serial response, or whether
+  // you would just like to clear the buffer.
+  //
+
+  StartHardwareSerial(SerialNumber, baudRate);
+  
+  char sensorString[30]; // a char array to hold the data from the Atlas Scientific product
+                         // Atlas' example indicates that they expect all returns to be <= 30 bytes
+  char inChar; // incoming characters on the serial port
+
+  // "println" prints <values>\r\n. Atlas uses println to send data in its 
+  // Arduino sample code, so I presume the "\r" is taken as the cutoff (its 
+  // sensors terminate with a carriage return) and the "\n" is discarded.
+  // Still, I wonder if it would be better to "Serial.print(...\n);"
+  // (or ASCII 13, however Arduino does it) explicitly
+  PrintlnHardwareSerial(SerialNumber, command); // send the command to the Atlas Scientific product
+
+  if (getReturn){
+    int i = 0;
+    // UNTESTED AND OFF THE TOP OF MY HEAD (ADW), COMIBNING 2 METHODS!!!!!
+    // Read from port until no more data are coming in
+    // Will I need a delay here to make sure that data are arriving?
+    // or something with bits_have_started = false; and a timeout
+    // in case nothing is coming in and I have that condition?
+    // while() is redundant here, because '\r' should be end of transmission...
+    // ... thinking though about how to recover from a garbled transmission
+    while (AvailableHardwareSerial(SerialNumber)){
+      inChar = ReadHardwareSerial(SerialNumber);
+      if (inChar != '\r'){
+        sensorString[i] = inChar;
+        i++;
+      }
+      else{
+        break;
+      }
+    }
+    // save iff both getReturn and saveReturn are true
+    // Currently also echoes the return to serial port if it will
+    // also be saved (sent to SD card)
+    if (saveReturn){
+      SDstart();
+      datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
+      datafile.print(",");
+      SDend();
+      // Echo to serial
+      Serial.print(sensorString);
+      Serial.print(F(","));
+    }
+  }
+  else{
+    // Get rid of the incoming Serial stream
+    while (AvailableHardwareSerial(SerialNumber)){
+      inChar = ReadHardwareSerial(SerialNumber); // do I need to assign it to a var?
+    }
+  }
+
+  EndHardwareSerial(SerialNumber, baudRate);
 
 }
 
-void StartHardwareSerial(int SerialNumber, int baud){
-  // Starts a hardware serial port on the Arduino Mega style board (LogMega)
+
+/////////////////////
+// Hardware Serial //
+/////////////////////
+
+// Currently used only for Atlas Scientific, but I (ADW) think could be useful
+// in general.
+// May be better created as a class that instantiates the pin number and 
+// baud, but I will have to learn more about how memory is handled with classes
+// and how to "destruct" them
+
+void Logger::StartHardwareSerial(int SerialNumber, int baud){
+  // Starts a hardware serial port, especially for the LogMega where there
+  // is more than one such port
   if (SerialNumber == 0){
     // Special case: used at 57600 for comms with computer.
-    // So end, and then begin at new baud rate.
-    Serial.end();
-    Serial.begin(baud);
+    // If you want 57600 bps, don't do anything to the Serial!
+    // Otherwise end, and then begin at new baud rate.
+    if (baud != 57600){
+      Serial.end();
+      Serial.begin(baud);
+    }
   }
-  if (SerialNumber == 1){
+  else if (SerialNumber == 1){
     Serial1.begin(baud);
   }
   else if (SerialNumber == 2){
@@ -1296,15 +1447,98 @@ void StartHardwareSerial(int SerialNumber, int baud){
   }
 }
 
-void EndHardwareSerial(int SerialNumber){
-  // Starts a hardware serial port on the Arduino Mega style board (LogMega)
+// Overload some of these functions as needed (in future) to work with multiple 
+// data types
+
+void Logger::PrintHardwareSerial(int SerialNumber, char* input){
+  // Prints a character arrray to a hardware serial port
+  // Especially for the LogMega where there is more than one such port
+  if (SerialNumber == 0){
+    Serial.print(input);
+  }
+  else if (SerialNumber == 1){
+    Serial1.print(input);
+  }
+  else if (SerialNumber == 2){
+    Serial2.print(input);
+  }
+  else if (SerialNumber == 3){
+    Serial3.print(input);
+  }
+}
+
+void Logger::PrintlnHardwareSerial(int SerialNumber, char* input){
+  // Prints a character arrray followed by \r\n to a hardware serial port
+  // Especially for the LogMega where there is more than one such port
+  if (SerialNumber == 0){
+    Serial.println(input);
+  }
+  else if (SerialNumber == 1){
+    Serial1.println(input);
+  }
+  else if (SerialNumber == 2){
+    Serial2.println(input);
+  }
+  else if (SerialNumber == 3){
+    Serial3.println(input);
+  }
+}
+
+char Logger::ReadHardwareSerial(int SerialNumber){
+  // Reads a byte (char) from the selected serial port
+  // Especially for the LogMega where there is more than one such port
+  if (SerialNumber == 0){
+    Serial.read();
+  }
+  else if (SerialNumber == 1){
+    Serial1.read();
+  }
+  else if (SerialNumber == 2){
+    Serial2.read();
+  }
+  else if (SerialNumber == 3){
+    Serial3.read();
+  }
+}
+
+int Logger::AvailableHardwareSerial(int SerialNumber){
+  // Returns the number of bytes queued up to read on the given serial port
+  // Especially for the LogMega where there is more than one such port
+  // Could do uint8_t if we get really low on memory :)
+  // But leaving like this in case we deal with larger buffers in future
+  // (64 byte right now)
+  int nbytes_to_read;
+  if (SerialNumber == 0){
+    nbytes_to_read = Serial.available();
+  }
+  else if (SerialNumber == 1){
+    nbytes_to_read = Serial1.available();
+  }
+  else if (SerialNumber == 2){
+    nbytes_to_read = Serial2.available();
+  }
+  else if (SerialNumber == 3){
+    nbytes_to_read = Serial3.available();
+  }
+  return nbytes_to_read;
+}
+
+void Logger::EndHardwareSerial(int SerialNumber, int baud){
+  // Closes a hardware serial port, especially for the LogMega where there
+  // is more than one such port
+  // Here, "baud" is an optional parameter that is important iff baud = 57600
+  // bps, in which case there is no reasno to stop and then re-instantiate the
+  // serial connection (because computer serial will be the same as sensor 
+  // serial)
   if (SerialNumber == 0){
     // Special case: used at 57600 for comms with computer.
     // So end, and then begin at 57600 for use outside comms with this sensor.
-    Serial.end();
-    Serial.begin(57600);
+    if (baud != 57600){
+      Serial.end();
+      Serial.begin(57600);
+    }
   }
-  if (SerialNumber == 1){
+  else if (SerialNumber == 1){
     Serial1.end();
   }
   else if (SerialNumber == 2){
@@ -1316,63 +1550,9 @@ void EndHardwareSerial(int SerialNumber){
 }
 
 
-String inputstring = "";                                                       //a string to hold incoming data from the PC
-String sensorstring = "";                                                      //a string to hold the data from the Atlas Scientific product
-boolean input_stringcomplete = false;                                          //have we received all the data from the PC
-boolean sensor_stringcomplete = false;                                         //have we received all the data from the Atlas Scientific product
-
-
-void setup(){                                                                //set up the hardware
-    Serial.begin(38400);                                                      //set baud rate for the hardware serial port_0 to 38400
-    Serial3.begin(38400);                                                     //set baud rate for software serial port_3 to 38400
-    inputstring.reserve(5);                                                   //set aside some bytes for receiving data from the PC
-    sensorstring.reserve(30);                                                 //set aside some bytes for receiving data from Atlas Scientific product
-}
-
-
-
-void serialEvent() {                                                         //if the hardware serial port_0 receives a char
-    char inchar = (char)Serial.read();                               //get the char we just received
-    inputstring += inchar;                                           //add it to the inputString
-    if(inchar == '\r') {input_stringcomplete = true;}                //if the incoming character is a <CR>, set the flag
-}
-
-
-void serialEvent3(){                                                         //if the hardware serial port_3 receives a char
-    char inchar = (char)Serial3.read();                              //get the char we just received
-    sensorstring += inchar;                                          //add it to the inputString
-    if(inchar == '\r') {sensor_stringcomplete = true;}               //if the incoming character is a <CR>, set the flag
-}
-
-
-
-void loop(){                                                                   //here we go....
-    
-    if (input_stringcomplete){                                                   //if a string from the PC has been received in its entirety
-        Serial3.print(inputstring);                                              //send that string to the Atlas Scientific product
-        inputstring = "";                                                        //clear the string:
-        input_stringcomplete = false;                                            //reset the flag used to tell if we have received a completed string from the PC
-    }
-    
-    if (sensor_stringcomplete){                                                   //if a string from the Atlas Scientific product has been received in its entierty
-        Serial.println(sensorstring);                                            //send that string to to the PC's serial monitor
-        sensorstring = "";                                                       //clear the string:
-        sensor_stringcomplete = false;                                           //reset the flag used to tell if we have received a completed string from the Atlas Scientific product
-    }
-}
-
-
-
-
-
-
-
-
-
-// End atlas scientifc code
-
-
-// NEW STUFF:
+////////////////////////////////////////////
+// FUNCTIONS FOR LOGGER START-UP SEQUENCE //
+////////////////////////////////////////////
 
 void Logger::name(){
   // Self-identify before talking
@@ -1380,7 +1560,6 @@ void Logger::name(){
   Serial.print(logger_name);
   Serial.print(F(">: "));
 }
-
 
 void Logger::print_time(){
   boolean exit_flag = 1;
@@ -1415,6 +1594,7 @@ void Logger::set_time_main(){
     }
   }
 }
+
 void Logger::announce_start(){
   Serial.println();
   name();
@@ -1511,7 +1691,11 @@ void Logger::startup_sequence(){
   }
 }
 
-// CLOCK SETTING -- NEED TO REWRITE LIBRARY FOR DS3234
+
+////////////////////////////////////////////////
+// CLOCK SETTING -- NOW WORKS WITH DS3234 RTC //
+////////////////////////////////////////////////
+
 void Logger::clockSet(){
 
   byte Year;
@@ -1608,6 +1792,11 @@ void Logger::GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW,
 	Second = Temp1*10 + Temp2;
 }
 
+
+///////////////////////////////////////////
+// SD SPI NON-CONFLICT UTILITY FUNCTIONS //
+///////////////////////////////////////////
+
 // SPI mode library for SD card -- don't want to edit SdFatLib, too much active
 // work by Bill Greiman and a huge pile of code. So will do SPI switches here
 // with these functions
@@ -1622,5 +1811,4 @@ void Logger::SDend()
 {
   digitalWrite(CSpinSD, HIGH); // CSpinSD is already set to output at the beginning, and this shoudl not change
 }
-
 
