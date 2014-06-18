@@ -97,7 +97,7 @@ class Logger {
     void vdivR(int pin, float Rref);
     void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, float intercept);
-    void AtlasScientific(char* command, int SerialNumber=0, int baudRate=38400, bool getReturn=true, bool saveReturn=true);
+    void AtlasScientific(char* command, int SerialNumber=0, int baudRate=38400, bool printReturn=true, bool saveReturn=true);
     void displacementMeasuredByResistance_piecewiseLinear(int analogPin, int Rref, float* x, float* R);
     
     // Sensors - special
@@ -109,6 +109,15 @@ class Logger {
     // because this is free for a rain gage on the ALog BottleLogger
     void TippingBucketRainGage();
 
+    // Hardware Serial that allows functions to flexibly define which port
+    // is desired (for LogMega)
+    void StartHardwareSerial(int SerialNumber, int baud);
+    void PrintHardwareSerial(int SerialNumber, char* input);
+    void PrintlnHardwareSerial(int SerialNumber, char* input);
+    char ReadHardwareSerial(int SerialNumber);
+    int AvailableHardwareSerial(int SerialNumber);
+    void EndHardwareSerial(int SerialNumber, int baud=-1); // baud to check if = 57600, so to keep port open for comms with computer'
+    
   private:
     void pinUnavailable(int pin);
     char *nameFile(char * _sitecode);
@@ -157,16 +166,6 @@ class Logger {
     void SDstart();
     void SDend();
     
-    // Hardware Serial that allows functions to flexibly define which port
-    // is desired (for LogMega)
-    void StartHardwareSerial(int SerialNumber, int baud);
-    void PrintHardwareSerial(int SerialNumber, char* input);
-    void PrintlnHardwareSerial(int SerialNumber, char* input);
-    char ReadHardwareSerial(int SerialNumber);
-    int AvailableHardwareSerial(int SerialNumber);
-    void EndHardwareSerial(int SerialNumber, int baud=-1); // baud to check if = 57600, so to keep port open for comms with computer'
-    
-
 };
 
 #endif
