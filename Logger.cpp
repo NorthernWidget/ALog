@@ -1558,7 +1558,7 @@ X Factory reset (pg.29) N/A
 */
 
 
-void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool getReturn, bool saveReturn){
+void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool printReturn, bool saveReturn){
   // * "command" is the command sent to the Atlas Scientific product.
   //   see the data sheet as well as the above quick lists
   // SerialNumber and baudRate default to 0 and 38400, respectively.
@@ -1581,7 +1581,7 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
   // (or ASCII 13, however Arduino does it) explicitly
   PrintlnHardwareSerial(SerialNumber, command); // send the command to the Atlas Scientific product
 
-  if (getReturn){
+  if (printReturn || saveReturn){
     int i = 0;
     // UNTESTED AND OFF THE TOP OF MY HEAD (ADW), COMIBNING 2 METHODS!!!!!
     // Read from port until no more data are coming in
@@ -1608,9 +1608,13 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
       datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
       datafile.print(",");
       SDend();
+    }
       // Echo to serial
+    if (saveReturn || printReturn){
       Serial.print(sensorString);
-      Serial.print(F(","));
+      if (saveReturn){
+        Serial.print(F(","));
+      }
     }
   }
   else{
