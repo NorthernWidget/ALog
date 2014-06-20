@@ -80,8 +80,8 @@ class Logger {
     void setupLogger();
     
     // Code for sleeping, starting up from sleep, synching SD card
-    void sleep();
     void sleep(int minutes); // soon to be deprecated: requires log_minutes to be declared twice, caused ADW some confusion
+    void sleep();
     void startLogging();
     void endLogging();
     void startAnalog();
@@ -94,9 +94,6 @@ class Logger {
     void maxbotixHRXL_WR_analog(int nping=10,int sonicPin=A0,int EX=99,bool writeAll=true); // Print order: Distance [cm], standard deviation [cm]
     //float maxbotix_HardwareSerial(int SerialNumber, int ExPin, int SerialEnablePin, int npings, bool writeAll, int maxRange, bool RS232); // Print order: Distance [cm], standard deviation [cm]
     void Decagon5TE(int excitPin, int SerialNumber); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
-    void Decagon5TE_softser(int excitPin, int SerPin); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
-    void Decagon5TE_softser_old(int excitPin, int dataPin);
-    void Decagon5TE_CZO(int excitPin);
     void DecagonMPS2(int excitPin, int SerialNumber); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
     void vdivR(int pin, float Rref);
     void flex(int flexPin, float Rref, float calib1, float calib2);
