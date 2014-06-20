@@ -582,6 +582,13 @@ float Logger::_vdivR(int pin,float Rref){
 // PUBLIC UTILITY FUNCTIONS TO IMPLEMENT LOGGER IN SKETCH //
 ////////////////////////////////////////////////////////////
 
+void Logger::sleep(){
+  // Maintain backwards compatibility with code that requires "log_minutes"
+  // to be defined separately from initialize step. (A bad idea, right? Will
+  // remove this compatibility once it seems to no longer be a problem.)
+  sleep(log_minutes);
+}
+
 void Logger::sleep(int log_minutes){
   // Go to sleep
   backtosleep:
