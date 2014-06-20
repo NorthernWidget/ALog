@@ -155,7 +155,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   // SERIAL //
   ////////////
 
-  Serial.begin(14400);
+  Serial.begin(57600);
 
   //////////////////
   // Logger setup //
@@ -446,7 +446,7 @@ void Logger::setupLogger(){
       // Copied from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1243973204
       //power_all_enable();
       /*
-      Serial.begin(14400);
+      Serial.begin(57600);
       Serial.flush();
       while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
        UCSR0A |= 1 << TXC0;  // mark transmission not complete
@@ -995,7 +995,7 @@ int Logger::maxbotix_Serial_parse(int Ex, int Rx, bool RS232){
   // Excites the MaxBotix sensor and receives its ranging output
   char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
   SoftwareSerial mySerial(Rx, -1, RS232); // RX, TX, inverse logic - RS232 true, TTL false; defaults to TTL (false)
-  mySerial.begin(9600);
+  mySerial.begin(57600);
   //Excite the sensor to produce a pulse
   pinMode(Ex, OUTPUT);
   digitalWrite(Ex, HIGH);
@@ -1474,7 +1474,23 @@ X Factory reset (pg.29) N/A
 */
 
 
-void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool printReturn, bool saveReturn){
+void Logger::AtlasLEDtest(){
+  Serial2.begin(38400);
+  Serial2.write(13); // Clear buffer -- carriage return
+  Serial2.print("L,1");
+  Serial2.write(13);
+  Serial2.end();
+}
+
+void Logger::Atlas_test(char* command){
+  Serial2.begin(38400);
+  Serial2.write(13); // Clear buffer -- carriage return
+  Serial2.print(command);
+  Serial2.write(13);
+  Serial2.end();
+}
+
+void Logger::AtlasScientific(char* command, int SerialNumber, uint32_t baudRate, bool printReturn, bool saveReturn){
   // * "command" is the command sent to the Atlas Scientific product.
   //   see the data sheet as well as the above quick lists
   // SerialNumber and baudRate default to 0 and 38400, respectively.
@@ -1484,9 +1500,8 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
   // you would just like to clear the buffer.
   //
 
-  StartHardwareSerial(SerialNumber, baudRate);
-  Serial3.println("L,0\r");
-  PrintHardwareSerial(SerialNumber, "L,0\r"); // send the command to the Atlas Scientific product
+  Serial2.begin(baudRate);
+  //Serial2.println("L,0\r");
   
   char sensorString[30]; // a char array to hold the data from the Atlas Scientific product
                          // Atlas' example indicates that they expect all returns to be <= 30 bytes
@@ -1503,8 +1518,9 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
   Serial.println(SerialNumber);
   Serial.print("Command to be sent: ");
   Serial.println(command);
-  PrintHardwareSerial(SerialNumber, command); // send the command to the Atlas Scientific product
-  PrintHardwareSerial(SerialNumber, "\r"); // carriage return to signal the end of the command
+  Serial2.write(13); // Clear buffer -- carriage return
+  Serial2.print(command); // send the command to the Atlas Scientific product
+  Serial2.write(13); // carriage return to signal the end of the command
 
   delay(100);
 
@@ -1519,8 +1535,8 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
     // in case nothing is coming in and I have that condition?
     // while() is redundant here, because '\r' should be end of transmission...
     // ... thinking though about how to recover from a garbled transmission
-    while (AvailableHardwareSerial(SerialNumber)){
-      inChar = ReadHardwareSerial(SerialNumber);
+    while (Serial2.available()){
+      inChar = Serial2.read();
       if (inChar != '\r'){
         sensorString[i] = inChar;
         Serial.print(inChar);
@@ -1549,13 +1565,13 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
   }
   else{
     // Get rid of the incoming Serial stream
-    //while (AvailableHardwareSerial(SerialNumber)){
-    //  inChar = ReadHardwareSerial(SerialNumber); // do I need to assign it to a var?
-    //}
+    while (Serial2.available()){
+      Serial2.read();
+    }
   }
   Serial.println("Step 2");
 
-  EndHardwareSerial(SerialNumber, baudRate);
+  Serial2.end();
 
   Serial.println("Step 3");
 }
@@ -1571,14 +1587,14 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
 // baud, but I will have to learn more about how memory is handled with classes
 // and how to "destruct" them
 
-void Logger::StartHardwareSerial(int SerialNumber, int baud){
+void Logger::StartHardwareSerial(int SerialNumber, uint32_t baud){
   // Starts a hardware serial port, especially for the LogMega where there
   // is more than one such port
   if (SerialNumber == 0){
-    // Special case: used at 14400 for comms with computer.
-    // If you want 14400 bps, don't do anything to the Serial!
+    // Special case: used at 57600 for comms with computer.
+    // If you want 57600 bps, don't do anything to the Serial!
     // Otherwise end, and then begin at new baud rate.
-    if (baud != 14400){
+    if (baud != 57600){
       Serial.end();
       Serial.begin(baud);
     }
@@ -1675,19 +1691,19 @@ int Logger::AvailableHardwareSerial(int SerialNumber){
   return nbytes_to_read;
 }
 
-void Logger::EndHardwareSerial(int SerialNumber, int baud){
+void Logger::EndHardwareSerial(int SerialNumber, uint32_t baud){
   // Closes a hardware serial port, especially for the LogMega where there
   // is more than one such port
-  // Here, "baud" is an optional parameter that is important iff baud = 14400
+  // Here, "baud" is an optional parameter that is important iff baud = 57600
   // bps, in which case there is no reasno to stop and then re-instantiate the
   // serial connection (because computer serial will be the same as sensor 
   // serial)
   if (SerialNumber == 0){
-    // Special case: used at 14400 for comms with computer.
-    // So end, and then begin at 14400 for use outside comms with this sensor.
-    if (baud != 14400){
+    // Special case: used at 57600 for comms with computer.
+    // So end, and then begin at 57600 for use outside comms with this sensor.
+    if (baud != 57600){
       Serial.end();
-      Serial.begin(14400);
+      Serial.begin(57600);
     }
   }
   else if (SerialNumber == 1){

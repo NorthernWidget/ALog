@@ -98,7 +98,9 @@ class Logger {
     void vdivR(int pin, float Rref);
     void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, float intercept);
-    void AtlasScientific(char* command, int SerialNumber=0, int baudRate=38400, bool printReturn=true, bool saveReturn=true);
+    void AtlasScientific(char* command, int SerialNumber=2, int baudRate=38400, bool printReturn=true, bool saveReturn=true);
+    void AtlasLEDtest();
+    void Atlas_test(char* command);
     void displacementMeasuredByResistance_piecewiseLinear(int analogPin, int Rref, float* x, float* R);
     
     // Sensors - special
