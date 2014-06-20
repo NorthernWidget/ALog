@@ -155,7 +155,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   // SERIAL //
   ////////////
 
-  Serial.begin(57600);
+  Serial.begin(14400);
 
   //////////////////
   // Logger setup //
@@ -298,6 +298,8 @@ void Logger::setupLogger(){
 
   name();
   Serial.println(F("Logger initialization complete! Ciao bellos."));
+  
+  delay(50); // time to finish printing
 
 }
 
@@ -444,7 +446,7 @@ void Logger::setupLogger(){
       // Copied from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1243973204
       //power_all_enable();
       /*
-      Serial.begin(57600);
+      Serial.begin(14400);
       Serial.flush();
       while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
        UCSR0A |= 1 << TXC0;  // mark transmission not complete
@@ -680,7 +682,7 @@ void Logger::endLogging(){
 void Logger::startAnalog(){
   // Turn on power to analog sensors
   digitalWrite(SensorPin3V3,HIGH);
-  delay(2);
+  delay(2); // Delay to ensure power reaches sensor
 }
 
 void Logger::endAnalog(){
@@ -748,14 +750,16 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   // Get range measurements
   // Get rid of any trash; Serial.flush() unnecessary; main thing that is important is
   // getting the 2 pings of junk out of the way
-  Serial.flush();
-  for (int i=1; i<=2; i++){
+  //Serial.flush();
+  // Just give it 5!
+  for (int i=1; i<=5; i++){
     if(EX != 99){
       digitalWrite(EX,HIGH);
         delay(1);
       digitalWrite(EX,LOW);
       }
     delay(100);
+    range = analogRead(sonicPin);
     }
   for(int i=1;i<=nping;i++){
     if(EX != 99){
@@ -1115,12 +1119,13 @@ void Logger::end_logging_to_otherfile(){
 //reads a 5tm soil moisture probe and prints results to Serial
 // Modified from Steve Hicks' code for an LCD reader by Andy Wickert
 
-/*
-void Logger::decagon5TE(int excitPin, int dataPin){
+
+void Logger::Decagon5TE_softser_old(int excitPin, int dataPin){
 
   // Seems I should have had a -1 in the below setting instead! (ADW, 16 June 2014)
-  NewSoftSerial mySerial(excitPin, dataPin);  //5tm's red wire (serial data out) connected to pin 5, pin 6 goes nowhere
+  SoftwareSerial mySerial(excitPin, dataPin);  //5tm's red wire (serial data out) connected to pin 5, pin 6 goes nowhere
   int Epsilon_Raw, Sigma_Raw, T_Raw;   //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
+  float Epsilon_a, EC, T; // Output variables
   char dataStream[14];   // Max 14 characters: 4x3 + 2 spaces
   int startflag=1;
   int endflag=0;
@@ -1130,10 +1135,11 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 
   if(startflag){
     // What had I been thinking? Isn't set as OUTPUT. Could be problem! (ADW, 16 June 2014)
+    pinMode(excitPin, OUTPUT);
     digitalWrite(excitPin,HIGH);
     startMillis = millis();
     startflag=0;
-    Serial.println(startMillis);
+    //Serial.println(startMillis);
   }
 
   // OK if it takes longer, so long as data stream is continuous
@@ -1141,8 +1147,8 @@ void Logger::decagon5TE(int excitPin, int dataPin){
   // receiving before 200 ms is up
   while (elapsed < 200){
     elapsed = millis() - startMillis;
-    Serial.print(F("ms elapsed = "));
-    Serial.println(elapsed);
+    //Serial.print(F("ms elapsed = "));
+    //Serial.println(elapsed);
     //  code keeps looping until incoming serial data appears on the mySerial pin
     while (mySerial.available()) {
       //Serial.println("Getting data:");
@@ -1160,10 +1166,11 @@ void Logger::decagon5TE(int excitPin, int dataPin){
     }
   }
     
+  digitalWrite(excitPin,LOW);
+  Serial.println(dataStream);
+
   if(endflag==1){
 
-    digitalWrite(excitPin,LOW);
-    Serial.println(dataStream);
     endflag=0;
 
     // parse the array into 3 integers  (for the 5TM, y is always 0)
@@ -1208,10 +1215,10 @@ void Logger::decagon5TE(int excitPin, int dataPin){
       float T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
     }
     
-*/    ///////////////
+    ///////////////
     // SAVE DATA //
     ///////////////
-/*
+
     datafile.print(Epsilon_a);
     datafile.print(",");
     datafile.print(EC);
@@ -1225,9 +1232,8 @@ void Logger::decagon5TE(int excitPin, int dataPin){
     Serial.print(F(","));
     Serial.print(T);
     Serial.print(F(","));
-*/
-//  }
-//}
+  }
+}
 
 
 //reads a 5TE soil moisture probe and prints results to Serial
@@ -1240,7 +1246,7 @@ void Logger::Decagon5TE(int exPin, int SerialNumber){
   // This could be different for SDI-12, talking with Kevin Smith about that
   // and Software Serial
 
-  StartHardwareSerial(SerialNumber, 1200);
+  Serial2.begin(1200);
   int Epsilon_Raw, Sigma_Raw, T_Raw; //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
   float Epsilon_a, EC, T; // Output variables
   char sensorString[14]; // Max 14 characters: 4x3 + 2 spaces
@@ -1249,12 +1255,12 @@ void Logger::Decagon5TE(int exPin, int SerialNumber){
 
   pinMode(exPin, OUTPUT);
   digitalWrite(exPin, HIGH);
-  delay(175); // Decagon says 150 ms measurement time, and I have some note
+  delay(475); // Decagon says 150 ms measurement time, and I have some note
               // about reading before 200 ms are up, so being safe here
               // and splitting the difference.
 
-  while (AvailableHardwareSerial(SerialNumber)){
-    inChar = ReadHardwareSerial(SerialNumber);
+  while (Serial2.available()){
+    inChar = Serial2.read();
     if (inChar != '\r'){
       sensorString[i] = inChar;
       // Had this before, but it basically just needs to avoid the end-of-line carriage return
@@ -1268,7 +1274,12 @@ void Logger::Decagon5TE(int exPin, int SerialNumber){
   pinMode(exPin, INPUT);
   digitalWrite(exPin, LOW);
 
-  EndHardwareSerial(SerialNumber, 1200);
+  // Buffer clear
+  while( Serial3.available() ){
+    Serial3.read();
+  }
+  
+  Serial2.end();
 
   // parse the array into 3 integers  (for the 5TM, y is always 0)
   sscanf (sensorString, "%d %d %d", &Epsilon_Raw, &Sigma_Raw, &T_Raw);     
@@ -1331,15 +1342,260 @@ void Logger::Decagon5TE(int exPin, int SerialNumber){
   Serial.print(F(","));
 }
 
+
+void Logger::Decagon5TE_softser(int exPin, int SerPin){
+  // SerialNumber specifies the hardware serial port number
+  // We use only the RX pin, since no info is being transmitted.
+  // This could be different for SDI-12, talking with Kevin Smith about that
+  // and Software Serial
+
+  SoftwareSerial mySerial(SerPin, -1); // RX, TX, inverse logic - RS232 true, TTL false; defaults to TTL (false)
+  mySerial.begin(1200);
+  int Epsilon_Raw, Sigma_Raw, T_Raw; //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
+  float Epsilon_a, EC, T; // Output variables
+  char sensorString[14]; // Max 14 characters: 4x3 + 2 spaces
+  char inChar; // to hold temporary serial input
+  int i=0;
+
+  pinMode(exPin, OUTPUT);
+  digitalWrite(exPin, HIGH);
+  delay(175); // Decagon says 150 ms measurement time, and I have some note
+              // about reading before 200 ms are up, so being safe here
+              // and splitting the difference.
+
+  while (mySerial.available()){
+    inChar = mySerial.read();
+    Serial.print(inChar);
+    if (inChar != '\r'){
+      sensorString[i] = inChar;
+      // Had this before, but it basically just needs to avoid the end-of-line carriage return
+      // if((c>='0' and c<='9') || c==' '){
+      i++;
+    }
+  }
+
+  // exPin also powers the sensor: so turning LOW here, after communications
+  // are over.
+  pinMode(exPin, INPUT);
+  digitalWrite(exPin, LOW);
+
+  mySerial.end();
+
+  // parse the array into 3 integers  (for the 5TM, y is always 0)
+  sscanf (sensorString, "%d %d %d", &Epsilon_Raw, &Sigma_Raw, &T_Raw);     
+
+  // Change measured values into real values, via equations in Decagon 5TE
+  // manual
+
+  // Dielectric permittivity [-unitless-]
+  if (Epsilon_Raw == 4095){
+    // Error alert!
+    Epsilon_a = -9999.99;
+  }
+  else {
+    Epsilon_a = Epsilon_Raw/50.;
+  }
+  // Electrical Conductivity [dS/m]
+  if (Sigma_Raw == 1023){
+    // Error alert!
+    EC = -9999.99;
+  }
+  else if (Sigma_Raw <= 700){
+    EC = Sigma_Raw/100.;
+  }
+  else {
+    // (i.e. Sigma_Raw > 700, but no elif needed so long as input string
+    // parses correctly... hmm, should maybe protect against that)
+    EC = (700. + 5.*(Sigma_Raw- 700.))/100.;
+  }
+  // Temperature [degrees C]
+  // Combined both steps of the operation as given in the manual
+  if (T_Raw == 1023){
+    // Error alert!
+    T = -9999.99;
+  }
+  else if (T_Raw <= 900){
+    T = (T_Raw - 400.) / 10.;
+  }
+  else {
+    // (i.e. T_Raw > 900, but no elif needed so long as input string
+    // parses correctly... hmm, should maybe protect against that)
+    T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
+  }
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  datafile.print(Epsilon_a);
+  datafile.print(",");
+  datafile.print(EC);
+  datafile.print(",");
+  datafile.print(T);
+  datafile.print(",");
+  // Echo to serial
+  Serial.print(Epsilon_a);
+  Serial.print(F(","));
+  Serial.print(EC);
+  Serial.print(F(","));
+  Serial.print(T);
+  Serial.print(F(","));
+}
+
+void Logger::Decagon5TE_CZO(int excitPin){
+  
+  Serial3.begin(1200);
+
+  int Epsilon_Raw, Sigma_Raw, T_Raw;   //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
+  char dataStream[18] = "                 ";    // Max 15 characters: 4 chars x 3 values + 2 spaces
+                                                // + 1 carriage return at end
+                                                // Give extra space and make it start out as spaces to disallow gibberish!
+  int startflag=1;
+  int endflag=0;
+  int i=0;
+  unsigned int startMillis; // same comment as right below
+  unsigned int elapsed = 0; // shouldn't overflow on the time scales I'm using
+  float EC;
+  float T;
+  float Epsilon_a;
+  
+  pinMode(excitPin,OUTPUT);
+
+  if(startflag){
+    digitalWrite(excitPin,HIGH);
+    startMillis = millis();
+    startflag=0;
+  }
+
+  // OK if it takes longer, so long as data stream is continuous
+  // so we don't break out of inner while loop, and we start 
+  // receiving before 200 ms is up
+  while (elapsed < 600){
+    elapsed = millis() - startMillis;
+    //  code keeps looping until incoming serial data appears on the mySerial pin
+    while (Serial3.available()) {
+      //Serial.println("Getting data:");
+        delay(1);  
+      if (Serial3.available() >0) {
+    		endflag=1;
+        char c = Serial3.read();  //gets one byte from serial buffer
+        int cASCII = int(c); // int type to read value and look for
+                             // "endline" carriage return
+//        Serial.print(cASCII);
+//        Serial.print(" ");
+        if (cASCII == 13){
+          // If you have received a carriage return character,
+          // transmission is over
+          goto outofloop;
+        }
+        else if ((c>='0' and c<='9') || c==' ') {
+         dataStream[i] = c; //makes the string readString 
+         i++;
+        }
+      }
+    }
+  }
+  outofloop:
+
+  digitalWrite(excitPin,LOW);
+
+  if(endflag==1){
+    endflag=0;
+    Serial.println();
+    Serial.println();
+    Serial.println(dataStream);
+    Serial.println();
+
+    // parse the array into 3 integers  (for the 5TM, y is always 0)
+    sscanf (dataStream, "%d %d %d", &Epsilon_Raw, &Sigma_Raw, &T_Raw);
+
+    // Change measured values into real values, via equations in Decagon 5TE
+    // manual
+
+    // Dielectric permittivity [-unitless-]
+    if (Epsilon_Raw == 4095){
+      // Error alert!
+      Epsilon_a = -9999;
+    }
+    else {
+      Epsilon_a = Epsilon_Raw/50.;
+    }
+    // Electrical Conductivity [dS/m]
+    if (Sigma_Raw == 1023){
+      // Error alert!
+      EC = -9999;
+    }
+    else if (Sigma_Raw <= 700){
+      EC = Sigma_Raw/100.;
+    }
+    else {
+      // (i.e. Sigma_Raw > 700, but no elif needed so long as input string
+      // parses correctly... hmm, should maybe protect against that)
+      EC = (700. + 5.*(Sigma_Raw- 700.))/100.;
+    }
+    // Temperature [degrees C]
+    // Combined both steps of the operation as given in the manual
+    if (T_Raw == 1023){
+      // Error alert!
+      T = -9999;
+    }
+    else if (T_Raw <= 900){
+      T = (T_Raw - 400.) / 10.;
+    }
+    else {
+      // (i.e. T_Raw > 900, but no elif needed so long as input string
+      // parses correctly... hmm, should maybe protect against that)
+      T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
+    }
+
+    // Software fix for temperature sometimes having an additional random 
+    // character appended to the end
+    while (T_Raw > 1023){
+      T_Raw /= 10; // Floor divide by 10 to get rid of trailing digit
+    }
+    
+    ///////////////
+    // SAVE DATA //
+    ///////////////
+
+    datafile.print(Epsilon_a);
+    datafile.print(",");
+    datafile.print(EC);
+    datafile.print(",");
+    datafile.print(T);
+    datafile.print(",");
+    // Echo to serial
+    Serial.print(Epsilon_a);
+    Serial.print(",");
+    Serial.print(EC);
+    Serial.print(",");
+    Serial.print(T);
+    Serial.print(",");
+
+    // Flush Serial line and end
+    //Serial1.flush();
+    while(Serial1.available()){
+      Serial1.read();
+    }
+    // Set the RX pin to LOW to remove earlier noise
+    pinMode(10,INPUT);
+    digitalWrite(10,LOW);
+    delay(2000); // Need to wait this long for buffer to semi-reliably flush (or whatever is going on to stop messing up the serial signal)
+    digitalWrite(10,HIGH);
+    Serial3.end();
+    
+  }
+}
+
 void Logger::DecagonMPS2(int exPin, int SerialNumber){
   // SerialNumber specifies the hardware serial port number
   // We use only the RX pin, since no info is being transmitted.
   // This could be different for SDI-12, talking with Kevin Smith about that
   // and Software Serial
 
-  StartHardwareSerial(SerialNumber, 1200);
+  Serial3.begin(1200);
 
-  char sensorString[20];   // Guessing at length; Decagon manual unhelpful
+  String sensorString;   // Guessing at length; Decagon manual unhelpful
   char inChar; // to hold temporary serial input
   int i=0;
   unsigned int startMillis; // same comment as right below
@@ -1347,20 +1603,24 @@ void Logger::DecagonMPS2(int exPin, int SerialNumber){
 
   pinMode(exPin, OUTPUT);
   digitalWrite(exPin, HIGH);
-  delay(40); // Decagon says Serial stream should be completed by the time that
+  delay(300); // Decagon says Serial stream should be completed by the time that
              // about 40 ms have elapsed.... so being safe here with the
              // definition of "about", and deciding that it has at least
              // started by this time!
+             // Had to bump it WAY up to finish comms!
 
-  while (AvailableHardwareSerial(SerialNumber)){
-    inChar = ReadHardwareSerial(SerialNumber);
+  while (Serial3.available()){
+    inChar = Serial3.read();
+    //Serial.print(inChar);
     // end of transmission on carriage return
-    if (inChar != '\r'){
+    //if (inChar != '\r'){ // Actually, got to ignore gibberish at end of line, 
+    // so need more stringent requirements!
+    if ((inChar >= '0' and inChar <= '9') || inChar == ' ' || inChar == '.') {
       if (inChar == ' '){
-        sensorString[i-1] = ','; // make it directly printable: no need to parse
+        sensorString += ','; // make it directly printable: no need to parse
       }
       else {
-       sensorString[i] = inChar; //makes the string readString 
+       sensorString += inChar; //makes the string readString 
       }
       i++;
     }
@@ -1369,24 +1629,31 @@ void Logger::DecagonMPS2(int exPin, int SerialNumber){
   pinMode(exPin, INPUT);
   digitalWrite(exPin, LOW);
 
-  EndHardwareSerial(SerialNumber, 1200);
+  // Buffer clear
+  while( Serial3.available() ){
+    Serial3.read();
+  }
 
-  sensorString[i] = ','; // Comma at end as well - direct printing of data
+  Serial3.end();
 
+  sensorString += ','; // Comma at end as well - direct printing of data
+
+  /*
   // Copy array to remove spaces
   char sensorOutput[i+1];
   for (int j=0; j<=i; j++){
     sensorOutput[j] = sensorString[j];
   }
+  */
   
   ///////////////
   // SAVE DATA //
   ///////////////
 
   // Unique in that I already have the comma as part of the string!
-  datafile.print(sensorOutput);
+  datafile.print(sensorString);
   // Echo to serial
-  Serial.print(sensorOutput);
+  Serial.print(sensorString);
 
 }
 
@@ -1441,6 +1708,9 @@ void Logger::displacementMeasuredByResistance_piecewiseLinear(int analogPin, int
   int i = 0;
   int i_above;
   int i_below;
+  
+  Serial.println(R_below);
+  Serial.println(R_above);
   
   if (R[0] < R_sensor){
     while(R[i] < R_sensor){
@@ -1569,17 +1839,30 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
   //
 
   StartHardwareSerial(SerialNumber, baudRate);
+  Serial3.println("L,0\r");
+  PrintHardwareSerial(SerialNumber, "L,0\r"); // send the command to the Atlas Scientific product
   
   char sensorString[30]; // a char array to hold the data from the Atlas Scientific product
                          // Atlas' example indicates that they expect all returns to be <= 30 bytes
   char inChar; // incoming characters on the serial port
+
+  Serial.println("Step 0");
 
   // "println" prints <values>\r\n. Atlas uses println to send data in its 
   // Arduino sample code, so I presume the "\r" is taken as the cutoff (its 
   // sensors terminate with a carriage return) and the "\n" is discarded.
   // Still, I wonder if it would be better to "Serial.print(...\n);"
   // (or ASCII 13, however Arduino does it) explicitly
-  PrintlnHardwareSerial(SerialNumber, command); // send the command to the Atlas Scientific product
+  Serial.print("Serial port connection: ");
+  Serial.println(SerialNumber);
+  Serial.print("Command to be sent: ");
+  Serial.println(command);
+  PrintHardwareSerial(SerialNumber, command); // send the command to the Atlas Scientific product
+  PrintHardwareSerial(SerialNumber, "\r"); // carriage return to signal the end of the command
+
+  delay(100);
+
+  Serial.println("Step 1");
 
   if (printReturn || saveReturn){
     int i = 0;
@@ -1594,6 +1877,7 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
       inChar = ReadHardwareSerial(SerialNumber);
       if (inChar != '\r'){
         sensorString[i] = inChar;
+        Serial.print(inChar);
         i++;
       }
       else{
@@ -1619,13 +1903,15 @@ void Logger::AtlasScientific(char* command, int SerialNumber, int baudRate, bool
   }
   else{
     // Get rid of the incoming Serial stream
-    while (AvailableHardwareSerial(SerialNumber)){
-      inChar = ReadHardwareSerial(SerialNumber); // do I need to assign it to a var?
-    }
+    //while (AvailableHardwareSerial(SerialNumber)){
+    //  inChar = ReadHardwareSerial(SerialNumber); // do I need to assign it to a var?
+    //}
   }
+  Serial.println("Step 2");
 
   EndHardwareSerial(SerialNumber, baudRate);
 
+  Serial.println("Step 3");
 }
 
 
@@ -1643,10 +1929,10 @@ void Logger::StartHardwareSerial(int SerialNumber, int baud){
   // Starts a hardware serial port, especially for the LogMega where there
   // is more than one such port
   if (SerialNumber == 0){
-    // Special case: used at 57600 for comms with computer.
-    // If you want 57600 bps, don't do anything to the Serial!
+    // Special case: used at 14400 for comms with computer.
+    // If you want 14400 bps, don't do anything to the Serial!
     // Otherwise end, and then begin at new baud rate.
-    if (baud != 57600){
+    if (baud != 14400){
       Serial.end();
       Serial.begin(baud);
     }
@@ -1658,7 +1944,10 @@ void Logger::StartHardwareSerial(int SerialNumber, int baud){
     Serial2.begin(baud);
   }
   else if (SerialNumber == 3){
+    Serial.println("OFF!");
     Serial3.begin(baud);
+    Serial3.print("L,0\r");
+    Serial3.end();
   }
 }
 
@@ -1678,6 +1967,8 @@ void Logger::PrintHardwareSerial(int SerialNumber, char* input){
     Serial2.print(input);
   }
   else if (SerialNumber == 3){
+    Serial.print("PrintHardwareSerial sees ");
+    Serial.print(input);
     Serial3.print(input);
   }
 }
@@ -1741,16 +2032,16 @@ int Logger::AvailableHardwareSerial(int SerialNumber){
 void Logger::EndHardwareSerial(int SerialNumber, int baud){
   // Closes a hardware serial port, especially for the LogMega where there
   // is more than one such port
-  // Here, "baud" is an optional parameter that is important iff baud = 57600
+  // Here, "baud" is an optional parameter that is important iff baud = 14400
   // bps, in which case there is no reasno to stop and then re-instantiate the
   // serial connection (because computer serial will be the same as sensor 
   // serial)
   if (SerialNumber == 0){
-    // Special case: used at 57600 for comms with computer.
-    // So end, and then begin at 57600 for use outside comms with this sensor.
-    if (baud != 57600){
+    // Special case: used at 14400 for comms with computer.
+    // So end, and then begin at 14400 for use outside comms with this sensor.
+    if (baud != 14400){
       Serial.end();
-      Serial.begin(57600);
+      Serial.begin(14400);
     }
   }
   else if (SerialNumber == 1){
