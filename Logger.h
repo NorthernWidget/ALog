@@ -80,7 +80,8 @@ class Logger {
     void setupLogger();
     
     // Code for sleeping, starting up from sleep, synching SD card
-    void sleep(int minutes);
+    void sleep();
+    void sleep(int minutes); // soon to be deprecated: requires log_minutes to be declared twice, caused ADW some confusion
     void startLogging();
     void endLogging();
     void startAnalog();
