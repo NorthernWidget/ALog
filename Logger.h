@@ -114,12 +114,12 @@ class Logger {
 
     // Hardware Serial that allows functions to flexibly define which port
     // is desired (for LogMega)
-    void StartHardwareSerial(int SerialNumber, int baud);
+    void StartHardwareSerial(int SerialNumber, uint32_t baud);
     void PrintHardwareSerial(int SerialNumber, char* input);
     void PrintlnHardwareSerial(int SerialNumber, char* input);
     char ReadHardwareSerial(int SerialNumber);
     int AvailableHardwareSerial(int SerialNumber);
-    void EndHardwareSerial(int SerialNumber, int baud=-1); // baud to check if = 57600, so to keep port open for comms with computer'
+    void EndHardwareSerial(int SerialNumber, uint32_t baud=-1); // baud to check if = 57600, so to keep port open for comms with computer'
     
   private:
     void pinUnavailable(int pin);
