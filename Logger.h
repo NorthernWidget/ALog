@@ -83,12 +83,12 @@ class Logger {
     void sleep(int minutes); // soon to be deprecated: requires log_minutes to be declared twice, caused ADW some confusion
     void sleep();
     void startLogging();
-    void endLogging();
+    void endLogging(bool getInternalVoltage=true);
     void startAnalog();
     void endAnalog();
     
     // Sensors - standard procedure (wake up, log, sleep)
-    void thermistorB(float R0,float B,float Rref,float T0degC,int thermPin);
+    float thermistorB(float R0,float B,float Rref,float T0degC,int thermPin);
     void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,bool writeAll); // Print order: Distance [cm], standard deviation [cm]
     float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, int maxRange, bool RS232=false);
     void maxbotixHRXL_WR_analog(int nping=10,int sonicPin=A0,int EX=99,bool writeAll=true); // Print order: Distance [cm], standard deviation [cm]
