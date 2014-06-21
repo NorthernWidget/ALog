@@ -1500,80 +1500,79 @@ void Logger::AtlasScientific(char* command, int SerialNumber, uint32_t baudRate,
   // you would just like to clear the buffer.
   //
 
-  Serial2.begin(baudRate);
+  Serial3.begin(baudRate);
   //Serial2.println("L,0\r");
   
-  char sensorString[30]; // a char array to hold the data from the Atlas Scientific product
-                         // Atlas' example indicates that they expect all returns to be <= 30 bytes
-  char inChar; // incoming characters on the serial port
+  /*
+  uint32_t start_millis_clear_buffer = millis();
+  Serial2.write(13); // Clear buffer -- carriage return
+  while ( (millis() - start_millis_clear_buffer < 500) || Serial2.available() ){
+    Serial2.read();
+  }
+  */
 
-  Serial.println("Step 0");
+  String sensorString = ""; // a char array to hold the data from the Atlas Scientific product
+                         // Atlas' example indicates that they expect all returns to be <= 30 bytes
+  sensorString.reserve(30); // Sets aside memory for the Sring
+  char inChar; // incoming characters on the serial port
 
   // "println" prints <values>\r\n. Atlas uses println to send data in its 
   // Arduino sample code, so I presume the "\r" is taken as the cutoff (its 
   // sensors terminate with a carriage return) and the "\n" is discarded.
   // Still, I wonder if it would be better to "Serial.print(...\n);"
   // (or ASCII 13, however Arduino does it) explicitly
-  Serial.print("Serial port connection: ");
-  Serial.println(SerialNumber);
-  Serial.print("Command to be sent: ");
-  Serial.println(command);
-  Serial2.write(13); // Clear buffer -- carriage return
-  Serial2.print(command); // send the command to the Atlas Scientific product
-  Serial2.write(13); // carriage return to signal the end of the command
-
+  Serial3.print(command); // send the command to the Atlas Scientific product
+  Serial3.write(13); // carriage return to signal the end of the command
   delay(100);
 
-  Serial.println("Step 1");
-
-  if (printReturn || saveReturn){
-    int i = 0;
-    // UNTESTED AND OFF THE TOP OF MY HEAD (ADW), COMIBNING 2 METHODS!!!!!
-    // Read from port until no more data are coming in
-    // Will I need a delay here to make sure that data are arriving?
-    // or something with bits_have_started = false; and a timeout
-    // in case nothing is coming in and I have that condition?
-    // while() is redundant here, because '\r' should be end of transmission...
-    // ... thinking though about how to recover from a garbled transmission
-    while (Serial2.available()){
-      inChar = Serial2.read();
-      if (inChar != '\r'){
-        sensorString[i] = inChar;
-        Serial.print(inChar);
-        i++;
+  //delay();
+  
+  
+  uint32_t start_millis = millis(); // Safety guard in case all data not received -- won't hang for > 30 seconds
+  bool endflag = false;
+  
+  while (millis() - start_millis < 30000 && !endflag){
+    if (Serial3.available()){
+      if (printReturn || saveReturn){
+        inChar = Serial3.read();
+        // Serial.print(inChar); // uncomment for debugging input from sensor
+        if (inChar != '\r'){
+          //sensorString[i] = inChar;
+          sensorString += inChar;
+        }
+        else{
+          endflag = true;
+        }
       }
       else{
-        break;
-      }
-    }
-    // save iff both getReturn and saveReturn are true
-    // Currently also echoes the return to serial port if it will
-    // also be saved (sent to SD card)
-    if (saveReturn){
-      SDstart();
-      datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
-      datafile.print(",");
-      SDend();
-    }
-      // Echo to serial
-    if (saveReturn || printReturn){
-      Serial.print(sensorString);
-      if (saveReturn){
-        Serial.print(F(","));
+        // Get rid of the incoming Serial stream
+        Serial3.read();
       }
     }
   }
-  else{
-    // Get rid of the incoming Serial stream
-    while (Serial2.available()){
-      Serial2.read();
-    }
+  // save iff both getReturn and saveReturn are true
+  // Currently also echoes the return to serial port if it will
+  // also be saved (sent to SD card)
+  if (saveReturn){
+    SDstart();
+    datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
+    datafile.print(",");
+    SDend();
   }
-  Serial.println("Step 2");
+  // Echo to serial
+  if (saveReturn){
+    Serial.print(sensorString);
+    Serial.print(F(","));
+  }
+  else if (printReturn){ // so !savereturn
+    Serial.println();
+    Serial.print("Sensor returns: ");
+    Serial.println(sensorString);
+    Serial.println();
+  }
 
-  Serial2.end();
+  Serial3.end();
 
-  Serial.println("Step 3");
 }
 
 
@@ -1606,10 +1605,7 @@ void Logger::StartHardwareSerial(int SerialNumber, uint32_t baud){
     Serial2.begin(baud);
   }
   else if (SerialNumber == 3){
-    Serial.println("OFF!");
     Serial3.begin(baud);
-    Serial3.print("L,0\r");
-    Serial3.end();
   }
 }
 
@@ -1629,8 +1625,6 @@ void Logger::PrintHardwareSerial(int SerialNumber, char* input){
     Serial2.print(input);
   }
   else if (SerialNumber == 3){
-    Serial.print("PrintHardwareSerial sees ");
-    Serial.print(input);
     Serial3.print(input);
   }
 }
