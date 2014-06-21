@@ -66,7 +66,7 @@ const int SensorPinVCC = 39; // MOSFET to turn on and off VCC power to sensors
 const int SDpin = 48; // Turns on voltage source to SD card
 const int LEDpin = 49; // LED to tell user if logger is working properly
 const int wakePin = 2; // interrupt pin used for waking up via the alarm
-const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
+int interruptNum = 0; // =0 for pin 2, 1 for pin 3
 const int manualWakePin = 43; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
 
 /////////////////////////////////////////////////
@@ -367,7 +367,7 @@ void Logger::setupLogger(){
        * sleep mode: SLEEP_MODE_PWR_DOWN
        * 
        */  
-      set_sleep_mode(SLEEP_MODE_STANDBY);   // sleep mode is set here
+      set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
 
   //    setPrescaler(6); // Clock prescaler of 64, slows down to conserve power
       cbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter OFF
@@ -671,9 +671,11 @@ void Logger::startLogging(){
   unixDatestamp();
 }
 
-void Logger::endLogging(){
+void Logger::endLogging(bool getInternalVoltage){
   // Reads and prints internal voltage
-  readInternalVoltage();
+  if( getInternalVoltage ){
+    readInternalVoltage();
+  }
   
   // Ends line, turns of SD card, and resets alarm: ready to sleep
   endLine();
@@ -706,7 +708,14 @@ void Logger::endAnalog(){
 // Thermistor - with b-value
 //////////////////////////////
 
-void Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
+/*
+wish list -- but can't return arrays
+char[4] Logger::ThermistorB_char(float R0,float B,float Rref,float T0degC,int thermPin,)
+  FLOAT = thermistorB(float R0,float B,float Rref,float T0degC,int thermPin)
+  return dtostrf(FLOAT,4,2,0);
+*/
+
+float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
   // R0 and T0 are thermistor calibrations
   //
   // EXAMPLES:
@@ -737,6 +746,8 @@ void Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
   // Echo to serial
   Serial.print(T);
   Serial.print(F(","));
+  
+  return T;
 
 }
 
@@ -1531,7 +1542,7 @@ void Logger::AtlasScientific(char* command, int SerialNumber, uint32_t baudRate,
   uint32_t start_millis = millis(); // Safety guard in case all data not received -- won't hang for > 30 seconds
   bool endflag = false;
   
-  while (millis() - start_millis < 30000 && !endflag){
+  while (millis() - start_millis < 1500 && !endflag){
     if (Serial3.available()){
       if (printReturn || saveReturn){
         inChar = Serial3.read();
@@ -1540,13 +1551,6 @@ void Logger::AtlasScientific(char* command, int SerialNumber, uint32_t baudRate,
           //sensorString[i] = inChar;
           sensorString += inChar;
         }
-        else{
-          endflag = true;
-        }
-      }
-      else{
-        // Get rid of the incoming Serial stream
-        Serial3.read();
       }
     }
   }
@@ -1560,16 +1564,22 @@ void Logger::AtlasScientific(char* command, int SerialNumber, uint32_t baudRate,
     SDend();
   }
   // Echo to serial
-  if (saveReturn){
+  if (saveReturn || printReturn){
     Serial.print(sensorString);
     Serial.print(F(","));
   }
+  /*
   else if (printReturn){ // so !savereturn
     Serial.println();
     Serial.print("Sensor returns: ");
     Serial.println(sensorString);
     Serial.println();
   }
+  */
+  
+  // Get rid of the incoming Serial stream
+  //while (_tx_buffer->head != _tx_buffer->tail); // get rid of the rest of the buffer after Line 1
+  while( Serial3.read() != -1 );
 
   Serial3.end();
 
