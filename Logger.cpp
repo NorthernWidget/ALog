@@ -1166,8 +1166,8 @@ void Logger::Decagon5TE(int exPin, int SerialNumber){
   digitalWrite(exPin, LOW);
 
   // Buffer clear
-  while( Serial3.available() ){
-    Serial3.read();
+  while( Serial2.available() ){
+    Serial2.read();
   }
   
   Serial2.end();
