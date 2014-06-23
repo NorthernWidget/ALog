@@ -77,7 +77,7 @@ class Logger {
     
     // Initialization
     void initialize(char* _logger_name, char* _sitecode, int _log_minutes, bool _ext_int=false);
-    void setupLogger();
+    void setupLogger(bool testing=false);
     
     // Code for sleeping, starting up from sleep, synching SD card
     void sleep(int minutes); // soon to be deprecated: requires log_minutes to be declared twice, caused ADW some confusion
