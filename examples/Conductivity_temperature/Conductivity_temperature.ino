@@ -9,11 +9,10 @@
 #include <RTC_DS3234.h>
 #include <math.h>
 #include <avr/sleep.h>
-//#include <NewSoftSerial.h> // in case Decagon loggers are used / Digital IO is needed
 #include <SoftwareSerial.h>
 
 // Also, for float to string function
-//#include<stdlib.h>
+#include<stdlib.h>
 
 Logger logger;
 
@@ -21,7 +20,7 @@ Logger logger;
 // USER-ENTERED VARIABLES //
 ////////////////////////////
 char* dataLoggerName = "Kennicott Lake Lower";
-char* fileName = "KL_Lower.TXT"; // Name of file for logged data: 8.3 format (e.g, 
+char* fileName = "TEST.TXT"; // Name of file for logged data: 8.3 format (e.g, 
                                    // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
 // NOTE! LOGGING EVERY MINUTE BECAUSE OF OLD CODE WHERE
 // LOG INTERVAL WOULD NEED TO BE DECLARED TWICE. UGH.
@@ -34,12 +33,15 @@ bool external_interrupt = false; // e.g., rain gage
 
 // For temperature calibration
 float temperature_float;
+char AtlasTemp[9] = "T,";
 
 void setup(){
   logger.initialize(dataLoggerName, fileName, dataLoggingIntervalMinutes, external_interrupt);
   logger.setupLogger();
-  pinMode(39, OUTPUT);
-  digitalWrite(39, LOW);
+  // Not using switchable voltage regulators
+  // And anyway, should have this in the library in the future
+  //pinMode(39, OUTPUT);
+  //digitalWrite(39, LOW);
 }
 
 void loop(){
@@ -68,7 +70,7 @@ logger.startAnalog();
 // Water temperature at location of conductivity probe
 // Update values with those from calibration of thermistor
 // (Katy's yellow notebook)
-temperature_float = logger.thermistorB(100000, 3950, 25200, 25, A0);
+temperature_float = logger.thermistorB(10000, 3950, 25200, 25, A0);
 
 logger.endAnalog();
 
@@ -77,21 +79,28 @@ logger.endAnalog();
 //
 
 
-// Wake with something silly to get rid of serial stream
-logger.AtlasScientific("I", 3, 38400, false, false);
-// Get rid of the incoming Serial stream
-//while (_tx_buffer->head != _tx_buffer->tail); // get rid of the rest of the buffer after Line 1
-while( Serial3.read() != -1 );
+// just need to send *anything* to wake
+// "w" is not a command, but this is key -- logger will send "WA", but
+// Atlas command includes "while( Serial3.read() != -1 )"
+// to dump the incoming buffer, which keeps the rest of the code in synch.
+logger.AtlasScientific("w", 3, 38400, false, false);
 
 // Temperature calibration
-Serial3.print("T,");
-Serial3.print(temperature_float);
-logger.AtlasScientific("0", 3, 38400, true, false);
+if (temperature_float >= 0){
+  dtostrf(temperature_float, 6, 3, &AtlasTemp[2]);
+}
+else{
+  // Space for "-" sign
+  dtostrf(temperature_float, 6, 2, &AtlasTemp[2]);
+}
+logger.AtlasScientific(AtlasTemp, 3, 38400, false, false);
 
 // Read Atlas sensor
 logger.AtlasScientific("R", 3, 38400, true, true);
 
 // Sleep mode -- power save
+// sensor returns "*SL" when put into sleep
+// but the AtlasScientific function in the Logger library will get rid of this
 logger.AtlasScientific("Sleep", 3, 38400, false, false);
 
 // ****** DO NOT EDIT BELOW THIS LINE ****** 
