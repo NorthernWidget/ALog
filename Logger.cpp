@@ -184,7 +184,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   
 }
 
-void Logger::setupLogger(){
+void Logger::setupLogger(bool testing){
 
   Serial.println(F("Beginning logger setup."));
 
@@ -266,15 +266,22 @@ void Logger::setupLogger(){
     delay(10);
     Serial.println(F("Card failed, or not present"));
     delay(10);
-    LEDwarn(20); // 20 quick flashes of the LED
-    sd.initErrorHalt();
+    if (!testing){ // SD not always needed if just testing code
+      sd.initErrorHalt();
+      LEDwarn(20); // 20 quick flashes of the LED
+    }
+    else{
+      LEDwarn(2); // 2 quick flashes of the LED
+    }
   }
   SDend();
-
-  Serial.println(F("card initialized."));
-  Serial.println();
-  delay(10);
-  LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
+  
+  if (!testing){
+    Serial.println(F("card initialized."));
+    Serial.println();
+    delay(10);
+    LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
+  }
 
   delay(50);
 
@@ -1534,6 +1541,9 @@ void Logger::AtlasScientific(char* command, int SerialNumber, uint32_t baudRate,
   // (or ASCII 13, however Arduino does it) explicitly
   Serial3.print(command); // send the command to the Atlas Scientific product
   Serial3.write(13); // carriage return to signal the end of the command
+  
+  Serial3.flush(); // Wait for transmit to finish
+  
   delay(100);
 
   //delay();
@@ -1542,15 +1552,19 @@ void Logger::AtlasScientific(char* command, int SerialNumber, uint32_t baudRate,
   uint32_t start_millis = millis(); // Safety guard in case all data not received -- won't hang for > 30 seconds
   bool endflag = false;
   
-  while (millis() - start_millis < 1500 && !endflag){
+  // "5000" just to ensure that there is no hang if signal isn't good
+  while ((millis() - start_millis < 5000) && !endflag){
+    // used to have if (printReturn || saveReturn) here, but
+    // should read return either way
     if (Serial3.available()){
-      if (printReturn || saveReturn){
-        inChar = Serial3.read();
-        // Serial.print(inChar); // uncomment for debugging input from sensor
-        if (inChar != '\r'){
-          //sensorString[i] = inChar;
-          sensorString += inChar;
-        }
+      inChar = Serial3.read();
+      // Serial.print(inChar); // uncomment for debugging input from sensor
+      if (inChar != '\r'){
+        //sensorString[i] = inChar;
+        sensorString += inChar;
+      }
+      else{
+        endflag = true;
       }
     }
   }
