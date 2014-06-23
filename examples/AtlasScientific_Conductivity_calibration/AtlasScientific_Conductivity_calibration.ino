@@ -13,6 +13,7 @@
 
 Logger logger;
 
+char SerialNumberASCII[1];
 int SerialNumber = -1; // Not selected at start
 bool LoopFlag = true; // True if staying in loop
 int length; // String length
@@ -33,10 +34,13 @@ void loop()
   Serial.println("to which the sensor is atached.");
   while(SerialNumber < 0){
     if (Serial.available()){
-      SerialNumber = Serial.read();
+      SerialNumberASCII[0] = (Serial.read());
+      SerialNumber = atoi(SerialNumberASCII); // Convert to integer
     }
   }
   // Enable Serial
+  Serial.println();
+  Serial.println();
   Serial.print("OK, will communicate with Serial port ");
   Serial.println(SerialNumber);
   //logger.StartHardwareSerial(SerialNumber, 38400);
@@ -44,20 +48,26 @@ void loop()
 
   // Debugging LEDs
   Serial.println("Enabling debugging LEDs (if not already on).");
-  logger.AtlasScientific("L1", SerialNumber, 38400, false, false);
-  logger.StartHardwareSerial(SerialNumber, 38400);
-  logger.PrintlnHardwareSerial(SerialNumber, "L1");
-  logger.EndHardwareSerial(SerialNumber, 38400);
+  logger.AtlasScientific("L,1", SerialNumber, 38400, true, false);
+  Serial.println("Done.");
   Serial.println();
   
   // Dry calibration
   Serial.println("Ready to start dry calibration.");
-  Serial.println("Ensure that logger is fully dry.");
+  Serial.println("Ensure that sensor is fully dry.");
   Serial.println("Press ENTER when ready to calibrate.");
+  while (Serial.available()){
+    Serial.read(); // get rid of any "enter", etc. pressed before this.
+  }
   while (LoopFlag){
     if (Serial.available()){
-      LoopFlag = false;
-      while (Serial.available()){
+      inchar = Serial.read();
+      //Serial.println(inchar);
+      if (inchar == '\r' || inchar == '\n'){
+        LoopFlag = false;
+        Serial.println(LoopFlag);
+      }
+      while (Serial.available() ){
         Serial.read(); // clear buffer
       }
       Serial.println("Performing dry calibration. Please wait.");
@@ -76,30 +86,34 @@ void loop()
   Serial.println("electrical conductivity.");
   delay(2000);
   Serial.println("When the sensor is ready to be calibrated, enter the calibration");
-  Serial.println("fluid conductivity in Sv, and then press ENTER");
+  Serial.println("fluid conductivity in uS, and then press ENTER");
+  while (Serial.available()){
+    Serial.read(); // get rid of any "enter", etc. pressed before this.
+  }
   while (LoopFlag){
     if (Serial.available()){
-      LoopFlag = false;
-      while (Serial.available()){
-        inchar = (char)Serial.read();
-        if (inchar != '\r' && inchar != '\n'){
-          LowCalString += inchar;
-        }
+      inchar = (char)Serial.read(); // (char) not necessary; 13 == '\r'
+      if (inchar != '\r' && inchar != '\n'){
+        LowCalString += inchar;
       }
-      Serial.println();
-      Serial.print("Performing wet calibration at ");
-      Serial.print(LowCalString);
-      Serial.print(". ");
-      Serial.println("Please wait.");
-      length = LowCalString.length();
-      char LowCalCharArray[length];
-      LowCalString.toCharArray(LowCalCharArray, length);
-      logger.StartHardwareSerial(SerialNumber, 38400);
-      logger.PrintHardwareSerial(SerialNumber, "Cal,low,");
-      logger.EndHardwareSerial(SerialNumber, 38400);
-      logger.AtlasScientific(LowCalCharArray, SerialNumber, 38400, true, false);
+      else{
+        Serial.read();
+        LoopFlag = false;
+      }
     }
   }
+  Serial.println();
+  Serial.print("Performing wet calibration at ");
+  Serial.print(LowCalString);
+  Serial.print(". ");
+  Serial.println("Please wait.");
+  length = LowCalString.length();
+  char LowCalCharArray[length];
+  LowCalString.toCharArray(LowCalCharArray, length);
+  logger.StartHardwareSerial(SerialNumber, 38400);
+  logger.PrintHardwareSerial(SerialNumber, "Cal,low,");
+  logger.EndHardwareSerial(SerialNumber, 38400);
+  logger.AtlasScientific(LowCalCharArray, SerialNumber, 38400, true, false);
   LoopFlag = true;
   Serial.println("Low salinity calibration complete.");
   Serial.println("Please remove the sensor from the low salinity solution");
@@ -112,30 +126,34 @@ void loop()
   Serial.println("electrical conductivity.");
   delay(2000);
   Serial.println("When the sensor is ready to be calibrated, enter the calibration");
-  Serial.println("fluid conductivity in Sv, and then press ENTER");
+  Serial.println("fluid conductivity in uS, and then press ENTER");
+  while (Serial.available()){
+    Serial.read(); // get rid of any "enter", etc. pressed before this.
+  }
   while (LoopFlag){
     if (Serial.available()){
-      LoopFlag = false;
-      while (Serial.available()){
-        inchar = (char)Serial.read();
-        if (inchar != '\r' && inchar != '\n'){
-          HighCalString += inchar;
-        }
+      inchar = (char)Serial.read();
+      if (inchar != '\r' && inchar != '\n'){
+        HighCalString += inchar;
       }
-      Serial.println();
-      Serial.print("Performing wet calibration at ");
-      Serial.print(HighCalString);
-      Serial.print(". ");
-      Serial.println("Please wait.");
-      length = HighCalString.length();
-      char HighCalCharArray[length];
-      HighCalString.toCharArray(HighCalCharArray, length);
-      logger.StartHardwareSerial(SerialNumber, 38400);
-      logger.PrintHardwareSerial(SerialNumber, "Cal,high,");
-      logger.EndHardwareSerial(SerialNumber, 38400);
-      logger.AtlasScientific(HighCalCharArray, SerialNumber, 38400, true, false);
+      else{
+        Serial.read();
+        LoopFlag = false;
+      }
     }
   }
+  Serial.println();
+  Serial.print("Performing wet calibration at ");
+  Serial.print(HighCalString);
+  Serial.print(". ");
+  Serial.println("Please wait.");
+  length = HighCalString.length();
+  char HighCalCharArray[length];
+  HighCalString.toCharArray(HighCalCharArray, length);
+  logger.StartHardwareSerial(SerialNumber, 38400);
+  logger.PrintHardwareSerial(SerialNumber, "Cal,high,");
+  logger.EndHardwareSerial(SerialNumber, 38400);
+  logger.AtlasScientific(HighCalCharArray, SerialNumber, 38400, true, false);
   LoopFlag = true;
   Serial.println("High salinity calibration complete.");
   delay(500);
