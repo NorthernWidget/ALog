@@ -267,8 +267,8 @@ void Logger::setupLogger(bool testing){
     Serial.println(F("Card failed, or not present"));
     delay(10);
     if (!testing){ // SD not always needed if just testing code
-      sd.initErrorHalt();
       LEDwarn(20); // 20 quick flashes of the LED
+      sd.initErrorHalt();
     }
     else{
       LEDwarn(2); // 2 quick flashes of the LED
