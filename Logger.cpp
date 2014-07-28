@@ -401,7 +401,7 @@ digitalWrite(SDpin,LOW);
        * sleep mode: SLEEP_MODE_PWR_DOWN
        * 
        */  
-      set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
+      set_sleep_mode(SLEEP_MODE_STANDBY);   // sleep mode is set here
 
   //    setPrescaler(6); // Clock prescaler of 64, slows down to conserve power
       cbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter OFF
@@ -613,6 +613,14 @@ float Logger::_vdivR(int pin,float Rref){
 // PUBLIC UTILITY FUNCTIONS TO IMPLEMENT LOGGER IN SKETCH //
 ////////////////////////////////////////////////////////////
 
+
+void Logger::sleep(){
+  // Maintain backwards compatibility with code that requires "log_minutes"
+  // to be defined separately from initialize step. (A bad idea, right? Will
+  // remove this compatibility once it seems to no longer be a problem.)
+  sleep(log_minutes);
+}
+
 void Logger::sleep(int log_minutes){
   // Go to sleep
   backtosleep:
@@ -713,7 +721,7 @@ void Logger::endAnalog(){
 // Thermistor - with b-value
 //////////////////////////////
 
-void Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
+float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
   // R0 and T0 are thermistor calibrations
   //
   // EXAMPLES:
@@ -742,6 +750,8 @@ void Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
   // Echo to serial
   Serial.print(T);
   Serial.print(F(","));
+  
+  return T;
 
 }
 
@@ -1059,6 +1069,101 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
     end_logging_to_otherfile();
   }
   // Otherwise, these conditions match and we are in good shape.  
+}
+
+void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32_t baudRate, bool printReturn, bool saveReturn){
+  // * "command" is the command sent to the Atlas Scientific product.
+  //   see the data sheet as well as the above quick lists
+  // SerialNumber and baudRate default to 0 and 38400, respectively.
+  // SerialNumber could be changed for Arduino Mega.
+  // baudRate will stay constant insofar as Atlas sensors' baud rates do.
+  // getReturn determines whether you care about the Serial response, or whether
+  // you would just like to clear the buffer.
+  //
+
+  // Check if re-instantiating class causes problems -- maybe this is what 
+  // happened with Nick's loggers (but then why different times before
+  // failure?
+  // Same name, so maybe overwrite memory in same place?
+  SoftwareSerial mySerial(softSerRX, softSerTX);
+
+  mySerial.begin(baudRate);
+  //Serial2.println("L,0\r");
+  
+  /*
+  uint32_t start_millis_clear_buffer = millis();
+  Serial2.write(13); // Clear buffer -- carriage return
+  while ( (millis() - start_millis_clear_buffer < 500) || Serial2.available() ){
+    Serial2.read();
+  }
+  */
+
+  String sensorString = ""; // a char array to hold the data from the Atlas Scientific product
+                         // Atlas' example indicates that they expect all returns to be <= 30 bytes
+  sensorString.reserve(30); // Sets aside memory for the Sring
+  char inChar; // incoming characters on the serial port
+
+  // "println" prints <values>\r\n. Atlas uses println to send data in its 
+  // Arduino sample code, so I presume the "\r" is taken as the cutoff (its 
+  // sensors terminate with a carriage return) and the "\n" is discarded.
+  // Still, I wonder if it would be better to "Serial.print(...\n);"
+  // (or ASCII 13, however Arduino does it) explicitly
+  mySerial.print(command); // send the command to the Atlas Scientific product
+  mySerial.write(13); // carriage return to signal the end of the command
+  
+  mySerial.flush(); // Wait for transmit to finish
+  
+  delay(100);
+
+  //delay();
+  
+  
+  uint32_t start_millis = millis(); // Safety guard in case all data not received -- won't hang for > 30 seconds
+  bool endflag = false;
+  
+  // "5000" just to ensure that there is no hang if signal isn't good
+  while ((millis() - start_millis < 5000) && !endflag){
+    // used to have if (printReturn || saveReturn) here, but
+    // should read return either way
+    if (mySerial.available()){
+      inChar = mySerial.read();
+      // Serial.print(inChar); // uncomment for debugging input from sensor
+      if (inChar != '\r'){
+        //sensorString[i] = inChar;
+        sensorString += inChar;
+      }
+      else{
+        endflag = true;
+      }
+    }
+  }
+  // save iff both getReturn and saveReturn are true
+  // Currently also echoes the return to serial port if it will
+  // also be saved (sent to SD card)
+  if (saveReturn){
+    datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
+    datafile.print(",");
+  }
+  // Echo to serial
+  if (saveReturn || printReturn){
+    Serial.print(sensorString);
+    Serial.print(F(","));
+  }
+  /*
+  else if (printReturn){ // so !savereturn
+    Serial.println();
+    Serial.print("Sensor returns: ");
+    Serial.println(sensorString);
+    Serial.println();
+  }
+  */
+  
+  // Get rid of the incoming Serial stream
+  //while (_tx_buffer->head != _tx_buffer->tail); // get rid of the rest of the buffer after Line 1
+  while( mySerial.read() != -1 );
+
+  mySerial.end();
+
 }
 
 void Logger::TippingBucketRainGage(){
