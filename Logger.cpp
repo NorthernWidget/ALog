@@ -1318,6 +1318,9 @@ void Logger::DecagonMPS2(int exPin, int SerialNumber){
   datafile.print(sensorString);
   // Echo to serial
   Serial.print(sensorString);
+  
+  // Decagon MPS-2 documentation states : "The water potential in kilopascals is the 
+  // first number output by the sensor. The second number is temperature in Celsius"
 
 }
 
