@@ -33,72 +33,41 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // setup stuff in the constructor eventually (or maybe just lump "initialize" 
 // and "setup")
 
+// Avoid spurious warnings -- copied from RTClib code, but hopefully will avoid warnings about text in progmem
+#undef PROGMEM
+#define PROGMEM __attribute__(( section(".progmem.data") ))
+#undef PSTR
+#define PSTR(s) (__extension__({static prog_char __c[] PROGMEM = (s); &__c[0];}))
+
 
 /////////////////////////////////////////////////////
 // STATIC MEMBERS OF CLASS, SO ACCESSIBLE ANYWHERE //
 /////////////////////////////////////////////////////
 
-// MAYBE PUT UNDERSCORES BEFORE ALL OF THESE VARS, IF I THINK THERE IS RISK OF 
-// RE-DEFINING THEM IN SKETCH
-
-// DEFINE BOARD BASED ON MCU TYPE
-
-// First, give integer values to the different board types
-const int bottle_logger=0;
-const int big_log=1;
-const int log_mega=2; // In development
-
-// Then define _model
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
-  const int _model = bottle_logger;
-  const char _model_name[] = "bottle_logger";
-#elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__)
-  const int _model = big_log;
-  const char _model_name[] = "big_log";
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-  const int _model = log_mega;
-  const char _model_name[] = "log_mega";
-#endif
-
-// DECLARE PINS
-// Should do the full declaration here with some "if's" so I can do "const int"
-
 /////////////////
 // ASSIGN PINS //
 /////////////////
 
-#if(_model == bottle_logger)
-  // SD card: CSpin and protected pins
-  const int CLKpin = 13;
-  const int MISOpin = 12;
-  const int MOSIpin = 11;
-  const int CSpin = 10;
-  // Protected I2C pins
-  const int SDApin = A4;
-  const int SCLpin = A5;
-  // Digital pins
-  const int SensorPin = 4; // Activates voltage regulator to give power to sensors
-  const int SDpin = 8; // Turns on voltage source to SD card
-  const int LEDpin = 9; // LED to tell user if logger is working properly
-  const int wakePin = 2; // interrupt pin used for waking up via the alarm
-  const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
-  const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
-#elif(_model == big_log)
-  // SD card: CSpin and protected pins
-  const int CLKpin = 7;
-  const int MISOpin = 6;
-  const int MOSIpin = 5;
-  const int CSpin = 4;
-  // Protected I2C pins
-  const int SDApin = 23;
-  const int SCLpin = 22;
-  // Digital pins
-  const int SensorPin = 21; // Activates voltage regulator to give power to sensors
-  const int SDpin = 22; // Turns on voltage source to SD card
-  const int LEDpin = 23; // LED to tell user if logger is working properly
-  const int wakePin = 10; // interrupt pin used for waking up via the alarm
-  const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
-#endif
+// SD card: CSpinSD and protected pins
+const int CLKpin = 52;
+const int MISOpin = 50;
+const int MOSIpin = 51;
+const int CSpinSD = 53;
+// Protected clock pins -- I2C not protected here
+// const int SDApin = 20;
+// const int SCLpin = 21;
+const int CSpinRTC = 47;
+// Digital pins
+const int SensorPin3V3 = 42; // Activates 3.3V voltage regulator to give power to sensors
+const int SensorPinVCC = 39; // MOSFET to turn on and off VCC power to sensors
+// TO DO when board design is fixed!
+//const int Shield1PinVCC = 
+//const int Shield2PinVCC = 
+const int SDpin = 48; // Turns on voltage source to SD card
+const int LEDpin = 49; // LED to tell user if logger is working properly
+const int wakePin = 2; // interrupt pin used for waking up via the alarm
+int interruptNum = 0; // =0 for pin 2, 1 for pin 3
+const int manualWakePin = 43; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
 
 /////////////////////////////////////////////////
 // GLOBAL VARIABLES DEFINED IN INITIALIZE STEP //
@@ -107,6 +76,9 @@ const int log_mega=2; // In development
 // Logging interval - wake when minutes == this
 int log_minutes;
 bool camera_is_on = false; // for a video camera
+
+// testing
+uint8_t tmp;
 
 // Filename and logger name
 // Filename is set up as 8.3 filename:
@@ -124,8 +96,9 @@ bool tip = false;
 
 // Both for same clock, but need to create instances of both
 // classes in library (due to my glomming of two libs together)
-RTClib RTC;
-DS3231 Clock;
+// Mega just uses RTClib: put the clock-setting functions inside it
+
+RTC_DS3234 RTC(CSpinRTC);
 
 // SD CLASSES
 SdFat sd;
@@ -184,22 +157,10 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
 
   Serial.begin(57600);
 
-  /////////////////////////////
-  // Logger models and setup //
-  /////////////////////////////
+  //////////////////
+  // Logger setup //
+  //////////////////
 
-  if (_model == 0 || _model == 1 || _model == 2){
-    Serial.print("Logger model = ");
-    Serial.println(_model_name);
-  }
-  else{
-    Serial.println(F("Error: model name must be ""bottle"" or ""big""."));
-    Serial.println(F("Stopping execution."));
-    LEDwarn(100); // 100 quick flashes of the LED
-    // Do nothing until reset - maybe change this to sleep function so it doesn't drain its own batteries
-    while(1){}
-  }
-  
   // From weather station code
   // For power savings
   // http://jeelabs.net/projects/11/wiki/Weather_station_code
@@ -223,7 +184,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   
 }
 
-void Logger::setupLogger(){
+void Logger::setupLogger(bool testing){
 
   Serial.println(F("Beginning logger setup."));
 
@@ -234,6 +195,10 @@ void Logger::setupLogger(){
   // 3.3V regulator connected to the AREF pin is off. Otherwise, you will short
   // 1.1V (or VCC) against 3.3V and likely damage the MCU / fry the ADC(?)
   analogReference(EXTERNAL); // Commented out in other code - check on how to make this all work
+
+  // Start up SPI and RTC
+  SPI.begin();
+  RTC.begin();
 
   ///////////////////////////////////
   // CHECK IF LOG_MINUTES IS VALID //
@@ -260,88 +225,88 @@ void Logger::setupLogger(){
   digitalWrite(wakePin,HIGH); // enable internal 20K pull-up
   // Set the rest of the pins: this is my pinModeRunning() function in other code,
   // but really is just as good to plop in here
-  pinMode(CSpin,OUTPUT);
-  pinMode(SensorPin,OUTPUT);
+  pinMode(CSpinSD,OUTPUT);
+  pinMode(SensorPin3V3,OUTPUT);
   pinMode(LEDpin,OUTPUT);
   pinMode(SDpin,OUTPUT);
   // Manual wake pin - only on the new bottle loggers
-  if (_model == bottle_logger){
-    Serial.println(F("Setting manualWakePin"));
-    pinMode(manualWakePin,INPUT);
-    digitalWrite(manualWakePin,HIGH); // enable internal 20K pull-up
-    // FIX FIX FIX - PUT ALL PINS INTO "LOW" MODE, BASED ON LOGGER MODEL! COMPLETE COMPLETE!
-    //pinMode(6, OUTPUT);
-    //digitalWrite(6, LOW);
-  }
+  Serial.println(F("Setting manualWakePin"));
+  pinMode(manualWakePin,INPUT);
+  digitalWrite(manualWakePin,HIGH); // enable internal 20K pull-up
+  // FIX FIX FIX - PUT ALL PINS INTO "LOW" MODE, BASED ON LOGGER MODEL! COMPLETE COMPLETE!
+  //pinMode(6, OUTPUT);
+  //digitalWrite(6, LOW);
   //Start out with SD, Sensor pins set LOW
   digitalWrite(SDpin,LOW);
-  digitalWrite(SensorPin,LOW);
+  digitalWrite(SensorPin3V3,LOW);
+  // Start out with CS pins high -- no data transmission
+  digitalWrite(CSpinSD, HIGH);
+  digitalWrite(CSpinRTC, HIGH);
 
+  // Announce start
+  announce_start();
 
-////////////
-// SERIAL //
-////////////
+  ///////////////////
+  // SD CARD SETUP //
+  ///////////////////
+  
+  // Had to initialize SD card before using clock, otherwise both SPI devices
+  // clashed.
+  
+  // Bug in which there is a bit of extra hang with the LED on... lessens when 
+  // a serial monitor is present, so is probably related to print statements.
 
-Serial.begin(57600);
+  name();
+  Serial.print(F("Initializing SD card..."));
+  pinMode(SDpin,OUTPUT); // Not sure if it forgot...? Including this required for fix!
+  digitalWrite(SDpin,HIGH); // SD CARD ON
+  SDstart();
+  delay(10);
+  if (!sd.begin(CSpinSD, SPI_HALF_SPEED)){
+    delay(10);
+    Serial.println(F("Card failed, or not present"));
+    delay(10);
+    if (!testing){ // SD not always needed if just testing code
+      LEDwarn(20); // 20 quick flashes of the LED
+      sd.initErrorHalt();
+    }
+    else{
+      LEDwarn(2); // 2 quick flashes of the LED
+    }
+  }
+  SDend();
+  
+  if (!testing){
+    Serial.println(F("card initialized."));
+    Serial.println();
+    delay(10);
+    LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
+  }
 
-// Announce start
-announce_start();
+  delay(50);
 
-///////////////////
-// WIRE: I2C RTC //
-///////////////////
+  /////////////////
+  // CHECK CLOCK //
+  /////////////////
 
-Wire.begin();
+  // Includes check whether you are talking to Python terminal
+  startup_sequence();
 
-/////////////////
-// CHECK CLOCK //
-/////////////////
+  /////////////////////////////////////////////////////////////////////
+  // Set alarm to go off every time seconds==00 (i.e. once a minute) //
+  /////////////////////////////////////////////////////////////////////
 
-// Includes check whether you are talking to Python terminal
-startup_sequence();
+  DS3234_alarm1_1min(); // Change this to specific minutes later -- but will require a deprecation or bringing-up-to-date decision (DS3231 code)
+                        // So for now just use clunky way of waking every minute.
 
-////////////////
-// SD CARD ON //
-////////////////
+  delay(50);
 
-digitalWrite(SDpin,HIGH);
+  digitalWrite(SDpin,LOW); // SD CARD OFF
 
-/////////////////////////////////////////////////////////////////////
-// Set alarm to go off every time seconds==00 (i.e. once a minute) //
-/////////////////////////////////////////////////////////////////////
-
-alarm2_1min();
-
-///////////////////
-// SD CARD SETUP //
-///////////////////
-
-// Initialize SdFat or print a detailed error message and halt
-// Use half speed like the native library.
-// change to SPI_FULL_SPEED for more performance.
-
-delay(1000);
-
-name();
-Serial.print(F("Initializing SD card..."));
-if (!sd.begin(CSpin, SPI_HALF_SPEED)){
-  Serial.println(F("Card failed, or not present"));
-  LEDwarn(20); // 20 quick flashes of the LED
-  sd.initErrorHalt();
-}
-
-Serial.println(F("card initialized."));
-Serial.println();
-LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
-
-delay(50);
-
-name();
-Serial.println(F("Logger initialization complete! Ciao bellos."));
-
-delay(50);
-
-digitalWrite(SDpin,LOW);
+  name();
+  Serial.println(F("Logger initialization complete! Ciao bellos."));
+  
+  delay(50); // time to finish printing
 
 }
 
@@ -349,12 +314,24 @@ digitalWrite(SDpin,LOW);
 // PRIVATE FUNCTIONS: UTILITIES FOR LOGGER LIBRARY //
 /////////////////////////////////////////////////////
 
+  /*
+  Not using at the moment -- just hope users don't override the utility pin commands!
+  
   void Logger::pinUnavailable(int pin){
     int _errorFlag = 0;
-    char* _pinNameList[9] = {"MISOpin", "MOSIpin", "CSpin", "SensorPin", "SDpin", "LEDpin", "wakePin", "SDApin", "SCLpin"};
-    int _pinList[9] = {MISOpin, MOSIpin, CSpin, SensorPin, SDpin, LEDpin, wakePin, SDApin, SCLpin};
-    
-    for (int i=0; i<9; i++){
+    #define protected_pins_list_length 7
+    if (_model == bottle_logger)
+    {
+      char* _pinNameList[protected_pins_list_length] = {"CSpinSD", "SensorPin3V3", "SDpin", "LEDpin", "wakePin", "SDApin", "SCLpin"};
+      int _pinList[protected_pins_list_length] = {CSpinSD, SensorPin3V3, SDpin, LEDpin, wakePin, SDApin, SCLpin};
+    }
+    else if (_model == log_mega)
+    {
+      char* _pinNameList[protected_pins_list_length] = {"CSpinSD", "SensorPin3V3", "SDpin", "LEDpin", "wakePin", "CSpinRTC", "SensorPinVCC"};
+      int _pinList[protected_pins_list_length] = {MISOpin, MOSIpin, CSpinSD, SensorPin3V3, SDpin, LEDpin, wakePin, CSpinRTC, SensorPinVCC};
+    }
+
+    for (int i=0; i<protected_pins_list_length; i++){
       if (pin == _pinList[i]){
         _errorFlag++;
         Serial.print("Error: trying to alter the state of Pin ");
@@ -373,14 +350,10 @@ digitalWrite(SDpin,LOW);
       while(1){}
     }
   }
+  */
 
   void Logger::sleepNow()         // here we put the arduino to sleep
   {
-
-    alarm2reset();   // Turns alarm 2 off and then turns it back
-                             // on so it will go off again next minute
-                             // NOT BACK ON ANYMORE
-
 
       /* Now is the time to set the sleep mode. In the Atmega8 datasheet
        * http://www.atmel.com/dyn/resources/prod_documents/doc2486.pdf on page 35
@@ -471,6 +444,9 @@ digitalWrite(SDpin,LOW);
       detachInterrupt(interruptNum);      // disables interrupt so the 
                                // wakeUpNow code will not be executed 
                                // during normal running time.
+                               
+      // Reset the alarm flag (end pull-down of interrupt pin)
+      RTC.clear_alarm_flag(1);
 
       //delay(3); // Slight delay before I feel OK taking readings
 
@@ -508,31 +484,16 @@ digitalWrite(SDpin,LOW);
     tip = true;
   }
 
-
-  void Logger::alarm2reset()
-  {
-    // Reset alarm
-    Clock.turnOffAlarm(2);
-    Clock.turnOnAlarm(2);
-    // Not sure why, but have to use these "checking" functions, or else the clock
-    // won't realize that it's been reset.
-    // Here I'm just using them all; they're quick.
-    // But I could probably ignore the Alarm 1 ones
-    // Clock.checkAlarmEnabled(1);
-    Clock.checkAlarmEnabled(2);
-    // Clock.checkIfAlarm(1);
-    Clock.checkIfAlarm(2);
-  }
-
-  void Logger::alarm2_1min()
+  void Logger::DS3234_alarm1_1min()
   {
     // Sets an alarm that will go off once a minute
     // for intermittent data logging
     // (This will use the AVR interrupt)
-    Clock.turnOffAlarm(1);
-    Clock.turnOffAlarm(2);
-    Clock.setA2Time(1, 0, 0, 0b01110000, false, false, false); // just min mask
-    Clock.turnOnAlarm(2);
+    uint8_t flags[5] = { 0, 1, 1, 1, 1 }; // only care about seconds count
+    int wake_SECOND = 0; // wake on the 00 seconds
+    RTC.set_alarm_1(wake_SECOND, 0, 0, 0, flags);
+    RTC.enable_alarm(1);
+    RTC.clear_alarm_flag(1);
   }
 
   void Logger::LEDwarn(int nflash)
@@ -585,18 +546,33 @@ digitalWrite(SDpin,LOW);
     now = RTC.now();
 
     // SD
-    datafile.print(now.unixtime());
+    SDstart();
+    datafile.print(now.unixtime()); // Should work without clock's CSpinRTC -- digging into object that is already made
     datafile.print(",");
+    SDend();
     // Echo to serial
     Serial.print(now.unixtime());
     Serial.print(F(","));
   }
 
+  void Logger::readInternalVoltage(){
+    startAnalog();
+    int rawRead = analogRead(A15);
+    endAnalog();
+    float VCC = rawRead/1023. * 3.3 * 2; // equal resistors above and below voltage divider
+    SDstart();
+    datafile.print(VCC); // incidentally fixes problem with previous comma at end of line
+    Serial.print(VCC);
+    SDend();
+  }
+
   void Logger::endLine(){
     // Ends the line in the file; do this at end of recording instance
     // before going back to sleep
+    SDstart();
     datafile.println();
     Serial.println();
+    SDend();
     }
 
 float Logger::_vdivR(int pin,float Rref){
@@ -612,6 +588,13 @@ float Logger::_vdivR(int pin,float Rref){
 ////////////////////////////////////////////////////////////
 // PUBLIC UTILITY FUNCTIONS TO IMPLEMENT LOGGER IN SKETCH //
 ////////////////////////////////////////////////////////////
+
+void Logger::sleep(){
+  // Maintain backwards compatibility with code that requires "log_minutes"
+  // to be defined separately from initialize step. (A bad idea, right? Will
+  // remove this compatibility once it seems to no longer be a problem.)
+  sleep(log_minutes);
+}
 
 void Logger::sleep(int log_minutes){
   // Go to sleep
@@ -634,10 +617,11 @@ void Logger::sleep(int log_minutes){
   }
   // Check if the logger has been awakend by someone pushing the button
   // If so, bypass everything else
-  if (_model == bottle_logger && (digitalRead(manualWakePin) == LOW)){
+  if (digitalRead(manualWakePin) == LOW){
   }
   else{
-    int minute = Clock.getMinute();
+    DateTime rightnow = RTC.now();
+    int minute = rightnow.minute();
     // Only wake if you really have to
     if (minute % log_minutes == 0){
       Serial.println(F("Logging!"));
@@ -657,12 +641,24 @@ void Logger::sleep(int log_minutes){
 }
   
 void Logger::startLogging(){
+  // TROUBLESHOOTING: HAD TO USE cs() IN RTC_DS3234 SUB-FUNCTIONS
+  //tmp = RTC.clear_alarm_flag(1);
+  //Serial.print(F("TMP: "));
+  //Serial.println(tmp);
+  /*
+  SPI.setDataMode(SPI_MODE3);
+  digitalWrite(CSpinRTC, LOW);
+  SPI.transfer(0x8F);
+  SPI.transfer(0);
+  digitalWrite(CSpinRTC, HIGH);
+  */
   pinMode(SDpin,OUTPUT); // Seemed to have forgotten between loops... ?
   // Initialize logger
   digitalWrite(SDpin,HIGH); // Turn on SD card before writing to it
                             // Delay required after this??
+  SDstart();
   delay(10);
-  if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
+  if (!sd.begin(CSpinSD, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
@@ -677,31 +673,37 @@ void Logger::startLogging(){
     Serial.println(F(" for write failed"));
   delay(10);
   }
+  SDend();
   // Datestamp the start of the line
   unixDatestamp();
 }
 
-void Logger::endLogging(){
+void Logger::endLogging(bool getInternalVoltage){
+  // Reads and prints internal voltage
+  if( getInternalVoltage ){
+    readInternalVoltage();
+  }
+  
   // Ends line, turns of SD card, and resets alarm: ready to sleep
   endLine();
 
   // close the file: (This does the actual sync() step too - writes buffer)
+  SDstart();
   datafile.close();
   delay(2);
   digitalWrite(SDpin,LOW); // Turns off SD card
-  alarm2reset();
-  delay(10); // need time to reset alarms?
+  SDend();
 }
 
 void Logger::startAnalog(){
   // Turn on power to analog sensors
-  digitalWrite(SensorPin,HIGH);
-  delay(2);
+  digitalWrite(SensorPin3V3,HIGH);
+  delay(2); // Delay to ensure power reaches sensor
 }
 
 void Logger::endAnalog(){
   // Turn off power to analog sensors
-  digitalWrite(SensorPin,LOW);
+  digitalWrite(SensorPin3V3,LOW);
   delay(2);
 }
 
@@ -713,7 +715,14 @@ void Logger::endAnalog(){
 // Thermistor - with b-value
 //////////////////////////////
 
-void Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
+/*
+wish list -- but can't return arrays
+char[4] Logger::ThermistorB_char(float R0,float B,float Rref,float T0degC,int thermPin,)
+  FLOAT = thermistorB(float R0,float B,float Rref,float T0degC,int thermPin)
+  return dtostrf(FLOAT,4,2,0);
+*/
+
+float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
   // R0 and T0 are thermistor calibrations
   //
   // EXAMPLES:
@@ -737,11 +746,15 @@ void Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
   ///////////////
 
   // SD
+  SDstart();
   datafile.print(T);
   datafile.print(",");
+  SDend();
   // Echo to serial
   Serial.print(T);
   Serial.print(F(","));
+  
+  return T;
 
 }
 
@@ -762,14 +775,16 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   // Get range measurements
   // Get rid of any trash; Serial.flush() unnecessary; main thing that is important is
   // getting the 2 pings of junk out of the way
-  Serial.flush();
-  for (int i=1; i<=2; i++){
+  //Serial.flush();
+  // Just give it 5!
+  for (int i=1; i<=5; i++){
     if(EX != 99){
       digitalWrite(EX,HIGH);
         delay(1);
       digitalWrite(EX,LOW);
       }
     delay(100);
+    range = analogRead(sonicPin);
     }
   for(int i=1;i<=nping;i++){
     if(EX != 99){
@@ -784,8 +799,10 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
     if (writeAll){
       Serial.print(range);
       Serial.print(F(","));
+      SDstart();
       datafile.print(range);
       datafile.print(",");
+      SDend();
     }
   sumRange += range;
   }
@@ -807,10 +824,12 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   // SAVE DATA //
   ///////////////
 
+  SDstart();
   datafile.print(meanRange);
   datafile.print(",");
   datafile.print(sigma);
   datafile.print(",");
+  SDend();
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -859,8 +878,10 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
     if (writeAll){
       Serial.print(range);
       Serial.print(F(","));
+      SDstart();
       datafile.print(range);
       datafile.print(",");
+      SDend();
     }
   sumRange += range;
   }
@@ -882,10 +903,12 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   // SAVE DATA //
   ///////////////
 
+  SDstart();
   datafile.print(meanRange);
   datafile.print(",");
   datafile.print(sigma);
   datafile.print(",");
+  SDend();
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -938,6 +961,7 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
     mean_range = -9999;
     standard_deviation = -9999;
   }
+  SDstart();
   // Write all values if so desired
   if (writeAll){
     for (int i=0; i<npings; i++){
@@ -955,6 +979,7 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
   datafile.print(",");
   datafile.print(npings_with_real_returns);
   datafile.print(",");
+  SDend();
   // Echo to serial
   Serial.print(mean_range);
   Serial.print(F(","));
@@ -988,7 +1013,7 @@ int Logger::maxbotix_Serial_parse(int Ex, int Rx, bool RS232){
   // Excites the MaxBotix sensor and receives its ranging output
   char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
   SoftwareSerial mySerial(Rx, -1, RS232); // RX, TX, inverse logic - RS232 true, TTL false; defaults to TTL (false)
-  mySerial.begin(9600);
+  mySerial.begin(57600);
   //Excite the sensor to produce a pulse
   pinMode(Ex, OUTPUT);
   digitalWrite(Ex, HIGH);
@@ -1066,12 +1091,14 @@ void Logger::TippingBucketRainGage(){
   // Then prints date stamp
   pinMode(SDpin,OUTPUT); // Seemed to have forgotten between loops... ?
   digitalWrite(SDpin,HIGH); // might want to use a digitalread for better incorporation into normal logging cycle
+  SDstart();
   delay(10);
-  if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
+  if (!sd.begin(CSpinSD, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
   }
+  SDend();
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
   end_logging_to_otherfile();
@@ -1082,6 +1109,8 @@ void Logger::TippingBucketRainGage(){
 
 void Logger::start_logging_to_otherfile(char* filename){
   // open the file for write at end like the Native SD library
+  SDstart();
+  delay(10);
   if (!otherfile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
@@ -1090,14 +1119,17 @@ void Logger::start_logging_to_otherfile(char* filename){
     Serial.println(F(" for write failed"));
   delay(10);
   }
+  SDend();
   // Datestamp the start of the line - modified from unixDateStamp function
   now = RTC.now();
   // SD
   otherfile.print(now.unixtime());
   otherfile.print(",");
   // Echo to serial
+  SDstart();
   Serial.print(now.unixtime());
   Serial.print(F(","));
+  SDend();
 }
 
 void Logger::end_logging_to_otherfile(){
@@ -1112,117 +1144,185 @@ void Logger::end_logging_to_otherfile(){
 //reads a 5tm soil moisture probe and prints results to Serial
 // Modified from Steve Hicks' code for an LCD reader by Andy Wickert
 
-/*
-void Logger::decagon5TE(int excitPin, int dataPin){
 
-  NewSoftSerial mySerial(excitPin, dataPin);  //5tm's red wire (serial data out) connected to pin 5, pin 6 goes nowhere
-  int Epsilon_Raw, Sigma_Raw, T_Raw;   //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
-  char dataStream[14];   // Max 14 characters: 4x3 + 2 spaces
-  int startflag=1;
-  int endflag=0;
+//reads a 5TE soil moisture probe and prints results to Serial
+// Started from Steve Hicks' code for an LCD reader
+// But now different in many ways (ADW, 16 June 2014)
+
+void Logger::Decagon5TE(int exPin, int SerialNumber){
+  // SerialNumber specifies the hardware serial port number
+  // We use only the RX pin, since no info is being transmitted.
+  // This could be different for SDI-12, talking with Kevin Smith about that
+  // and Software Serial
+
+  Serial2.begin(1200);
+  int Epsilon_Raw, Sigma_Raw, T_Raw; //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
+  float Epsilon_a, EC, T; // Output variables
+  char sensorString[14]; // Max 14 characters: 4x3 + 2 spaces
+  char inChar; // to hold temporary serial input
+  int i=0;
+
+  pinMode(exPin, OUTPUT);
+  digitalWrite(exPin, HIGH);
+  delay(475); // Decagon says 150 ms measurement time, and I have some note
+              // about reading before 200 ms are up, so being safe here
+              // and splitting the difference.
+
+  while (Serial2.available()){
+    inChar = Serial2.read();
+    if (inChar != '\r'){
+      sensorString[i] = inChar;
+      // Had this before, but it basically just needs to avoid the end-of-line carriage return
+      // if((c>='0' and c<='9') || c==' '){
+      i++;
+    }
+  }
+
+  // exPin also powers the sensor: so turning LOW here, after communications
+  // are over.
+  pinMode(exPin, INPUT);
+  digitalWrite(exPin, LOW);
+
+  // Buffer clear
+  while( Serial2.available() ){
+    Serial2.read();
+  }
+  
+  Serial2.end();
+
+  // parse the array into 3 integers  (for the 5TM, y is always 0)
+  sscanf (sensorString, "%d %d %d", &Epsilon_Raw, &Sigma_Raw, &T_Raw);     
+
+  // Change measured values into real values, via equations in Decagon 5TE
+  // manual
+
+  // Dielectric permittivity [-unitless-]
+  if (Epsilon_Raw == 4095){
+    // Error alert!
+    Epsilon_a = -9999.99;
+  }
+  else {
+    Epsilon_a = Epsilon_Raw/50.;
+  }
+  // Electrical Conductivity [dS/m]
+  if (Sigma_Raw == 1023){
+    // Error alert!
+    EC = -9999.99;
+  }
+  else if (Sigma_Raw <= 700){
+    EC = Sigma_Raw/100.;
+  }
+  else {
+    // (i.e. Sigma_Raw > 700, but no elif needed so long as input string
+    // parses correctly... hmm, should maybe protect against that)
+    EC = (700. + 5.*(Sigma_Raw- 700.))/100.;
+  }
+  // Temperature [degrees C]
+  // Combined both steps of the operation as given in the manual
+  if (T_Raw == 1023){
+    // Error alert!
+    T = -9999.99;
+  }
+  else if (T_Raw <= 900){
+    T = (T_Raw - 400.) / 10.;
+  }
+  else {
+    // (i.e. T_Raw > 900, but no elif needed so long as input string
+    // parses correctly... hmm, should maybe protect against that)
+    T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
+  }
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  datafile.print(Epsilon_a);
+  datafile.print(",");
+  datafile.print(EC);
+  datafile.print(",");
+  datafile.print(T);
+  datafile.print(",");
+  // Echo to serial
+  Serial.print(Epsilon_a);
+  Serial.print(F(","));
+  Serial.print(EC);
+  Serial.print(F(","));
+  Serial.print(T);
+  Serial.print(F(","));
+}
+
+void Logger::DecagonMPS2(int exPin, int SerialNumber){
+  // SerialNumber specifies the hardware serial port number
+  // We use only the RX pin, since no info is being transmitted.
+  // This could be different for SDI-12, talking with Kevin Smith about that
+  // and Software Serial
+
+  Serial3.begin(1200);
+
+  String sensorString;   // Guessing at length; Decagon manual unhelpful
+  char inChar; // to hold temporary serial input
   int i=0;
   unsigned int startMillis; // same comment as right below
   unsigned int elapsed = 0; // shouldn't overflow on the time scales I'm using
 
-  if(startflag){
-    digitalWrite(excitPin,HIGH);
-    startMillis = millis();
-    startflag=0;
-    Serial.println(startMillis);
-  }
+  pinMode(exPin, OUTPUT);
+  digitalWrite(exPin, HIGH);
+  delay(300); // Decagon says Serial stream should be completed by the time that
+             // about 40 ms have elapsed.... so being safe here with the
+             // definition of "about", and deciding that it has at least
+             // started by this time!
+             // Had to bump it WAY up to finish comms!
 
-  // OK if it takes longer, so long as data stream is continuous
-  // so we don't break out of inner while loop, and we start 
-  // receiving before 200 ms is up
-  while (elapsed < 200){
-    elapsed = millis() - startMillis;
-    Serial.print(F("ms elapsed = "));
-    Serial.println(elapsed);
-    //  code keeps looping until incoming serial data appears on the mySerial pin
-    while (mySerial.available()) {
-      //Serial.println("Getting data:");
-        delay(1);  
-      if (mySerial.available() >0) {
-    		endflag=1;
-        char c = mySerial.read();  //gets one byte from serial buffer
-          Serial.println(c);
-        if((c>='0' and c<='9') || c==' ') {
-         dataStream[i] = c; //makes the string readString 
-         i++;
-        }
+  while (Serial3.available()){
+    inChar = Serial3.read();
+    //Serial.print(inChar);
+    // end of transmission on carriage return
+    //if (inChar != '\r'){ // Actually, got to ignore gibberish at end of line, 
+    // so need more stringent requirements!
+    if ((inChar >= '0' and inChar <= '9') || inChar == ' ' || inChar == '.') {
+      if (inChar == ' '){
+        sensorString += ','; // make it directly printable: no need to parse
       }
+      else {
+       sensorString += inChar; //makes the string readString 
+      }
+      i++;
     }
   }
-    
-  if(endflag==1){
 
-    digitalWrite(excitPin,LOW);
-    Serial.println(dataStream);
-    endflag=0;
+  pinMode(exPin, INPUT);
+  digitalWrite(exPin, LOW);
 
-    // parse the array into 3 integers  (for the 5TM, y is always 0)
-    sscanf (dataStream, "%d %d %d", &Epsilon_Raw, &Sigma_Raw, &T_Raw);     
+  // Buffer clear
+  while( Serial3.available() ){
+    Serial3.read();
+  }
 
-    // Change measured values into real values, via equations in Decagon 5TE
-    // manual
+  Serial3.end();
 
-    // Dielectric permittivity [-unitless-]
-    if (Epsilon_Raw == 4095){
-      // Error alert!
-      char Epsilon_a[6] = "ERROR";
-    }
-    else {
-      float Epsilon_a = Epsilon_Raw/50.;
-    }
-    // Electrical Conductivity [dS/m]
-    if (Sigma_Raw == 1023){
-      // Error alert!
-      char EC[6] = "ERROR";
-    }
-    else if (Sigma_Raw <= 700){
-      float EC = Sigma_Raw/100.;
-    }
-    else {
-      // (i.e. Sigma_Raw > 700, but no elif needed so long as input string
-      // parses correctly... hmm, should maybe protect against that)
-      float EC = (700. + 5.*(Sigma_Raw- 700.))/100.;
-    }
-    // Temperature [degrees C]
-    // Combined both steps of the operation as given in the manual
-    if (T_Raw == 1023){
-      // Error alert!
-      char T[6] = "ERROR";
-    }
-    else if (T_Raw <= 900){
-      float T = (T_Raw - 400.) / 10.;
-    }
-    else {
-      // (i.e. T_Raw > 900, but no elif needed so long as input string
-      // parses correctly... hmm, should maybe protect against that)
-      float T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
-    }
-    
-*/    ///////////////
-    // SAVE DATA //
-    ///////////////
-/*
-    datafile.print(Epsilon_a);
-    datafile.print(",");
-    datafile.print(EC);
-    datafile.print(",");
-    datafile.print(T);
-    datafile.print(",");
-    // Echo to serial
-    Serial.print(Epsilon_a);
-    Serial.print(F(","));
-    Serial.print(EC);
-    Serial.print(F(","));
-    Serial.print(T);
-    Serial.print(F(","));
-*/
-//  }
-//}
+  sensorString += ','; // Comma at end as well - direct printing of data
 
+  /*
+  // Copy array to remove spaces
+  char sensorOutput[i+1];
+  for (int j=0; j<=i; j++){
+    sensorOutput[j] = sensorString[j];
+  }
+  */
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // Unique in that I already have the comma as part of the string!
+  datafile.print(sensorString);
+  // Echo to serial
+  Serial.print(sensorString);
+  
+  // Decagon MPS-2 documentation states : "The water potential in kilopascals is the 
+  // first number output by the sensor. The second number is temperature in Celsius"
+
+}
 
 void Logger::vdivR(int pin, float Rref){
   float _R = _vdivR(pin, Rref);
@@ -1231,8 +1331,10 @@ void Logger::vdivR(int pin, float Rref){
   // SAVE DATA //
   ///////////////
 
+  SDstart();
   datafile.print(_R);
   datafile.print(",");
+  SDend();
   // Echo to serial
   Serial.print(_R);
   Serial.print(F(","));
@@ -1245,12 +1347,401 @@ void Logger::flex(int flexPin, float Rref, float calib1, float calib2){
 }
 
 void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, float intercept){
+  // Generic resistance-with-distance device that varies linearly
   float _Rpot = _vdivR(linpotPin, Rref);
   float _dist = slope*_Rpot + intercept;
 }
 
+void Logger::displacementMeasuredByResistance_piecewiseLinear(int analogPin, int Rref, float* x, float* R){
+  // Computes a distance displacement as a function of measured resistance
+  // as a piecewise linear function (i.e. linearly interpolating between
+  // values in a look-up table.
+  
+  // INPUT VARIABLES:
+  // analogPin = pin number that resistor is attached to (other end goes
+  //   to a 3V3 pin -- or whatever the reference voltage happens to be)
+  // Rref = resistance of reference resistor (in Ohms or whatever R uses)
+  // x = array of distances in look-up table (units defined as user would like)
+  // R = array of resistances in look-up table (in Ohms or whatever Rref uses)
 
-// NEW STUFF:
+  float R_sensor = _vdivR(analogPin, Rref);
+  
+  // Find first value in table that is past measured value -- whether lower or
+  // higher (just depending on direction or R change)
+
+  // Declar vars s.t. they will start out on the proper side of the measurement
+  float R_below = R_sensor - 1000;
+  float R_above = R_sensor + 1000;
+  int i = 0;
+  int i_above;
+  int i_below;
+  
+  Serial.println(R_below);
+  Serial.println(R_above);
+  
+  if (R[0] < R_sensor){
+    while(R[i] < R_sensor){
+      i++; // Will land on the high value (i.e. past the mark)
+    }
+  }
+  else if (R[0] > R_sensor){
+    while(R[i] < R_sensor){
+      i++; // Will land on the low value (i.e. past the mark)
+    }
+  }
+  // Double-check this!
+  float fraction_along = (R_sensor - R[i-1]) / (R[i] - R[i-1]); // Partial distance over full distance
+  float distance = x[i-1] + ( (x[i] - x[i-1]) * fraction_along );
+
+  // Write to file:
+  SDstart();
+  datafile.print(distance); // Should work without clock's CSpinRTC -- digging into object that is already made
+  datafile.print(",");
+  SDend();
+  // Echo to serial
+  Serial.print(distance);
+  Serial.print(F(","));
+}
+
+//////////////////////////////
+// ATLAS SCIENTIFIC SENSORS //
+//////////////////////////////
+
+/*
+ ADW: NOTE TO SELF -- REWRITE!!!!
+ This software was made to demonstrate how to quickly get your Atlas Scientific product running on the Arduino platform.
+ An Arduino MEGA 2560 board was used to test this code.
+ This code was written in the Arudino 1.0 IDE
+ Modify the code to fit your system.
+ **Type in a command in the serial monitor and the Atlas Scientific product will respond.**
+ **The data from the Atlas Scientific product will come out on the serial monitor.**
+ Code efficacy was NOT considered, this is a demo only.
+ The TX3 line goes to the RX pin of your product.
+ The RX3 line goes to the TX pin of your product.
+ Make sure you also connect to power and GND pins to power and a common ground.
+ Open TOOLS > serial monitor, set the serial monitor to the correct serial port and set the baud rate to 38400.
+ Remember, select carriage return from the drop down menu next to the baud rate selection; not "both NL & CR".
+ */
+
+/*
+
+///////////////////////////////////////////
+// COMMANDS FOR ATLAS SCIENTIFIC SENSORS //
+///////////////////////////////////////////
+
+The Atlas Scientific sensors operate by receiving a Serial command and then 
+performing the requested action and/or returning a value.
+
+Full documentation of these commands are given in the datasheets on the Atlas 
+Scientific website:
+https://www.atlas-scientific.com
+
+Here, these commands have been copy/pasted into a quick reference section.
+
+Columns:
+Command -- what it does -- default state
+ARGH but it pastes with spaces!
+Will just have to regex first and last spaces into a nice table -- on to-do list.
+-- ADW: 15 June 2014
+
+// Also, do something to enable / disable indicator lights?
+// Perhaps earlier in code if Atlas sensors are present...
+
+
+////////
+// pH //
+////////
+
+There are a total of 14 different commands that can be given to the pH Circuit.
+All commands must be followed by a carriage return <CR>.
+Commands are not case sensitive.
+
+L1 Enables debugging LEDs Enabled
+L0 Disables debugging LEDs Disabled
+R Takes one pH reading N/A
+C Takes continuous pH readings every 378 Milliseconds. N/A
+TT.TT Take temperature dependent reading. 25 C°
+E Stops all readings. Enter standby/quiescent mode. N/A
+S Calibration at pH Seven N/A
+F Calibration at pH Four N/A
+T Calibration at pH Ten N/A
+X Return Circuit to factory settings N/A
+I Information: Type of Circuit • firmware version • firmware creation date N/A
+# (xxxx, !, ?) Set Device ID No ID Set
+Z0 Change baud rate 38,400 bps
+Z(1-8) Set fixed baud rate Z6 (38,400 bps)
+
+
+/////////////////////////////
+// Electrical Conductivity //
+/////////////////////////////
+
+C,<1|0|?> Enable / Disable or Query continuous readings (pg.15) Enabled
+Cal,<type,nnn> Performs calibration (pg.21) User must calibrate
+I Device information (pg.24) N/A
+I2C,<nnn> Sets the I 2 C ID number (pg.30) Not set
+K,<nn.nn|?> Set or Query the probe K constant (pg.17) K=1.0
+L,<1|0|?> Enable / Disable or Query the LEDs (pg.14) LEDs Enabled
+Name,<nnn|?> Set or Query the name of the device (pg.23) Not set
+O, <parameter>,<1|0> Enable / Disable or Query parts of the output string (pg.19) All Enabled
+R Returns a single reading (pg.16) N/A
+Response,<1|0|?> Enable / Disable or Query response code (pg.25) Enabled
+Serial,<nnn> Set the baud rate (pg.28) 38400
+Sleep Enter low power sleep mode (pg.27) N/A
+Status Retrieve status information (pg.26) N/A
+T,<XX.XX|?> Set or Query the temperature compensation (pg.18) 25 ̊C
+X Factory reset (pg.29) N/A
+
+*/
+
+
+void Logger::AtlasLEDtest(){
+  Serial2.begin(38400);
+  Serial2.write(13); // Clear buffer -- carriage return
+  Serial2.print("L,1");
+  Serial2.write(13);
+  Serial2.end();
+}
+
+void Logger::Atlas_test(char* command){
+  Serial2.begin(38400);
+  Serial2.write(13); // Clear buffer -- carriage return
+  Serial2.print(command);
+  Serial2.write(13);
+  Serial2.end();
+}
+
+void Logger::AtlasScientific(char* command, int SerialNumber, uint32_t baudRate, bool printReturn, bool saveReturn){
+  // * "command" is the command sent to the Atlas Scientific product.
+  //   see the data sheet as well as the above quick lists
+  // SerialNumber and baudRate default to 0 and 38400, respectively.
+  // SerialNumber could be changed for Arduino Mega.
+  // baudRate will stay constant insofar as Atlas sensors' baud rates do.
+  // getReturn determines whether you care about the Serial response, or whether
+  // you would just like to clear the buffer.
+  //
+
+  Serial3.begin(baudRate);
+  //Serial2.println("L,0\r");
+  
+  /*
+  uint32_t start_millis_clear_buffer = millis();
+  Serial2.write(13); // Clear buffer -- carriage return
+  while ( (millis() - start_millis_clear_buffer < 500) || Serial2.available() ){
+    Serial2.read();
+  }
+  */
+
+  String sensorString = ""; // a char array to hold the data from the Atlas Scientific product
+                         // Atlas' example indicates that they expect all returns to be <= 30 bytes
+  sensorString.reserve(30); // Sets aside memory for the Sring
+  char inChar; // incoming characters on the serial port
+
+  // "println" prints <values>\r\n. Atlas uses println to send data in its 
+  // Arduino sample code, so I presume the "\r" is taken as the cutoff (its 
+  // sensors terminate with a carriage return) and the "\n" is discarded.
+  // Still, I wonder if it would be better to "Serial.print(...\n);"
+  // (or ASCII 13, however Arduino does it) explicitly
+  Serial3.print(command); // send the command to the Atlas Scientific product
+  Serial3.write(13); // carriage return to signal the end of the command
+  
+  Serial3.flush(); // Wait for transmit to finish
+  
+  delay(100);
+
+  //delay();
+  
+  
+  uint32_t start_millis = millis(); // Safety guard in case all data not received -- won't hang for > 30 seconds
+  bool endflag = false;
+  
+  // "5000" just to ensure that there is no hang if signal isn't good
+  while ((millis() - start_millis < 5000) && !endflag){
+    // used to have if (printReturn || saveReturn) here, but
+    // should read return either way
+    if (Serial3.available()){
+      inChar = Serial3.read();
+      // Serial.print(inChar); // uncomment for debugging input from sensor
+      if (inChar != '\r'){
+        //sensorString[i] = inChar;
+        sensorString += inChar;
+      }
+      else{
+        endflag = true;
+      }
+    }
+  }
+  // save iff both getReturn and saveReturn are true
+  // Currently also echoes the return to serial port if it will
+  // also be saved (sent to SD card)
+  if (saveReturn){
+    SDstart();
+    datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
+    datafile.print(",");
+    SDend();
+  }
+  // Echo to serial
+  if (saveReturn || printReturn){
+    Serial.print(sensorString);
+    Serial.print(F(","));
+  }
+  /*
+  else if (printReturn){ // so !savereturn
+    Serial.println();
+    Serial.print("Sensor returns: ");
+    Serial.println(sensorString);
+    Serial.println();
+  }
+  */
+  
+  // Get rid of the incoming Serial stream
+  //while (_tx_buffer->head != _tx_buffer->tail); // get rid of the rest of the buffer after Line 1
+  while( Serial3.read() != -1 );
+
+  Serial3.end();
+
+}
+
+
+/////////////////////
+// Hardware Serial //
+/////////////////////
+
+// Currently used only for Atlas Scientific, but I (ADW) think could be useful
+// in general.
+// May be better created as a class that instantiates the pin number and 
+// baud, but I will have to learn more about how memory is handled with classes
+// and how to "destruct" them
+
+void Logger::StartHardwareSerial(int SerialNumber, uint32_t baud){
+  // Starts a hardware serial port, especially for the LogMega where there
+  // is more than one such port
+  if (SerialNumber == 0){
+    // Special case: used at 57600 for comms with computer.
+    // If you want 57600 bps, don't do anything to the Serial!
+    // Otherwise end, and then begin at new baud rate.
+    if (baud != 57600){
+      Serial.end();
+      Serial.begin(baud);
+    }
+  }
+  else if (SerialNumber == 1){
+    Serial1.begin(baud);
+  }
+  else if (SerialNumber == 2){
+    Serial2.begin(baud);
+  }
+  else if (SerialNumber == 3){
+    Serial3.begin(baud);
+  }
+}
+
+// Overload some of these functions as needed (in future) to work with multiple 
+// data types
+
+void Logger::PrintHardwareSerial(int SerialNumber, char* input){
+  // Prints a character arrray to a hardware serial port
+  // Especially for the LogMega where there is more than one such port
+  if (SerialNumber == 0){
+    Serial.print(input);
+  }
+  else if (SerialNumber == 1){
+    Serial1.print(input);
+  }
+  else if (SerialNumber == 2){
+    Serial2.print(input);
+  }
+  else if (SerialNumber == 3){
+    Serial3.print(input);
+  }
+}
+
+void Logger::PrintlnHardwareSerial(int SerialNumber, char* input){
+  // Prints a character arrray followed by \r\n to a hardware serial port
+  // Especially for the LogMega where there is more than one such port
+  if (SerialNumber == 0){
+    Serial.println(input);
+  }
+  else if (SerialNumber == 1){
+    Serial1.println(input);
+  }
+  else if (SerialNumber == 2){
+    Serial2.println(input);
+  }
+  else if (SerialNumber == 3){
+    Serial3.println(input);
+  }
+}
+
+char Logger::ReadHardwareSerial(int SerialNumber){
+  // Reads a byte (char) from the selected serial port
+  // Especially for the LogMega where there is more than one such port
+  if (SerialNumber == 0){
+    Serial.read();
+  }
+  else if (SerialNumber == 1){
+    Serial1.read();
+  }
+  else if (SerialNumber == 2){
+    Serial2.read();
+  }
+  else if (SerialNumber == 3){
+    Serial3.read();
+  }
+}
+
+int Logger::AvailableHardwareSerial(int SerialNumber){
+  // Returns the number of bytes queued up to read on the given serial port
+  // Especially for the LogMega where there is more than one such port
+  // Could do uint8_t if we get really low on memory :)
+  // But leaving like this in case we deal with larger buffers in future
+  // (64 byte right now)
+  int nbytes_to_read;
+  if (SerialNumber == 0){
+    nbytes_to_read = Serial.available();
+  }
+  else if (SerialNumber == 1){
+    nbytes_to_read = Serial1.available();
+  }
+  else if (SerialNumber == 2){
+    nbytes_to_read = Serial2.available();
+  }
+  else if (SerialNumber == 3){
+    nbytes_to_read = Serial3.available();
+  }
+  return nbytes_to_read;
+}
+
+void Logger::EndHardwareSerial(int SerialNumber, uint32_t baud){
+  // Closes a hardware serial port, especially for the LogMega where there
+  // is more than one such port
+  // Here, "baud" is an optional parameter that is important iff baud = 57600
+  // bps, in which case there is no reasno to stop and then re-instantiate the
+  // serial connection (because computer serial will be the same as sensor 
+  // serial)
+  if (SerialNumber == 0){
+    // Special case: used at 57600 for comms with computer.
+    // So end, and then begin at 57600 for use outside comms with this sensor.
+    if (baud != 57600){
+      Serial.end();
+      Serial.begin(57600);
+    }
+  }
+  else if (SerialNumber == 1){
+    Serial1.end();
+  }
+  else if (SerialNumber == 2){
+    Serial2.end();
+  }
+  else if (SerialNumber == 3){
+    Serial3.end();
+  }
+}
+
+
+////////////////////////////////////////////
+// FUNCTIONS FOR LOGGER START-UP SEQUENCE //
+////////////////////////////////////////////
 
 void Logger::name(){
   // Self-identify before talking
@@ -1258,7 +1749,6 @@ void Logger::name(){
   Serial.print(logger_name);
   Serial.print(F(">: "));
 }
-
 
 void Logger::print_time(){
   boolean exit_flag = 1;
@@ -1293,6 +1783,7 @@ void Logger::set_time_main(){
     }
   }
 }
+
 void Logger::announce_start(){
   Serial.println();
   name();
@@ -1372,7 +1863,7 @@ void Logger::startup_sequence(){
   }
   else{
     // No serial; just blink
-    now = RTC.now();
+    DateTime now = RTC.now();
     unixtime_at_start = now.unixtime();
     // Keep Serial just in case computer is connected w/out Python terminal
     Serial.print(F("Current UNIX time stamp according to logger is: "));
@@ -1389,6 +1880,11 @@ void Logger::startup_sequence(){
   }
 }
 
+
+////////////////////////////////////////////////
+// CLOCK SETTING -- NOW WORKS WITH DS3234 RTC //
+////////////////////////////////////////////////
+
 void Logger::clockSet(){
 
   byte Year;
@@ -1403,37 +1899,30 @@ void Logger::clockSet(){
   bool h12;
   bool PM;
 
+  const int len = 32;
+  static char buf[len];
+
   DateTime nowPreSet = RTC.now();  
 
 	GetDateStuff(Year, Month, Date, DoW, Hour, Minute, Second);
 
-	Clock.setClockMode(false);	// set to 24h
+	RTC.setClockMode(false);	// set to 24h
 	//setClockMode(true);	// set to 12h
 
-	Clock.setYear(Year);
-	Clock.setMonth(Month);
-	Clock.setDate(Date);
-	Clock.setDoW(DoW);
-	Clock.setHour(Hour);
-	Clock.setMinute(Minute);
-	Clock.setSecond(Second);
+  Serial.println("Setting  time");
+	RTC.setYear(Year);
+	RTC.setMonth(Month);
+	RTC.setDate(Date);
+	RTC.setDoW(DoW);
+	RTC.setHour(Hour);
+	RTC.setMinute(Minute);
+	RTC.setSecond(Second);
 
 	// Give time at next five seconds
-	// Should use a DateTime object for this, b/c rollover is a potential
-	// problem, but this display is not mission-critical
 	for (int i=0; i<5; i++){
 	    delay(1000);
-	    Serial.print(Clock.getYear(), DEC);
-	    Serial.print(F("-"));
-	    Serial.print(Clock.getMonth(Century), DEC);
-	    Serial.print(F("-"));
-	    Serial.print(Clock.getDate(), DEC);
-	    Serial.print(F(" "));
-	    Serial.print(Clock.getHour(h12, PM), DEC); //24-hr
-	    Serial.print(F(":"));
-	    Serial.print(Clock.getMinute(), DEC);
-	    Serial.print(F(":"));
-	    Serial.println(Clock.getSecond(), DEC);
+      DateTime now = RTC.now();
+      Serial.println(now.toString(buf,len));
 	}
   delay(1000);
   unsigned long unixtime_at_receive_string = nowPreSet.unixtime();
@@ -1441,7 +1930,6 @@ void Logger::clockSet(){
   Serial.println(unixtime_at_receive_string);
   Serial.println(F("Clock set!"));
 }
-
 
 void Logger::GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW, 
 		byte& Hour, byte& Minute, byte& Second) {
@@ -1493,4 +1981,23 @@ void Logger::GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW,
 	Second = Temp1*10 + Temp2;
 }
 
+
+///////////////////////////////////////////
+// SD SPI NON-CONFLICT UTILITY FUNCTIONS //
+///////////////////////////////////////////
+
+// SPI mode library for SD card -- don't want to edit SdFatLib, too much active
+// work by Bill Greiman and a huge pile of code. So will do SPI switches here
+// with these functions
+void Logger::SDstart()
+{
+  SPI.setBitOrder(MSBFIRST);
+  SPI.setDataMode(SPI_MODE0);
+  digitalWrite(CSpinSD, LOW); // CSpinSD is already set to output at the beginning, and this shoudl not change
+}
+
+void Logger::SDend()
+{
+  digitalWrite(CSpinSD, HIGH); // CSpinSD is already set to output at the beginning, and this shoudl not change
+}
 

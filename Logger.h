@@ -55,10 +55,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <SdFat.h>
 #include <Wire.h>
-#include <DS3231.h>
+#include <SPI.h>
 #include <math.h>
 #include <avr/sleep.h>
 #include <stdlib.h> // For turning incoming ASCII character strings into int with atol
+
+#include <RTClib.h>
+#include <RTC_DS3234.h>
 
 // Outside of class definitions
 void wakeUpNow();
@@ -74,24 +77,32 @@ class Logger {
     
     // Initialization
     void initialize(char* _logger_name, char* _sitecode, int _log_minutes, bool _ext_int=false);
-    void setupLogger();
+    void setupLogger(bool testing=false);
     
     // Code for sleeping, starting up from sleep, synching SD card
-    void sleep(int minutes);
+    void sleep(int minutes); // soon to be deprecated: requires log_minutes to be declared twice, caused ADW some confusion
+    void sleep();
     void startLogging();
-    void endLogging();
+    void endLogging(bool getInternalVoltage=true);
     void startAnalog();
     void endAnalog();
     
     // Sensors - standard procedure (wake up, log, sleep)
-    void thermistorB(float R0,float B,float Rref,float T0degC,int thermPin);
+    float thermistorB(float R0,float B,float Rref,float T0degC,int thermPin);
     void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,bool writeAll); // Print order: Distance [cm], standard deviation [cm]
     float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, int maxRange, bool RS232=false);
     void maxbotixHRXL_WR_analog(int nping=10,int sonicPin=A0,int EX=99,bool writeAll=true); // Print order: Distance [cm], standard deviation [cm]
-    void decagon5TE(int excitPin, int dataPin); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
+    //float maxbotix_HardwareSerial(int SerialNumber, int ExPin, int SerialEnablePin, int npings, bool writeAll, int maxRange, bool RS232); // Print order: Distance [cm], standard deviation [cm]
+    void Decagon5TE(int excitPin, int SerialNumber); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
+    void DecagonMPS2(int excitPin, int SerialNumber); // Print order:  Water potential [kPa], Temperature [Celsius]
+
     void vdivR(int pin, float Rref);
     void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, float intercept);
+    void AtlasScientific(char* command, int SerialNumber=2, uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
+    void AtlasLEDtest();
+    void Atlas_test(char* command);
+    void displacementMeasuredByResistance_piecewiseLinear(int analogPin, int Rref, float* x, float* R);
     
     // Sensors - special
     // Rain gage - will wake logger up and cause it to log to a different file
@@ -102,6 +113,15 @@ class Logger {
     // because this is free for a rain gage on the ALog BottleLogger
     void TippingBucketRainGage();
 
+    // Hardware Serial that allows functions to flexibly define which port
+    // is desired (for LogMega)
+    void StartHardwareSerial(int SerialNumber, uint32_t baud);
+    void PrintHardwareSerial(int SerialNumber, char* input);
+    void PrintlnHardwareSerial(int SerialNumber, char* input);
+    char ReadHardwareSerial(int SerialNumber);
+    int AvailableHardwareSerial(int SerialNumber);
+    void EndHardwareSerial(int SerialNumber, uint32_t baud=-1); // baud to check if = 57600, so to keep port open for comms with computer'
+    
   private:
     void pinUnavailable(int pin);
     char *nameFile(char * _sitecode);
@@ -109,8 +129,7 @@ class Logger {
     // Sleep and alarms
     void sleepNow();
     // wakeUpNow defined outside of class; see above
-    void alarm2reset();
-    void alarm2_1min();
+    void DS3234_alarm1_1min();
     
     // LED signals
     void LEDwarn(int nflash);
@@ -141,39 +160,17 @@ class Logger {
     // Logging
     void start_logging_to_otherfile(char* filename);
     void end_logging_to_otherfile();
+    void readInternalVoltage();
     void endLine();
-
+    // SD card start/end for multiple SPI devices
+    // Onus is on the other device to change SPI_MODE and bit order back to its 
+    // preference -- as it should be, since I can't anticipate what the other
+    // device will need. This *is* done for the DS3234 clock that is integrated
+    // into the LogMega.
+    void SDstart();
+    void SDend();
+    
 };
 
-#endif  
-    
-///////////////
-// REFERENCE //
-///////////////
-
-// Reference pinout for ATmega644/1284
-// INT2 not currently working
-//
-//                      +---\/---+
-//          (D 0) PB0  1|        |40  PA0 (AI 0 / D24)
-//          (D 1) PB1  2|        |39  PA1 (AI 1 / D25)
-//INT2-BAD  (D 2) PB2  3|        |38  PA2 (AI 2 / D26)
-//      PWM (D 3) PB3  4|        |37  PA3 (AI 3 / D27)
-//      PWM (D 4) PB4  5|        |36  PA4 (AI 4 / D28)
-//     MOSI (D 5) PB5  6|        |35  PA5 (AI 5 / D29)
-//PWM  MISO (D 6) PB6  7|        |34  PA6 (AI 6 / D30)
-//PWM   SCK (D 7) PB7  8|        |33  PA7 (AI 7 / D31)
-//                RST  9|        |32  AREF
-//                VCC 10|        |31  GND 
-//                GND 11|        |30  AVCC
-//              XTAL2 12|        |29  PC7 (D 23)
-//              XTAL1 13|        |28  PC6 (D 22)
-//     RX0 (D 8)  PD0 14|        |27  PC5 (D 21) TDI
-//     TX0 (D 9)  PD1 15|        |26  PC4 (D 20) TDO
-//INT0 RX1 (D 10) PD2 16|        |25  PC3 (D 19) TMS
-//INT1 TX1 (D 11) PD3 17|        |24  PC2 (D 18) TCK
-//     PWM (D 12) PD4 18|        |23  PC1 (D 17) SDA
-//     PWM (D 13) PD5 19|        |22  PC0 (D 16) SCL
-//     PWM (D 14) PD6 20|        |21  PD7 (D 15) PWM
-//                      +--------+
+#endif
 
