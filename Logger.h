@@ -77,14 +77,15 @@ class Logger {
     void setupLogger();
     
     // Code for sleeping, starting up from sleep, synching SD card
-    void sleep(int minutes);
+    void sleep(int minutes); // soon to be deprecated: requires log_minutes to be declared twice, caused ADW some confusion
+    void sleep();
     void startLogging();
     void endLogging();
     void startAnalog();
     void endAnalog();
     
     // Sensors - standard procedure (wake up, log, sleep)
-    void thermistorB(float R0,float B,float Rref,float T0degC,int thermPin);
+    float thermistorB(float R0,float B,float Rref,float T0degC,int thermPin);
     void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,bool writeAll); // Print order: Distance [cm], standard deviation [cm]
     float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, int maxRange, bool RS232=false);
     void maxbotixHRXL_WR_analog(int nping=10,int sonicPin=A0,int EX=99,bool writeAll=true); // Print order: Distance [cm], standard deviation [cm]
@@ -92,6 +93,7 @@ class Logger {
     void vdivR(int pin, float Rref);
     void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, float intercept);
+    void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
     
     // Sensors - special
     // Rain gage - will wake logger up and cause it to log to a different file
