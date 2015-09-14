@@ -401,7 +401,7 @@ digitalWrite(SDpin,LOW);
        * sleep mode: SLEEP_MODE_PWR_DOWN
        * 
        */  
-      set_sleep_mode(SLEEP_MODE_STANDBY);   // sleep mode is set here
+      set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
 
   //    setPrescaler(6); // Clock prescaler of 64, slows down to conserve power
       cbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter OFF
