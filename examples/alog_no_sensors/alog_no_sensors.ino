@@ -34,7 +34,7 @@ void loop(){
 // ***************************************** 
 
 // Sleep 
-logger.sleep(1);
+logger.sleep();
 
 // Wake up and initialize
 logger.startLogging();
