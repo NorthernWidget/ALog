@@ -1318,6 +1318,12 @@ void Logger::DecagonMPS2(int exPin, int SerialNumber){
   datafile.print(sensorString);
   // Echo to serial
   Serial.print(sensorString);
+<<<<<<< HEAD
+=======
+  
+  // Decagon MPS-2 documentation states : "The water potential in kilopascals is the 
+  // first number output by the sensor. The second number is temperature in Celsius"
+>>>>>>> 584493dad77b2e0ce2f92ed979b0605d7d598cbf
 
 }
 
@@ -1419,6 +1425,7 @@ void Logger::displacementMeasuredByResistance_piecewiseLinear(int analogPin, int
  Open TOOLS > serial monitor, set the serial monitor to the correct serial port and set the baud rate to 38400.
  Remember, select carriage return from the drop down menu next to the baud rate selection; not "both NL & CR".
  */
+<<<<<<< HEAD
 
 /*
 
@@ -1508,6 +1515,97 @@ void Logger::Atlas_test(char* command){
   Serial2.end();
 }
 
+=======
+
+/*
+
+///////////////////////////////////////////
+// COMMANDS FOR ATLAS SCIENTIFIC SENSORS //
+///////////////////////////////////////////
+
+The Atlas Scientific sensors operate by receiving a Serial command and then 
+performing the requested action and/or returning a value.
+
+Full documentation of these commands are given in the datasheets on the Atlas 
+Scientific website:
+https://www.atlas-scientific.com
+
+Here, these commands have been copy/pasted into a quick reference section.
+
+Columns:
+Command -- what it does -- default state
+ARGH but it pastes with spaces!
+Will just have to regex first and last spaces into a nice table -- on to-do list.
+-- ADW: 15 June 2014
+
+// Also, do something to enable / disable indicator lights?
+// Perhaps earlier in code if Atlas sensors are present...
+
+
+////////
+// pH //
+////////
+
+There are a total of 14 different commands that can be given to the pH Circuit.
+All commands must be followed by a carriage return <CR>.
+Commands are not case sensitive.
+
+L1 Enables debugging LEDs Enabled
+L0 Disables debugging LEDs Disabled
+R Takes one pH reading N/A
+C Takes continuous pH readings every 378 Milliseconds. N/A
+TT.TT Take temperature dependent reading. 25 C°
+E Stops all readings. Enter standby/quiescent mode. N/A
+S Calibration at pH Seven N/A
+F Calibration at pH Four N/A
+T Calibration at pH Ten N/A
+X Return Circuit to factory settings N/A
+I Information: Type of Circuit • firmware version • firmware creation date N/A
+# (xxxx, !, ?) Set Device ID No ID Set
+Z0 Change baud rate 38,400 bps
+Z(1-8) Set fixed baud rate Z6 (38,400 bps)
+
+
+/////////////////////////////
+// Electrical Conductivity //
+/////////////////////////////
+
+C,<1|0|?> Enable / Disable or Query continuous readings (pg.15) Enabled
+Cal,<type,nnn> Performs calibration (pg.21) User must calibrate
+I Device information (pg.24) N/A
+I2C,<nnn> Sets the I 2 C ID number (pg.30) Not set
+K,<nn.nn|?> Set or Query the probe K constant (pg.17) K=1.0
+L,<1|0|?> Enable / Disable or Query the LEDs (pg.14) LEDs Enabled
+Name,<nnn|?> Set or Query the name of the device (pg.23) Not set
+O, <parameter>,<1|0> Enable / Disable or Query parts of the output string (pg.19) All Enabled
+R Returns a single reading (pg.16) N/A
+Response,<1|0|?> Enable / Disable or Query response code (pg.25) Enabled
+Serial,<nnn> Set the baud rate (pg.28) 38400
+Sleep Enter low power sleep mode (pg.27) N/A
+Status Retrieve status information (pg.26) N/A
+T,<XX.XX|?> Set or Query the temperature compensation (pg.18) 25 ̊C
+X Factory reset (pg.29) N/A
+
+*/
+
+
+void Logger::AtlasLEDtest(){
+  Serial2.begin(38400);
+  Serial2.write(13); // Clear buffer -- carriage return
+  Serial2.print("L,1");
+  Serial2.write(13);
+  Serial2.end();
+}
+
+void Logger::Atlas_test(char* command){
+  Serial2.begin(38400);
+  Serial2.write(13); // Clear buffer -- carriage return
+  Serial2.print(command);
+  Serial2.write(13);
+  Serial2.end();
+}
+
+>>>>>>> 584493dad77b2e0ce2f92ed979b0605d7d598cbf
 void Logger::AtlasScientific(char* command, int SerialNumber, uint32_t baudRate, bool printReturn, bool saveReturn){
   // * "command" is the command sent to the Atlas Scientific product.
   //   see the data sheet as well as the above quick lists
