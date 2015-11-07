@@ -644,7 +644,6 @@ void Logger::sleep(){
 
 void Logger::sleep(int log_minutes){
   // Go to sleep
-  backtosleep:
   IS_LOGGING = false; // not logging when sleeping!
   sleepNow();
   
@@ -696,7 +695,7 @@ void Logger::sleep(int log_minutes){
         if (NEW_RAIN_BUCKET_TIP){
           TippingBucketRainGage();
         }
-        goto backtosleep;
+        sleep(log_minutes)
       }
     }
   }
@@ -748,6 +747,9 @@ void Logger::endLogging(){
   // After this step, since everything is in the loop() part of the Arduino
   // sketch, the sketch will cycle back back to sleep(...)
   // But if I want to, I could call sleep(...) from here.
+  // I might do it (better to be safe) if I find that infinite recursion
+  // will not cause memory issues.
+  // sleep(log_minutes)
 }
 
 void Logger::startAnalog(){
