@@ -73,7 +73,7 @@ class Logger {
     Logger();
     
     // Initialization
-    void initialize(char* _logger_name, char* _sitecode, int _log_minutes, bool _ext_int=false);
+    void initialize(char* _logger_name, char* _sitecode, int _log_minutes, bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false);
     void setupLogger();
     
     // Code for sleeping, starting up from sleep, synching SD card

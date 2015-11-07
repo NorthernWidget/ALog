@@ -106,7 +106,12 @@ const int log_mega=2; // In development
 
 // Logging interval - wake when minutes == this
 int log_minutes;
-bool camera_is_on = false; // for a video camera
+bool CAMERA_IS_ON = false; // for a video camera
+
+// IS_LOGGING tells the logger if it is awake and actively logging
+// Prevents being put back to sleep by an event (e.g., rain gage bucket tip)
+// if it is in the middle of logging, so it will return to logging instead.
+bool IS_LOGGING = false;
 
 // Filename and logger name
 // Filename is set up as 8.3 filename:
@@ -114,9 +119,11 @@ bool camera_is_on = false; // for a video camera
 char* filename;
 char* logger_name;
 
-// For interrupt
+// For interrupt from sensor
 bool extInt;
-bool tip = false;
+bool NEW_RAIN_BUCKET_TIP = false; // flag
+bool LOG_ON_BUCKET_TIP; // Defaults to False, true if you should log every 
+                        // time an event (e.g., rain gage bucket tip) happens
 
 /////////////////////////
 // INSTANTIATE CLASSES //
@@ -145,7 +152,7 @@ DateTime now;
 // Constructor
 Logger::Logger(){}
 
-void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, bool _ext_int){
+void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, bool _ext_int, bool _LOG_ON_BUCKET_TIP){
   /*
   Model automatically determined from the MCU type and is used to modify 
   pinout-dependent functions. There may be a need to add a board version in the 
@@ -160,10 +167,13 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   // SLEEP COUNTER //
   ///////////////////
   
-  // Assign the class-wide static members to the input values
+  // Assign the global variables (not intended to change) to the input values
   logger_name = _logger_name;
   filename = _filename;
   log_minutes = _log_minutes;
+  
+  // Assign the global and changable variables to input values
+  LOG_ON_BUCKET_TIP = _LOG_ON_BUCKET_TIP;
 
   //////////////////////////////////////////
   // EXTERNAL INTERRUPT (E.G., RAIN GAGE) //
@@ -376,6 +386,7 @@ digitalWrite(SDpin,LOW);
 
   void Logger::sleepNow()         // here we put the arduino to sleep
   {
+    IS_LOGGING = false;           // Definitely not logging anymore
 
     alarm2reset();   // Turns alarm 2 off and then turns it back
                              // on so it will go off again next minute
@@ -466,7 +477,9 @@ digitalWrite(SDpin,LOW);
       // After waking, run sleep mode function, and then remainder of this function (below)
       sleep_disable();         // first thing after waking from sleep:
                                // disable sleep...
-      detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this to allow both measurements types!
+      // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this to allow both measurements types!
+      // 06-11-2015: The above line commented to allow the rain gage to be read
+      // at the same time as other readings
                           // Maybe move this to specific post-wakeup code?
       detachInterrupt(interruptNum);      // disables interrupt so the 
                                // wakeUpNow code will not be executed 
@@ -493,6 +506,11 @@ digitalWrite(SDpin,LOW);
     // timers and code using timers (serial.print and more...) will not work here.
     // we don't really need to execute any special functions here, since we
     // just want the thing to wake up
+    IS_LOGGING = true;                   // Currently logging
+                                         //    this will allow the logging 
+                                         //    to happen even if the logger is
+                                         //    already awake to deal with a 
+                                         //    rain gauge bucket tip
     sbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter ON
   }
 
@@ -504,8 +522,11 @@ digitalWrite(SDpin,LOW);
     // just want the thing to wake up
     //sleep_disable();         // first thing after waking from sleep:
                                // disable sleep...
-    //delayMicroseconds(10000);
-    tip = true;
+    NEW_RAIN_BUCKET_TIP = true;
+    // If the logger is already logging, run
+    if (IS_LOGGING){
+      
+    }
   }
 
 
@@ -624,42 +645,59 @@ void Logger::sleep(){
 void Logger::sleep(int log_minutes){
   // Go to sleep
   backtosleep:
+  IS_LOGGING = false; // not logging when sleeping!
   sleepNow();
-  delay(100);
-  //Serial.println("Hi");
-  Serial.println(tip);
+  
+  // Wake up
+  delay(100); // Is such a long delay necessary?
   // First, check if there was a bucket tip from the rain gage, if present
-  if (tip){
-    Serial.println("Tip!");
-    pinMode(LEDpin, OUTPUT);
-    digitalWrite(LEDpin, HIGH);
+  if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
-    delay(50);
-    digitalWrite(LEDpin, LOW);
-    pinMode(LEDpin, INPUT);
-    tip = false;
-    goto backtosleep; // Could remove this to log everything else on each bucket tip
-  }
-  // Check if the logger has been awakend by someone pushing the button
-  // If so, bypass everything else
-  if (_model == bottle_logger && (digitalRead(manualWakePin) == LOW)){
-  }
-  else{
-    int minute = Clock.getMinute();
-    // Only wake if you really have to
-    if (minute % log_minutes == 0){
-      Serial.println(F("Logging!"));
+    if (LOG_ON_BUCKET_TIP){
+      // If we want data recorded when the bucket tips, we don't want it to 
+      // interrupt a current logging step.
+      // And IS_LOGGING will just stay true if we're interrupting that.
+      IS_LOGGING = true; // First switch the IS_LOGGING flag because we're
+                         // doing it now.
     }
-    else {
-      Serial.print(F("Going back to sleep for "));
-      Serial.print(minute % log_minutes);
-      if (minute % log_minutes == 1){
-        Serial.println(F(" more minute"));
+  }
+  // Then check if a logging event is supposed to occur
+  // that is not part of a new bucket tip
+  else if (IS_LOGGING){
+    // Check if the logger has been awakend by someone pushing the button
+    // If so, bypass everything else
+    if (_model == bottle_logger && (digitalRead(manualWakePin) == LOW)){
+    }
+
+    // FIND OUT HOW TO TELL PROGRAM TO LOG IF TIPPED AND NOT ON TIME
+    //          (done, but hack-ey)
+    // AND ALSO HOW TO NOT TO GO BACK TO SLEEP IF A CONDITION IS MET
+    // THAT WILL TELL IT TO DO CONTINUOUS LOGGING FOR SOME TIME
+    // AND HOW TO PASS THE FLAGS FOR THIS TO THE MAIN CODE FROM OUTSIDE
+
+    else{
+      int minute = Clock.getMinute();
+      // Only wake if you really have to
+      if (minute % log_minutes == 0){
+        Serial.println(F("Logging!"));
       }
-      else{
-        Serial.println(F(" more minutes"));
+      else {
+        Serial.print(F("Going back to sleep for "));
+        Serial.print(minute % log_minutes);
+        if (minute % log_minutes == 1){
+          Serial.println(F(" more minute"));
+        }
+        else{
+          Serial.println(F(" more minutes"));
+        }
+        // Check right before going back to sleep if there has been a rain
+        // gauge bucket tip while it has been on
+        // This is a temporary solution!
+        if (NEW_RAIN_BUCKET_TIP){
+          TippingBucketRainGage();
+        }
+        goto backtosleep;
       }
-      goto backtosleep;
     }
   }
 }
@@ -699,6 +737,17 @@ void Logger::endLogging(){
   digitalWrite(SDpin,LOW); // Turns off SD card
   alarm2reset();
   delay(10); // need time to reset alarms?
+
+  // Check right before going back to sleep if there has been a rain
+  // gauge bucket tip while it has been on
+  // This is a temporary solution!
+  if (NEW_RAIN_BUCKET_TIP){
+    TippingBucketRainGage();
+  }
+
+  // After this step, since everything is in the loop() part of the Arduino
+  // sketch, the sketch will cycle back back to sleep(...)
+  // But if I want to, I could call sleep(...) from here.
 }
 
 void Logger::startAnalog(){
@@ -1044,20 +1093,20 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
   //Serial.print(indicator);
   //endAnalog();
   // So I check if it is > 1000
-  //bool camera_is_on = (indicator > 1000);
-  //bool camera_is_on = (indicator > 0); // unnecessary holdover, and just if(indicator)
+  //bool CAMERA_IS_ON = (indicator > 1000);
+  //bool CAMERA_IS_ON = (indicator > 0); // unnecessary holdover, and just if(indicator)
   Serial.print("C");
-  Serial.print(camera_is_on);
+  Serial.print("Camera is on");
   Serial.print(want_camera_on);
   // Turn camera on or off if needed
-  //if ( (camera_is_on == 0 && want_camera_on == 1) || (camera_is_on == 1 && want_camera_on == 0)){
-  if (camera_is_on != want_camera_on){
+  //if ( (CAMERA_IS_ON == 0 && want_camera_on == 1) || (CAMERA_IS_ON == 1 && want_camera_on == 0)){
+  if (CAMERA_IS_ON != want_camera_on){
     pinMode(control_pin, OUTPUT);
     digitalWrite(control_pin, LOW);
     delay(200);
     pinMode(control_pin, INPUT);
     digitalWrite(control_pin, HIGH);
-    camera_is_on = 1 - camera_is_on; // flips it from true to false and vice versa
+    CAMERA_IS_ON = 1 - CAMERA_IS_ON; // flips it from true to false and vice versa
     // Use this to get times of camera on/off
     start_logging_to_otherfile("camera.txt");
     if (want_camera_on == 1){
@@ -1167,6 +1216,7 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
 }
 
 void Logger::TippingBucketRainGage(){
+
   // Uses the interrupt to read a tipping bucket rain gage.
   // Then prints date stamp
   pinMode(SDpin,OUTPUT); // Seemed to have forgotten between loops... ?
@@ -1181,8 +1231,32 @@ void Logger::TippingBucketRainGage(){
   start_logging_to_otherfile("b_tips.txt");
   end_logging_to_otherfile();
   digitalWrite(SDpin,LOW);
+
+  /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
+  pinMode(LEDpin, OUTPUT);
+  digitalWrite(LEDpin, HIGH);
+  /// END TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   Serial.println(F("Tip!"));
   delay(200); // to make sure tips aren't double-counted
+  /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
+  digitalWrite(LEDpin, LOW);
+  pinMode(LEDpin, INPUT);
+  /// END TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
+  NEW_RAIN_BUCKET_TIP = false;
+  
+  // Sets flag to log data if the "LOG_ON_BUCKET_TIP" flag is set "TRUE"
+  if (LOG_ON_BUCKET_TIP){
+    IS_LOGGING = true;
+  }
+  
+  // Then based on whether we are already logging or if we are supposed to 
+  // start logging here, we can continue with the logging process, or just 
+  // go back to sleep
+  if (!IS_LOGGING){
+    // Nested recursion to next-level-up function; better than goto
+    sleep(log_minutes);
+  }
+
 }
 
 void Logger::start_logging_to_otherfile(char* filename){
