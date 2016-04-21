@@ -15,13 +15,13 @@ Logger logger;
 ////////////////////////////
 // USER-ENTERED VARIABLES //
 ////////////////////////////
-char* dataLoggerName = "BG 01";
-char* fileName = "BG01.txt"; // Name of file for logged data: 8.3 format (e.g, 
+char* dataLoggerName = "T 01";
+char* fileName = "T01.txt"; // Name of file for logged data: 8.3 format (e.g, 
                                    // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
-int dataLoggingIntervalMinutes = 10; // Will log when the remainder of "minutes", divided by
+int dataLoggingIntervalMinutes = 1; // Will log when the remainder of "minutes", divided by
                                      // this, equals 0. For regular logging intervals, make  
                                      // sure that this number divides evenly into 60.
-bool external_interrupt = true; // e.g., rain gage
+bool external_interrupt = false; // e.g., rain gage
 
 void setup(){
   logger.initialize(dataLoggerName, fileName, dataLoggingIntervalMinutes, external_interrupt);
@@ -33,7 +33,7 @@ void loop(){
 // ***************************************** 
 
 // Sleep 
-logger.sleep(1);
+logger.sleep();
 
 // Wake up and initialize
 logger.startLogging();
