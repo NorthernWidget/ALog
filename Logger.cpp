@@ -668,6 +668,10 @@ void Logger::sleep(int log_minutes){
     // Check if the logger has been awakend by someone pushing the button
     // If so, bypass everything else
     if (_model == bottle_logger && (digitalRead(manualWakePin) == LOW)){
+      // Brief light flash to show that logging is happening
+      digitalWrite(LEDpin, HIGH);
+      delay(5); // to make sure tips aren't double-counted
+      digitalWrite(LEDpin, LOW);
     }
 
     // FIND OUT HOW TO TELL PROGRAM TO LOG IF TIPPED AND NOT ON TIME
@@ -736,10 +740,12 @@ void Logger::endLogging(){
   // THIS DELAY IS ***CRITICAL*** -- WITHOUT IT, THERE IS NOT SUFFICIENT
   // TIME TO WRITE THE DATA TO THE SD CARD!
   delay(20);
-  
   digitalWrite(SDpin,LOW); // Turns off SD card
+
+  // Reset alarm  
   alarm2reset();
   delay(10); // need time to reset alarms?
+
 
   // Check right before going back to sleep if there has been a rain
   // gauge bucket tip while it has been on
