@@ -715,7 +715,6 @@ void Logger::startLogging(){
     Serial.println(F("Error initializing SD card for writing"));
   }
   // Open file to write data
-  // Have to do this every time now.
   delay(10);
   if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
     Serial.print(F("Opening "));
@@ -725,29 +724,19 @@ void Logger::startLogging(){
   }
   // Datestamp the start of the line
   unixDatestamp();
-  datafile.close();
 }
 
 void Logger::endLogging(){
   // Ends line, turns of SD card, and resets alarm: ready to sleep
 
-  // Open file to write data
-  delay(10);
-  if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
-    Serial.print(F("Opening "));
-    Serial.print(filename);
-    Serial.println(F(" for write failed"));
-  delay(10);
-  }
-
   endLine();
-  datafile.println();
 
   // close the file: (This does the actual sync() step too - writes buffer)
   datafile.close();
   // THIS DELAY IS ***CRITICAL*** -- WITHOUT IT, THERE IS NOT SUFFICIENT
   // TIME TO WRITE THE DATA TO THE SD CARD!
   delay(20);
+  
   digitalWrite(SDpin,LOW); // Turns off SD card
   alarm2reset();
   delay(10); // need time to reset alarms?
@@ -806,19 +795,9 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin)
   // SAVE DATA //
   ///////////////
 
-  // SD open
-  delay(10);
-  if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
-    Serial.print(F("Opening "));
-    Serial.print(filename);
-    Serial.println(F(" for write failed"));
-  delay(10);
-  }
-
   // SD write
   datafile.print(T);
   datafile.print(",");
-  datafile.close();
   
   // Echo to serial
   Serial.print(T);
