@@ -977,7 +977,8 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
   }
   // Put all of the range values in the array 
   for (int i=0; i<npings; i++){
-    myranges[i] = maxbotix_Serial_parse(Ex, Rx, RS232);
+    // myranges[i] = maxbotix_soft_Serial_parse(Ex, Rx, RS232);
+    myranges[i] = maxbotix_Serial_parse(Ex);
   }
   // Then get the mean and standard deviation of all of the data
   int npings_with_nodata_returns = 0;
@@ -1051,8 +1052,37 @@ float Logger::standard_deviation_from_array(int values[], int nvalues, float mea
   return sqrt(sumsquares/nvalues);
 }
 
+int Logger::maxbotix_Serial_parse(int Ex){
+  // Excites the MaxBotix sensor and receives its ranging output
+  char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
+  Serial.end(); // End 57600 bps computer comms
+  Serial.begin(9600); // Start 9600 bps logger comms
+  //Excite the sensor to produce a pulse
+  pinMode(Ex, OUTPUT);
+  digitalWrite(Ex, HIGH);
+  delay(1);
+  digitalWrite(Ex, LOW);
+  // Record the result of the ranging
+  int i=0; // counter
+  // Not sure if this will work - maybe loop around to the other end of the array?
+  while (range[i-1] != 13){
+    if (Serial.available()){
+      range[i] = Serial.read();
+      i++;
+    }
+  }
+  Serial.end();
+  Serial.begin(57600);
+  // Convert to integer
+  char r2[4]; // range stripped of all of its extra characters
+  for (int i=1; i<5; i++){
+    r2[i-1] = range[i];
+  }
+  int r3 = atol(r2);
+  return r3;
+}
 
-int Logger::maxbotix_Serial_parse(int Ex, int Rx, bool RS232){
+int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
   // Excites the MaxBotix sensor and receives its ranging output
   char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
   SoftwareSerial mySerial(Rx, -1, RS232); // RX, TX, inverse logic - RS232 true, TTL false; defaults to TTL (false)
@@ -1482,6 +1512,7 @@ void Logger::set_time_main(){
     }
   }
 }
+
 void Logger::announce_start(){
   Serial.println();
   name();
@@ -1492,14 +1523,33 @@ void Logger::announce_start(){
 }
 
 void Logger::startup_sequence(){
-  boolean comp = 0;
+  boolean comp = false;
+  char handshake[4];
+  char handshake_test[5] = "alog"; // 5 chars, incl. termination
+  int ntrue = 0;
+  int i;
   unsigned long unixtime_at_start;
+
+  // Check if connected to computer with ALogTalk running to set the clock
   int millisthen = millis();
   while ( (millis() - millisthen) < 2000 && (comp == 0)){
     if ( Serial.available() ){
-      comp = 1;
+      i = 0;
+      while( Serial.available() && (i < 4)){
+        handshake[i] = Serial.read();
+        i++;
+      }
+	    for (int i=0; i<4; i++){
+        if (handshake[i] == handshake_test[i]){
+          ntrue++;
+        }
+      }
+      if (ntrue == 4){
+        comp = true;
+      }
     }
   }
+  // Run through startup sequence, including clock setting if comp is true
   name();
   Serial.println(F("HELLO, COMPUTER."));
   delay(500);
@@ -1556,7 +1606,7 @@ void Logger::startup_sequence(){
             Serial.println(F("Please select <y> or <n>."));
           }
         }
-      }//*/
+      }
     }
   }
   else{
