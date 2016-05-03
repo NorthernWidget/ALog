@@ -199,7 +199,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   /////////////////////////////
 
   if (_model == 0 || _model == 1 || _model == 2){
-    Serial.print("Logger model = ");
+    Serial.print(F("Logger model = "));
     Serial.println(_model_name);
   }
   else{
@@ -226,7 +226,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   
   delay(20);
   
-  Serial.print("Filename: ");
+  Serial.print(F("Filename: "));
   Serial.println(filename);
   
   Serial.println(F("Logger done initializing."));
@@ -372,9 +372,9 @@ digitalWrite(SDpin,LOW);
     for (int i=0; i<9; i++){
       if (pin == _pinList[i]){
         _errorFlag++;
-        Serial.print("Error: trying to alter the state of Pin ");
+        Serial.print(F("Error: trying to alter the state of Pin "));
         Serial.println(_pinList[i]);
-        Serial.print("This pin is assigned in a system-critical role as: ");
+        Serial.print(F("This pin is assigned in a system-critical role as: "));
         Serial.println(_pinNameList[i]);
         // Note: numbers >13 in standard Arduino are analog pins
       }
@@ -388,16 +388,16 @@ digitalWrite(SDpin,LOW);
       }
     }
     if (SPI_or_I2C_flag){
-      Serial.println("You are using the SPI or I2C bus; take care that this does not clash");
-      Serial.println("with the SD card interface (SPI) or the clock interface (I2C).");
+      Serial.println(F("You are using the SPI or I2C bus; take care that this does not clash"));
+      Serial.println(F("with the SD card interface (SPI) or the clock interface (I2C)."));
     }
     
     for (int i=0; i<9; i++){
       if (pin == _pinList_crit[i]){
         _errorFlag++;
-        Serial.print("Error: trying to alter the state of Pin ");
+        Serial.print(F("Error: trying to alter the state of Pin "));
         Serial.println(_pinList_crit[i]);
-        Serial.print("This pin is assigned in a system-critical role as: ");
+        Serial.print(F("This pin is assigned in a system-critical role as: "));
         Serial.println(_pinNameList_crit[i]);
         // Note: numbers >13 in standard Arduino are analog pins
       }
@@ -898,7 +898,7 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
   //Serial.print(Vh_real);
   //Serial.print(",");
   Serial.print(RH);
-  Serial.print(",");
+  Serial.print(F(","));
 
 }
 
@@ -1224,8 +1224,8 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
   // So I check if it is > 1000
   //bool CAMERA_IS_ON = (indicator > 1000);
   //bool CAMERA_IS_ON = (indicator > 0); // unnecessary holdover, and just if(indicator)
-  Serial.print("C");
-  Serial.print("Camera is on");
+  Serial.print(F("C"));
+  Serial.print(F("Camera is on"));
   Serial.print(want_camera_on);
   // Turn camera on or off if needed
   //if ( (CAMERA_IS_ON == 0 && want_camera_on == 1) || (CAMERA_IS_ON == 1 && want_camera_on == 0)){
