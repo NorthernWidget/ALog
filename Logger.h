@@ -136,8 +136,9 @@ class Logger {
 		byte& Hour, byte& Minute, byte& Second);
     
     // Sensor utility codes
-    float _vdivR(int pin, float Rref, bool Rref_on_GND_side=true);
-    int maxbotix_Serial_parse(int Ex, int Rx, bool RS232=false);
+    float _vdivR(int pin, float Rref);
+    int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
+    int maxbotix_Serial_parse(int Ex);
     float standard_deviation_from_array(float values[], int nvalues, float mean);
     float standard_deviation_from_array(int values[], int nvalues, float mean);
         
