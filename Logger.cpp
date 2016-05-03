@@ -69,7 +69,7 @@ const int log_mega=2; // In development
 
 #if(_model == bottle_logger)
   // SD card: CSpin and protected pins
-  const int CLKpin = 13;
+  const int SCKpin = 13;
   const int MISOpin = 12;
   const int MOSIpin = 11;
   const int CSpin = 10;
@@ -85,7 +85,7 @@ const int log_mega=2; // In development
   const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
 #elif(_model == big_log)
   // SD card: CSpin and protected pins
-  const int CLKpin = 7;
+  const int SCKpin = 7;
   const int MISOpin = 6;
   const int MOSIpin = 5;
   const int CSpin = 4;
@@ -362,8 +362,12 @@ digitalWrite(SDpin,LOW);
 
   void Logger::pinUnavailable(int pin){
     int _errorFlag = 0;
-    char* _pinNameList[9] = {"MISOpin", "MOSIpin", "CSpin", "SensorPin", "SDpin", "LEDpin", "wakePin", "SDApin", "SCLpin"};
-    int _pinList[9] = {MISOpin, MOSIpin, CSpin, SensorPin, SDpin, LEDpin, wakePin, SDApin, SCLpin};
+
+    char* _pinNameList_crit[9] = {"CSpin", "SensorPin", "SDpin", "LEDpin", "wakePin"};
+    int _pinList_crit[9] = {CSpin, SensorPin, SDpin, LEDpin, wakePin};
+
+    char* _pinNameList[9] = {"MISOpin", "MOSIpin", "SCKpin", "SDApin", "SCLpin"};
+    int _pinList[9] = {MISOpin, MOSIpin, SCKpin, SDApin, SCLpin};
     
     for (int i=0; i<9; i++){
       if (pin == _pinList[i]){
@@ -372,6 +376,29 @@ digitalWrite(SDpin,LOW);
         Serial.println(_pinList[i]);
         Serial.print("This pin is assigned in a system-critical role as: ");
         Serial.println(_pinNameList[i]);
+        // Note: numbers >13 in standard Arduino are analog pins
+      }
+    }
+    
+    bool SPI_or_I2C_flag = false;
+    for (int i=0; i<9; i++){
+      if (pin == _pinList_crit[i]){
+        SPI_or_I2C_flag = true;
+        break;
+      }
+    }
+    if (SPI_or_I2C_flag){
+      Serial.println("You are using the SPI or I2C bus; take care that this does not clash");
+      Serial.println("with the SD card interface (SPI) or the clock interface (I2C).");
+    }
+    
+    for (int i=0; i<9; i++){
+      if (pin == _pinList_crit[i]){
+        _errorFlag++;
+        Serial.print("Error: trying to alter the state of Pin ");
+        Serial.println(_pinList_crit[i]);
+        Serial.print("This pin is assigned in a system-critical role as: ");
+        Serial.println(_pinNameList_crit[i]);
         // Note: numbers >13 in standard Arduino are analog pins
       }
     }
