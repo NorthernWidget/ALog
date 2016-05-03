@@ -621,13 +621,25 @@ digitalWrite(SDpin,LOW);
     Serial.println();
     }
 
-float Logger::_vdivR(int pin,float Rref){
+float Logger::_vdivR(int pin, float Rref, bool Rref_on_GND_side){
   // Same as public vidvR code, but returns value instead of 
   // saving it to a file
   int _ADC;
+  float _R;
   _ADC = analogRead(pin);
   float _ADCnorm = _ADC/1023.0; // Normalize to 0-1
-  float _R = Rref/_ADCnorm - Rref; // R1 = (R2-Vin)/Vout - R2
+  if(Rref_on_GND_side){
+    // Standard case for the provided slots for reference resistors
+    // This is the default.
+    _R = Rref/_ADCnorm - Rref; // R1 = (R2*Vin)/Vout - R2
+  }
+  else {
+    // This could happen if an external sensor has a different setup for
+    // its known and unknown resistors; in this case, place the reference
+    // resistor between the analog pin and 3V3. (The sensor, internally, 
+    // has its thermistor connected to GND.)
+    _R = Rref * (1. / ((1./_ADCnorm) - 1.)); // R2 = R1* (1 / ((Vin/Vout) - 1))
+  }
   return _R;
 }
 
@@ -778,7 +790,7 @@ void Logger::endAnalog(){
 // Thermistor - with b-value
 //////////////////////////////
 
-float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
+float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side){
   // R0 and T0 are thermistor calibrations
   //
   // EXAMPLES:
@@ -786,8 +798,7 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin)
   // thermistorB(10000,3988,13320,25,tempPin); // EPCOS, DigiKey # 495-2153-ND
 
   // Voltage divider
-  float Rtherm = _vdivR(thermPin,Rref);
-  //float Rtherm = 10000;
+  float Rtherm = _vdivR(thermPin,Rref,Rref_on_GND_side);
   
   // B-value thermistor equations
   float T0 = T0degC + 273.15;
@@ -812,6 +823,58 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin)
   return T;
 
 }
+
+
+// HTM2500LF Humidity and Temperature Sensor
+// by TE Connectivity Measurement Specialties
+///////////////////////////////////////////////
+
+void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref){
+  // Rref is for the thermistor input (resistance)
+  // humidity input is a voltage
+
+  // First, measure these pins
+  // This will fully calculate and write the temperature data, too.
+  float V_humid_norm = analogRead(humidPin)/1023.; // 0-1
+  float Tmin = thermistorB(10000, 3347, 10000, 25, thermPin, false);
+  float Ttyp = thermistorB(10000, 3380, 10000, 25, thermPin, false);
+  float Tmax = thermistorB(10000, 3413, 10000, 25, thermPin, false);
+  
+  // Then, convert the normalized voltage into a humidity reading
+  // The calibration is created for a 5V input, but the data sheet says it
+  // is ratiometric, so I think I will just renormalize the voltage to
+  // pretend that it is 5V input in order to get the right input values
+  // for the equation. Just multiply by 5!
+  
+  // T error is small, and has a small effect on humidity -- much smaller 
+  // than published error (see data sheet) -- maybe eventually code error
+  // into this function. So just use typical thermistor values.
+  float Vh = 5000 * V_humid_norm; // mV
+  //float Vh_real = 3300 * V_humid_norm; // switching 3.3V basis
+  
+  // RH in percent
+  //float RH = ( (-1.9206E-9 * Vh**3) + (1.437E-5 * Vh**2) + (3.421E-3 * Vh) - 12.4 ) / (1 + (Ttyp - 23) * 2.4E-3);
+  // Got to use the pow(base, int) function or do multiplication the long way...
+  float RH = ( (-1.9206E-9 * Vh*Vh*Vh) + (1.437E-5 * Vh*Vh) + (3.421E-3 * Vh) - 12.4 ) / (1 + (Ttyp - 23) * 2.4E-3);
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  //datafile.print(Vh_real);
+  //datafile.print(",");
+  datafile.print(RH);
+  datafile.print(",");
+  
+  // Echo to serial
+  //Serial.print(Vh_real);
+  //Serial.print(",");
+  Serial.print(RH);
+  Serial.print(",");
+
+}
+
 
 // MaxBotix ruggedized standard size ultrasonic rangefinder: 
 // 1 cm = 1 10-bit ADC interval
@@ -1413,8 +1476,8 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 //}
 
 
-void Logger::vdivR(int pin, float Rref){
-  float _R = _vdivR(pin, Rref);
+void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
+  float _R = _vdivR(pin, Rref, Rref_on_GND_side);
   
   ///////////////
   // SAVE DATA //
