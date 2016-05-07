@@ -604,7 +604,9 @@ digitalWrite(SDpin,LOW);
 
   void Logger::unixDatestamp(){
 
+    startAnalog(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
+    endAnalog();
 
     // SD
     datafile.print(now.unixtime());
@@ -1310,7 +1312,9 @@ void Logger::start_logging_to_otherfile(char* filename){
   delay(10);
   }
   // Datestamp the start of the line - modified from unixDateStamp function
+  startAnalog(); // Now using 3V3 regulator for sensors to power clock
   now = RTC.now();
+  endAnalog();
   // SD
   otherfile.print(now.unixtime());
   otherfile.print(",");
@@ -1489,7 +1493,9 @@ void Logger::print_time(){
       exit_flag = 0; // Exit loop once this is done
       // Print times before setting clock
       for (int i=0; i<5; i++){
+        startAnalog(); // Now using 3V3 regulator for sensors to power clock
         now = RTC.now();
+        endAnalog();
         Serial.println(now.unixtime());
         if ( i<4 ){
           // No need to delay on the last time through
@@ -1562,7 +1568,9 @@ void Logger::startup_sequence(){
     delay(1500);
     name();
     Serial.print(F("UNIX TIME STAMP ON MY WATCH IS: "));
+    startAnalog(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
+    endAnalog();
     unixtime_at_start = now.unixtime();
     Serial.println(unixtime_at_start);
     delay(1500);
@@ -1611,7 +1619,9 @@ void Logger::startup_sequence(){
   }
   else{
     // No serial; just blink
+    startAnalog(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
+    endAnalog();
     unixtime_at_start = now.unixtime();
     // Keep Serial just in case computer is connected w/out Python terminal
     Serial.print(F("Current UNIX time stamp according to logger is: "));
@@ -1642,7 +1652,9 @@ void Logger::clockSet(){
   bool h12;
   bool PM;
 
-  DateTime nowPreSet = RTC.now();  
+  startAnalog(); // Now using 3V3 regulator for sensors to power clock
+  DateTime nowPreSet = RTC.now();
+  endAnalog();
 
 	GetDateStuff(Year, Month, Date, DoW, Hour, Minute, Second);
 
