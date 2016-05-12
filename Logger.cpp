@@ -69,7 +69,7 @@ const int log_mega=2; // In development
 
 #if(_model == bottle_logger)
   // SD card: CSpin and protected pins
-  const int CLKpin = 13;
+  const int SCKpin = 13;
   const int MISOpin = 12;
   const int MOSIpin = 11;
   const int CSpin = 10;
@@ -85,7 +85,7 @@ const int log_mega=2; // In development
   const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
 #elif(_model == big_log)
   // SD card: CSpin and protected pins
-  const int CLKpin = 7;
+  const int SCKpin = 7;
   const int MISOpin = 6;
   const int MOSIpin = 5;
   const int CSpin = 4;
@@ -199,7 +199,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   /////////////////////////////
 
   if (_model == 0 || _model == 1 || _model == 2){
-    Serial.print("Logger model = ");
+    Serial.print(F("Logger model = "));
     Serial.println(_model_name);
   }
   else{
@@ -226,7 +226,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   
   delay(20);
   
-  Serial.print("Filename: ");
+  Serial.print(F("Filename: "));
   Serial.println(filename);
   
   Serial.println(F("Logger done initializing."));
@@ -362,16 +362,43 @@ digitalWrite(SDpin,LOW);
 
   void Logger::pinUnavailable(int pin){
     int _errorFlag = 0;
-    char* _pinNameList[9] = {"MISOpin", "MOSIpin", "CSpin", "SensorPin", "SDpin", "LEDpin", "wakePin", "SDApin", "SCLpin"};
-    int _pinList[9] = {MISOpin, MOSIpin, CSpin, SensorPin, SDpin, LEDpin, wakePin, SDApin, SCLpin};
+
+    char* _pinNameList_crit[9] = {"CSpin", "SensorPin", "SDpin", "LEDpin", "wakePin"};
+    int _pinList_crit[9] = {CSpin, SensorPin, SDpin, LEDpin, wakePin};
+
+    char* _pinNameList[9] = {"MISOpin", "MOSIpin", "SCKpin", "SDApin", "SCLpin"};
+    int _pinList[9] = {MISOpin, MOSIpin, SCKpin, SDApin, SCLpin};
     
     for (int i=0; i<9; i++){
       if (pin == _pinList[i]){
         _errorFlag++;
-        Serial.print("Error: trying to alter the state of Pin ");
+        Serial.print(F("Error: trying to alter the state of Pin "));
         Serial.println(_pinList[i]);
-        Serial.print("This pin is assigned in a system-critical role as: ");
+        Serial.print(F("This pin is assigned in a system-critical role as: "));
         Serial.println(_pinNameList[i]);
+        // Note: numbers >13 in standard Arduino are analog pins
+      }
+    }
+    
+    bool SPI_or_I2C_flag = false;
+    for (int i=0; i<9; i++){
+      if (pin == _pinList_crit[i]){
+        SPI_or_I2C_flag = true;
+        break;
+      }
+    }
+    if (SPI_or_I2C_flag){
+      Serial.println(F("You are using the SPI or I2C bus; take care that this does not clash"));
+      Serial.println(F("with the SD card interface (SPI) or the clock interface (I2C)."));
+    }
+    
+    for (int i=0; i<9; i++){
+      if (pin == _pinList_crit[i]){
+        _errorFlag++;
+        Serial.print(F("Error: trying to alter the state of Pin "));
+        Serial.println(_pinList_crit[i]);
+        Serial.print(F("This pin is assigned in a system-critical role as: "));
+        Serial.println(_pinNameList_crit[i]);
         // Note: numbers >13 in standard Arduino are analog pins
       }
     }
@@ -623,13 +650,25 @@ digitalWrite(SDpin,LOW);
     Serial.println();
     }
 
-float Logger::_vdivR(int pin,float Rref){
+float Logger::_vdivR(int pin, float Rref, bool Rref_on_GND_side){
   // Same as public vidvR code, but returns value instead of 
   // saving it to a file
   int _ADC;
+  float _R;
   _ADC = analogRead(pin);
   float _ADCnorm = _ADC/1023.0; // Normalize to 0-1
-  float _R = Rref/_ADCnorm - Rref; // R1 = (R2-Vin)/Vout - R2
+  if(Rref_on_GND_side){
+    // Standard case for the provided slots for reference resistors
+    // This is the default.
+    _R = Rref/_ADCnorm - Rref; // R1 = (R2*Vin)/Vout - R2
+  }
+  else {
+    // This could happen if an external sensor has a different setup for
+    // its known and unknown resistors; in this case, place the reference
+    // resistor between the analog pin and 3V3. (The sensor, internally, 
+    // has its thermistor connected to GND.)
+    _R = Rref * (1. / ((1./_ADCnorm) - 1.)); // R2 = R1* (1 / ((Vin/Vout) - 1))
+  }
   return _R;
 }
 
@@ -780,7 +819,7 @@ void Logger::endAnalog(){
 // Thermistor - with b-value
 //////////////////////////////
 
-float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin){
+float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side){
   // R0 and T0 are thermistor calibrations
   //
   // EXAMPLES:
@@ -788,8 +827,7 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin)
   // thermistorB(10000,3988,13320,25,tempPin); // EPCOS, DigiKey # 495-2153-ND
 
   // Voltage divider
-  float Rtherm = _vdivR(thermPin,Rref);
-  //float Rtherm = 10000;
+  float Rtherm = _vdivR(thermPin,Rref,Rref_on_GND_side);
   
   // B-value thermistor equations
   float T0 = T0degC + 273.15;
@@ -814,6 +852,58 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin)
   return T;
 
 }
+
+
+// HTM2500LF Humidity and Temperature Sensor
+// by TE Connectivity Measurement Specialties
+///////////////////////////////////////////////
+
+void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref){
+  // Rref is for the thermistor input (resistance)
+  // humidity input is a voltage
+
+  // First, measure these pins
+  // This will fully calculate and write the temperature data, too.
+  float V_humid_norm = analogRead(humidPin)/1023.; // 0-1
+  float Tmin = thermistorB(10000, 3347, 10000, 25, thermPin, false);
+  float Ttyp = thermistorB(10000, 3380, 10000, 25, thermPin, false);
+  float Tmax = thermistorB(10000, 3413, 10000, 25, thermPin, false);
+  
+  // Then, convert the normalized voltage into a humidity reading
+  // The calibration is created for a 5V input, but the data sheet says it
+  // is ratiometric, so I think I will just renormalize the voltage to
+  // pretend that it is 5V input in order to get the right input values
+  // for the equation. Just multiply by 5!
+  
+  // T error is small, and has a small effect on humidity -- much smaller 
+  // than published error (see data sheet) -- maybe eventually code error
+  // into this function. So just use typical thermistor values.
+  float Vh = 5000 * V_humid_norm; // mV
+  //float Vh_real = 3300 * V_humid_norm; // switching 3.3V basis
+  
+  // RH in percent
+  //float RH = ( (-1.9206E-9 * Vh**3) + (1.437E-5 * Vh**2) + (3.421E-3 * Vh) - 12.4 ) / (1 + (Ttyp - 23) * 2.4E-3);
+  // Got to use the pow(base, int) function or do multiplication the long way...
+  float RH = ( (-1.9206E-9 * Vh*Vh*Vh) + (1.437E-5 * Vh*Vh) + (3.421E-3 * Vh) - 12.4 ) / (1 + (Ttyp - 23) * 2.4E-3);
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  //datafile.print(Vh_real);
+  //datafile.print(",");
+  datafile.print(RH);
+  datafile.print(",");
+  
+  // Echo to serial
+  //Serial.print(Vh_real);
+  //Serial.print(",");
+  Serial.print(RH);
+  Serial.print(F(","));
+
+}
+
 
 // MaxBotix ruggedized standard size ultrasonic rangefinder: 
 // 1 cm = 1 10-bit ADC interval
@@ -1136,8 +1226,8 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
   // So I check if it is > 1000
   //bool CAMERA_IS_ON = (indicator > 1000);
   //bool CAMERA_IS_ON = (indicator > 0); // unnecessary holdover, and just if(indicator)
-  Serial.print("C");
-  Serial.print("Camera is on");
+  Serial.print(F("C"));
+  Serial.print(F("Camera is on"));
   Serial.print(want_camera_on);
   // Turn camera on or off if needed
   //if ( (CAMERA_IS_ON == 0 && want_camera_on == 1) || (CAMERA_IS_ON == 1 && want_camera_on == 0)){
@@ -1447,8 +1537,8 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 //}
 
 
-void Logger::vdivR(int pin, float Rref){
-  float _R = _vdivR(pin, Rref);
+void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
+  float _R = _vdivR(pin, Rref, Rref_on_GND_side);
   
   ///////////////
   // SAVE DATA //
