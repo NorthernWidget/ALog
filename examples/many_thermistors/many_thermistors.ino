@@ -57,12 +57,12 @@ logger.startAnalog();
 // 3. Reference resistor resistance
 // 4. Temperature T0 at which thermistor resistance is R0
 // 5. Analog pin to which thermistor is attached.
-logger.thermistorB(10000, 3960, 10000, 25, 0); // +5  cm
-logger.thermistorB(10000, 3960, 10000, 25, 1); // -2  cm
-logger.thermistorB(10000, 3960, 10000, 25, 2); // -5  cm
-logger.thermistorB(10000, 3960, 10000, 25, 3); // -10 cm
-logger.thermistorB(10000, 3960, 10000, 25, 6); // -15 cm
-logger.thermistorB(10000, 3960, 10000, 25, 7); // -25 cm
+logger.thermistorB(10000, 3950, 10000, 25, 0); // +5  cm
+logger.thermistorB(10000, 3950, 10000, 25, 1); // -2  cm
+logger.thermistorB(10000, 3950, 10000, 25, 2); // -5  cm
+logger.thermistorB(10000, 3950, 10000, 25, 3); // -10 cm
+logger.thermistorB(10000, 3950, 10000, 25, 6); // -15 cm
+logger.thermistorB(10000, 3950, 10000, 25, 7); // -25 cm
 
 logger.endAnalog();
 

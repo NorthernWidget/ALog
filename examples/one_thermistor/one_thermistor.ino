@@ -51,7 +51,7 @@ logger.startLogging();
 
 logger.startAnalog();
 
-logger.thermistorB(10000, 3960, 10000, 25, 0);
+logger.thermistorB(10000, 3950, 10000, 25, 0);
 
 logger.endAnalog();
 
