@@ -77,8 +77,9 @@ const int log_mega=2; // In development
   const int SDApin = A4;
   const int SCLpin = A5;
   // Digital pins
-  const int SensorPin = 4; // Activates voltage regulator to give power to sensors
-  const int SDpin = 8; // Turns on voltage source to SD card
+  const int SensorPowerPin = 4; // Activates voltage regulator to give power to sensors
+  const int SDpowerPin = 8; // Turns on voltage source to SD card
+  const int ClockPowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
   const int LEDpin = 9; // LED to tell user if logger is working properly
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
   const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
@@ -93,8 +94,8 @@ const int log_mega=2; // In development
   const int SDApin = 23;
   const int SCLpin = 22;
   // Digital pins
-  const int SensorPin = 21; // Activates voltage regulator to give power to sensors
-  const int SDpin = 22; // Turns on voltage source to SD card
+  const int SensorPowerPin = 21; // Activates voltage regulator to give power to sensors
+  const int SDpowerPin = 22; // Turns on voltage source to SD card
   const int LEDpin = 23; // LED to tell user if logger is working properly
   const int wakePin = 10; // interrupt pin used for waking up via the alarm
   const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
@@ -272,9 +273,10 @@ void Logger::setupLogger(){
   // Set the rest of the pins: this is my pinModeRunning() function in other code,
   // but really is just as good to plop in here
   pinMode(CSpin,OUTPUT);
-  pinMode(SensorPin,OUTPUT);
+  pinMode(SensorPowerPin,OUTPUT);
   pinMode(LEDpin,OUTPUT);
-  pinMode(SDpin,OUTPUT);
+  pinMode(SDpowerPin,OUTPUT);
+  pinMode(ClockPowerPin,OUTPUT);
   // Manual wake pin - only on the new bottle loggers
   if (_model == bottle_logger){
     Serial.println(F("Setting manualWakePin"));
@@ -285,8 +287,8 @@ void Logger::setupLogger(){
     //digitalWrite(6, LOW);
   }
   //Start out with SD, Sensor pins set LOW
-  digitalWrite(SDpin,LOW);
-  digitalWrite(SensorPin,LOW);
+  digitalWrite(SDpowerPin,LOW);
+  digitalWrite(SensorPowerPin,LOW);
 
 
 ////////////
@@ -315,7 +317,7 @@ startup_sequence();
 // SD CARD ON //
 ////////////////
 
-digitalWrite(SDpin,HIGH);
+digitalWrite(SDpowerPin,HIGH);
 
 /////////////////////////////////////////////////////////////////////
 // Set alarm to go off every time seconds==00 (i.e. once a minute) //
@@ -352,7 +354,7 @@ Serial.println(F("Logger initialization complete! Ciao bellos."));
 
 delay(50);
 
-digitalWrite(SDpin,LOW);
+digitalWrite(SDpowerPin,LOW);
 
 }
 
@@ -363,8 +365,8 @@ digitalWrite(SDpin,LOW);
   void Logger::pinUnavailable(int pin){
     int _errorFlag = 0;
 
-    char* _pinNameList_crit[9] = {"CSpin", "SensorPin", "SDpin", "LEDpin", "wakePin"};
-    int _pinList_crit[9] = {CSpin, SensorPin, SDpin, LEDpin, wakePin};
+    char* _pinNameList_crit[9] = {"CSpin", "SensorPowerPin", "SDpowerPin", "ClockPowerPin", "LEDpin", "wakePin"};
+    int _pinList_crit[9] = {CSpin, SensorPowerPin, SDpowerPin, ClockPowerPin, LEDpin, wakePin};
 
     char* _pinNameList[9] = {"MISOpin", "MOSIpin", "SCKpin", "SDApin", "SCLpin"};
     int _pinList[9] = {MISOpin, MOSIpin, SCKpin, SDApin, SCLpin};
@@ -631,9 +633,9 @@ digitalWrite(SDpin,LOW);
 
   void Logger::unixDatestamp(){
 
-    startAnalog(); // Now using 3V3 regulator for sensors to power clock
+    RTCon(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
-    endAnalog();
+    RTCsleep();
 
     // SD
     datafile.print(now.unixtime());
@@ -670,6 +672,23 @@ float Logger::_vdivR(int pin, float Rref, bool Rref_on_GND_side){
     _R = Rref * (1. / ((1./_ADCnorm) - 1.)); // R2 = R1* (1 / ((Vin/Vout) - 1))
   }
   return _R;
+}
+
+void Logger::RTCon(){
+  // Turn on power clock
+  digitalWrite(ClockPowerPin,HIGH);
+  delay(2);
+}
+
+void Logger::RTCsleep(){
+  // Turn off power clock
+  // At this point, it runs on VCC (if logger is powered... which it is
+  // if this program is running) via the backup battery power supply.
+  // This "tricks" it into turning off its I2C bus and saves power on the
+  // board, but keeps its alarm functionality on.
+  // (Idea to do this courtesy of Gerhard Oberforcher)
+  digitalWrite(ClockPowerPin,LOW);
+  delay(2);
 }
 
 ////////////////////////////////////////////////////////////
@@ -749,9 +768,9 @@ void Logger::sleep(int log_minutes){
 }
   
 void Logger::startLogging(){
-  pinMode(SDpin,OUTPUT); // Seemed to have forgotten between loops... ?
+  pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
   // Initialize logger
-  digitalWrite(SDpin,HIGH); // Turn on SD card before writing to it
+  digitalWrite(SDpowerPin,HIGH); // Turn on SD card before writing to it
                             // Delay required after this??
   delay(10);
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
@@ -781,7 +800,7 @@ void Logger::endLogging(){
   // THIS DELAY IS ***CRITICAL*** -- WITHOUT IT, THERE IS NOT SUFFICIENT
   // TIME TO WRITE THE DATA TO THE SD CARD!
   delay(20);
-  digitalWrite(SDpin,LOW); // Turns off SD card
+  digitalWrite(SDpowerPin,LOW); // Turns off SD card
 
   // Reset alarm  
   alarm2reset();
@@ -801,16 +820,15 @@ void Logger::endLogging(){
 
 void Logger::startAnalog(){
   // Turn on power to analog sensors
-  digitalWrite(SensorPin,HIGH);
+  digitalWrite(SensorPowerPin,HIGH);
   delay(2);
 }
 
 void Logger::endAnalog(){
   // Turn off power to analog sensors
-  digitalWrite(SensorPin,LOW);
+  digitalWrite(SensorPowerPin,LOW);
   delay(2);
 }
-
 
 ////////////////////////////////
 // SENSOR INTERFACE FUNCTIONS //
@@ -1350,8 +1368,8 @@ void Logger::TippingBucketRainGage(){
 
   // Uses the interrupt to read a tipping bucket rain gage.
   // Then prints date stamp
-  pinMode(SDpin,OUTPUT); // Seemed to have forgotten between loops... ?
-  digitalWrite(SDpin,HIGH); // might want to use a digitalread for better incorporation into normal logging cycle
+  pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
+  digitalWrite(SDpowerPin,HIGH); // might want to use a digitalread for better incorporation into normal logging cycle
   delay(10);
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
@@ -1361,7 +1379,7 @@ void Logger::TippingBucketRainGage(){
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
   end_logging_to_otherfile();
-  digitalWrite(SDpin,LOW);
+  digitalWrite(SDpowerPin,LOW);
 
   /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   pinMode(LEDpin, OUTPUT);
@@ -1402,9 +1420,9 @@ void Logger::start_logging_to_otherfile(char* filename){
   delay(10);
   }
   // Datestamp the start of the line - modified from unixDateStamp function
-  startAnalog(); // Now using 3V3 regulator for sensors to power clock
+  RTCon(); // Now using 3V3 regulator for sensors to power clock
   now = RTC.now();
-  endAnalog();
+  RTCsleep();
   // SD
   otherfile.print(now.unixtime());
   otherfile.print(",");
@@ -1583,9 +1601,9 @@ void Logger::print_time(){
       exit_flag = 0; // Exit loop once this is done
       // Print times before setting clock
       for (int i=0; i<5; i++){
-        startAnalog(); // Now using 3V3 regulator for sensors to power clock
+        RTCon(); // Now using 3V3 regulator for sensors to power clock
         now = RTC.now();
-        endAnalog();
+        RTCsleep();
         Serial.println(now.unixtime());
         if ( i<4 ){
           // No need to delay on the last time through
@@ -1658,9 +1676,9 @@ void Logger::startup_sequence(){
     delay(1500);
     name();
     Serial.print(F("UNIX TIME STAMP ON MY WATCH IS: "));
-    startAnalog(); // Now using 3V3 regulator for sensors to power clock
+    RTCon(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
-    endAnalog();
+    RTCsleep();
     unixtime_at_start = now.unixtime();
     Serial.println(unixtime_at_start);
     delay(1500);
@@ -1709,9 +1727,10 @@ void Logger::startup_sequence(){
   }
   else{
     // No serial; just blink
-    startAnalog(); // Now using 3V3 regulator for sensors to power clock
+    RTCon(); // Now using 3V3 regulator for sensors to power clock
+    delay(5);
     now = RTC.now();
-    endAnalog();
+    RTCsleep();
     unixtime_at_start = now.unixtime();
     // Keep Serial just in case computer is connected w/out Python terminal
     Serial.print(F("Current UNIX time stamp according to logger is: "));
@@ -1742,9 +1761,9 @@ void Logger::clockSet(){
   bool h12;
   bool PM;
 
-  startAnalog(); // Now using 3V3 regulator for sensors to power clock
+  RTCon(); // Now using 3V3 regulator for sensors to power clock
   DateTime nowPreSet = RTC.now();
-  endAnalog();
+  RTCsleep();
 
 	GetDateStuff(Year, Month, Date, DoW, Hour, Minute, Second);
 

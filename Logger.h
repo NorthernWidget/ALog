@@ -130,6 +130,10 @@ class Logger {
     void announce_start();
     void startup_sequence();
     
+    // Clock power
+    void RTCon();
+    void RTCsleep();
+    
     // Clock setting
     void clockSet();
     void GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW, 
