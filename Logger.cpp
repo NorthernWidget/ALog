@@ -287,7 +287,7 @@ void Logger::setupLogger(){
     //digitalWrite(6, LOW);
   }
   //Start out with SD, Sensor pins set LOW
-  digitalWrite(SDpowerPin,LOW);
+  //digitalWrite(SDpowerPin,LOW);
   digitalWrite(SensorPowerPin,LOW);
 
 
@@ -352,7 +352,7 @@ Serial.println(F("Logger initialization complete! Ciao bellos."));
 
 delay(50);
 
-digitalWrite(SDpowerPin,LOW);
+//digitalWrite(SDpowerPin,LOW);
 
 }
 
@@ -640,8 +640,11 @@ digitalWrite(SDpowerPin,LOW);
     RTCsleep();
 
     // SD
+    digitalWrite(SDpowerPin,HIGH);
+  delay(10);
     datafile.print(now.unixtime());
     datafile.print(",");
+    //digitalWrite(SDpowerPin,LOW);
     // Echo to serial
     Serial.print(now.unixtime());
     Serial.print(F(","));
@@ -650,7 +653,9 @@ digitalWrite(SDpowerPin,LOW);
   void Logger::endLine(){
     // Ends the line in the file; do this at end of recording instance
     // before going back to sleep
+    digitalWrite(SDpowerPin,HIGH);    
     datafile.println();
+    //digitalWrite(SDpowerPin,LOW);
     Serial.println();
     }
 
@@ -748,7 +753,6 @@ void Logger::sleep(int log_minutes){
       RTCon();  //Chad
       int minute = Clock.getMinute();
       RTCsleep();  //Chad
-      Serial.println(minute); // Chad
       // Only wake if you really have to
       if (minute % log_minutes == 0){
         Serial.println(F("Logging!"));
@@ -778,7 +782,7 @@ void Logger::startLogging(){
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
   // Initialize logger
   digitalWrite(SDpowerPin,HIGH); // Turn on SD card before writing to it
-                            // Delay required after this??
+                                 // Delay required after this??
   delay(10);
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
@@ -793,7 +797,7 @@ void Logger::startLogging(){
     Serial.println(F(" for write failed"));
   delay(10);
   }
-  // Datestamp the start of the line
+  // Datestamp the start of the line -- this will also turn off the SDpowerPin
   unixDatestamp();
 }
 
@@ -802,12 +806,14 @@ void Logger::endLogging(){
 
   endLine();
 
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
   // close the file: (This does the actual sync() step too - writes buffer)
   datafile.close();
   // THIS DELAY IS ***CRITICAL*** -- WITHOUT IT, THERE IS NOT SUFFICIENT
   // TIME TO WRITE THE DATA TO THE SD CARD!
   delay(20);
-  digitalWrite(SDpowerPin,LOW); // Turns off SD card
+  //digitalWrite(SDpowerPin,LOW); // Turns off SD card
  
 
   // Reset alarm  
@@ -868,8 +874,12 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   ///////////////
 
   // SD write
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
+  //delay(100);
   datafile.print(T);
   datafile.print(",");
+  //digitalWrite(SDpowerPin,LOW);
   
   // Echo to serial
   Serial.print(T);
@@ -917,10 +927,13 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
   ///////////////
 
   // SD write
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
   //datafile.print(Vh_real);
   //datafile.print(",");
   datafile.print(RH);
   datafile.print(",");
+  //digitalWrite(SDpowerPin,LOW);
   
   // Echo to serial
   //Serial.print(Vh_real);
@@ -970,8 +983,11 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
     if (writeAll){
       Serial.print(range);
       Serial.print(F(","));
+      digitalWrite(SDpowerPin,HIGH);
+  delay(10);
       datafile.print(range);
       datafile.print(",");
+      //digitalWrite(SDpowerPin,LOW);
     }
   sumRange += range;
   }
@@ -992,11 +1008,14 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   ///////////////
   // SAVE DATA //
   ///////////////
-
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
+  delay(10);
   datafile.print(meanRange);
   datafile.print(",");
   datafile.print(sigma);
   datafile.print(",");
+  //digitalWrite(SDpowerPin,LOW);
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -1045,8 +1064,11 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
     if (writeAll){
       Serial.print(range);
       Serial.print(F(","));
+      digitalWrite(SDpowerPin,HIGH);
+  delay(10);
       datafile.print(range);
       datafile.print(",");
+      //digitalWrite(SDpowerPin,LOW);
     }
   sumRange += range;
   }
@@ -1067,11 +1089,13 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   ///////////////
   // SAVE DATA //
   ///////////////
-
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
   datafile.print(meanRange);
   datafile.print(",");
   datafile.print(sigma);
   datafile.print(",");
+  //digitalWrite(SDpowerPin,LOW);
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -1127,6 +1151,8 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
   }
   // Write all values if so desired
   if (writeAll){
+    digitalWrite(SDpowerPin,HIGH);
+  delay(10);
     for (int i=0; i<npings; i++){
       datafile.print(myranges[i]);
       datafile.print(",");
@@ -1134,14 +1160,18 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
       Serial.print(myranges[i]);
       Serial.print(F(","));
     }
+    //digitalWrite(SDpowerPin,LOW);
   }
   // Always write the mean, standard deviation, and number of good returns
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
   datafile.print(mean_range);
   datafile.print(",");
   datafile.print(standard_deviation);
   datafile.print(",");
   datafile.print(npings_with_real_returns);
   datafile.print(",");
+  //digitalWrite(SDpowerPin,LOW);
   // Echo to serial
   Serial.print(mean_range);
   Serial.print(F(","));
@@ -1347,8 +1377,11 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
   // Currently also echoes the return to serial port if it will
   // also be saved (sent to SD card)
   if (saveReturn){
+    digitalWrite(SDpowerPin,HIGH);
+  delay(10);
     datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
     datafile.print(",");
+    //digitalWrite(SDpowerPin,LOW);
   }
   // Echo to serial
   if (saveReturn || printReturn){
@@ -1387,7 +1420,7 @@ void Logger::TippingBucketRainGage(){
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
   end_logging_to_otherfile();
-  digitalWrite(SDpowerPin,LOW);
+  //digitalWrite(SDpowerPin,LOW);
 
   /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   pinMode(LEDpin, OUTPUT);
@@ -1418,6 +1451,8 @@ void Logger::TippingBucketRainGage(){
 }
 
 void Logger::start_logging_to_otherfile(char* filename){
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
   // open the file for write at end like the Native SD library
   if (!otherfile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 
@@ -1432,6 +1467,7 @@ void Logger::start_logging_to_otherfile(char* filename){
   now = RTC.now();
   RTCsleep();
   // SD
+  digitalWrite(SDpowerPin,HIGH);  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
   otherfile.print(now.unixtime());
   otherfile.print(",");
   // Echo to serial
@@ -1442,10 +1478,13 @@ void Logger::start_logging_to_otherfile(char* filename){
 void Logger::end_logging_to_otherfile(){
   // Ends line and closes otherfile
   // Copied from endLine function
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
   otherfile.println();
   Serial.println();
   // close the file: (This does the actual sync() step too - writes buffer)
   otherfile.close();
+  //digitalWrite(SDpowerPin,LOW);
 }
 
 //reads a 5tm soil moisture probe and prints results to Serial
@@ -1545,12 +1584,14 @@ void Logger::decagon5TE(int excitPin, int dataPin){
     // SAVE DATA //
     ///////////////
 /*
+    digitalWrite(SDpowerPin,HIGH);    
     datafile.print(Epsilon_a);
     datafile.print(",");
     datafile.print(EC);
     datafile.print(",");
     datafile.print(T);
     datafile.print(",");
+    //digitalWrite(SDpowerPin,LOW);
     // Echo to serial
     Serial.print(Epsilon_a);
     Serial.print(F(","));
@@ -1569,9 +1610,12 @@ void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
   ///////////////
   // SAVE DATA //
   ///////////////
-
+  
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
   datafile.print(_R);
   datafile.print(",");
+  //digitalWrite(SDpowerPin,LOW);
   // Echo to serial
   Serial.print(_R);
   Serial.print(F(","));
