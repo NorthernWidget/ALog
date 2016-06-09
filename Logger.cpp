@@ -313,17 +313,13 @@ Wire.begin();
 // Includes check whether you are talking to Python terminal
 startup_sequence();
 
-////////////////
-// SD CARD ON //
-////////////////
-
-digitalWrite(SDpowerPin,HIGH);
-
 /////////////////////////////////////////////////////////////////////
 // Set alarm to go off every time seconds==00 (i.e. once a minute) //
 /////////////////////////////////////////////////////////////////////
 
+RTCon();
 alarm2_1min();
+RTCsleep();
 
 ///////////////////
 // SD CARD SETUP //
@@ -332,6 +328,8 @@ alarm2_1min();
 // Initialize SdFat or print a detailed error message and halt
 // Use half speed like the native library.
 // change to SPI_FULL_SPEED for more performance.
+
+digitalWrite(SDpowerPin,HIGH);
 
 delay(1000);
 
@@ -563,6 +561,7 @@ digitalWrite(SDpowerPin,LOW);
   void Logger::alarm2reset()
   {
     // Reset alarm
+    RTCon();
     Clock.turnOffAlarm(2);
     Clock.turnOnAlarm(2);
     // Not sure why, but have to use these "checking" functions, or else the clock
@@ -573,6 +572,7 @@ digitalWrite(SDpowerPin,LOW);
     Clock.checkAlarmEnabled(2);
     // Clock.checkIfAlarm(1);
     Clock.checkIfAlarm(2);
+    RTCsleep();
   }
 
   void Logger::alarm2_1min()
@@ -580,10 +580,12 @@ digitalWrite(SDpowerPin,LOW);
     // Sets an alarm that will go off once a minute
     // for intermittent data logging
     // (This will use the AVR interrupt)
+    RTCon();
     Clock.turnOffAlarm(1);
     Clock.turnOffAlarm(2);
     Clock.setA2Time(1, 0, 0, 0b01110000, false, false, false); // just min mask
     Clock.turnOnAlarm(2);
+    RTCsleep();
   }
 
   void Logger::LEDwarn(int nflash)
@@ -676,6 +678,7 @@ float Logger::_vdivR(int pin, float Rref, bool Rref_on_GND_side){
 
 void Logger::RTCon(){
   // Turn on power clock
+  digitalWrite(SDpowerPin,HIGH); //Chad
   digitalWrite(ClockPowerPin,HIGH);
   delay(2);
 }
@@ -687,6 +690,7 @@ void Logger::RTCsleep(){
   // This "tricks" it into turning off its I2C bus and saves power on the
   // board, but keeps its alarm functionality on.
   // (Idea to do this courtesy of Gerhard Oberforcher)
+  //digitalWrite(SDpowerPin,LOW); //Chad  
   digitalWrite(ClockPowerPin,LOW);
   delay(2);
 }
@@ -741,7 +745,10 @@ void Logger::sleep(int log_minutes){
     // AND HOW TO PASS THE FLAGS FOR THIS TO THE MAIN CODE FROM OUTSIDE
 
     else{
+      RTCon();  //Chad
       int minute = Clock.getMinute();
+      RTCsleep();  //Chad
+      Serial.println(minute); // Chad
       // Only wake if you really have to
       if (minute % log_minutes == 0){
         Serial.println(F("Logging!"));
@@ -801,6 +808,7 @@ void Logger::endLogging(){
   // TIME TO WRITE THE DATA TO THE SD CARD!
   delay(20);
   digitalWrite(SDpowerPin,LOW); // Turns off SD card
+ 
 
   // Reset alarm  
   alarm2reset();
@@ -866,7 +874,7 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   // Echo to serial
   Serial.print(T);
   Serial.print(F(","));
-  
+
   return T;
 
 }
@@ -1728,13 +1736,13 @@ void Logger::startup_sequence(){
   else{
     // No serial; just blink
     RTCon(); // Now using 3V3 regulator for sensors to power clock
-    delay(5);
     now = RTC.now();
     RTCsleep();
     unixtime_at_start = now.unixtime();
     // Keep Serial just in case computer is connected w/out Python terminal
     Serial.print(F("Current UNIX time stamp according to logger is: "));
     Serial.println(unixtime_at_start);
+
     if(unixtime_at_start < 1000000000){
       LEDtimeWrong(3);
     }
@@ -1762,8 +1770,8 @@ void Logger::clockSet(){
   bool PM;
 
   RTCon(); // Now using 3V3 regulator for sensors to power clock
+
   DateTime nowPreSet = RTC.now();
-  RTCsleep();
 
 	GetDateStuff(Year, Month, Date, DoW, Hour, Minute, Second);
 
@@ -1778,11 +1786,14 @@ void Logger::clockSet(){
 	Clock.setMinute(Minute);
 	Clock.setSecond(Second);
 
+  RTCsleep();
+
 	// Give time at next five seconds
 	// Should use a DateTime object for this, b/c rollover is a potential
 	// problem, but this display is not mission-critical
 	for (int i=0; i<5; i++){
 	    delay(1000);
+      RTCon();
 	    Serial.print(Clock.getYear(), DEC);
 	    Serial.print(F("-"));
 	    Serial.print(Clock.getMonth(Century), DEC);
@@ -1794,6 +1805,7 @@ void Logger::clockSet(){
 	    Serial.print(Clock.getMinute(), DEC);
 	    Serial.print(F(":"));
 	    Serial.println(Clock.getSecond(), DEC);
+      RTCsleep();
 	}
   delay(1000);
   unsigned long unixtime_at_receive_string = nowPreSet.unixtime();
