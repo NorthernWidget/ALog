@@ -225,7 +225,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   // LOGGER FILE NAME //
   //////////////////////
   
-  delay(20);
+  delay(10);
   
   Serial.print(F("Filename: "));
   Serial.println(filename);
@@ -331,7 +331,7 @@ RTCsleep();
 
 digitalWrite(SDpowerPin,HIGH);
 
-delay(1000);
+delay(10);
 
 name();
 Serial.print(F("Initializing SD card..."));
@@ -344,15 +344,14 @@ if (!sd.begin(CSpin, SPI_HALF_SPEED)){
 Serial.println(F("card initialized."));
 Serial.println();
 LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
+//digitalWrite(SDpowerPin,LOW);
 
-delay(50);
+delay(10);
 
 name();
 Serial.println(F("Logger initialization complete! Ciao bellos."));
 
-delay(50);
-
-//digitalWrite(SDpowerPin,LOW);
+delay(10);
 
 }
 
@@ -641,7 +640,7 @@ delay(50);
 
     // SD
     digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+    delay(10);
     datafile.print(now.unixtime());
     datafile.print(",");
     //digitalWrite(SDpowerPin,LOW);
@@ -719,7 +718,7 @@ void Logger::sleep(int log_minutes){
   sleepNow();
   
   // Wake up
-  delay(100); // Is such a long delay necessary?
+  delay(10); // Is such a long delay necessary?
   // First, check if there was a bucket tip from the rain gage, if present
   if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
@@ -876,7 +875,6 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   // SD write
   digitalWrite(SDpowerPin,HIGH);
   delay(10);
-  //delay(100);
   datafile.print(T);
   datafile.print(",");
   //digitalWrite(SDpowerPin,LOW);
@@ -1684,7 +1682,7 @@ void Logger::announce_start(){
   name();
   Serial.println(F(" = this logger's name."));
   Serial.println();
-  delay(500);
+  delay(100);
   Serial.println(F("********************** Logger initializing. **********************"));
 }
 
