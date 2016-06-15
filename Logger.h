@@ -134,6 +134,10 @@ class Logger {
     void RTCon();
     void RTCsleep();
     
+    // SD card power
+    void SDpowerOn();
+    void SDpowerOff();
+    
     // Clock setting
     void clockSet();
     void GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW, 
