@@ -640,7 +640,7 @@ delay(10);
     // SD
     SDpowerOn();
     datafile.print(now.unixtime());
-    datafile.print(",");
+    datafile.print(F(","));
     SDpowerOff();
     // Echo to serial
     Serial.print(now.unixtime());
@@ -883,7 +883,7 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   // SD write
   SDpowerOn();
   datafile.print(T);
-  datafile.print(",");
+  datafile.print(F(","));
   SDpowerOff();
   
   // Echo to serial
@@ -934,14 +934,69 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
   // SD write
   SDpowerOn();
   //datafile.print(Vh_real);
-  //datafile.print(",");
+  //datafile.print(F(","));
   datafile.print(RH);
-  datafile.print(",");
+  datafile.print(F(","));
   SDpowerOff();
   
   // Echo to serial
   //Serial.print(Vh_real);
   //Serial.print(",");
+  Serial.print(RH);
+  Serial.print(F(","));
+
+}
+
+
+// HTM2500LF Humidity and Temperature Sensor
+// by TE Connectivity Measurement Specialties
+///////////////////////////////////////////////
+
+void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin){
+  // humidity input is a voltage
+  // Rref is for 
+  
+  // First, measure these pins
+  // This will fully calculate and write the temperature data, too.
+  float V_humid_norm = analogRead(humidPin)/1023.; // 0-1
+  // Will write temperature to file here
+  float T = thermistorB(R0, B, Rref, T0degC, thermPin);
+
+  // Then, convert the normalized voltage into a humidity reading
+  // The calibration is created for a 5V input, but the data sheet says it
+  // is ratiometric, so I think I will just renormalize the voltage to
+  // pretend that it is 5V input in order to get the right input values
+  // for the equation. Just multiply by 5!
+  
+  // T error is small, and has a small effect on humidity -- much smaller 
+  // than published error (see data sheet) -- maybe eventually code error
+  // into this function. So just use typical thermistor values.
+  float Vh = 5000 * V_humid_norm; // mV
+  //float Vh_real = 3300 * V_humid_norm; // switching 3.3V basis
+  
+  // RH in percent
+  // Got to use the pow(base, int) function or do multiplication the long way...
+  float RH_no_T_corr = (-1.91E-9 * Vh*Vh*Vh) + (1.33E-5 * Vh*Vh) + (9.56E-3 * Vh);
+  float RH = RH_no_T_corr + 0.05 * (T - 23);
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // Print normalized 0-1 voltage in case my 5V conversion doesn't work the way
+  // I think it will -- though if it is ratiometric, I think it should.
+ 
+  // SD write
+  SDpowerOn();
+  datafile.print(V_humid_norm);
+  datafile.print(F(","));
+  datafile.print(RH);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(V_humid_norm);
+  Serial.print(F(","));
   Serial.print(RH);
   Serial.print(F(","));
 
@@ -989,7 +1044,7 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
       Serial.print(F(","));
       SDpowerOn();
       datafile.print(range);
-      datafile.print(",");
+      datafile.print(F(","));
       SDpowerOff();
     }
   sumRange += range;
@@ -1014,9 +1069,9 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   SDpowerOn();
   delay(10);
   datafile.print(meanRange);
-  datafile.print(",");
+  datafile.print(F(","));
   datafile.print(sigma);
-  datafile.print(",");
+  datafile.print(F(","));
   SDpowerOff();
   // Echo to serial
   Serial.print(meanRange);
@@ -1068,7 +1123,7 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
       Serial.print(F(","));
       SDpowerOn();
       datafile.print(range);
-      datafile.print(",");
+      datafile.print(F(","));
       SDpowerOff();
     }
   sumRange += range;
@@ -1092,9 +1147,9 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   ///////////////
   SDpowerOn();
   datafile.print(meanRange);
-  datafile.print(",");
+  datafile.print(F(","));
   datafile.print(sigma);
-  datafile.print(",");
+  datafile.print(F(","));
   SDpowerOff();
   // Echo to serial
   Serial.print(meanRange);
@@ -1154,7 +1209,7 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
     SDpowerOn();
     for (int i=0; i<npings; i++){
       datafile.print(myranges[i]);
-      datafile.print(",");
+      datafile.print(F(","));
       // Echo to serial
       Serial.print(myranges[i]);
       Serial.print(F(","));
@@ -1164,11 +1219,11 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
   // Always write the mean, standard deviation, and number of good returns
   SDpowerOn();
   datafile.print(mean_range);
-  datafile.print(",");
+  datafile.print(F(","));
   datafile.print(standard_deviation);
-  datafile.print(",");
+  datafile.print(F(","));
   datafile.print(npings_with_real_returns);
-  datafile.print(",");
+  datafile.print(F(","));
   SDpowerOff();
   // Echo to serial
   Serial.print(mean_range);
@@ -1377,7 +1432,7 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
   if (saveReturn){
     SDpowerOn();
     datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
-    datafile.print(",");
+    datafile.print(F(","));
     SDpowerOff();
   }
   // Echo to serial
@@ -1583,11 +1638,11 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 /*
     digitalWrite(SDpowerPin,HIGH);    
     datafile.print(Epsilon_a);
-    datafile.print(",");
+    datafile.print(F(","));
     datafile.print(EC);
-    datafile.print(",");
+    datafile.print(F(","));
     datafile.print(T);
-    datafile.print(",");
+    datafile.print(F(","));
     digitalWrite(SDpowerPin,LOW);
     // Echo to serial
     Serial.print(Epsilon_a);
@@ -1600,6 +1655,34 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 //  }
 //}
 
+void Logger::DecagonGS1(int pin, float Vref){
+  int _ADC;
+  int voltage;
+  float volumetric_water_content;
+  _ADC = analogRead(pin); // 0-1023
+  voltage = Vref * _ADC / 1023.;
+  // Standard Decagon equation -- linear, for up to 60% VWC
+  volumetric_water_content = 0.494 * voltage - 0.554;
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(voltage);
+  datafile.print(F(","));
+  datafile.print(volumetric_water_content);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(voltage);
+  Serial.print(F(","));
+  Serial.print(volumetric_water_content);
+  Serial.print(F(","));
+
+}
 
 void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
   float _R = _vdivR(pin, Rref, Rref_on_GND_side);
@@ -1610,7 +1693,7 @@ void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
   
   SDpowerOn();
   datafile.print(_R);
-  datafile.print(",");
+  datafile.print(F(","));
   SDpowerOff();
   // Echo to serial
   Serial.print(_R);
