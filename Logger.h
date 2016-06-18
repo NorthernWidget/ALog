@@ -97,6 +97,7 @@ class Logger {
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref);
     void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin);
+    void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0, float B, float Rref, float T0degC, int thermPin);
     
     // Sensors - special
     // Rain gage - will wake logger up and cause it to log to a different file

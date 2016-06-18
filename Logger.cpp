@@ -1316,6 +1316,84 @@ int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
   //return atol(r2); // Return integer values in mm; no parsing of error values
 }
 
+void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0, float B, float Rref, float T0degC, int thermPin){
+  // +/- 90 degree inclinometer, measures +/- 1.0g
+  // Needs 4.75--5.25V input
+  // This function works with the analog outputs
+  // Turned on and off by a switching 5V charge pump or boost converter
+  
+  float Vout_x = (analogRead(xPin) / 1023.) * 3.3;
+  float Vout_y = (analogRead(yPin) / 1023.) * 3.3;
+  
+  float Offset = 2.5; // VDD/2
+  float Sensitivity = 2.;
+
+  // Temperature correction
+  float T = thermistorB(R0, B, Rref, T0degC, thermPin);
+  // Sensitivity correction for Scorr
+  float Scorr = -0.00011 * T*T + 0.0022 * T + 0.0408;
+  
+  float Sensitivity_compensated = Sensitivity * ( 1 + Scorr/100.);
+  
+  float angle_x_rad = asin( (Vout_x - Offset)/Sensitivity_compensated );
+  float angle_y_rad = asin( (Vout_y - Offset)/Sensitivity_compensated );
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(angle_x_rad);
+  datafile.print(F(","));
+  datafile.print(angle_y_rad);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(voltage);
+  Serial.print(F(","));
+  Serial.print(volumetric_water_content);
+  Serial.print(F(","));
+
+}
+
+
+/*
+// These constants won't change.  They're used to give names
+// to the pins used:
+const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
+const int analogOutPin = 9; // Analog output pin that the LED is attached to
+
+int sensorValue = 0;        // value read from the pot
+int outputValue = 0;        // value output to the PWM (analog out)
+
+void setup() {
+  // initialize serial communications at 9600 bps:
+  Serial.begin(9600);
+}
+
+void loop() {
+  // read the analog in value:
+  sensorValue = analogRead(analogInPin);
+  // map it to the range of the analog out:
+  outputValue = map(sensorValue, 0, 1023, 0, 255);
+  // change the analog out value:
+  analogWrite(analogOutPin, outputValue);
+
+  // print the results to the serial monitor:
+  Serial.print("sensor = ");
+  Serial.print(sensorValue);
+  Serial.print("\t output = ");
+  Serial.println(outputValue);
+
+  // wait 2 milliseconds before the next loop
+  // for the analog-to-digital converter to settle
+  // after the last reading:
+  delay(2);
+}
+*/
+
 void Logger::HackHD(int control_pin, bool want_camera_on){
 //void Logger::HackHD(int control_pin, int indicator_pin, bool want_camera_on){
   // 0.2 mA quiescent current draw
@@ -1656,8 +1734,9 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 //}
 
 void Logger::DecagonGS1(int pin, float Vref){
+  // Vref in volts
   int _ADC;
-  int voltage;
+  float voltage;
   float volumetric_water_content;
   _ADC = analogRead(pin); // 0-1023
   voltage = Vref * _ADC / 1023.;
