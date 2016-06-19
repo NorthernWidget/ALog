@@ -51,8 +51,8 @@ logger.startLogging();
 
 logger.startAnalog();
 
-DecagonGS1(0, 3.3);
-DecagonGS1(1, 3.3);
+logger.DecagonGS1(0, 3.3);
+logger.DecagonGS1(1, 3.3);
 
 logger.endAnalog();
 
