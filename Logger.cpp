@@ -1351,48 +1351,88 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0,
   SDpowerOff();
   
   // Echo to serial
-  Serial.print(voltage);
+  Serial.print(angle_x_rad);
   Serial.print(F(","));
-  Serial.print(volumetric_water_content);
+  Serial.print(angle_y_rad);
   Serial.print(F(","));
 
 }
 
+void Logger::Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation){
+  // Meters per second per rotation:
+  // Inspeed anemometer that we have: 2.5 mph/Hz
+  //                                  = 1.1176 (m/s)/Hz
 
-/*
-// These constants won't change.  They're used to give names
-// to the pins used:
-const int analogInPin = A0;  // Analog input pin that the potentiometer is attached to
-const int analogOutPin = 9; // Analog output pin that the LED is attached to
+  // Look up: http://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
 
-int sensorValue = 0;        // value read from the pot
-int outputValue = 0;        // value output to the PWM (analog out)
+  int rotation_count;
+  float rotation_Hz;
+  float wind_speed_meters_per_second;
+  float reading_duration_seconds = reading_duration_milliseconds * 1000.;
 
-void setup() {
-  // initialize serial communications at 9600 bps:
-  Serial.begin(9600);
+  pinMode(3, INPUT);
+  digitalWrite(3, HIGH);
+  
+  unsigned long millis_start = millis();
+  attachInterrupt(1, _ISR_void, LOW);
+
+  // Avoid rollovers by comparing unsigned integers with the 
+  // same number of bits
+  while (millis() - millis_start <= reading_duration_milliseconds){
+    sleepNow_nap();
+    rotation_count ++;
+  }
+  
+  rotation_Hz = rotation_count / reading_duration_seconds;
+  wind_speed_meters_per_second = rotation_Hz * meters_per_second_per_rotation;
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(rotation_Hz);
+  datafile.print(F(","));
+  datafile.print(wind_speed_meters_per_second);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(rotation_Hz);
+  Serial.print(F(","));
+  Serial.print(wind_speed_meters_per_second);
+  Serial.print(F(","));
+  
 }
 
-void loop() {
-  // read the analog in value:
-  sensorValue = analogRead(analogInPin);
-  // map it to the range of the analog out:
-  outputValue = map(sensorValue, 0, 1023, 0, 255);
-  // change the analog out value:
-  analogWrite(analogOutPin, outputValue);
-
-  // print the results to the serial monitor:
-  Serial.print("sensor = ");
-  Serial.print(sensorValue);
-  Serial.print("\t output = ");
-  Serial.println(outputValue);
-
-  // wait 2 milliseconds before the next loop
-  // for the analog-to-digital converter to settle
-  // after the last reading:
-  delay(2);
+void Logger::Wind_Vane_Inspeed(){
+  // Resistance changes with rotation
 }
-*/
+  
+void Logger::sleepNow_nap()         // here we put the arduino to sleep between interrupt readings
+{
+    set_sleep_mode(SLEEP_MODE_STANDBY);   // sleep mode is set here
+
+    cbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter OFF
+
+    sleep_enable();          // enables the sleep bit in the mcucr register
+                             // so sleep is possible. just a safety pin 
+    sleep_mode();            // here the device is actually put to sleep!!
+                             // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP
+
+    // After waking, run sleep mode function, and then remainder of this function (below)
+    sleep_disable();         // first thing after waking from sleep:
+                             // disable sleep...
+    // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this to allow both measurements types!
+    // 06-11-2015: The above line commented to allow the rain gage to be read
+    // at the same time as other readings
+                        // Maybe move this to specific post-wakeup code?
+}
+
+// Must be defined outside of Logger class
+void _ISR_void(){
+}
 
 void Logger::HackHD(int control_pin, bool want_camera_on){
 //void Logger::HackHD(int control_pin, int indicator_pin, bool want_camera_on){

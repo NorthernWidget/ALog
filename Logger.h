@@ -63,6 +63,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Outside of class definitions
 void wakeUpNow();
 void wakeUpNow_tip();
+void _ISR_void();
 
 // The rest of the library
 
@@ -98,6 +99,8 @@ class Logger {
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref);
     void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin);
     void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0, float B, float Rref, float T0degC, int thermPin);
+    void Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation);
+    void Wind_Vane_Inspeed();
     
     // Sensors - special
     // Rain gage - will wake logger up and cause it to log to a different file
@@ -114,6 +117,7 @@ class Logger {
 
     // Sleep and alarms
     void sleepNow();
+    void sleepNow_nap();
     // wakeUpNow defined outside of class; see above
     void alarm2reset();
     void alarm2_1min();
