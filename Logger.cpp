@@ -1913,10 +1913,12 @@ void Logger::startup_sequence(){
       }
     }
   }
+  
   // Run through startup sequence, including clock setting if comp is true
   name();
   Serial.println(F("HELLO, COMPUTER."));
   delay(500);
+  //if ( Serial.available() ){ // To allow clock setting, uncomment this and comment the above section that sets "comp"
   if ( comp ){
     delay(4000); // Give Python time to print
     name();
