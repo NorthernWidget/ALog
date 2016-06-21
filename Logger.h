@@ -60,6 +60,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/sleep.h>
 #include <stdlib.h> // For turning incoming ASCII character strings into int with atol
 
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BMP085_U.h>
+
 // Outside of class definitions
 void wakeUpNow();
 void wakeUpNow_tip();
@@ -100,7 +103,9 @@ class Logger {
     void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin);
     void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0, float B, float Rref, float T0degC, int thermPin);
     void Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation);
-    void Wind_Vane_Inspeed();
+    void Wind_Vane_Inspeed(int vanePin);
+    void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref);
+    void Barometer_BMP180();
     
     // Sensors - special
     // Rain gage - will wake logger up and cause it to log to a different file

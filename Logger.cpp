@@ -1406,8 +1406,91 @@ void Logger::Anemometer_reed_switch(int interrupt_number, unsigned long reading_
   
 }
 
-void Logger::Wind_Vane_Inspeed(){
+void Logger::Wind_Vane_Inspeed(int vanePin){
   // Resistance changes with rotation
+  // This is for the eVane2
+  // Connect one wire to power supply, one wire to analog pin, one wire to GND
+  // From documentation:
+  // 5 - 95% of power supply input voltage = 0 to 360 degrees of rotation
+  // Uses Hall Effect Sensor
+  // Don't forget to use set screw to zero wind sensor before starting!
+  float Vin_normalized = (analogRead(vanePin) / 1023.);
+  float Vin_stretched = (Vin_normalized - 0.05) / 0.9;
+  float Wind_angle = Vin_stretched * 360.; // Degrees -- azimuth
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(Wind_angle);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(Wind_angle);
+  Serial.print(F(","));
+}
+
+void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref){
+  // Using an instrumentation amplifier with a Pyranometer
+  // Kipp and Zonen: raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
+  
+  float Vin = (analogRead(analogPin) / 1023.) * V_ref;
+  float Radiation_W_m2 = Vin / (raw_mV_per_W_per_m2 * gain);
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(Radiation_W_m2);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(Radiation_W_m2);
+  Serial.print(F(","));
+}
+
+void Logger::Barometer_BMP180(){
+  // Borrowed/modified from "sensorapi"
+  // Commented out portions to add temperature support
+  //float temperature;
+  float pressure;
+  Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
+
+  sensors_event_t event;
+  bmp.getEvent(&event);
+  
+  if (event.pressure){
+    //temperature = bmp.getTemperature(&temperature);
+    pressure = event.pressure * 100.; // hPa to Pa
+  }
+  else{
+    //temperature = -9999;
+    pressure = -9999;
+  }
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  //datafile.print(temperature);
+  //datafile.print(F(","));
+  datafile.print(pressure);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  //Serial.print(temperature);
+  //Serial.print(F(","));
+  Serial.print(pressure);
+  Serial.print(F(","));
 }
   
 void Logger::sleepNow_nap()         // here we put the arduino to sleep between interrupt readings
