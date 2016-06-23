@@ -60,9 +60,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/sleep.h>
 #include <stdlib.h> // For turning incoming ASCII character strings into int with atol
 
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BMP085_U.h>
+
 // Outside of class definitions
 void wakeUpNow();
 void wakeUpNow_tip();
+void _ISR_void();
 
 // The rest of the library
 
@@ -89,13 +93,20 @@ class Logger {
     void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,bool writeAll); // Print order: Distance [cm], standard deviation [cm]
     float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, int maxRange, bool RS232=false);
     void maxbotixHRXL_WR_analog(int nping=10,int sonicPin=A0,int EX=99,bool writeAll=true); // Print order: Distance [cm], standard deviation [cm]
-    void decagon5TE(int excitPin, int dataPin); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
+    //void decagon5TE(int excitPin, int dataPin); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
+    void DecagonGS1(int pin, float Vref);
     void vdivR(int pin, float Rref, bool Rref_on_GND_side=true);
     void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, float intercept);
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref);
-        
+    void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin);
+    void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0, float B, float Rref, float T0degC, int thermPin);
+    void Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation);
+    void Wind_Vane_Inspeed(int vanePin);
+    void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref);
+    void Barometer_BMP180();
+    
     // Sensors - special
     // Rain gage - will wake logger up and cause it to log to a different file
     /////////// PLACEHOLDER
@@ -111,6 +122,7 @@ class Logger {
 
     // Sleep and alarms
     void sleepNow();
+    void sleepNow_nap();
     // wakeUpNow defined outside of class; see above
     void alarm2reset();
     void alarm2_1min();
@@ -134,6 +146,10 @@ class Logger {
     void RTCon();
     void RTCsleep();
     
+    // SD card power
+    void SDpowerOn();
+    void SDpowerOff();
+    
     // Clock setting
     void clockSet();
     void GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW, 
@@ -154,34 +170,4 @@ class Logger {
 };
 
 #endif  
-    
-///////////////
-// REFERENCE //
-///////////////
-
-// Reference pinout for ATmega644/1284
-// INT2 not currently working
-//
-//                      +---\/---+
-//          (D 0) PB0  1|        |40  PA0 (AI 0 / D24)
-//          (D 1) PB1  2|        |39  PA1 (AI 1 / D25)
-//INT2-BAD  (D 2) PB2  3|        |38  PA2 (AI 2 / D26)
-//      PWM (D 3) PB3  4|        |37  PA3 (AI 3 / D27)
-//      PWM (D 4) PB4  5|        |36  PA4 (AI 4 / D28)
-//     MOSI (D 5) PB5  6|        |35  PA5 (AI 5 / D29)
-//PWM  MISO (D 6) PB6  7|        |34  PA6 (AI 6 / D30)
-//PWM   SCK (D 7) PB7  8|        |33  PA7 (AI 7 / D31)
-//                RST  9|        |32  AREF
-//                VCC 10|        |31  GND 
-//                GND 11|        |30  AVCC
-//              XTAL2 12|        |29  PC7 (D 23)
-//              XTAL1 13|        |28  PC6 (D 22)
-//     RX0 (D 8)  PD0 14|        |27  PC5 (D 21) TDI
-//     TX0 (D 9)  PD1 15|        |26  PC4 (D 20) TDO
-//INT0 RX1 (D 10) PD2 16|        |25  PC3 (D 19) TMS
-//INT1 TX1 (D 11) PD3 17|        |24  PC2 (D 18) TCK
-//     PWM (D 12) PD4 18|        |23  PC1 (D 17) SDA
-//     PWM (D 13) PD5 19|        |22  PC0 (D 16) SCL
-//     PWM (D 14) PD6 20|        |21  PD7 (D 15) PWM
-//                      +--------+
 

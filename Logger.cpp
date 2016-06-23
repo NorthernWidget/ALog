@@ -225,7 +225,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   // LOGGER FILE NAME //
   //////////////////////
   
-  delay(20);
+  delay(10);
   
   Serial.print(F("Filename: "));
   Serial.println(filename);
@@ -287,7 +287,7 @@ void Logger::setupLogger(){
     //digitalWrite(6, LOW);
   }
   //Start out with SD, Sensor pins set LOW
-  //digitalWrite(SDpowerPin,LOW);
+  digitalWrite(SDpowerPin,LOW);
   digitalWrite(SensorPowerPin,LOW);
 
 
@@ -329,30 +329,28 @@ RTCsleep();
 // Use half speed like the native library.
 // change to SPI_FULL_SPEED for more performance.
 
-digitalWrite(SDpowerPin,HIGH);
-
-delay(1000);
 
 name();
+
+SDpowerOn();
 Serial.print(F("Initializing SD card..."));
 if (!sd.begin(CSpin, SPI_HALF_SPEED)){
   Serial.println(F("Card failed, or not present"));
   LEDwarn(20); // 20 quick flashes of the LED
   sd.initErrorHalt();
 }
+SDpowerOff();
 
 Serial.println(F("card initialized."));
 Serial.println();
 LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
 
-delay(50);
+delay(10);
 
 name();
 Serial.println(F("Logger initialization complete! Ciao bellos."));
 
-delay(50);
-
-//digitalWrite(SDpowerPin,LOW);
+delay(10);
 
 }
 
@@ -637,14 +635,13 @@ delay(50);
 
     RTCon(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
-    RTCsleep();
+    //RTCsleep();
 
     // SD
-    digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+    SDpowerOn();
     datafile.print(now.unixtime());
-    datafile.print(",");
-    //digitalWrite(SDpowerPin,LOW);
+    datafile.print(F(","));
+    SDpowerOff();
     // Echo to serial
     Serial.print(now.unixtime());
     Serial.print(F(","));
@@ -653,9 +650,9 @@ delay(50);
   void Logger::endLine(){
     // Ends the line in the file; do this at end of recording instance
     // before going back to sleep
-    digitalWrite(SDpowerPin,HIGH);    
+    SDpowerOn();
     datafile.println();
-    //digitalWrite(SDpowerPin,LOW);
+    SDpowerOff();
     Serial.println();
     }
 
@@ -683,7 +680,8 @@ float Logger::_vdivR(int pin, float Rref, bool Rref_on_GND_side){
 
 void Logger::RTCon(){
   // Turn on power clock
-  digitalWrite(SDpowerPin,HIGH); //Chad
+  pinMode(SDpowerPin,OUTPUT);
+  digitalWrite(SDpowerPin,HIGH); //Chad -- one model's pull-ups attached to SDpowerPin
   digitalWrite(ClockPowerPin,HIGH);
   delay(2);
 }
@@ -695,9 +693,19 @@ void Logger::RTCsleep(){
   // This "tricks" it into turning off its I2C bus and saves power on the
   // board, but keeps its alarm functionality on.
   // (Idea to do this courtesy of Gerhard Oberforcher)
-  //digitalWrite(SDpowerPin,LOW); //Chad  
+  digitalWrite(SDpowerPin,LOW); //Chad -- one model's pull-ups attached to SDpowerPin 
   digitalWrite(ClockPowerPin,LOW);
   delay(2);
+}
+
+void Logger::SDpowerOn(){
+  digitalWrite(SDpowerPin,HIGH);
+  delay(10);
+}
+
+void Logger::SDpowerOff(){
+  delay(10);
+  digitalWrite(SDpowerPin,LOW);
 }
 
 ////////////////////////////////////////////////////////////
@@ -719,7 +727,7 @@ void Logger::sleep(int log_minutes){
   sleepNow();
   
   // Wake up
-  delay(100); // Is such a long delay necessary?
+  delay(10); // Is such a long delay necessary?
   // First, check if there was a bucket tip from the rain gage, if present
   if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
@@ -781,9 +789,7 @@ void Logger::sleep(int log_minutes){
 void Logger::startLogging(){
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
   // Initialize logger
-  digitalWrite(SDpowerPin,HIGH); // Turn on SD card before writing to it
-                                 // Delay required after this??
-  delay(10);
+  SDpowerOn();
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
@@ -797,7 +803,9 @@ void Logger::startLogging(){
     Serial.println(F(" for write failed"));
   delay(10);
   }
-  // Datestamp the start of the line -- this will also turn off the SDpowerPin
+  digitalWrite(SDpowerPin,LOW);
+  
+  // Datestamp the start of the line
   unixDatestamp();
 }
 
@@ -806,14 +814,13 @@ void Logger::endLogging(){
 
   endLine();
 
-  digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+  SDpowerOn();
   // close the file: (This does the actual sync() step too - writes buffer)
   datafile.close();
   // THIS DELAY IS ***CRITICAL*** -- WITHOUT IT, THERE IS NOT SUFFICIENT
   // TIME TO WRITE THE DATA TO THE SD CARD!
   delay(20);
-  //digitalWrite(SDpowerPin,LOW); // Turns off SD card
+  SDpowerOff();
  
 
   // Reset alarm  
@@ -874,12 +881,10 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   ///////////////
 
   // SD write
-  digitalWrite(SDpowerPin,HIGH);
-  delay(10);
-  //delay(100);
+  SDpowerOn();
   datafile.print(T);
-  datafile.print(",");
-  //digitalWrite(SDpowerPin,LOW);
+  datafile.print(F(","));
+  SDpowerOff();
   
   // Echo to serial
   Serial.print(T);
@@ -927,17 +932,71 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
   ///////////////
 
   // SD write
-  digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+  SDpowerOn();
   //datafile.print(Vh_real);
-  //datafile.print(",");
+  //datafile.print(F(","));
   datafile.print(RH);
-  datafile.print(",");
-  //digitalWrite(SDpowerPin,LOW);
+  datafile.print(F(","));
+  SDpowerOff();
   
   // Echo to serial
   //Serial.print(Vh_real);
   //Serial.print(",");
+  Serial.print(RH);
+  Serial.print(F(","));
+
+}
+
+
+// HTM2500LF Humidity and Temperature Sensor
+// by TE Connectivity Measurement Specialties
+///////////////////////////////////////////////
+
+void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin){
+  // humidity input is a voltage
+  // Rref is for 
+  
+  // First, measure these pins
+  // This will fully calculate and write the temperature data, too.
+  float V_humid_norm = analogRead(humidPin)/1023.; // 0-1
+  // Will write temperature to file here
+  float T = thermistorB(R0, B, Rref, T0degC, thermPin);
+
+  // Then, convert the normalized voltage into a humidity reading
+  // The calibration is created for a 5V input, but the data sheet says it
+  // is ratiometric, so I think I will just renormalize the voltage to
+  // pretend that it is 5V input in order to get the right input values
+  // for the equation. Just multiply by 5!
+  
+  // T error is small, and has a small effect on humidity -- much smaller 
+  // than published error (see data sheet) -- maybe eventually code error
+  // into this function. So just use typical thermistor values.
+  float Vh = 5000 * V_humid_norm; // mV
+  //float Vh_real = 3300 * V_humid_norm; // switching 3.3V basis
+  
+  // RH in percent
+  // Got to use the pow(base, int) function or do multiplication the long way...
+  float RH_no_T_corr = (-1.91E-9 * Vh*Vh*Vh) + (1.33E-5 * Vh*Vh) + (9.56E-3 * Vh);
+  float RH = RH_no_T_corr + 0.05 * (T - 23);
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // Print normalized 0-1 voltage in case my 5V conversion doesn't work the way
+  // I think it will -- though if it is ratiometric, I think it should.
+ 
+  // SD write
+  SDpowerOn();
+  datafile.print(V_humid_norm);
+  datafile.print(F(","));
+  datafile.print(RH);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(V_humid_norm);
+  Serial.print(F(","));
   Serial.print(RH);
   Serial.print(F(","));
 
@@ -983,11 +1042,10 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
     if (writeAll){
       Serial.print(range);
       Serial.print(F(","));
-      digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+      SDpowerOn();
       datafile.print(range);
-      datafile.print(",");
-      //digitalWrite(SDpowerPin,LOW);
+      datafile.print(F(","));
+      SDpowerOff();
     }
   sumRange += range;
   }
@@ -1008,14 +1066,13 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   ///////////////
   // SAVE DATA //
   ///////////////
-  digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+  SDpowerOn();
   delay(10);
   datafile.print(meanRange);
-  datafile.print(",");
+  datafile.print(F(","));
   datafile.print(sigma);
-  datafile.print(",");
-  //digitalWrite(SDpowerPin,LOW);
+  datafile.print(F(","));
+  SDpowerOff();
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -1064,11 +1121,10 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
     if (writeAll){
       Serial.print(range);
       Serial.print(F(","));
-      digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+      SDpowerOn();
       datafile.print(range);
-      datafile.print(",");
-      //digitalWrite(SDpowerPin,LOW);
+      datafile.print(F(","));
+      SDpowerOff();
     }
   sumRange += range;
   }
@@ -1089,13 +1145,12 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   ///////////////
   // SAVE DATA //
   ///////////////
-  digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+  SDpowerOn();
   datafile.print(meanRange);
-  datafile.print(",");
+  datafile.print(F(","));
   datafile.print(sigma);
-  datafile.print(",");
-  //digitalWrite(SDpowerPin,LOW);
+  datafile.print(F(","));
+  SDpowerOff();
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -1151,27 +1206,25 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
   }
   // Write all values if so desired
   if (writeAll){
-    digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+    SDpowerOn();
     for (int i=0; i<npings; i++){
       datafile.print(myranges[i]);
-      datafile.print(",");
+      datafile.print(F(","));
       // Echo to serial
       Serial.print(myranges[i]);
       Serial.print(F(","));
     }
-    //digitalWrite(SDpowerPin,LOW);
+    SDpowerOff();
   }
   // Always write the mean, standard deviation, and number of good returns
-  digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+  SDpowerOn();
   datafile.print(mean_range);
-  datafile.print(",");
+  datafile.print(F(","));
   datafile.print(standard_deviation);
-  datafile.print(",");
+  datafile.print(F(","));
   datafile.print(npings_with_real_returns);
-  datafile.print(",");
-  //digitalWrite(SDpowerPin,LOW);
+  datafile.print(F(","));
+  SDpowerOff();
   // Echo to serial
   Serial.print(mean_range);
   Serial.print(F(","));
@@ -1261,6 +1314,207 @@ int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
   //Serial.print("; ");
   return r3;
   //return atol(r2); // Return integer values in mm; no parsing of error values
+}
+
+void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0, float B, float Rref, float T0degC, int thermPin){
+  // +/- 90 degree inclinometer, measures +/- 1.0g
+  // Needs 4.75--5.25V input
+  // This function works with the analog outputs
+  // Turned on and off by a switching 5V charge pump or boost converter
+  
+  float Vout_x = (analogRead(xPin) / 1023.) * 3.3;
+  float Vout_y = (analogRead(yPin) / 1023.) * 3.3;
+  
+  float Offset = 2.5; // VDD/2
+  float Sensitivity = 2.;
+
+  // Temperature correction
+  float T = thermistorB(R0, B, Rref, T0degC, thermPin);
+  // Sensitivity correction for Scorr
+  float Scorr = -0.00011 * T*T + 0.0022 * T + 0.0408;
+  
+  float Sensitivity_compensated = Sensitivity * ( 1 + Scorr/100.);
+  
+  float angle_x_rad = asin( (Vout_x - Offset)/Sensitivity_compensated );
+  float angle_y_rad = asin( (Vout_y - Offset)/Sensitivity_compensated );
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(angle_x_rad);
+  datafile.print(F(","));
+  datafile.print(angle_y_rad);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(angle_x_rad);
+  Serial.print(F(","));
+  Serial.print(angle_y_rad);
+  Serial.print(F(","));
+
+}
+
+void Logger::Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation){
+  // Meters per second per rotation:
+  // Inspeed anemometer that we have: 2.5 mph/Hz
+  //                                  = 1.1176 (m/s)/Hz
+
+  // Look up: http://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
+
+  int rotation_count;
+  float rotation_Hz;
+  float wind_speed_meters_per_second;
+  float reading_duration_seconds = reading_duration_milliseconds * 1000.;
+
+  pinMode(3, INPUT);
+  digitalWrite(3, HIGH);
+  
+  unsigned long millis_start = millis();
+  attachInterrupt(1, _ISR_void, LOW);
+
+  // Avoid rollovers by comparing unsigned integers with the 
+  // same number of bits
+  while (millis() - millis_start <= reading_duration_milliseconds){
+    sleepNow_nap();
+    rotation_count ++;
+  }
+  
+  rotation_Hz = rotation_count / reading_duration_seconds;
+  wind_speed_meters_per_second = rotation_Hz * meters_per_second_per_rotation;
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(rotation_Hz);
+  datafile.print(F(","));
+  datafile.print(wind_speed_meters_per_second);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(rotation_Hz);
+  Serial.print(F(","));
+  Serial.print(wind_speed_meters_per_second);
+  Serial.print(F(","));
+  
+}
+
+void Logger::Wind_Vane_Inspeed(int vanePin){
+  // Resistance changes with rotation
+  // This is for the eVane2
+  // Connect one wire to power supply, one wire to analog pin, one wire to GND
+  // From documentation:
+  // 5 - 95% of power supply input voltage = 0 to 360 degrees of rotation
+  // Uses Hall Effect Sensor
+  // Don't forget to use set screw to zero wind sensor before starting!
+  float Vin_normalized = (analogRead(vanePin) / 1023.);
+  float Vin_stretched = (Vin_normalized - 0.05) / 0.9;
+  float Wind_angle = Vin_stretched * 360.; // Degrees -- azimuth
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(Wind_angle);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(Wind_angle);
+  Serial.print(F(","));
+}
+
+void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref){
+  // Using an instrumentation amplifier with a Pyranometer
+  // Kipp and Zonen: raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
+  
+  float Vin = (analogRead(analogPin) / 1023.) * V_ref;
+  float Radiation_W_m2 = Vin / (raw_mV_per_W_per_m2 * gain);
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(Radiation_W_m2);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(Radiation_W_m2);
+  Serial.print(F(","));
+}
+
+void Logger::Barometer_BMP180(){
+  // Borrowed/modified from "sensorapi"
+  // Commented out portions to add temperature support
+  //float temperature;
+  float pressure;
+  Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
+
+  sensors_event_t event;
+  bmp.getEvent(&event);
+  
+  if (event.pressure){
+    //temperature = bmp.getTemperature(&temperature);
+    pressure = event.pressure * 100.; // hPa to Pa
+  }
+  else{
+    //temperature = -9999;
+    pressure = -9999;
+  }
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  //datafile.print(temperature);
+  //datafile.print(F(","));
+  datafile.print(pressure);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  //Serial.print(temperature);
+  //Serial.print(F(","));
+  Serial.print(pressure);
+  Serial.print(F(","));
+}
+  
+void Logger::sleepNow_nap()         // here we put the arduino to sleep between interrupt readings
+{
+    set_sleep_mode(SLEEP_MODE_STANDBY);   // sleep mode is set here
+
+    cbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter OFF
+
+    sleep_enable();          // enables the sleep bit in the mcucr register
+                             // so sleep is possible. just a safety pin 
+    sleep_mode();            // here the device is actually put to sleep!!
+                             // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP
+
+    // After waking, run sleep mode function, and then remainder of this function (below)
+    sleep_disable();         // first thing after waking from sleep:
+                             // disable sleep...
+    // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this to allow both measurements types!
+    // 06-11-2015: The above line commented to allow the rain gage to be read
+    // at the same time as other readings
+                        // Maybe move this to specific post-wakeup code?
+}
+
+// Must be defined outside of Logger class
+void _ISR_void(){
 }
 
 void Logger::HackHD(int control_pin, bool want_camera_on){
@@ -1377,11 +1631,10 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
   // Currently also echoes the return to serial port if it will
   // also be saved (sent to SD card)
   if (saveReturn){
-    digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+    SDpowerOn();
     datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
-    datafile.print(",");
-    //digitalWrite(SDpowerPin,LOW);
+    datafile.print(F(","));
+    SDpowerOff();
   }
   // Echo to serial
   if (saveReturn || printReturn){
@@ -1410,8 +1663,8 @@ void Logger::TippingBucketRainGage(){
   // Uses the interrupt to read a tipping bucket rain gage.
   // Then prints date stamp
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
-  digitalWrite(SDpowerPin,HIGH); // might want to use a digitalread for better incorporation into normal logging cycle
-  delay(10);
+  // might want to use a digitalread for better incorporation into normal logging cycle
+  SDpowerOn();
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
@@ -1420,7 +1673,7 @@ void Logger::TippingBucketRainGage(){
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
   end_logging_to_otherfile();
-  //digitalWrite(SDpowerPin,LOW);
+  SDpowerOff();
 
   /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   pinMode(LEDpin, OUTPUT);
@@ -1451,8 +1704,7 @@ void Logger::TippingBucketRainGage(){
 }
 
 void Logger::start_logging_to_otherfile(char* filename){
-  digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+  SDpowerOn();
   // open the file for write at end like the Native SD library
   if (!otherfile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 
@@ -1462,14 +1714,16 @@ void Logger::start_logging_to_otherfile(char* filename){
     Serial.println(F(" for write failed"));
   delay(10);
   }
+  SDpowerOff();
   // Datestamp the start of the line - modified from unixDateStamp function
   RTCon(); // Now using 3V3 regulator for sensors to power clock
   now = RTC.now();
   RTCsleep();
   // SD
-  digitalWrite(SDpowerPin,HIGH);  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
+  SDpowerOn();  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
   otherfile.print(now.unixtime());
   otherfile.print(",");
+  SDpowerOff();
   // Echo to serial
   Serial.print(now.unixtime());
   Serial.print(F(","));
@@ -1478,13 +1732,12 @@ void Logger::start_logging_to_otherfile(char* filename){
 void Logger::end_logging_to_otherfile(){
   // Ends line and closes otherfile
   // Copied from endLine function
-  digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+  SDpowerOn();
   otherfile.println();
   Serial.println();
   // close the file: (This does the actual sync() step too - writes buffer)
   otherfile.close();
-  //digitalWrite(SDpowerPin,LOW);
+  SDpowerOff();
 }
 
 //reads a 5tm soil moisture probe and prints results to Serial
@@ -1586,12 +1839,12 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 /*
     digitalWrite(SDpowerPin,HIGH);    
     datafile.print(Epsilon_a);
-    datafile.print(",");
+    datafile.print(F(","));
     datafile.print(EC);
-    datafile.print(",");
+    datafile.print(F(","));
     datafile.print(T);
-    datafile.print(",");
-    //digitalWrite(SDpowerPin,LOW);
+    datafile.print(F(","));
+    digitalWrite(SDpowerPin,LOW);
     // Echo to serial
     Serial.print(Epsilon_a);
     Serial.print(F(","));
@@ -1603,6 +1856,35 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 //  }
 //}
 
+void Logger::DecagonGS1(int pin, float Vref){
+  // Vref in volts
+  int _ADC;
+  float voltage;
+  float volumetric_water_content;
+  _ADC = analogRead(pin); // 0-1023
+  voltage = Vref * _ADC / 1023.;
+  // Standard Decagon equation -- linear, for up to 60% VWC
+  volumetric_water_content = 0.494 * voltage - 0.554;
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  SDpowerOn();
+  datafile.print(voltage);
+  datafile.print(F(","));
+  datafile.print(volumetric_water_content);
+  datafile.print(F(","));
+  SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(voltage);
+  Serial.print(F(","));
+  Serial.print(volumetric_water_content);
+  Serial.print(F(","));
+
+}
 
 void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
   float _R = _vdivR(pin, Rref, Rref_on_GND_side);
@@ -1611,11 +1893,10 @@ void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
   // SAVE DATA //
   ///////////////
   
-  digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+  SDpowerOn();
   datafile.print(_R);
-  datafile.print(",");
-  //digitalWrite(SDpowerPin,LOW);
+  datafile.print(F(","));
+  SDpowerOff();
   // Echo to serial
   Serial.print(_R);
   Serial.print(F(","));
@@ -1684,7 +1965,7 @@ void Logger::announce_start(){
   name();
   Serial.println(F(" = this logger's name."));
   Serial.println();
-  delay(500);
+  delay(100);
   Serial.println(F("********************** Logger initializing. **********************"));
 }
 
@@ -1715,10 +1996,12 @@ void Logger::startup_sequence(){
       }
     }
   }
+  
   // Run through startup sequence, including clock setting if comp is true
   name();
   Serial.println(F("HELLO, COMPUTER."));
   delay(500);
+  //if ( Serial.available() ){ // To allow clock setting, uncomment this and comment the above section that sets "comp"
   if ( comp ){
     delay(4000); // Give Python time to print
     name();
