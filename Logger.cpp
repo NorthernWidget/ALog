@@ -1457,23 +1457,15 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, f
 
 float Logger::analogReadOvesample(int pin, int adc_bits, int nsamples){
 
-  const float MAX_READING_10_bit = 1023.0;
-  const float MAX_READING_11_bit = 2046.0;
-  const float MAX_READING_12_bit = 4092.0;
-  const float MAX_READING_13_bit = 8184.0;
-  const float MAX_READING_14_bit = 16368.0;
-  const float MAX_READING_15_bit = 32736.0;
-  const float MAX_READING_16_bit = 65472.0;
-  const float MAX_READING_17_bit = 130944.0;
-  const float MAX_READING_18_bit = 261888.0;
-  const float MAX_READING_19_bit = 523776.0;
-  const float MAX_READING_20_bit = 1047552.0;
-  const float MAX_READING_21_bit = 2095104.0;
-
-  eRCaGuy_analogReadXXbit adc;
+  // Configure the adc how you want it
+  // Not changing the ADC speed here -- could do this in the future
+  // to speed this process up so long as I appropriately slow it down
+  // at the end
+  adc.setBitsOfResolution(adc_bits);
+  adc.setNumSamplesToAvg(nsamples);
 
   //get the avg. of [nsamples] readings at [adc_bits] bits precision
-  float analog_reading = adc.analogReadXXbit(pin, adc_bits, nsamples);
+  float analog_reading = adc.newAnalogRead(pin)
 
   return analog_reading;
   
