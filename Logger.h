@@ -53,6 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <SoftwareSerial.h>
 //#endif
 
+// Standard libraries
 #include <SdFat.h>
 #include <Wire.h>
 #include <DS3231.h>
@@ -60,8 +61,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/sleep.h>
 #include <stdlib.h> // For turning incoming ASCII character strings into int with atol
 
-#include <Adafruit_Sensor.h>
+// Sensor-centric libraries
+#include "Adafruit_Sensor.h"
 #include <Adafruit_BMP085_U.h>
+#include <eRCaGuy_analogReadXXbit.h>
 
 // Outside of class definitions
 void wakeUpNow();
@@ -161,7 +164,8 @@ class Logger {
     int maxbotix_Serial_parse(int Ex);
     float standard_deviation_from_array(float values[], int nvalues, float mean);
     float standard_deviation_from_array(int values[], int nvalues, float mean);
-        
+    float analogReadOvesample(int pin, int adc_bits, int nsamples);
+    
     // Logging
     void start_logging_to_otherfile(char* filename);
     void end_logging_to_otherfile();
