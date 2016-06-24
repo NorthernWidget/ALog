@@ -1448,7 +1448,8 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, f
   // Using an instrumentation amplifier with a Pyranometer
   // Kipp and Zonen: raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
   
-  float Vin = (analogRead(analogPin) / 1023.) * V_ref;
+  // Hard-code the oversampling for now
+  float Vin = (analogReadOversample(analogPin, 14) / 1023.) * V_ref;
   float Radiation_W_m2 = Vin / (raw_mV_per_W_per_m2 * gain);
   
   ///////////////
