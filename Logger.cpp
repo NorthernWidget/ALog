@@ -1325,7 +1325,7 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0,
   float Vout_x = (analogRead(xPin) / 1023.) * 3.3;
   float Vout_y = (analogRead(yPin) / 1023.) * 3.3;
   
-  float Offset = 2.5; // VDD/2
+  float Offset = 2.6; // VDD/2 -- shouldn't always hard-code!
   float Sensitivity = 2.;
 
   // Temperature correction
@@ -1335,8 +1335,11 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0,
   
   float Sensitivity_compensated = Sensitivity * ( 1 + Scorr/100.);
   
-  float angle_x_rad = asin( (Vout_x - Offset)/Sensitivity_compensated );
-  float angle_y_rad = asin( (Vout_y - Offset)/Sensitivity_compensated );
+  float angle_x_radians = asin( (Vout_x - Offset)/Sensitivity_compensated );
+  float angle_y_radians = asin( (Vout_y - Offset)/Sensitivity_compensated );
+  
+  float angle_x_degrees = 180./3.14159 * angle_x_radians;
+  float angle_y_degrees = 180./3.14159 * angle_y_radians;
   
   ///////////////
   // SAVE DATA //
@@ -1344,16 +1347,24 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0,
 
   // SD write
   SDpowerOn();
-  datafile.print(angle_x_rad);
+  datafile.print(Vout_x);
   datafile.print(F(","));
-  datafile.print(angle_y_rad);
+  datafile.print(Vout_y);
+  datafile.print(F(","));
+  datafile.print(angle_x_degrees);
+  datafile.print(F(","));
+  datafile.print(angle_y_degrees);
   datafile.print(F(","));
   SDpowerOff();
   
   // Echo to serial
-  Serial.print(angle_x_rad);
+  Serial.print(Vout_x);
   Serial.print(F(","));
-  Serial.print(angle_y_rad);
+  Serial.print(Vout_y);
+  Serial.print(F(","));
+  Serial.print(angle_x_radians);
+  Serial.print(F(","));
+  Serial.print(angle_y_radians);
   Serial.print(F(","));
 
 }
