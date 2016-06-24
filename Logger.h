@@ -62,9 +62,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h> // For turning incoming ASCII character strings into int with atol
 
 // Sensor-centric libraries
-#include "Adafruit_Sensor.h"
+#include <Adafruit_Sensor.h>
 #include <Adafruit_BMP085_U.h>
-#include <eRCaGuy_analogReadXXbit.h>
+#include <eRCaGuy_NewAnalogRead.h>
 
 // Outside of class definitions
 void wakeUpNow();
@@ -164,7 +164,7 @@ class Logger {
     int maxbotix_Serial_parse(int Ex);
     float standard_deviation_from_array(float values[], int nvalues, float mean);
     float standard_deviation_from_array(int values[], int nvalues, float mean);
-    float analogReadOvesample(int pin, int adc_bits, int nsamples);
+    float analogReadOvesample(int pin, int adc_bits=10, int nsamples=1);
     
     // Logging
     void start_logging_to_otherfile(char* filename);
