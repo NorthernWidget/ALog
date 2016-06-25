@@ -164,7 +164,7 @@ class Logger {
     int maxbotix_Serial_parse(int Ex);
     float standard_deviation_from_array(float values[], int nvalues, float mean);
     float standard_deviation_from_array(int values[], int nvalues, float mean);
-    float analogReadOvesample(int pin, int adc_bits=10, int nsamples=1);
+    float analogReadOversample(int pin, int adc_bits=10, int nsamples=1);
     
     // Logging
     void start_logging_to_otherfile(char* filename);

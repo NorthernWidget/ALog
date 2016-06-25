@@ -1467,28 +1467,31 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, f
   Serial.print(F(","));
 }
 
-float Logger::analogReadOvesample(int pin, int adc_bits, int nsamples){
+float Logger::analogReadOversample(int pin, int adc_bits, int nsamples){
   // Use basic analogRead if adc_bits == 10 (default)
   // Otherwise, use library to oversample it
 
   float analog_reading;
-  
-  if (adc_bits == 10){
+
+  // Give 10 bits if you ask for less -- safe  
+  if (adc_bits <= 10){
     analog_reading = analogRead(pin);
   }
+  else if (adc_bits > 10){
 
-  // Configure the adc how you want it
-  // Not changing the ADC speed here -- could do this in the future
-  // to speed this process up so long as I appropriately slow it down
-  // at the end
-  adc.setBitsOfResolution(adc_bits);
-  adc.setNumSamplesToAvg(nsamples);
+    // Configure the adc how you want it
+    // Not changing the ADC speed here -- could do this in the future
+    // to speed this process up so long as I appropriately slow it down
+    // at the end
+    adc.setBitsOfResolution(adc_bits);
+    adc.setNumSamplesToAvg(nsamples);
 
-  //get the avg. of [nsamples] readings at [adc_bits] bits precision
-  long analog_reading_high_res = adc.newAnalogRead(pin);
-  // Normalize as if 10 bits, but as float
-  float precision_above_ten = pow(2., adc_bits - 10.);
-  analog_reading = analog_reading_high_res / precision_above_ten;
+    //get the avg. of [nsamples] readings at [adc_bits] bits precision
+    long analog_reading_high_res = adc.newAnalogRead(pin);
+    // Normalize as if 10 bits, but as float
+    float precision_above_ten = pow(2., adc_bits - 10.);
+    analog_reading = analog_reading_high_res / precision_above_ten;
+  }
 
   return analog_reading;
   
