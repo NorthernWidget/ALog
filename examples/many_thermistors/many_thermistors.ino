@@ -10,6 +10,11 @@
 //#include <NewSoftSerial.h> // in case Decagon loggers are used / Digital IO is needed
 #include <SoftwareSerial.h>
 
+// Sensor-centric libraries
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BMP085_U.h>
+#include <eRCaGuy_NewAnalogRead.h>
+
 Logger logger;
 
 ////////////////////////////
