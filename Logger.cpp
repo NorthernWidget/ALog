@@ -656,12 +656,12 @@ delay(10);
     Serial.println();
     }
 
-float Logger::_vdivR(int pin, float Rref, bool Rref_on_GND_side){
+float Logger::_vdivR(int pin, float Rref, int adc_bits, bool Rref_on_GND_side){
   // Same as public vidvR code, but returns value instead of 
   // saving it to a file
   int _ADC;
   float _R;
-  _ADC = analogRead(pin);
+  _ADC = analogReadOversample(pin, adc_bits);
   float _ADCnorm = _ADC/1023.0; // Normalize to 0-1
   if(Rref_on_GND_side){
     // Standard case for the provided slots for reference resistors
@@ -767,8 +767,8 @@ void Logger::sleep(int log_minutes){
       }
       else {
         Serial.print(F("Going back to sleep for "));
-        Serial.print(minute % log_minutes);
-        if (minute % log_minutes == 1){
+        Serial.print(log_minutes - minute % log_minutes);
+        if (log_minutes - minute % log_minutes == 1){
           Serial.println(F(" more minute"));
         }
         else{
@@ -882,12 +882,16 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
 
   // SD write
   SDpowerOn();
-  datafile.print(T);
+  datafile.print(Rtherm, 4);
+  datafile.print(F(","));
+  datafile.print(T, 4);
   datafile.print(F(","));
   SDpowerOff();
   
   // Echo to serial
-  Serial.print(T);
+  Serial.print(Rtherm, 4);
+  Serial.print(F(","));
+  Serial.print(T, 4);
   Serial.print(F(","));
 
   return T;
@@ -935,14 +939,14 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
   SDpowerOn();
   //datafile.print(Vh_real);
   //datafile.print(F(","));
-  datafile.print(RH);
+  datafile.print(RH, 4);
   datafile.print(F(","));
   SDpowerOff();
   
   // Echo to serial
   //Serial.print(Vh_real);
   //Serial.print(",");
-  Serial.print(RH);
+  Serial.print(RH, 4);
   Serial.print(F(","));
 
 }
@@ -1490,7 +1494,7 @@ float Logger::analogReadOversample(int pin, int adc_bits, int nsamples){
     long analog_reading_high_res = adc.newAnalogRead(pin);
     // Normalize as if 10 bits, but as float
     float precision_above_ten = pow(2., adc_bits - 10.);
-    analog_reading = analog_reading_high_res / precision_above_ten;
+    analog_reading = analog_reading_high_res / precision_above_ten; // 0-1023, but float
   }
 
   return analog_reading;
@@ -1900,10 +1904,11 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 
 void Logger::DecagonGS1(int pin, float Vref){
   // Vref in volts
-  int _ADC;
+  float _ADC;
   float voltage;
   float volumetric_water_content;
-  _ADC = analogRead(pin); // 0-1023
+  //_ADC = analogReadOversample(pin, 14, 10); // 0-1023
+  _ADC = analogRead(pin);
   voltage = Vref * _ADC / 1023.;
   // Standard Decagon equation -- linear, for up to 60% VWC
   volumetric_water_content = 0.494 * voltage - 0.554;
@@ -1914,16 +1919,16 @@ void Logger::DecagonGS1(int pin, float Vref){
 
   // SD write
   SDpowerOn();
-  datafile.print(voltage);
+  datafile.print(voltage, 4);
   datafile.print(F(","));
-  datafile.print(volumetric_water_content);
+  datafile.print(volumetric_water_content, 4);
   datafile.print(F(","));
   SDpowerOff();
   
   // Echo to serial
-  Serial.print(voltage);
+  Serial.print(voltage, 4);
   Serial.print(F(","));
-  Serial.print(volumetric_water_content);
+  Serial.print(volumetric_water_content, 4);
   Serial.print(F(","));
 
 }
