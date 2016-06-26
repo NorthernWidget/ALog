@@ -15,13 +15,13 @@ Logger logger;
 ////////////////////////////
 // USER-ENTERED VARIABLES //
 ////////////////////////////
-char* dataLoggerName = "T 01";
-char* fileName = "T01.txt"; // Name of file for logged data: 8.3 format (e.g, 
-                                   // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
+char* dataLoggerName = "Soil Moisture 5";
+char* fileName = "SM05.txt";
 int dataLoggingIntervalMinutes = 1; // Will log when the remainder of "minutes", divided by
                                      // this, equals 0. For regular logging intervals, make  
                                      // sure that this number divides evenly into 60.
 bool external_interrupt = false; // e.g., rain gage
+// END USER-ENTERED VALUES //
 
 void setup(){
   logger.initialize(dataLoggerName, fileName, dataLoggingIntervalMinutes, external_interrupt);
@@ -50,6 +50,8 @@ logger.startLogging();
 // startAnalog() and endAnalog() commands
 
 logger.startAnalog();
+
+while(1){}
 
 logger.DecagonGS1(0, 3.3);
 logger.DecagonGS1(1, 3.3);
