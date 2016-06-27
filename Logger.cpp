@@ -661,7 +661,8 @@ float Logger::_vdivR(int pin, float Rref, int adc_bits, bool Rref_on_GND_side){
   // saving it to a file
   int _ADC;
   float _R;
-  _ADC = analogReadOversample(pin, adc_bits);
+  //_ADC = analogReadOversample(pin, adc_bits);
+  _ADC = analogRead(pin);
   float _ADCnorm = _ADC/1023.0; // Normalize to 0-1
   if(Rref_on_GND_side){
     // Standard case for the provided slots for reference resistors
@@ -1453,7 +1454,8 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, f
   // Kipp and Zonen: raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
   
   // Hard-code the oversampling for now
-  float Vin = (analogReadOversample(analogPin, 14) / 1023.) * V_ref;
+  //float Vin = (analogReadOversample(analogPin, 14) / 1023.) * V_ref;
+  float Vin = analogRead(analogPin);
   float Radiation_W_m2 = Vin / (raw_mV_per_W_per_m2 * gain);
   
   ///////////////
@@ -1474,33 +1476,43 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, f
 float Logger::analogReadOversample(int pin, int adc_bits, int nsamples){
   // Use basic analogRead if adc_bits == 10 (default)
   // Otherwise, use library to oversample it
+  // Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
 
   float analog_reading;
+  /*
+  uint8_t n = adc_bits - 10; //"rightshift" value, AKA: "n"
+  unsigned long oversample_num = 1UL<<(2*n); //4^n; best & fastest method to do 4 to a power
+  unsigned int divisor = 1<<n; //same thing as 2^n
 
-  // Give 10 bits if you ask for less -- safe  
-  if (adc_bits <= 10){
-    analog_reading = analogRead(pin);
+  //outer loop: get the number of samples to avg
+  unsigned long reading_sum = 0;
+  for (unsigned long i=0; i<nsamples; i++)
+  {
+    //inner loop: do oversampling, per AVR121 Application Note, in order to enhance resolution of 10-bit ADC
+    unsigned long inner_sum = 0;
+    for (unsigned long j=0; j<oversample_num; j++)
+    {
+      inner_sum += analogRead(pin); //take a 10-bit reading on the Arduino ADC
+    }
+    //Convert these many 10-bit samples to a single higher-resolution sample:
+    //Standard Method:
+    //unsigned int reading = inner_sum >> n; //See AVR121 Application Note
+    //Rounding Method (to nearest integer):
+    unsigned long reading = (inner_sum + (unsigned long)divisor/2UL) >> n; //See AVR121 
+    reading_sum += reading;
   }
-  else if (adc_bits > 10){
+  float avg_reading = (float)reading_sum/(float)nsamples;
 
-    // Configure the adc how you want it
-    // Not changing the ADC speed here -- could do this in the future
-    // to speed this process up so long as I appropriately slow it down
-    // at the end
-    adc.setBitsOfResolution(adc_bits);
-    adc.setNumSamplesToAvg(nsamples);
-
-    //get the avg. of [nsamples] readings at [adc_bits] bits precision
-    long analog_reading_high_res = adc.newAnalogRead(pin);
-    // Normalize as if 10 bits, but as float
-    float precision_above_ten = pow(2., adc_bits - 10.);
-    analog_reading = analog_reading_high_res / precision_above_ten; // 0-1023, but float
-  }
-
+  // Normalize to 10 bits for all of the stuff here that expects that
+  float precision_above_ten = pow(2., adc_bits - 10.);
+  // float avg_reading_norm_to_ten_bits = ... keeping old name
+  analog_reading = avg_reading / precision_above_ten; // 0-1023, but float
+  */
+  analog_reading = 2.1234;
   return analog_reading;
-  
 }
 
+/*
 void Logger::Barometer_BMP180(){
   // Borrowed/modified from "sensorapi"
   // Commented out portions to add temperature support
@@ -1538,6 +1550,7 @@ void Logger::Barometer_BMP180(){
   Serial.print(pressure);
   Serial.print(F(","));
 }
+*/
   
 void Logger::sleepNow_nap()         // here we put the arduino to sleep between interrupt readings
 {
@@ -1907,9 +1920,26 @@ void Logger::DecagonGS1(int pin, float Vref){
   float _ADC;
   float voltage;
   float volumetric_water_content;
-  //_ADC = analogReadOversample(pin, 14, 10); // 0-1023
+  //unsigned long inner_sum = 0;
+  //_ADC = analogReadOversample(pin, 14); // 0-1023
   _ADC = analogRead(pin);
   voltage = Vref * _ADC / 1023.;
+
+  // Will not write to SD card, even when oversampling is down to just this
+  // small amount of code/overhead! For either the unsigned long or float cases.
+  // But will send values back to Serial.
+  // Why???
+  /*  
+  // 14 bit reading
+  for (int j=0; j<256; j++)
+  {
+    _ADC += analogRead(pin)/256.;
+    //inner_sum += analogRead(pin); //take a 10-bit reading on the Arduino ADC
+  }
+  //_ADC = inner_sum / 256.;
+  voltage = Vref * _ADC / 1023.;
+  */
+  
   // Standard Decagon equation -- linear, for up to 60% VWC
   volumetric_water_content = 0.494 * voltage - 0.554;
   

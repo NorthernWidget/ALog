@@ -62,9 +62,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h> // For turning incoming ASCII character strings into int with atol
 
 // Sensor-centric libraries
-#include <Adafruit_Sensor.h>
-#include <Adafruit_BMP085_U.h>
-#include <eRCaGuy_NewAnalogRead.h>
+//#include <Adafruit_Sensor.h>
+//#include <Adafruit_BMP085_U.h>
+//#include <eRCaGuy_NewAnalogRead.h>
 
 // Outside of class definitions
 void wakeUpNow();
@@ -108,7 +108,7 @@ class Logger {
     void Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation);
     void Wind_Vane_Inspeed(int vanePin);
     void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref);
-    void Barometer_BMP180();
+    //void Barometer_BMP180();
     
     // Sensors - special
     // Rain gage - will wake logger up and cause it to log to a different file
