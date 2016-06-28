@@ -306,6 +306,9 @@ announce_start();
 
 Wire.begin();
 
+SDpowerOn();
+RTCon();
+
 /////////////////
 // CHECK CLOCK //
 /////////////////
@@ -317,9 +320,9 @@ startup_sequence();
 // Set alarm to go off every time seconds==00 (i.e. once a minute) //
 /////////////////////////////////////////////////////////////////////
 
-RTCon();
+//RTCon();
 alarm2_1min();
-RTCsleep();
+//RTCsleep();
 
 ///////////////////
 // SD CARD SETUP //
@@ -332,14 +335,13 @@ RTCsleep();
 
 name();
 
-SDpowerOn();
+delay(10);
 Serial.print(F("Initializing SD card..."));
 if (!sd.begin(CSpin, SPI_HALF_SPEED)){
   Serial.println(F("Card failed, or not present"));
   LEDwarn(20); // 20 quick flashes of the LED
   sd.initErrorHalt();
 }
-SDpowerOff();
 
 Serial.println(F("card initialized."));
 Serial.println();
@@ -351,6 +353,9 @@ name();
 Serial.println(F("Logger initialization complete! Ciao bellos."));
 
 delay(10);
+
+SDpowerOff();
+RTCsleep();
 
 }
 
@@ -559,7 +564,7 @@ delay(10);
   void Logger::alarm2reset()
   {
     // Reset alarm
-    RTCon();
+    //RTCon();
     Clock.turnOffAlarm(2);
     Clock.turnOnAlarm(2);
     // Not sure why, but have to use these "checking" functions, or else the clock
@@ -570,7 +575,7 @@ delay(10);
     Clock.checkAlarmEnabled(2);
     // Clock.checkIfAlarm(1);
     Clock.checkIfAlarm(2);
-    RTCsleep();
+    //RTCsleep();
   }
 
   void Logger::alarm2_1min()
@@ -578,12 +583,12 @@ delay(10);
     // Sets an alarm that will go off once a minute
     // for intermittent data logging
     // (This will use the AVR interrupt)
-    RTCon();
+    //RTCon();
     Clock.turnOffAlarm(1);
     Clock.turnOffAlarm(2);
     Clock.setA2Time(1, 0, 0, 0b01110000, false, false, false); // just min mask
     Clock.turnOnAlarm(2);
-    RTCsleep();
+    //RTCsleep();
   }
 
   void Logger::LEDwarn(int nflash)
@@ -633,15 +638,15 @@ delay(10);
 
   void Logger::unixDatestamp(){
 
-    RTCon(); // Now using 3V3 regulator for sensors to power clock
+    //RTCon(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
-    //RTCsleep();
+    ////RTCsleep();
 
     // SD
-    SDpowerOn();
+    //SDpowerOn();
     datafile.print(now.unixtime());
     datafile.print(F(","));
-    SDpowerOff();
+    //SDpowerOff();
     // Echo to serial
     Serial.print(now.unixtime());
     Serial.print(F(","));
@@ -650,9 +655,9 @@ delay(10);
   void Logger::endLine(){
     // Ends the line in the file; do this at end of recording instance
     // before going back to sleep
-    SDpowerOn();
+    //SDpowerOn();
     datafile.println();
-    SDpowerOff();
+    //SDpowerOff();
     Serial.println();
     }
 
@@ -701,11 +706,11 @@ void Logger::RTCsleep(){
 
 void Logger::SDpowerOn(){
   digitalWrite(SDpowerPin,HIGH);
-  delay(10);
+  //delay(10);
 }
 
 void Logger::SDpowerOff(){
-  delay(10);
+  //delay(10);
   digitalWrite(SDpowerPin,LOW);
 }
 
@@ -729,6 +734,12 @@ void Logger::sleep(int log_minutes){
   
   // Wake up
   delay(10); // Is such a long delay necessary?
+  
+  // Turn power on for everything -- wastes power, improves stability.
+  // Optimize this when you have time for sensor or logger failures
+  SDpowerOn();
+  RTCon();
+
   // First, check if there was a bucket tip from the rain gage, if present
   if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
@@ -759,9 +770,9 @@ void Logger::sleep(int log_minutes){
     // AND HOW TO PASS THE FLAGS FOR THIS TO THE MAIN CODE FROM OUTSIDE
 
     else{
-      RTCon();  //Chad
+      //RTCon();  //Chad
       int minute = Clock.getMinute();
-      RTCsleep();  //Chad
+      //RTCsleep();  //Chad
       // Only wake if you really have to
       if (minute % log_minutes == 0){
         Serial.println(F("Logging!"));
@@ -781,6 +792,7 @@ void Logger::sleep(int log_minutes){
         if (NEW_RAIN_BUCKET_TIP){
           TippingBucketRainGage();
         }
+        delay(20); // finish printing
         goto backtosleep;
       }
     }
@@ -789,8 +801,13 @@ void Logger::sleep(int log_minutes){
   
 void Logger::startLogging(){
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
+
+  // SD and RTC on the whole time -- better this way
+  // Have dealt with errors in the past!
+  // With nothing writing to the card -- and things being generally slow.
+
   // Initialize logger
-  SDpowerOn();
+  //SDpowerOn();
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
@@ -804,8 +821,8 @@ void Logger::startLogging(){
     Serial.println(F(" for write failed"));
   delay(10);
   }
-  digitalWrite(SDpowerPin,LOW);
-  
+  //digitalWrite(SDpowerPin,LOW);
+    
   // Datestamp the start of the line
   unixDatestamp();
 }
@@ -815,14 +832,12 @@ void Logger::endLogging(){
 
   endLine();
 
-  SDpowerOn();
+  //SDpowerOn();
   // close the file: (This does the actual sync() step too - writes buffer)
   datafile.close();
   // THIS DELAY IS ***CRITICAL*** -- WITHOUT IT, THERE IS NOT SUFFICIENT
   // TIME TO WRITE THE DATA TO THE SD CARD!
-  delay(20);
-  SDpowerOff();
- 
+  delay(60);
 
   // Reset alarm  
   alarm2reset();
@@ -835,6 +850,11 @@ void Logger::endLogging(){
   if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
   }
+  
+  //delay(100);
+  SDpowerOff();
+  RTCsleep();
+  delay(10);
 
   // After this step, since everything is in the loop() part of the Arduino
   // sketch, the sketch will cycle back back to sleep(...)
@@ -882,17 +902,17 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   ///////////////
 
   // SD write
-  SDpowerOn();
-  datafile.print(Rtherm, 4);
+  //SDpowerOn();
+  datafile.print(Rtherm, 2);
   datafile.print(F(","));
-  datafile.print(T, 4);
+  datafile.print(T, 2);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   
   // Echo to serial
-  Serial.print(Rtherm, 4);
+  Serial.print(Rtherm, 2);
   Serial.print(F(","));
-  Serial.print(T, 4);
+  Serial.print(T, 2);
   Serial.print(F(","));
 
   return T;
@@ -937,12 +957,12 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
   ///////////////
 
   // SD write
-  SDpowerOn();
+  //SDpowerOn();
   //datafile.print(Vh_real);
   //datafile.print(F(","));
   datafile.print(RH, 4);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   
   // Echo to serial
   //Serial.print(Vh_real);
@@ -992,12 +1012,12 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, float Vre
   // I think it will -- though if it is ratiometric, I think it should.
  
   // SD write
-  SDpowerOn();
+  //SDpowerOn();
   datafile.print(V_humid_norm);
   datafile.print(F(","));
   datafile.print(RH);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   
   // Echo to serial
   Serial.print(V_humid_norm);
@@ -1047,10 +1067,10 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
     if (writeAll){
       Serial.print(range);
       Serial.print(F(","));
-      SDpowerOn();
+      //SDpowerOn();
       datafile.print(range);
       datafile.print(F(","));
-      SDpowerOff();
+      //SDpowerOff();
     }
   sumRange += range;
   }
@@ -1071,13 +1091,13 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   ///////////////
   // SAVE DATA //
   ///////////////
-  SDpowerOn();
+  //SDpowerOn();
   delay(10);
   datafile.print(meanRange);
   datafile.print(F(","));
   datafile.print(sigma);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -1104,6 +1124,7 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   // Get rid of any trash; Serial.flush() unnecessary; main thing that is important is
   // getting the 2 pings of junk out of the way
   Serial.flush();
+
   for (int i=1; i<=2; i++){
     if(EX != 99){
       digitalWrite(EX,HIGH);
@@ -1112,6 +1133,7 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
       }
     delay(100);
     }
+  sp = analogRead(sonicPin);
   for(int i=1;i<=nping;i++){
     if(EX != 99){
       digitalWrite(EX,HIGH);
@@ -1124,13 +1146,13 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
     ranges[i-1] = range; // 10-bit ADC value (1--1024) * 5 = range in mm
                          // C is 0-indexed, hence the "-1"
     if (writeAll){
-      Serial.print(range);
+      Serial.print(range, 0);
       Serial.print(F(","));
-      SDpowerOn();
-      datafile.print(range);
+      //SDpowerOn();
+      datafile.print(range, 0);
       datafile.print(F(","));
-      SDpowerOff();
-    }
+      //SDpowerOff();
+    }  
   sumRange += range;
   }
  
@@ -1146,21 +1168,58 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   }
   // Calculate stdev
   sigma = sqrt(sumsquares/nping);
-    
+
   ///////////////
   // SAVE DATA //
   ///////////////
-  SDpowerOn();
+  //SDpowerOn();
   datafile.print(meanRange);
   datafile.print(F(","));
   datafile.print(sigma);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
   Serial.print(sigma);
   Serial.print(F(","));
+
+}
+
+void Logger::maxbotixHRXL_WR_analog_oneping(int sonicPin){
+  // WRITTEN B/C SD WRITES FAILING WITH ANY FOR LOOP USAGE!
+  // ACTUALLY, NOT JUST THIS -- REASSIGNING VARIABLE?
+  // Returns distance in mm, +/- 5 mm
+  // Each 10-bit ADC increment corresponds to 5 mm.
+  // set EX=99 if you don't need it (or leave it clear -- this is default)
+  // Default nping=10 and sonicPin=A0
+  // Basically only differs from older MB sensor function in its range scaling
+  // and its added defaults.
+  
+  int meanRange; // The average range over all the pings
+  int sp; // analog reading of sonic pin; probably unnecessary, but Arduino warns against having too many fcns w/ artihmetic, I think
+
+  // Get the first readings out of the way before doing the real one  
+  //analogRead(sonicPin);
+  //delay(100);
+  //analogRead(sonicPin);
+  delay(300);
+  sp = analogRead(sonicPin);
+  meanRange = (sp + 1) * 5;
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+  //SDpowerOn();
+  datafile.print(meanRange);
+  datafile.print(F(","));
+  //datafile.print(sigma);
+  //datafile.print(F(","));
+  //SDpowerOff();
+  // Echo to serial
+  Serial.print(meanRange);
+  Serial.print(F(","));
+  //Serial.print(sigma);
+  //Serial.print(F(","));
 
 }
 
@@ -1211,7 +1270,7 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
   }
   // Write all values if so desired
   if (writeAll){
-    SDpowerOn();
+    //SDpowerOn();
     for (int i=0; i<npings; i++){
       datafile.print(myranges[i]);
       datafile.print(F(","));
@@ -1219,17 +1278,17 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
       Serial.print(myranges[i]);
       Serial.print(F(","));
     }
-    SDpowerOff();
+    //SDpowerOff();
   }
   // Always write the mean, standard deviation, and number of good returns
-  SDpowerOn();
+  //SDpowerOn();
   datafile.print(mean_range);
   datafile.print(F(","));
   datafile.print(standard_deviation);
   datafile.print(F(","));
   datafile.print(npings_with_real_returns);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   // Echo to serial
   Serial.print(mean_range);
   Serial.print(F(","));
@@ -1321,16 +1380,20 @@ int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
   //return atol(r2); // Return integer values in mm; no parsing of error values
 }
 
-void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0, float B, float Rref, float T0degC, int thermPin){
+void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float VDD, float R0, float B, float Rref, float T0degC, int thermPin){
   // +/- 90 degree inclinometer, measures +/- 1.0g
   // Needs 4.75--5.25V input
   // This function works with the analog outputs
   // Turned on and off by a switching 5V charge pump or boost converter
   
-  float Vout_x = (analogRead(xPin) / 1023.) * 3.3;
-  float Vout_y = (analogRead(yPin) / 1023.) * 3.3;
+  //float Vout_x = (analogRead(xPin) / 1023.) * VDD;
+  //float Vout_y = (analogRead(yPin) / 1023.) * VDD;
+
+  // Hard-code the oversampling for now
+  float Vout_x = (analogReadOversample(xPin, 14) / 1023.) * VDD;
+  float Vout_y = (analogReadOversample(yPin, 14) / 1023.) * VDD;
   
-  float Offset = 2.6; // VDD/2 -- shouldn't always hard-code!
+  float Offset = VDD/2.;
   float Sensitivity = 2.;
 
   // Temperature correction
@@ -1351,7 +1414,7 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0,
   ///////////////
 
   // SD write
-  SDpowerOn();
+  //SDpowerOn();
   datafile.print(Vout_x);
   datafile.print(F(","));
   datafile.print(Vout_y);
@@ -1360,16 +1423,16 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0,
   datafile.print(F(","));
   datafile.print(angle_y_degrees);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   
   // Echo to serial
   Serial.print(Vout_x);
   Serial.print(F(","));
   Serial.print(Vout_y);
   Serial.print(F(","));
-  Serial.print(angle_x_radians);
+  Serial.print(angle_x_degrees);
   Serial.print(F(","));
-  Serial.print(angle_y_radians);
+  Serial.print(angle_y_degrees);
   Serial.print(F(","));
 
 }
@@ -1407,12 +1470,12 @@ void Logger::Anemometer_reed_switch(int interrupt_number, unsigned long reading_
   ///////////////
 
   // SD write
-  SDpowerOn();
+  //SDpowerOn();
   datafile.print(rotation_Hz);
   datafile.print(F(","));
   datafile.print(wind_speed_meters_per_second);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   
   // Echo to serial
   Serial.print(rotation_Hz);
@@ -1439,10 +1502,10 @@ void Logger::Wind_Vane_Inspeed(int vanePin){
   ///////////////
 
   // SD write
-  SDpowerOn();
+  //SDpowerOn();
   datafile.print(Wind_angle);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   
   // Echo to serial
   Serial.print(Wind_angle);
@@ -1451,11 +1514,13 @@ void Logger::Wind_Vane_Inspeed(int vanePin){
 
 void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref){
   // Using an instrumentation amplifier with a Pyranometer
-  // Kipp and Zonen: raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
+  // Kipp and Zonen: nominal raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
+  // Actual raw output is based on calibration
   
-  // Hard-code the oversampling for now
-  //float Vin = (analogReadOversample(analogPin, 14) / 1023.) * V_ref;
-  float Vin = analogRead(analogPin);
+  // Hard-code the oversampling for now to 14 bits
+  // Vref V --> mV
+  float Vin = (analogReadOversample(analogPin, 14) / 1023.) * V_ref * 1000.;
+  //float Vin = V_ref * 1000. * analogRead(analogPin) / 1023.; // No oversampling
   float Radiation_W_m2 = Vin / (raw_mV_per_W_per_m2 * gain);
   
   ///////////////
@@ -1463,10 +1528,10 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, f
   ///////////////
 
   // SD write
-  SDpowerOn();
+  //SDpowerOn();
   datafile.print(Radiation_W_m2);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   
   // Echo to serial
   Serial.print(Radiation_W_m2);
@@ -1479,7 +1544,7 @@ float Logger::analogReadOversample(int pin, int adc_bits, int nsamples){
   // Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
 
   float analog_reading;
-  /*
+
   uint8_t n = adc_bits - 10; //"rightshift" value, AKA: "n"
   unsigned long oversample_num = 1UL<<(2*n); //4^n; best & fastest method to do 4 to a power
   unsigned int divisor = 1<<n; //same thing as 2^n
@@ -1507,8 +1572,7 @@ float Logger::analogReadOversample(int pin, int adc_bits, int nsamples){
   float precision_above_ten = pow(2., adc_bits - 10.);
   // float avg_reading_norm_to_ten_bits = ... keeping old name
   analog_reading = avg_reading / precision_above_ten; // 0-1023, but float
-  */
-  analog_reading = 2.1234;
+
   return analog_reading;
 }
 
@@ -1537,12 +1601,12 @@ void Logger::Barometer_BMP180(){
   ///////////////
 
   // SD write
-  SDpowerOn();
+  //SDpowerOn();
   //datafile.print(temperature);
   //datafile.print(F(","));
   datafile.print(pressure);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   
   // Echo to serial
   //Serial.print(temperature);
@@ -1690,10 +1754,10 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
   // Currently also echoes the return to serial port if it will
   // also be saved (sent to SD card)
   if (saveReturn){
-    SDpowerOn();
+    //SDpowerOn();
     datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
     datafile.print(F(","));
-    SDpowerOff();
+    //SDpowerOff();
   }
   // Echo to serial
   if (saveReturn || printReturn){
@@ -1723,7 +1787,7 @@ void Logger::TippingBucketRainGage(){
   // Then prints date stamp
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
   // might want to use a digitalread for better incorporation into normal logging cycle
-  SDpowerOn();
+  //SDpowerOn();
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
@@ -1732,7 +1796,7 @@ void Logger::TippingBucketRainGage(){
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
   end_logging_to_otherfile();
-  SDpowerOff();
+  //SDpowerOff();
 
   /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   pinMode(LEDpin, OUTPUT);
@@ -1763,7 +1827,7 @@ void Logger::TippingBucketRainGage(){
 }
 
 void Logger::start_logging_to_otherfile(char* filename){
-  SDpowerOn();
+  //SDpowerOn();
   // open the file for write at end like the Native SD library
   if (!otherfile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 
@@ -1773,16 +1837,16 @@ void Logger::start_logging_to_otherfile(char* filename){
     Serial.println(F(" for write failed"));
   delay(10);
   }
-  SDpowerOff();
+  //SDpowerOff();
   // Datestamp the start of the line - modified from unixDateStamp function
-  RTCon(); // Now using 3V3 regulator for sensors to power clock
+  //RTCon(); // Now using 3V3 regulator for sensors to power clock
   now = RTC.now();
-  RTCsleep();
+  //RTCsleep();
   // SD
-  SDpowerOn();  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
+  //SDpowerOn();  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
   otherfile.print(now.unixtime());
   otherfile.print(",");
-  SDpowerOff();
+  //SDpowerOff();
   // Echo to serial
   Serial.print(now.unixtime());
   Serial.print(F(","));
@@ -1791,12 +1855,12 @@ void Logger::start_logging_to_otherfile(char* filename){
 void Logger::end_logging_to_otherfile(){
   // Ends line and closes otherfile
   // Copied from endLine function
-  SDpowerOn();
+  //SDpowerOn();
   otherfile.println();
   Serial.println();
   // close the file: (This does the actual sync() step too - writes buffer)
   otherfile.close();
-  SDpowerOff();
+  //SDpowerOff();
 }
 
 //reads a 5tm soil moisture probe and prints results to Serial
@@ -1922,13 +1986,15 @@ void Logger::DecagonGS1(int pin, float Vref){
   float volumetric_water_content;
   //unsigned long inner_sum = 0;
   //_ADC = analogReadOversample(pin, 14); // 0-1023
-  _ADC = analogRead(pin);
+  //_ADC = analogRead(pin);
+  _ADC = analogReadOversample(pin, 14);
   voltage = Vref * _ADC / 1023.;
-
+  
   // Will not write to SD card, even when oversampling is down to just this
   // small amount of code/overhead! For either the unsigned long or float cases.
   // But will send values back to Serial.
   // Why???
+  // Was power issue with too much clock on/off
   /*  
   // 14 bit reading
   for (int j=0; j<256; j++)
@@ -1948,12 +2014,12 @@ void Logger::DecagonGS1(int pin, float Vref){
   ///////////////
 
   // SD write
-  SDpowerOn();
+  //SDpowerOn();
   datafile.print(voltage, 4);
   datafile.print(F(","));
   datafile.print(volumetric_water_content, 4);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   
   // Echo to serial
   Serial.print(voltage, 4);
@@ -1970,10 +2036,10 @@ void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
   // SAVE DATA //
   ///////////////
   
-  SDpowerOn();
+  //SDpowerOn();
   datafile.print(_R);
   datafile.print(F(","));
-  SDpowerOff();
+  //SDpowerOff();
   // Echo to serial
   Serial.print(_R);
   Serial.print(F(","));
@@ -2011,9 +2077,9 @@ void Logger::print_time(){
       exit_flag = 0; // Exit loop once this is done
       // Print times before setting clock
       for (int i=0; i<5; i++){
-        RTCon(); // Now using 3V3 regulator for sensors to power clock
+        //RTCon(); // Now using 3V3 regulator for sensors to power clock
         now = RTC.now();
-        RTCsleep();
+        //RTCsleep();
         Serial.println(now.unixtime());
         if ( i<4 ){
           // No need to delay on the last time through
@@ -2053,6 +2119,8 @@ void Logger::startup_sequence(){
   int ntrue = 0;
   int i;
   unsigned long unixtime_at_start;
+  
+  //logger.RTCon();
 
   // Check if connected to computer with ALogTalk running to set the clock
   int millisthen = millis();
@@ -2088,9 +2156,9 @@ void Logger::startup_sequence(){
     delay(1500);
     name();
     Serial.print(F("UNIX TIME STAMP ON MY WATCH IS: "));
-    RTCon(); // Now using 3V3 regulator for sensors to power clock
+    //RTCon(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
-    RTCsleep();
+    //RTCsleep();
     unixtime_at_start = now.unixtime();
     Serial.println(unixtime_at_start);
     delay(1500);
@@ -2139,9 +2207,9 @@ void Logger::startup_sequence(){
   }
   else{
     // No serial; just blink
-    RTCon(); // Now using 3V3 regulator for sensors to power clock
+    //RTCon(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
-    RTCsleep();
+    //RTCsleep();
     unixtime_at_start = now.unixtime();
     // Keep Serial just in case computer is connected w/out Python terminal
     Serial.print(F("Current UNIX time stamp according to logger is: "));
@@ -2157,6 +2225,9 @@ void Logger::startup_sequence(){
     Serial.println(F("Now beginning to log."));
     delay(1000);
   }
+  
+  //logger.RTCsleep();
+  
 }
 
 void Logger::clockSet(){
@@ -2173,7 +2244,7 @@ void Logger::clockSet(){
   bool h12;
   bool PM;
 
-  RTCon(); // Now using 3V3 regulator for sensors to power clock
+  //RTCon(); // Now using 3V3 regulator for sensors to power clock
 
   DateTime nowPreSet = RTC.now();
 
@@ -2190,14 +2261,14 @@ void Logger::clockSet(){
 	Clock.setMinute(Minute);
 	Clock.setSecond(Second);
 
-  RTCsleep();
+  //RTCsleep();
 
 	// Give time at next five seconds
 	// Should use a DateTime object for this, b/c rollover is a potential
 	// problem, but this display is not mission-critical
 	for (int i=0; i<5; i++){
 	    delay(1000);
-      RTCon();
+      //RTCon();
 	    Serial.print(Clock.getYear(), DEC);
 	    Serial.print(F("-"));
 	    Serial.print(Clock.getMonth(Century), DEC);
@@ -2209,7 +2280,7 @@ void Logger::clockSet(){
 	    Serial.print(Clock.getMinute(), DEC);
 	    Serial.print(F(":"));
 	    Serial.println(Clock.getSecond(), DEC);
-      RTCsleep();
+      //RTCsleep();
 	}
   delay(1000);
   unsigned long unixtime_at_receive_string = nowPreSet.unixtime();

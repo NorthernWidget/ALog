@@ -97,6 +97,7 @@ class Logger {
     float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, int maxRange, bool RS232=false);
     void maxbotixHRXL_WR_analog(int nping=10,int sonicPin=A0,int EX=99,bool writeAll=true); // Print order: Distance [cm], standard deviation [cm]
     //void decagon5TE(int excitPin, int dataPin); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
+    void maxbotixHRXL_WR_analog_oneping(int sonicPin);
     void DecagonGS1(int pin, float Vref);
     void vdivR(int pin, float Rref, bool Rref_on_GND_side=true);
     void flex(int flexPin, float Rref, float calib1, float calib2);
@@ -104,7 +105,7 @@ class Logger {
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref);
     void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin);
-    void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float R0, float B, float Rref, float T0degC, int thermPin);
+    void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float VDD, float R0, float B, float Rref, float T0degC, int thermPin);
     void Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation);
     void Wind_Vane_Inspeed(int vanePin);
     void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref);
