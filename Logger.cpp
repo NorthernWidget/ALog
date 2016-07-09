@@ -125,6 +125,7 @@ bool extInt;
 bool NEW_RAIN_BUCKET_TIP = false; // flag
 bool LOG_ON_BUCKET_TIP; // Defaults to False, true if you should log every 
                         // time an event (e.g., rain gage bucket tip) happens
+unsigned int rotation_count = 0;
 
 /////////////////////////
 // INSTANTIATE CLASSES //
@@ -930,7 +931,7 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
 
   // First, measure these pins
   // This will fully calculate and write the temperature data, too.
-  float V_humid_norm = analogRead(humidPin)/1023.; // 0-1
+  float V_humid_norm = analogReadOversample(humidPin, 14)/1023.; // 0-1
   float Tmin = thermistorB(10000, 3347, 10000, 25, thermPin, false);
   float Ttyp = thermistorB(10000, 3380, 10000, 25, thermPin, false);
   float Tmax = thermistorB(10000, 3413, 10000, 25, thermPin, false);
@@ -1380,18 +1381,21 @@ int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
   //return atol(r2); // Return integer values in mm; no parsing of error values
 }
 
-void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float VDD, float R0, float B, float Rref, float T0degC, int thermPin){
+void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float V_ADC, float VDD, float R0, float B, float Rref, float T0degC, int thermPin){
   // +/- 90 degree inclinometer, measures +/- 1.0g
   // Needs 4.75--5.25V input
   // This function works with the analog outputs
   // Turned on and off by a switching 5V charge pump or boost converter
   
-  //float Vout_x = (analogRead(xPin) / 1023.) * VDD;
-  //float Vout_y = (analogRead(yPin) / 1023.) * VDD;
+  //int _ADCx = analogRead(xPin);
+  //int _ADCy = analogRead(yPin);
+  
+  //float Vout_x = (_ADCx / 1023.) * VDD;
+  //float Vout_y = (_ADCy / 1023.) * VDD;
 
   // Hard-code the oversampling for now
-  float Vout_x = (analogReadOversample(xPin, 14) / 1023.) * VDD;
-  float Vout_y = (analogReadOversample(yPin, 14) / 1023.) * VDD;
+  float Vout_x = (analogReadOversample(xPin, 14) / 1023.) * V_ADC;
+  float Vout_y = (analogReadOversample(yPin, 14) / 1023.) * V_ADC;
   
   float Offset = VDD/2.;
   float Sensitivity = 2.;
@@ -1426,6 +1430,14 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float VDD
   //SDpowerOff();
   
   // Echo to serial
+  //int a = analogRead(xPin) - 512;
+  //int b = analogRead(yPin) - 512;
+  //Serial.print(a);
+  //Serial.print(F(","));
+  //Serial.print(b);
+  //Serial.print(F(","));
+  //Serial.print(VDD);
+  //Serial.print(F(","));
   Serial.print(Vout_x);
   Serial.print(F(","));
   Serial.print(Vout_y);
@@ -1442,25 +1454,32 @@ void Logger::Anemometer_reed_switch(int interrupt_number, unsigned long reading_
   // Inspeed anemometer that we have: 2.5 mph/Hz
   //                                  = 1.1176 (m/s)/Hz
 
+  // I plan for no more than 40 Hz (100 mph), so will have a delay of
+  // 10 ms between rotations to debounce the input. This should allow
+  // up to 250 mph, at which point larger problems likely exist...
+
   // Look up: http://arduino.stackexchange.com/questions/12587/how-can-i-handle-the-millis-rollover
 
-  int rotation_count;
+  rotation_count = 0; // Global variable
+  //int rotation_count_local;
   float rotation_Hz;
   float wind_speed_meters_per_second;
-  float reading_duration_seconds = reading_duration_milliseconds * 1000.;
+  float reading_duration_seconds = reading_duration_milliseconds / 1000.;
 
   pinMode(3, INPUT);
   digitalWrite(3, HIGH);
   
   unsigned long millis_start = millis();
-  attachInterrupt(1, _ISR_void, LOW);
+  attachInterrupt(1, _anemometer_count_increment, FALLING);
 
   // Avoid rollovers by comparing unsigned integers with the 
   // same number of bits
   while (millis() - millis_start <= reading_duration_milliseconds){
-    sleepNow_nap();
-    rotation_count ++;
+    //rotation_count_local = rotation_count;
+    //sleepNow_nap();
+    //rotation_count ++;
   }
+  detachInterrupt(1);
   
   rotation_Hz = rotation_count / reading_duration_seconds;
   wind_speed_meters_per_second = rotation_Hz * meters_per_second_per_rotation;
@@ -1471,16 +1490,20 @@ void Logger::Anemometer_reed_switch(int interrupt_number, unsigned long reading_
 
   // SD write
   //SDpowerOn();
-  datafile.print(rotation_Hz);
+  datafile.print(rotation_count);
   datafile.print(F(","));
-  datafile.print(wind_speed_meters_per_second);
+  datafile.print(rotation_Hz, 4);
+  datafile.print(F(","));
+  datafile.print(wind_speed_meters_per_second, 4);
   datafile.print(F(","));
   //SDpowerOff();
   
   // Echo to serial
-  Serial.print(rotation_Hz);
+  Serial.print(rotation_count);
   Serial.print(F(","));
-  Serial.print(wind_speed_meters_per_second);
+  Serial.print(rotation_Hz, 4);
+  Serial.print(F(","));
+  Serial.print(wind_speed_meters_per_second, 4);
   Serial.print(F(","));
   
 }
@@ -1529,12 +1552,12 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, f
 
   // SD write
   //SDpowerOn();
-  datafile.print(Radiation_W_m2);
+  datafile.print(Radiation_W_m2, 4);
   datafile.print(F(","));
   //SDpowerOff();
   
   // Echo to serial
-  Serial.print(Radiation_W_m2);
+  Serial.print(Radiation_W_m2, 4);
   Serial.print(F(","));
 }
 
@@ -1638,6 +1661,13 @@ void Logger::sleepNow_nap()         // here we put the arduino to sleep between 
 
 // Must be defined outside of Logger class
 void _ISR_void(){
+}
+
+void _anemometer_count_increment(){
+  rotation_count ++;
+  detachInterrupt(1);
+  delay(20); // debounce
+  attachInterrupt(1, _anemometer_count_increment, FALLING);
 }
 
 void Logger::HackHD(int control_pin, bool want_camera_on){
@@ -1785,6 +1815,9 @@ void Logger::TippingBucketRainGage(){
 
   // Uses the interrupt to read a tipping bucket rain gage.
   // Then prints date stamp
+
+  detachInterrupt(1);
+
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
   // might want to use a digitalread for better incorporation into normal logging cycle
   //SDpowerOn();
@@ -1803,7 +1836,7 @@ void Logger::TippingBucketRainGage(){
   digitalWrite(LEDpin, HIGH);
   /// END TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   Serial.println(F("Tip!"));
-  delay(200); // to make sure tips aren't double-counted
+  delay(50); // to make sure tips aren't double-counted
   /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   digitalWrite(LEDpin, LOW);
   pinMode(LEDpin, INPUT);
@@ -1815,6 +1848,10 @@ void Logger::TippingBucketRainGage(){
     IS_LOGGING = true;
   }
   
+  //delay(2000);
+  
+  attachInterrupt(1, wakeUpNow_tip, LOW);
+
   // Then based on whether we are already logging or if we are supposed to 
   // start logging here, we can continue with the logging process, or just 
   // go back to sleep

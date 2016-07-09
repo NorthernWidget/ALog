@@ -70,6 +70,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 void wakeUpNow();
 void wakeUpNow_tip();
 void _ISR_void();
+void _anemometer_count_increment();
 
 // The rest of the library
 
@@ -105,7 +106,7 @@ class Logger {
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref);
     void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin);
-    void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float VDD, float R0, float B, float Rref, float T0degC, int thermPin);
+    void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float V_ADC, float VDD, float R0, float B, float Rref, float T0degC, int thermPin);
     void Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation);
     void Wind_Vane_Inspeed(int vanePin);
     void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref);
