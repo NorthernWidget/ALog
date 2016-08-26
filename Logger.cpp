@@ -877,6 +877,29 @@ void Logger::endAnalog(){
 // SENSOR INTERFACE FUNCTIONS //
 ////////////////////////////////
 
+// Read analog pin
+//////////////////////////////
+
+float Logger::readPin(int pin){
+
+float pinValue = analogRead(pin);
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  //SDpowerOn();
+  datafile.print(pinValue);
+  datafile.print(",");
+ 
+  //SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(pinValue);
+  Serial.print(",");
+}
+
 // Thermistor - with b-value
 //////////////////////////////
 
