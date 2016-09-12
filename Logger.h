@@ -94,6 +94,7 @@ class Logger {
     
     // Sensors - standard procedure (wake up, log, sleep)
     float readPin(int pin);
+    float analogReadOversample(int pin, int adc_bits=10, int nsamples=1);
     float thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side=true);
     void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,bool writeAll); // Print order: Distance [cm], standard deviation [cm]
     float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, int maxRange, bool RS232=false);
@@ -167,7 +168,7 @@ class Logger {
     int maxbotix_Serial_parse(int Ex);
     float standard_deviation_from_array(float values[], int nvalues, float mean);
     float standard_deviation_from_array(int values[], int nvalues, float mean);
-    float analogReadOversample(int pin, int adc_bits=10, int nsamples=1);
+
     
     // Logging
     void start_logging_to_otherfile(char* filename);

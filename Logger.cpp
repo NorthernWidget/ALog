@@ -883,6 +883,7 @@ void Logger::endAnalog(){
 float Logger::readPin(int pin){
 
 float pinValue = analogRead(pin);
+return pinValue;
 
   ///////////////
   // SAVE DATA //
@@ -2090,7 +2091,7 @@ void Logger::DecagonGS1(int pin, float Vref){
 }
 
 void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
-  float _R = _vdivR(pin, Rref, Rref_on_GND_side);
+  float _R = (pin, Rref, Rref_on_GND_side);
   
   ///////////////
   // SAVE DATA //
