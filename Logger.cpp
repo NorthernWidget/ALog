@@ -194,7 +194,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   // SERIAL //
   ////////////
 
-  Serial.begin(57600);
+  Serial.begin(38400);
 
   /////////////////////////////
   // Logger models and setup //
@@ -296,7 +296,7 @@ void Logger::setupLogger(){
 // SERIAL //
 ////////////
 
-Serial.begin(57600);
+Serial.begin(38400);
 
 // Announce start
 announce_start();
@@ -522,7 +522,7 @@ RTCsleep();
       // Copied from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1243973204
       //power_all_enable();
       /*
-      Serial.begin(57600);
+      Serial.begin(38400);
       Serial.flush();
       while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
        UCSR0A |= 1 << TXC0;  // mark transmission not complete
@@ -665,10 +665,9 @@ RTCsleep();
 float Logger::_vdivR(int pin, float Rref, int adc_bits, bool Rref_on_GND_side){
   // Same as public vidvR code, but returns value instead of 
   // saving it to a file
-  int _ADC;
+  float _ADC;
   float _R;
-  //_ADC = analogReadOversample(pin, adc_bits);
-  _ADC = analogRead(pin);
+  _ADC = analogReadOversample(pin, adc_bits);
   float _ADCnorm = _ADC/1023.0; // Normalize to 0-1
   if(Rref_on_GND_side){
     // Standard case for the provided slots for reference resistors
@@ -883,7 +882,6 @@ void Logger::endAnalog(){
 float Logger::readPin(int pin){
 
 float pinValue = analogRead(pin);
-return pinValue;
 
   ///////////////
   // SAVE DATA //
@@ -891,14 +889,40 @@ return pinValue;
 
   // SD write
   //SDpowerOn();
-  datafile.print(pinValue);
+  datafile.print(pinValue, 4);
   datafile.print(",");
  
   //SDpowerOff();
   
   // Echo to serial
-  Serial.print(pinValue);
+  Serial.print(pinValue, 4);
   Serial.print(",");
+
+return pinValue;
+
+}
+
+float Logger::readPinOversample(int pin, int bits){
+
+float pinValue = analogReadOversample(pin, bits);
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  //SDpowerOn();
+  datafile.print(pinValue,4);
+  datafile.print(",");
+ 
+  //SDpowerOff();
+  
+  // Echo to serial
+  Serial.print(pinValue,4);
+  Serial.print(",");
+
+return pinValue;
+
 }
 
 // Thermistor - with b-value
@@ -912,7 +936,7 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   // thermistorB(10000,3988,13320,25,tempPin); // EPCOS, DigiKey # 495-2153-ND
 
   // Voltage divider
-  float Rtherm = _vdivR(thermPin,Rref,Rref_on_GND_side);
+  float Rtherm = _vdivR(thermPin,Rref,14,Rref_on_GND_side);
   
   // B-value thermistor equations
   float T0 = T0degC + 273.15;
@@ -930,14 +954,14 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   //SDpowerOn();
   datafile.print(Rtherm, 2);
   datafile.print(F(","));
-  datafile.print(T, 2);
+  datafile.print(T, 4);
   datafile.print(F(","));
   //SDpowerOff();
   
   // Echo to serial
   Serial.print(Rtherm, 2);
   Serial.print(F(","));
-  Serial.print(T, 2);
+  Serial.print(T, 4);
   Serial.print(F(","));
 
   return T;
@@ -1345,7 +1369,7 @@ float Logger::standard_deviation_from_array(int values[], int nvalues, float mea
 int Logger::maxbotix_Serial_parse(int Ex){
   // Excites the MaxBotix sensor and receives its ranging output
   char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
-  Serial.end(); // End 57600 bps computer comms
+  Serial.end(); // End 38400 bps computer comms
   Serial.begin(9600); // Start 9600 bps logger comms
   //Excite the sensor to produce a pulse
   pinMode(Ex, OUTPUT);
@@ -1362,7 +1386,7 @@ int Logger::maxbotix_Serial_parse(int Ex){
     }
   }
   Serial.end();
-  Serial.begin(57600);
+  Serial.begin(38400);
   // Convert to integer
   char r2[4]; // range stripped of all of its extra characters
   for (int i=1; i<5; i++){

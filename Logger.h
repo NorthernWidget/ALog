@@ -94,6 +94,7 @@ class Logger {
     
     // Sensors - standard procedure (wake up, log, sleep)
     float readPin(int pin);
+    float readPinOversample(int pin, int bits);
     float analogReadOversample(int pin, int adc_bits=10, int nsamples=1);
     float thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side=true);
     void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,bool writeAll); // Print order: Distance [cm], standard deviation [cm]
