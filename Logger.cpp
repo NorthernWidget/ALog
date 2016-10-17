@@ -106,7 +106,17 @@ const int log_mega=2; // In development
 /////////////////////////////////////////////////
 
 // Logging interval - wake when minutes == this
-int log_minutes;
+//int log_minutes; //**chad delete when new alarm works
+int dayInterval;
+int hourInterval;
+int minInterval;
+int secInterval;
+// Alarm counters
+int _days;
+int _hours;
+int _minutes;
+int _seconds;
+
 bool CAMERA_IS_ON = false; // for a video camera
 
 // IS_LOGGING tells the logger if it is awake and actively logging
@@ -154,7 +164,9 @@ DateTime now;
 // Constructor
 Logger::Logger(){}
 
-void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, bool _ext_int, bool _LOG_ON_BUCKET_TIP){
+//void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, bool _ext_int, bool _LOG_ON_BUCKET_TIP){  Chad:old
+
+void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, int _hourInterval, int _minInterval, int _secInterval, bool _ext_int, bool _LOG_ON_BUCKET_TIP){
   /*
   Model automatically determined from the MCU type and is used to modify 
   pinout-dependent functions. There may be a need to add a board version in the 
@@ -172,7 +184,11 @@ void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, b
   // Assign the global variables (not intended to change) to the input values
   logger_name = _logger_name;
   filename = _filename;
-  log_minutes = _log_minutes;
+  dayInterval = _dayInterval;
+  hourInterval = _hourInterval;
+  minInterval = _minInterval;
+  secInterval = _secInterval;
+
   
   // Assign the global and changable variables to input values
   LOG_ON_BUCKET_TIP = _LOG_ON_BUCKET_TIP;
@@ -248,8 +264,9 @@ void Logger::setupLogger(){
   // 1.1V (or VCC) against 3.3V and likely damage the MCU / fry the ADC(?)
   analogReference(EXTERNAL); // Commented out in other code - check on how to make this all work
 
+/*
   ///////////////////////////////////
-  // CHECK IF LOG_MINUTES IS VALID //
+  // CHECK IF LOG_MINUTES IS VALID //  **Chad-LOG_MINUTES is no longer used
   ///////////////////////////////////
 
   // Warn if log_minutes is bad.
@@ -263,8 +280,25 @@ void Logger::setupLogger(){
     Serial.println(F("Disabling time-lapse data logging (log_minutes = -1 is the call for this)"));
     Serial.println(F("This also disables the ""Log Now"" button."));
   }
-  // 0 will always log - so need to figure out what to do about that. maybe just decide hourly ok default?
+  // 0 will always log - so need to figure out what to do about that. maybe just decide hourly ok default?  */
 
+  ///////////////////////////////////
+  // CHECK FOR VALID LOG INTERVALS //
+  ///////////////////////////////////
+/*
+log_minutes=1; //**chad tempararily doing this till new alarm system is working.
+if (log_minutes > 59){
+    Serial.println(F("CANNOT LOG AT INTERVALS OF >= 1 HOUR"));
+    Serial.println(F("PLEASE CHANGE <log_minutes> PASSED TO FUNCTION <sleep> TO AN INTEGER <= 59"));
+    LEDwarn(300); // 300 quick flashes of the LED - serious badness!
+  }
+  else if (log_minutes == -1){
+    Serial.println(F("Disabling time-lapse data logging (log_minutes = -1 is the call for this)"));
+    Serial.println(F("This also disables the ""Log Now"" button."));
+  }
+
+  // 0 will always log - so need to figure out what to do about that. maybe just decide hourly ok default?
+*/
   //////////////
   // SET PINS //
   //////////////
@@ -317,12 +351,9 @@ RTCon();
 // Includes check whether you are talking to Python terminal
 startup_sequence();
 
-/////////////////////////////////////////////////////////////////////
-// Set alarm to go off every time seconds==00 (i.e. once a minute) //
-/////////////////////////////////////////////////////////////////////
+// Initialize watchdog timer for 8 second
+//watchdogSetup();
 
-//RTCon();
-alarm2_1min();
 //RTCsleep();
 
 ///////////////////
@@ -336,7 +367,7 @@ alarm2_1min();
 
 name();
 
-delay(10);
+delay(5);
 Serial.print(F("Initializing SD card..."));
 if (!sd.begin(CSpin, SPI_HALF_SPEED)){
   Serial.println(F("Card failed, or not present"));
@@ -348,13 +379,27 @@ Serial.println(F("card initialized."));
 Serial.println();
 LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
 
-delay(10);
+//delay(10);
 
 name();
 Serial.println(F("Logger initialization complete! Ciao bellos."));
 
 delay(10);
 
+    bool Century, h12 = false;
+    bool PM;
+    _days = Clock.getDoW();
+    _hours = Clock.getHour(h12, PM);
+    _minutes = Clock.getMinute();
+    _seconds = Clock.getSecond()+5;  //Set first alarm to activate in 5 seconds.
+    if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
+    if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
+    if(_hours > 23){_hours = _hours - 24; _days++;}
+    if(_days > 7){_days = _days - 7;} 
+
+alarm( _days, _hours, _minutes, _seconds);  //Set first alarm.
+checkTime();  //Verify time
+delay(2);
 SDpowerOff();
 RTCsleep();
 
@@ -420,10 +465,9 @@ RTCsleep();
   {
     IS_LOGGING = false;           // Definitely not logging anymore
 
-    alarm2reset();   // Turns alarm 2 off and then turns it back
+//**chad    alarm2reset();   // Turns alarm 2 off and then turns it back
                              // on so it will go off again next minute
                              // NOT BACK ON ANYMORE
-
 
       /* Now is the time to set the sleep mode. In the Atmega8 datasheet
        * http://www.atmel.com/dyn/resources/prod_documents/doc2486.pdf on page 35
@@ -472,12 +516,25 @@ RTCsleep();
        * In all but the IDLE sleep modes only LOW can be used.
        */
 
+      /*
       if (log_minutes == -1 && extInt == false){
         Serial.println(F("All inputs to wake from sleep disabled! Reprogram, please!"));
       }
       if (log_minutes != -1){
         attachInterrupt(interruptNum, wakeUpNow, LOW); // wakeUpNow when wakePin gets LOW 
+      }*/
+
+//**chad attach inturrupt used to be here and run each cycle
+
+      if (dayInterval && hourInterval && minInterval && secInterval == -1 && extInt == false){
+        Serial.println(F("All inputs to wake from sleep disabled! Reprogram, please!"));
       }
+        //Serial.print(F("interrupt"));  delay(10);
+      if (dayInterval || hourInterval || minInterval || secInterval != -1){
+        attachInterrupt(interruptNum, wakeUpNow, LOW); // wakeUpNow when wakePin goes LOW 
+        //Serial.println(F(" attached")); delay(10);
+      }
+
       if (extInt){
         attachInterrupt(1, wakeUpNow_tip, LOW);
       }
@@ -504,12 +561,13 @@ RTCsleep();
       //Serial.end();
 
       sleep_mode();            // here the device is actually put to sleep!!
-                               // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP
+      //delay(2);                // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP.  
 
       // After waking, run sleep mode function, and then remainder of this function (below)
       sleep_disable();         // first thing after waking from sleep:
                                // disable sleep...
-      // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this to allow both measurements types!
+
+      // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this  to allow both measurements types!
       // 06-11-2015: The above line commented to allow the rain gage to be read
       // at the same time as other readings
                           // Maybe move this to specific post-wakeup code?
@@ -528,7 +586,7 @@ RTCsleep();
        UCSR0A |= 1 << TXC0;  // mark transmission not complete
       while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
       */
-
+      //delay(1); //**Chad - this is needed for stability?.
   }
 
   // Must be defined outside of Logger class
@@ -543,8 +601,7 @@ RTCsleep();
                                          //    to happen even if the logger is
                                          //    already awake to deal with a 
                                          //    rain gauge bucket tip
-    sbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter ON
-  }
+   }
 
   void wakeUpNow_tip()        // here the interrupt is handled after wakeup
   {
@@ -562,35 +619,217 @@ RTCsleep();
   }
 
 
-  void Logger::alarm2reset()
+  /*void Logger::alarm2reset() //**Chad changed these all to 1
   {
     // Reset alarm
     //RTCon();
+    Clock.turnOffAlarm(1);
     Clock.turnOffAlarm(2);
+    Clock.turnOnAlarm(1);
     Clock.turnOnAlarm(2);
+   //delay(1);
     // Not sure why, but have to use these "checking" functions, or else the clock
     // won't realize that it's been reset.
     // Here I'm just using them all; they're quick.
     // But I could probably ignore the Alarm 1 ones
     // Clock.checkAlarmEnabled(1);
+    Clock.checkAlarmEnabled(1);
     Clock.checkAlarmEnabled(2);
+    //delay(1);
     // Clock.checkIfAlarm(1);
+    Clock.checkIfAlarm(1);
     Clock.checkIfAlarm(2);
+    //delay(1);
     //RTCsleep();
-  }
+  }  Chad-function no longer needed */  
 
-  void Logger::alarm2_1min()
-  {
-    // Sets an alarm that will go off once a minute
-    // for intermittent data logging
-    // (This will use the AVR interrupt)
-    //RTCon();
-    Clock.turnOffAlarm(1);
+
+void Logger::alarm(int _days ,int _hours, int _minutes, int _seconds){
+
+/* Retrieves everything you could want to know about alarm one. 
+ * A1Dy true makes the alarm go on A1Day = Day of Week,
+ * A1Dy false makes the alarm go on A1Day = Date of month.
+ *
+ * byte AlarmBits sets the behavior of the alarms:
+ *	Dy	A1M4	A1M3	A1M2	A1M1	Rate
+ *	X	1		1		1		1		Once per second
+ *	X	1		1		1		0		Alarm when seconds match
+ *	X	1		1		0		0		Alarm when min, sec match
+ *	X	1		0		0		0		Alarm when hour, min, sec match
+ *	0	0		0		0		0		Alarm when date, h, m, s match
+ *	1	0		0		0		0		Alarm when DoW, h, m, s match
+ *
+ *	Dy	A2M4	A2M3	A2M2	Rate
+ *	X	1		1		1		Once per minute (at seconds = 00)
+ *	X	1		1		0		Alarm when minutes match
+ *	X	1		0		0		Alarm when hours and minutes match
+ *	0	0		0		0		Alarm when date, hour, min match
+ *	1	0		0		0		Alarm when DoW, hour, min match
+ 
+
+const int ALRM1_MATCH_EVERY_SEC  0b1111  // once a second
+const int ALRM1_MATCH_SEC        0b1110  // when seconds match
+const int ALRM1_MATCH_MIN_SEC    0b1100  // when minutes and seconds match
+const int ALRM1_MATCH_HR_MIN_SEC 0b1000  // when hours, minutes, and seconds match
+const int ALRM1_MATCH_HR_MIN_SEC 0b0000  // when hours, minutes, and seconds match
+    byte ALRM1_SET = ALRM1_MATCH_HR_MIN_SEC;
+
+const int ALRM2_ONCE_PER_MIN     0b111   // once per minute (00 seconds of every minute)
+const int ALRM2_MATCH_MIN        0b110   // when minutes match
+const int ALRM2_MATCH_HR_MIN     0b100   // when hours and minutes match
+const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
+    byte ALRM2_SET = ALRM2_DISABLE;
+
+      // Set AlarmBits, ALRM2 first, followed by ALRM1
+      AlarmBits = ALRM2_SET;
+      AlarmBits <<= 4;
+      AlarmBits |= ALRM1_SET;
+*/
+
+    RTCon();
+
+    bool Century, h12, A12h =false;
+    bool ADy = true;
+    bool PM, Apm;
+
+    byte AlarmBits = 0b00000000;
+    Clock.turnOffAlarm(1); //Turn off alarms before setting.
     Clock.turnOffAlarm(2);
-    Clock.setA2Time(1, 0, 0, 0b01110000, false, false, false); // just min mask
+    checkAlarms();  //Clear alarm flags
+
+    Clock.setA1Time(_days, _hours, _minutes, _seconds, AlarmBits, true, false, false);
+    delay(2);
+    int _days_backup = _days;
+    int _hours_backup = _hours;
+    int _minutes_backup = _minutes+1;
+  
+    if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
+    if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
+    if(_hours > 23){_hours = _hours - 24; _days++;}
+    if(_days > 7){_days = _days - 7;} 
+    Clock.setA2Time(_days_backup, _hours_backup, _minutes_backup, AlarmBits, true, false, false);  //setting as backup wake function
+    delay(2);
+    Clock.turnOnAlarm(1); //Turn on alarms.
+    delay(1);
     Clock.turnOnAlarm(2);
-    //RTCsleep();
+    delay(2);
+
+displayAlarms(); delay(10);  //Uncomment to see alarms on serial monitor.
+
+}
+
+
+void Logger::displayAlarms(){
+  bool ADy, A12h, Apm;
+  byte ADay, AHour, AMinute, ASecond, AlarmBits;
+  Serial.print("Alarm 1: ");
+	Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
+	Serial.print(ADay, DEC);
+	if (ADy) {
+		Serial.print(" DoW");
+	} else {
+		Serial.print(" Date");
+	}
+	Serial.print(' ');
+	Serial.print(AHour, DEC);
+	Serial.print(' ');
+	Serial.print(AMinute, DEC);
+	Serial.print(' ');
+	Serial.print(ASecond, DEC);
+	Serial.print(' ');
+	if (A12h) {
+		if (Apm) {
+			Serial.print("pm");
+		} else {
+			Serial.print("am");
+		}
+	}
+	if (Clock.checkAlarmEnabled(1)){
+		Serial.print("enabled");
+  } else{
+    Serial.print("not enabled");
+    }
+	
+	Serial.print('\n');
+	// Display Alarm 2 information
+	Serial.print("Alarm 2: ");
+	Clock.getA2Time(ADay, AHour, AMinute, AlarmBits, ADy, A12h, Apm);
+	Serial.print(ADay, DEC);
+	if (ADy){
+		Serial.print(" DoW");
+	} 
+    else{
+    Serial.print(" Date");
+	  } 
+	Serial.print(' ');
+	Serial.print(AHour, DEC);
+	Serial.print(' ');
+	Serial.print(AMinute, DEC);
+	Serial.print(' ');
+	if (A12h) {
+		if (Apm) {
+			Serial.print("pm ");
+		} else {
+			Serial.print("am ");
+		}
+	}
+	if (Clock.checkAlarmEnabled(2)) {
+		Serial.print("enabled");
+	} else{
+    Serial.print("not enabled");
   }
+	// display alarm bits
+	Serial.print('\n');
+//	Serial.println(AlarmBits, BIN);
+//  Serial.println(Clock.getSecond());
+
+checkTime();
+}
+
+void Logger::checkAlarms(){
+	if (Clock.checkIfAlarm(1)) {
+		Serial.print(" A1! ");
+	}
+	if (Clock.checkIfAlarm(2)) {
+		Serial.print(" A2! ");
+	}
+}
+
+void Logger::checkTime(){
+//Get current time:
+bool Century=false;
+bool h12 = false;
+bool PM;
+  Serial.print("GMT DATE/TIME: "); delay(5);
+	Serial.print(Clock.getYear(), DEC);
+	Serial.print(' ');
+	// then the month
+	Serial.print(Clock.getMonth(Century), DEC);
+	Serial.print(' ');
+	// then the date
+	Serial.print(Clock.getDate(), DEC);
+	Serial.print(' ');
+	// and the day of the week
+	//Serial.print(Clock.getDoW(), DEC);
+	//Serial.print(' ');
+	// Finally the hour, minute, and second
+	Serial.print(Clock.getHour(h12, PM), DEC);
+	Serial.print(' ');
+	Serial.print(Clock.getMinute(), DEC);
+	Serial.print(' ');
+	Serial.print(Clock.getSecond(), DEC);
+	// Add AM/PM indicator
+	if (h12) {
+		if (PM) {
+			Serial.println(" PM ");
+		} else {
+			Serial.println(" AM ");
+		}
+	} else {
+		Serial.println(" 24h GMT");
+	}
+delay(2);
+}
 
   void Logger::LEDwarn(int nflash)
   {
@@ -684,6 +923,29 @@ float Logger::_vdivR(int pin, float Rref, int adc_bits, bool Rref_on_GND_side){
   return _R;
 }
 
+////Delete when debug is finished
+float Logger::_vdivR_Debug(int pin, float Rref, int adc_bits, bool Rref_on_GND_side){
+  // Same as public vidvR code, but returns value instead of 
+  // saving it to a file
+  float _ADC;
+  float _R;
+  _ADC = analogReadOversample_Debug(pin, adc_bits);
+  float _ADCnorm = _ADC/1023.0; // Normalize to 0-1
+  if(Rref_on_GND_side){
+    // Standard case for the provided slots for reference resistors
+    // This is the default.
+    _R = Rref/_ADCnorm - Rref; // R1 = (R2*Vin)/Vout - R2
+  }
+  else {
+    // This could happen if an external sensor has a different setup for
+    // its known and unknown resistors; in this case, place the reference
+    // resistor between the analog pin and 3V3. (The sensor, internally, 
+    // has its thermistor connected to GND.)
+    _R = Rref * (1. / ((1./_ADCnorm) - 1.)); // R2 = R1* (1 / ((Vin/Vout) - 1))
+  }
+  return _R;
+}
+
 void Logger::RTCon(){
   // Turn on power clock
   pinMode(SDpowerPin,OUTPUT);
@@ -719,26 +981,33 @@ void Logger::SDpowerOff(){
 ////////////////////////////////////////////////////////////
 
 
-void Logger::sleep(){
+/*void Logger::sleep(){
   // Maintain backwards compatibility with code that requires "log_minutes"
   // to be defined separately from initialize step. (A bad idea, right? Will
   // remove this compatibility once it seems to no longer be a problem.)
   sleep(log_minutes);
-}
+}*/
 
-void Logger::sleep(int log_minutes){
+void Logger::sleep(){
   // Go to sleep
-  backtosleep:
+//  backtosleep:  **chad no longer needed
   IS_LOGGING = false; // not logging when sleeping!
+
+  //wdt_disable();
+
   sleepNow();
+
+  //wdt_enable(WDTO_8S);
   
   // Wake up
-  delay(10); // Is such a long delay necessary?
+//  delay(10); // Is such a long delay necessary?  **Chad changed from 10.
   
   // Turn power on for everything -- wastes power, improves stability.
   // Optimize this when you have time for sensor or logger failures
   SDpowerOn();
   RTCon();
+
+  checkAlarms(); //**chad check and clear flag when power is on!  
 
   // First, check if there was a bucket tip from the rain gage, if present
   if (NEW_RAIN_BUCKET_TIP){
@@ -770,14 +1039,14 @@ void Logger::sleep(int log_minutes){
     // AND HOW TO PASS THE FLAGS FOR THIS TO THE MAIN CODE FROM OUTSIDE
 
     else{
-      //RTCon();  //Chad
-      int minute = Clock.getMinute();
+/*      //RTCon();  //Chad
+      int minute = Clock.getSecond(); //**Chad change Clock.getMinute(); to getSecond();
       //RTCsleep();  //Chad
       // Only wake if you really have to
-      if (minute % log_minutes == 0){
+      if (minute % log_minutes == 0){  */
         Serial.println(F("Logging!"));
       }
-      else {
+/*      else {
         Serial.print(F("Going back to sleep for "));
         Serial.print(log_minutes - minute % log_minutes);
         if (log_minutes - minute % log_minutes == 1){
@@ -795,7 +1064,7 @@ void Logger::sleep(int log_minutes){
         delay(20); // finish printing
         goto backtosleep;
       }
-    }
+    }*/
   }
 }
   
@@ -807,7 +1076,7 @@ void Logger::startLogging(){
   // With nothing writing to the card -- and things being generally slow.
 
   // Initialize logger
-  //SDpowerOn();
+  //SDpowerOn(); Turned on in sleep function.
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
@@ -815,47 +1084,52 @@ void Logger::startLogging(){
   }
   // Open file to write data
   delay(10);
-  if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
+  if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {   
     Serial.print(F("Opening "));
     Serial.print(filename);
     Serial.println(F(" for write failed"));
   delay(10);
-  }
+  }  
   //digitalWrite(SDpowerPin,LOW);
-    
   // Datestamp the start of the line
   unixDatestamp();
 }
 
 void Logger::endLogging(){
   // Ends line, turns of SD card, and resets alarm: ready to sleep
-
   endLine();
-
   //SDpowerOn();
   // close the file: (This does the actual sync() step too - writes buffer)
   datafile.close();
+  delay(30);
   // THIS DELAY IS ***CRITICAL*** -- WITHOUT IT, THERE IS NOT SUFFICIENT
   // TIME TO WRITE THE DATA TO THE SD CARD!
-  delay(60);
-
-  // Reset alarm  
-  alarm2reset();
-  delay(10); // need time to reset alarms?
-
-
   // Check right before going back to sleep if there has been a rain
   // gauge bucket tip while it has been on
   // This is a temporary solution!
   if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
   }
-  
-  //delay(100);
-  SDpowerOff();
-  RTCsleep();
-  delay(10);
 
+//  SDpowerOff();
+
+//  RTCon();
+
+    //Calculate for next alarm
+    _days = _days+dayInterval;
+    _hours = _hours+hourInterval;
+    _minutes = _minutes+minInterval;
+    _seconds = _seconds+secInterval;   
+    if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
+    if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
+    if(_hours > 23){_hours = _hours - 24; _days++;}
+    if(_days > 7){_days = _days - 7;} 
+
+  alarm(_days, _hours, _minutes, _seconds);  //Set new alarms.
+
+  delay(2);
+  RTCsleep();
+  delay(2);
   // After this step, since everything is in the loop() part of the Arduino
   // sketch, the sketch will cycle back back to sleep(...)
 }
@@ -889,13 +1163,13 @@ float pinValue = analogRead(pin);
 
   // SD write
   //SDpowerOn();
-  datafile.print(pinValue, 4);
+  datafile.print(pinValue, 1);
   datafile.print(",");
  
   //SDpowerOff();
   
   // Echo to serial
-  Serial.print(pinValue, 4);
+  Serial.print(pinValue, 1);
   Serial.print(",");
 
 return pinValue;
@@ -952,15 +1226,15 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
 
   // SD write
   //SDpowerOn();
-  datafile.print(Rtherm, 2);
-  datafile.print(F(","));
+//  datafile.print(Rtherm, 2);
+//  datafile.print(F(","));
   datafile.print(T, 4);
   datafile.print(F(","));
   //SDpowerOff();
   
   // Echo to serial
-  Serial.print(Rtherm, 2);
-  Serial.print(F(","));
+//  Serial.print(Rtherm, 2);
+//  Serial.print(F(","));
   Serial.print(T, 4);
   Serial.print(F(","));
 
@@ -968,6 +1242,55 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
 
 }
 
+// Thermistor - with b-value //Temp debugging code - delete
+//////////////////////////////
+
+float Logger::thermistorB_Debug(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side){
+  // R0 and T0 are thermistor calibrations
+  //
+  // EXAMPLES:
+  // thermistorB(10000,3950,30000,25,tempPin); // Cantherm from DigiKey
+  // thermistorB(10000,3988,13320,25,tempPin); // EPCOS, DigiKey # 495-2153-ND
+  datafile.println();
+  datafile.close();
+
+  delay(30);
+
+
+  // Voltage divider
+  float Rtherm = _vdivR_Debug(thermPin,Rref,14,Rref_on_GND_side);
+ 
+  // B-value thermistor equations
+  float T0 = T0degC + 273.15;
+  float Rinf = R0*exp(-B/T0);
+  float T = B / log(Rtherm/Rinf);
+  
+  // Convert to celsius
+  T = T - 273.15;
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+ 
+  // SD write
+  //SDpowerOn();
+//  datafile.print(Rtherm, 2);
+//  datafile.print(F(","));
+  otherfile.print(T, 4);
+  otherfile.print(F(","));
+  //SDpowerOff();
+  
+  end_logging_to_otherfile();
+
+  // Echo to serial
+//  Serial.print(Rtherm, 2);
+//  Serial.print(F(","));
+//  Serial.print(T, 4);
+//  Serial.print(F(","));
+
+  return T;
+  
+}
 
 // HTM2500LF Humidity and Temperature Sensor
 // by TE Connectivity Measurement Specialties
@@ -1647,6 +1970,50 @@ float Logger::analogReadOversample(int pin, int adc_bits, int nsamples){
   return analog_reading;
 }
 
+float Logger::analogReadOversample_Debug(int pin, int adc_bits, int nsamples){
+  // Use basic analogRead if adc_bits == 10 (default)
+  // Otherwise, use library to oversample it
+  // Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
+
+
+  start_logging_to_otherfile("Oversample.txt");
+
+  float analog_reading;
+
+  uint8_t n = adc_bits - 10; //"rightshift" value, AKA: "n"
+  unsigned long oversample_num = 1UL<<(2*n); //4^n; best & fastest method to do 4 to a power
+  unsigned int divisor = 1<<n; //same thing as 2^n
+
+  //outer loop: get the number of samples to avg
+  unsigned long reading_sum = 0;
+  for (unsigned long i=0; i<nsamples; i++)
+  {
+    //inner loop: do oversampling, per AVR121 Application Note, in order to enhance resolution of 10-bit ADC
+    unsigned long inner_sum = 0;
+
+    for (unsigned long j=0; j<oversample_num; j++)
+    {
+      inner_sum += analogRead(pin); //take a 10-bit reading on the Arduino ADC
+      otherfile.print(analogRead(pin));
+      otherfile.print(F(","));
+    }
+    //Convert these many 10-bit samples to a single higher-resolution sample:
+    //Standard Method:
+    //unsigned int reading = inner_sum >> n; //See AVR121 Application Note
+    //Rounding Method (to nearest integer):
+    unsigned long reading = (inner_sum + (unsigned long)divisor/2UL) >> n; //See AVR121 
+    reading_sum += reading;
+  }
+  float avg_reading = (float)reading_sum/(float)nsamples;
+
+  // Normalize to 10 bits for all of the stuff here that expects that
+  float precision_above_ten = pow(2., adc_bits - 10.);
+  // float avg_reading_norm_to_ten_bits = ... keeping old name
+  analog_reading = avg_reading / precision_above_ten; // 0-1023, but float
+
+  return analog_reading;
+}
+
 /*
 void Logger::Barometer_BMP180(){
   // Borrowed/modified from "sensorapi"
@@ -1697,6 +2064,7 @@ void Logger::sleepNow_nap()         // here we put the arduino to sleep between 
                              // so sleep is possible. just a safety pin 
     sleep_mode();            // here the device is actually put to sleep!!
                              // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP
+    sbi(ADCSRA,ADEN);        // switch Analog to Digitalconverter ON **Chad, was in the wakeupnow function?
 
     // After waking, run sleep mode function, and then remainder of this function (below)
     sleep_disable();         // first thing after waking from sleep:
@@ -1751,6 +2119,18 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
     CAMERA_IS_ON = 1 - CAMERA_IS_ON; // flips it from true to false and vice versa
     // Use this to get times of camera on/off
     start_logging_to_otherfile("camera.txt");
+
+    now = RTC.now();
+    //RTCsleep();
+    // SD
+    //SDpowerOn();  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
+    otherfile.print(now.unixtime());
+    otherfile.print(",");
+    //SDpowerOff();
+    // Echo to serial
+    Serial.print(now.unixtime());
+    Serial.print(F(","));
+
     if (want_camera_on == 1){
       otherfile.print("ON");
     }
@@ -1876,6 +2256,16 @@ void Logger::TippingBucketRainGage(){
   }
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
+  now = RTC.now();
+  //RTCsleep();
+  // SD
+  //SDpowerOn();  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
+  otherfile.print(now.unixtime());
+  otherfile.print(",");
+  //SDpowerOff();
+  // Echo to serial
+  Serial.print(now.unixtime());
+  Serial.print(F(","));
   end_logging_to_otherfile();
   //SDpowerOff();
 
@@ -1906,7 +2296,7 @@ void Logger::TippingBucketRainGage(){
   if (!IS_LOGGING){
     // Nested recursion to next-level-up function, hopefully doesn't
     // chew through too much memory!
-    sleep(log_minutes);
+    sleep();
   }
 
 }
@@ -1925,7 +2315,7 @@ void Logger::start_logging_to_otherfile(char* filename){
   //SDpowerOff();
   // Datestamp the start of the line - modified from unixDateStamp function
   //RTCon(); // Now using 3V3 regulator for sensors to power clock
-  now = RTC.now();
+  /*now = RTC.now();
   //RTCsleep();
   // SD
   //SDpowerOn();  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
@@ -1934,7 +2324,7 @@ void Logger::start_logging_to_otherfile(char* filename){
   //SDpowerOff();
   // Echo to serial
   Serial.print(now.unixtime());
-  Serial.print(F(","));
+  Serial.print(F(","));*/  //removed from function
 }
 
 void Logger::end_logging_to_otherfile(){
@@ -1945,6 +2335,7 @@ void Logger::end_logging_to_otherfile(){
   Serial.println();
   // close the file: (This does the actual sync() step too - writes buffer)
   otherfile.close();
+  delay(10);
   //SDpowerOff();
 }
 
@@ -2230,10 +2621,10 @@ void Logger::startup_sequence(){
   // Run through startup sequence, including clock setting if comp is true
   name();
   Serial.println(F("HELLO, COMPUTER."));
-  delay(500);
+  delay(50);
   //if ( Serial.available() ){ // To allow clock setting, uncomment this and comment the above section that sets "comp"
   if ( comp ){
-    delay(4000); // Give Python time to print
+    delay(1000); // Give Python time to print
     name();
     Serial.print(F("LOGGING TO FILE ["));
     Serial.print(filename);
@@ -2314,6 +2705,28 @@ void Logger::startup_sequence(){
   //logger.RTCsleep();
   
 }
+
+
+/*
+
+Void Logger::watchdogSetup(){
+cli();  // disable all interrupts
+wdt_reset();  // reset the WDT timer
+/*
+WDTCSR configuration:
+WDIE = 1: Interrupt Enable
+WDE = 1 :Reset Enable
+WDP3 = 1 :For 2000ms Time-out
+WDP2 = 1 :For 2000ms Time-out
+WDP1 = 1 :For 2000ms Time-out
+WDP0 = 1 :For 2000ms Time-out
+*//*
+// Enter Watchdog Configuration mode:
+WDTCSR |= (1<<WDCE) | (1<<WDE);
+// Set Watchdog settings:
+WDTCSR = (1<<WDIE) | (1<<WDE) | (1<<WDP3) | (1<<WDP2) | (1<<WDP1) | (1<<WDP0);
+sei();
+}*/
 
 void Logger::clockSet(){
 

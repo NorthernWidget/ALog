@@ -81,11 +81,11 @@ class Logger {
     Logger();
     
     // Initialization
-    void initialize(char* _logger_name, char* _sitecode, int _log_minutes, bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false);
+    void initialize(char* _logger_name, char* _sitecode, int _dayInterval, int _hourInterval, int _minInterval, int _secInterval, bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false);
     void setupLogger();
     
     // Code for sleeping, starting up from sleep, synching SD card
-    void sleep(int minutes); // soon to be deprecated: requires log_minutes to be declared twice, caused ADW some confusion
+//    void sleep(int minutes); // soon to be deprecated: requires log_minutes to be declared twice, caused ADW some confusion
     void sleep();
     void startLogging();
     void endLogging();
@@ -96,7 +96,9 @@ class Logger {
     float readPin(int pin);
     float readPinOversample(int pin, int bits);
     float analogReadOversample(int pin, int adc_bits=10, int nsamples=1);
+    float analogReadOversample_Debug(int pin, int adc_bits=10, int nsamples=1);  //debug tool delete when finished
     float thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side=true);
+    float thermistorB_Debug(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side=true); //delete when done debugging
     void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,bool writeAll); // Print order: Distance [cm], standard deviation [cm]
     float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, int maxRange, bool RS232=false);
     void maxbotixHRXL_WR_analog(int nping=10,int sonicPin=A0,int EX=99,bool writeAll=true); // Print order: Distance [cm], standard deviation [cm]
@@ -104,6 +106,7 @@ class Logger {
     void maxbotixHRXL_WR_analog_oneping(int sonicPin);
     void DecagonGS1(int pin, float Vref);
     void vdivR(int pin, float Rref, bool Rref_on_GND_side=true);
+    void vdivR_Debug(int pin, float Rref, bool Rref_on_GND_side=true);  //debug tool delete when finished
     void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, float intercept);
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
@@ -132,9 +135,10 @@ class Logger {
     void sleepNow();
     void sleepNow_nap();
     // wakeUpNow defined outside of class; see above
-    void alarm2reset();
-    void alarm2_1min();
-    
+    void alarm(int dayInterval ,int hourInterval, int minInterval, int secInterval);
+    void displayAlarms(); //debug tool delete if desired.
+    void checkAlarms();  //debug tool delete if desired. 
+    void checkTime();   //debug tool delete if desired. 
     // LED signals
     void LEDwarn(int nflash);
     void LEDgood();
@@ -165,6 +169,7 @@ class Logger {
     
     // Sensor utility codes
     float _vdivR(int pin, float Rref, int adc_bits=10, bool Rref_on_GND_side=true);
+    float _vdivR_Debug(int pin, float Rref, int adc_bits=10, bool Rref_on_GND_side=true); //Debug tool delete when finished
     int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
     int maxbotix_Serial_parse(int Ex);
     float standard_deviation_from_array(float values[], int nvalues, float mean);
