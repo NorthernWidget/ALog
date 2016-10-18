@@ -18,30 +18,23 @@ Logger logger;
 ////////////////////////////
 // USER-ENTERED VARIABLES //
 ////////////////////////////
-char* dataLoggerName = "South Boulder Creek";
-char* fileName = "EC_TEMP.TXT"; // Name of file for logged data: 8.3 format (e.g, 
-                                   // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
-// NOTE! LOGGING EVERY MINUTE BECAUSE OF OLD CODE WHERE
-// LOG INTERVAL WOULD NEED TO BE DECLARED TWICE. UGH.
-// FIXED IN MAIN CPP SO UPDATE NEXT TIME -- REMOVE
-// dataLoggingIntervalMinutes from Sleep function var pass.
-int dataLoggingIntervalMinutes = 1; // Will log when the remainder of "minutes", divided by
-                                     // this, equals 0. For regular logging intervals, make  
-                                     // sure that this number divides evenly into 60.
+char* dataLoggerName = "SC 01";
+char* fileName = "SC01.txt"; // Name of file for logged data: 8.3 format (e.g, 
+                             // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
+
+//Setup logging interval here, may setup more than one variable. 
+//Minimum interval = 1 sec, maximum interval is 1 second short of 7 days.  
+int Log_Interval_Seconds = 30; //Valid range is 0-59 seconds
+int Log_Interval_Minutes = 0; //Valid range is 0-59 minutes
+int Log_Interval_Hours = 0; //Valid range is 0-23 hours
+int Log_Interval_Days = 0; //Valid range is 0-6 days
 bool external_interrupt = false; // e.g., rain gage
 
 // For temperature calibration
 float temperature_float;
 char AtlasTemp[9] = "T,";
 
-void setup(){
-  logger.initialize(dataLoggerName, fileName, dataLoggingIntervalMinutes, external_interrupt);
-  logger.setupLogger();
-  // Not using switchable voltage regulators
-  // And anyway, should have this in the library in the future
-  //pinMode(39, OUTPUT);
-  //digitalWrite(39, LOW);
-}
+void setup(){MCUSR = 0;wdt_disable();logger.initialize(dataLoggerName, fileName, Log_Interval_Days, Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, external_interrupt);logger.setupLogger();}
 
 void loop(){
 
@@ -76,7 +69,6 @@ logger.endAnalog();
 //
 // INSERT DIGITAL SENSOR READING COMMANDS HERE!
 //
-
 
 // just need to send *anything* to wake
 // "w" is not a command, but this is key -- logger will send "WA", but

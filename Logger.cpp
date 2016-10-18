@@ -714,7 +714,7 @@ const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
     Clock.turnOnAlarm(2);
     delay(2);
 
-displayAlarms(); delay(10);  //Uncomment to see alarms on serial monitor.
+//displayAlarms(); delay(10);  //Uncomment to see alarms on serial monitor.
 
 }
 
