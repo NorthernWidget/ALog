@@ -8,6 +8,7 @@
 #include <DS3231.h>
 #include <math.h>
 #include <avr/sleep.h>
+#include <avr/wdt.h>
 #include <SoftwareSerial.h>
 
 // Also, for float to string function

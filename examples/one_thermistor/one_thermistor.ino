@@ -7,6 +7,7 @@
 #include <DS3231.h>
 #include <math.h>
 #include <avr/sleep.h>
+#include <avr/wdt.h>
 //#include <NewSoftSerial.h> // in case Decagon loggers are used / Digital IO is needed
 #include <SoftwareSerial.h>
 
