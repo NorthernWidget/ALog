@@ -1137,12 +1137,13 @@ void Logger::endLogging(){
 void Logger::startAnalog(){
   // Turn on power to analog sensors
   digitalWrite(SensorPowerPin,HIGH);
+  sbi(ADCSRA,ADEN);        // switch Analog to Digitalconverter ON **Chad, was in the wakeupnow function?
   delay(2);
 }
 
 void Logger::endAnalog(){
   // Turn off power to analog sensors
-  digitalWrite(SensorPowerPin,LOW);
+  //digitalWrite(SensorPowerPin,LOW);
   delay(2);
 }
 
@@ -2064,7 +2065,6 @@ void Logger::sleepNow_nap()         // here we put the arduino to sleep between 
                              // so sleep is possible. just a safety pin 
     sleep_mode();            // here the device is actually put to sleep!!
                              // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP
-    sbi(ADCSRA,ADEN);        // switch Analog to Digitalconverter ON **Chad, was in the wakeupnow function?
 
     // After waking, run sleep mode function, and then remainder of this function (below)
     sleep_disable();         // first thing after waking from sleep:
