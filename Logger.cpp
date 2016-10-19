@@ -1143,7 +1143,7 @@ void Logger::startAnalog(){
 
 void Logger::endAnalog(){
   // Turn off power to analog sensors
-  //digitalWrite(SensorPowerPin,LOW);
+  digitalWrite(SensorPowerPin,LOW);
   delay(2);
 }
 
