@@ -177,6 +177,10 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, i
   If so, it will log; otherwise, it will go back to sleep.
   */
   
+  MCUSR = 0;  //reset flag of Watch dog timer
+  wdt_disable();  //Disable Watch dog timer
+
+
   ///////////////////
   // SLEEP COUNTER //
   ///////////////////
@@ -379,12 +383,19 @@ Serial.println(F("card initialized."));
 Serial.println();
 LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
 
-//delay(10);
+start_logging_to_otherfile("StartTimes.txt");
+now = RTC.now();
+otherfile.print(now.unixtime());
+otherfile.print(",");
+end_logging_to_otherfile();
 
 name();
 Serial.println(F("Logger initialization complete! Ciao bellos."));
 
 delay(10);
+
+Clock.checkIfAlarm(1); //Clear alarm flags
+Clock.checkIfAlarm(2); //Clear alarm flags
 
     bool Century, h12 = false;
     bool PM;
@@ -695,13 +706,15 @@ const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
     byte AlarmBits = 0b00000000;
     Clock.turnOffAlarm(1); //Turn off alarms before setting.
     Clock.turnOffAlarm(2);
-    checkAlarms();  //Clear alarm flags
+
+    Clock.checkIfAlarm(1); //Clear alarm flags, do I need to do this here?
+    Clock.checkIfAlarm(2); //Clear alarm flags
 
     Clock.setA1Time(_days, _hours, _minutes, _seconds, AlarmBits, true, false, false);
     delay(2);
     int _days_backup = _days;
     int _hours_backup = _hours;
-    int _minutes_backup = _minutes+1;
+    int _minutes_backup = _minutes+2;
   
     if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
     if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
@@ -787,11 +800,52 @@ checkTime();
 }
 
 void Logger::checkAlarms(){
-	if (Clock.checkIfAlarm(1)) {
-		Serial.print(" A1! ");
-	}
+	Clock.checkIfAlarm(1);
 	if (Clock.checkIfAlarm(2)) {
-		Serial.print(" A2! ");
+		Serial.println("Alarm missed! reset for 10 seconds.");
+    datafile.close();
+    delay(30);
+    bool Century, h12 = false;
+    bool PM;
+    _days = Clock.getDoW();
+    _hours = Clock.getHour(h12, PM);
+    _minutes = Clock.getMinute();
+    _seconds = Clock.getSecond()+10;  //Set first alarm to activate in 5 seconds.
+    if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
+    if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
+    if(_hours > 23){_hours = _hours - 24; _days++;}
+    if(_days > 7){_days = _days - 7;} 
+
+    if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
+    // Just use Serial.println: don't kill batteries by aborting code 
+    // on error
+    Serial.println(F("Error initializing SD card for writing"));
+  }
+    start_logging_to_otherfile("Alarm_miss.txt");
+
+  bool ADy, A12h, Apm;
+  byte ADay, AHour, AMinute, ASecond, AlarmBits;
+  otherfile.print(now.unixtime());
+  otherfile.print(",");
+  otherfile.print("Alarm: ");
+	Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
+	otherfile.print(ADay, DEC);
+	otherfile.print(" DoW");
+	otherfile.print(' ');
+	otherfile.print(AHour, DEC);
+	otherfile.print(' ');
+	otherfile.print(AMinute, DEC);
+	otherfile.print(' ');
+	otherfile.print(ASecond, DEC);
+	otherfile.print(' ');
+	if (A12h) {
+		if (Apm) {
+			otherfile.print("PM");
+		} else {
+			otherfile.print("AM");
+		}
+	}
+  end_logging_to_otherfile();
 	}
 }
 
@@ -993,11 +1047,12 @@ void Logger::sleep(){
 //  backtosleep:  **chad no longer needed
   IS_LOGGING = false; // not logging when sleeping!
 
-  //wdt_disable();
+  wdt_reset();  //reset the timer, is this needed?  
+  wdt_disable();  //Disable the watchdog timer
 
   sleepNow();
 
-  //wdt_enable(WDTO_8S);
+  wdt_enable(WDTO_8S);  // Enable the watchdog timer, must activate before checkAlarms();
   
   // Wake up
 //  delay(10); // Is such a long delay necessary?  **Chad changed from 10.
@@ -1038,13 +1093,13 @@ void Logger::sleep(){
     // THAT WILL TELL IT TO DO CONTINUOUS LOGGING FOR SOME TIME
     // AND HOW TO PASS THE FLAGS FOR THIS TO THE MAIN CODE FROM OUTSIDE
 
-    else{
+/*    else{
 /*      //RTCon();  //Chad
       int minute = Clock.getSecond(); //**Chad change Clock.getMinute(); to getSecond();
       //RTCsleep();  //Chad
       // Only wake if you really have to
       if (minute % log_minutes == 0){  */
-        Serial.println(F("Logging!"));
+/*        Serial.println(F("Logging!"));
       }
 /*      else {
         Serial.print(F("Going back to sleep for "));
