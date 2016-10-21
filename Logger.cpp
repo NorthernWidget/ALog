@@ -409,8 +409,9 @@ Clock.checkIfAlarm(2); //Clear alarm flags
     if(_days > 7){_days = _days - 7;} 
 
 alarm( _days, _hours, _minutes, _seconds);  //Set first alarm.
-checkTime();  //Verify time
-delay(2);
+checkTime();  // Verify time
+displayAlarms();  // Verify Alarms
+delay(10);
 SDpowerOff();
 RTCsleep();
 
@@ -801,20 +802,20 @@ checkTime();
 void Logger::checkAlarms(){
 	Clock.checkIfAlarm(1);
 	if (Clock.checkIfAlarm(2)) {
-		Serial.println("Alarm missed! reset for 10 seconds.");
+		Serial.println("Alarm missed! Reset logger.");
     datafile.close();
     delay(30);
-    bool Century, h12 = false;
+/*  bool Century, h12 = false;
     bool PM;
     _days = Clock.getDoW();
     _hours = Clock.getHour(h12, PM);
     _minutes = Clock.getMinute();
-    _seconds = Clock.getSecond()+10;  //Set first alarm to activate in 5 seconds.
+    _seconds = Clock.getSecond()+10;  //Set first alarm to activate in 10 seconds.
     if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
     if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
     if(_hours > 23){_hours = _hours - 24; _days++;}
     if(_days > 7){_days = _days - 7;} 
-
+*/
     if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
@@ -845,6 +846,7 @@ void Logger::checkAlarms(){
 		}
 	}
   end_logging_to_otherfile();
+  delay(20000);
 	}
 }
 
