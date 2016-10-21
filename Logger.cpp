@@ -138,6 +138,15 @@ bool LOG_ON_BUCKET_TIP; // Defaults to False, true if you should log every
 unsigned int rotation_count = 0;
 
 /////////////////////////
+// WATCHDOG INTERRUPT //
+/////////////////////////
+ISR (WDT_vect) 
+{
+ MCUSR = 0;
+ wdt_disable();  // disable watchdog
+}
+
+/////////////////////////
 // INSTANTIATE CLASSES //
 /////////////////////////
 
@@ -820,6 +829,7 @@ void Logger::checkAlarms(){
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
+//    wdt_reset();
   }
     start_logging_to_otherfile("Alarm_miss.txt");
 
@@ -1048,7 +1058,7 @@ void Logger::sleep(){
 //  backtosleep:  **chad no longer needed
   IS_LOGGING = false; // not logging when sleeping!
 
-  wdt_reset();  //reset the timer, is this needed?  
+//  wdt_reset();  //reset the timer, is this needed?  
   wdt_disable();  //Disable the watchdog timer
 
   sleepNow();
@@ -1137,6 +1147,7 @@ void Logger::startLogging(){
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
+//    wdt_reset();
   }
   // Open file to write data
   delay(10);
@@ -2309,6 +2320,7 @@ void Logger::TippingBucketRainGage(){
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
+//    wdt_reset();
   }
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
