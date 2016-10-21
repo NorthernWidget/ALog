@@ -716,10 +716,9 @@ const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
     int _hours_backup = _hours;
     int _minutes_backup = _minutes+2;
   
-    if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
-    if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
-    if(_hours > 23){_hours = _hours - 24; _days++;}
-    if(_days > 7){_days = _days - 7;} 
+    if(_minutes_backup > 59){_minutes_backup = _minutes_backup - 60; _hours_backup++;}
+    if(_hours_backup > 23){_hours_backup = _hours_backup - 24; _days_backup++;}
+    if(_days_backup > 7){_days_backup = _days_backup - 7;} 
     Clock.setA2Time(_days_backup, _hours_backup, _minutes_backup, AlarmBits, true, false, false);  //setting as backup wake function
     delay(2);
     Clock.turnOnAlarm(1); //Turn on alarms.
