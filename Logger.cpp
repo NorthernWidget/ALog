@@ -140,11 +140,11 @@ unsigned int rotation_count = 0;
 /////////////////////////
 // WATCHDOG INTERRUPT //
 /////////////////////////
-ISR (WDT_vect) 
+/*ISR (WDT_vect) 
 {
  MCUSR = 0;
  wdt_disable();  // disable watchdog
-}
+}*/
 
 /////////////////////////
 // INSTANTIATE CLASSES //
@@ -186,7 +186,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, i
   If so, it will log; otherwise, it will go back to sleep.
   */
   
-  MCUSR = 0;  //reset flag of Watch dog timer
+  MCUSR = MCUSR & B11110111;  // Clear the reset flag, the WDRF bit (bit 3) of MCUSR for watchdog timer.
   wdt_disable();  //Disable Watch dog timer
 
 
@@ -1058,15 +1058,31 @@ void Logger::sleep(){
 //  backtosleep:  **chad no longer needed
   IS_LOGGING = false; // not logging when sleeping!
 
-//  wdt_reset();  //reset the timer, is this needed?  
   wdt_disable();  //Disable the watchdog timer
 
   sleepNow();
-
-  wdt_enable(WDTO_8S);  // Enable the watchdog timer, must activate before checkAlarms();
-  
   // Wake up
-//  delay(10); // Is such a long delay necessary?  **Chad changed from 10.
+
+  //wdt_enable(WDTO_8S);  // Enable the watchdog timer, must activate before checkAlarms();  (this did not work)
+  
+  // Set the WDCE bit (bit 4) and the WDE bit (bit 3) 
+  // of WDTCSR. The WDCE bit must be set in order to 
+  // change WDE or the watchdog prescalers. Setting the 
+  // WDCE bit will allow updtaes to the prescalers and 
+  // WDE for 4 clock cycles then it will be reset by 
+  // hardware.
+  WDTCSR = WDTCSR | B00011000; 
+
+  // Set the watchdog timeout prescaler value to 1024 K 
+  // which will yeild a time-out interval of about 8.0 s.
+  WDTCSR = B00100001;
+
+  // Enable the watchdog timer interupt.
+  WDTCSR = WDTCSR | B01000000;
+  MCUSR = MCUSR & B11110111;
+
+  
+  //delay(1); // Is such a long delay necessary?  **Chad changed from 10.
   
   // Turn power on for everything -- wastes power, improves stability.
   // Optimize this when you have time for sensor or logger failures
