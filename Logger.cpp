@@ -831,54 +831,57 @@ checkTime();
 
 void Logger::checkAlarms(){
 	Clock.checkIfAlarm(1);
-	if (Clock.checkIfAlarm(2)) {
-		Serial.println("Alarm missed! Reset logger.");
-    datafile.close();
-    delay(30);
-/*  bool Century, h12 = false;
-    bool PM;
-    _days = Clock.getDoW();
-    _hours = Clock.getHour(h12, PM);
-    _minutes = Clock.getMinute();
-    _seconds = Clock.getSecond()+10;  //Set first alarm to activate in 10 seconds.
-    if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
-    if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
-    if(_hours > 23){_hours = _hours - 24; _days++;}
-    if(_days > 7){_days = _days - 7;} 
-*/
-    if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
-    // Just use Serial.println: don't kill batteries by aborting code 
-    // on error
-    Serial.println(F("Error initializing SD card for writing"));
-//    wdt_reset();
-  }
-    start_logging_to_otherfile("Alarm_miss.txt");
+	
+	if (_use_sleep_mode){
+	  if (Clock.checkIfAlarm(2)) {
+		  Serial.println("Alarm missed! Reset logger.");
+      datafile.close();
+      delay(30);
+  /*  bool Century, h12 = false;
+      bool PM;
+      _days = Clock.getDoW();
+      _hours = Clock.getHour(h12, PM);
+      _minutes = Clock.getMinute();
+      _seconds = Clock.getSecond()+10;  //Set first alarm to activate in 10 seconds.
+      if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
+      if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
+      if(_hours > 23){_hours = _hours - 24; _days++;}
+      if(_days > 7){_days = _days - 7;} 
+  */
+      if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
+        // Just use Serial.println: don't kill batteries by aborting code 
+        // on error
+        Serial.println(F("Error initializing SD card for writing"));
+      }
+      start_logging_to_otherfile("Alarm_miss.txt");
 
-  bool ADy, A12h, Apm;
-  byte ADay, AHour, AMinute, ASecond, AlarmBits;
-  otherfile.print(now.unixtime());
-  otherfile.print(",");
-  otherfile.print("Alarm: ");
-	Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
-	otherfile.print(ADay, DEC);
-	otherfile.print(" DoW");
-	otherfile.print(' ');
-	otherfile.print(AHour, DEC);
-	otherfile.print(' ');
-	otherfile.print(AMinute, DEC);
-	otherfile.print(' ');
-	otherfile.print(ASecond, DEC);
-	otherfile.print(' ');
-	if (A12h) {
-		if (Apm) {
-			otherfile.print("PM");
-		} else {
-			otherfile.print("AM");
-		}
-	}
-  end_logging_to_otherfile();
-  delay(20000);
-	}
+      bool ADy, A12h, Apm;
+      byte ADay, AHour, AMinute, ASecond, AlarmBits;
+      otherfile.print(now.unixtime());
+      otherfile.print(",");
+      otherfile.print("Alarm: ");
+	    Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
+	    otherfile.print(ADay, DEC);
+	    otherfile.print(" DoW");
+	    otherfile.print(' ');
+	    otherfile.print(AHour, DEC);
+	    otherfile.print(' ');
+	    otherfile.print(AMinute, DEC);
+	    otherfile.print(' ');
+	    otherfile.print(ASecond, DEC);
+	    otherfile.print(' ');
+	    if (A12h) {
+		    if (Apm) {
+			    otherfile.print("PM");
+		    }
+		    else {
+			    otherfile.print("AM");
+		    }
+	    }
+      end_logging_to_otherfile();
+      delay(20000); // Wait until WDT resets logger (<= 8 seconds)
+	  }
+  }
 }
 
 void Logger::checkTime(){
