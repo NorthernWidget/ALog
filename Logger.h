@@ -93,6 +93,9 @@ class Logger {
     void startAnalog();
     void endAnalog();
     
+    // Getters and setters
+    bool get_use_sleep_mode();
+    
     // Sensors - standard procedure (wake up, log, sleep)
     float readPin(int pin);
     float readPinOversample(int pin, int bits);

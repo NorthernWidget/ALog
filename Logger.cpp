@@ -116,6 +116,8 @@ int _days;
 int _hours;
 int _minutes;
 int _seconds;
+// Use the sleep mode?
+bool _use_sleep_mode = true; // Defaults to true
 
 bool CAMERA_IS_ON = false; // for a video camera
 
@@ -201,7 +203,15 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, i
   hourInterval = _hourInterval;
   minInterval = _minInterval;
   secInterval = _secInterval;
-
+  
+  // If all logging intervals are 0, then this means that we don't go to sleep:
+  // continuous logging!
+  // (If all were set to 0, logger would try to log continuously anyway; this
+  // just makes things easier by avoiding the sleep function
+  if ((dayInterval || hourInterval || minInterval || secInterval) == false){
+    _use_sleep_mode = false;
+    IS_LOGGING = true; // is always logging, in this case!
+  }
   
   // Assign the global and changable variables to input values
   LOG_ON_BUCKET_TIP = _LOG_ON_BUCKET_TIP;
@@ -421,10 +431,20 @@ alarm( _days, _hours, _minutes, _seconds);  //Set first alarm.
 checkTime();  // Verify time
 displayAlarms();  // Verify Alarms
 delay(10);
-SDpowerOff();
-RTCsleep();
-
+if (_use_sleep_mode){
+  SDpowerOff();
+  RTCsleep();
+  }
 }
+
+/////////////////////////////////////////////
+// GETTERS AND SETTERS: ADD MORE AS NEEDED //
+/////////////////////////////////////////////
+
+  bool Logger::get_use_sleep_mode(){
+    return _use_sleep_mode;
+  }
+
 
 /////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS: UTILITIES FOR LOGGER LIBRARY //
@@ -481,7 +501,7 @@ RTCsleep();
       while(1){}
     }
   }
-
+  
   void Logger::sleepNow()         // here we put the arduino to sleep
   {
     IS_LOGGING = false;           // Definitely not logging anymore
@@ -634,6 +654,7 @@ RTCsleep();
                                // disable sleep...
     NEW_RAIN_BUCKET_TIP = true;
     // If the logger is already logging, run
+    // !!!!!!!!!! WHAT WAS SUPPOSED TO GO INSIDE HERE?
     if (IS_LOGGING){
       
     }
@@ -1061,6 +1082,9 @@ void Logger::sleep(){
   wdt_disable();  //Disable the watchdog timer
 
   sleepNow();
+}
+
+void Logger::startLogging(){
   // Wake up
 
   //wdt_enable(WDTO_8S);  // Enable the watchdog timer, must activate before checkAlarms();  (this did not work)
@@ -1148,9 +1172,7 @@ void Logger::sleep(){
       }
     }*/
   }
-}
-  
-void Logger::startLogging(){
+
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
 
   // SD and RTC on the whole time -- better this way
@@ -1190,6 +1212,8 @@ void Logger::endLogging(){
   // Check right before going back to sleep if there has been a rain
   // gauge bucket tip while it has been on
   // This is a temporary solution!
+  // (May be able to reduce delay if not going back to sleep -- i.e., write
+  //  to card while logging next step.)
   if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
   }
@@ -1198,6 +1222,7 @@ void Logger::endLogging(){
 
 //  RTCon();
 
+  if (_use_sleep_mode){
     //Calculate for next alarm
     _days = _days+dayInterval;
     _hours = _hours+hourInterval;
@@ -1208,11 +1233,12 @@ void Logger::endLogging(){
     if(_hours > 23){_hours = _hours - 24; _days++;}
     if(_days > 7){_days = _days - 7;} 
 
-  alarm(_days, _hours, _minutes, _seconds);  //Set new alarms.
+    alarm(_days, _hours, _minutes, _seconds);  //Set new alarms.
 
-  delay(2);
-  RTCsleep();
-  delay(2);
+    delay(2);
+    RTCsleep();
+    delay(2);
+  }
   // After this step, since everything is in the loop() part of the Arduino
   // sketch, the sketch will cycle back back to sleep(...)
 }
@@ -2377,12 +2403,13 @@ void Logger::TippingBucketRainGage(){
   // Then based on whether we are already logging or if we are supposed to 
   // start logging here, we can continue with the logging process, or just 
   // go back to sleep
-  if (!IS_LOGGING){
+  if (_use_sleep_mode){
     // Nested recursion to next-level-up function, hopefully doesn't
     // chew through too much memory!
-    sleep();
+    if (!IS_LOGGING){
+      sleep();
+    }
   }
-
 }
 
 void Logger::start_logging_to_otherfile(char* filename){
@@ -2394,7 +2421,7 @@ void Logger::start_logging_to_otherfile(char* filename){
     Serial.print(F("Opening "));
     Serial.print(filename);
     Serial.println(F(" for write failed"));
-  delay(10);
+    delay(10);
   }
   //SDpowerOff();
   // Datestamp the start of the line - modified from unixDateStamp function
