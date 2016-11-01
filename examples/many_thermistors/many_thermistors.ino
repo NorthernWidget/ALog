@@ -1,21 +1,5 @@
 #include "Logger.h"
 
-// Include Libraries
-#include <Arduino.h> // For 1.0
-#include <SdFat.h>
-#include <Wire.h>
-#include <DS3231.h>
-#include <math.h>
-#include <avr/sleep.h>
-#include <avr/wdt.h>
-//#include <NewSoftSerial.h> // in case Decagon loggers are used / Digital IO is needed
-#include <SoftwareSerial.h>
-
-// Sensor-centric libraries
-/*#include <Adafruit_Sensor.h>
-#include <Adafruit_BMP085_U.h>*/
-
-
 Logger logger;
 
 ////////////////////////////

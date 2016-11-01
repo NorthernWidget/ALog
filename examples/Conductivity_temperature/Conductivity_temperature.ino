@@ -1,19 +1,5 @@
 #include "Logger.h"
 
-// Include Libraries
-#include <Arduino.h> // For 1.0
-#include <SdFat.h>
-#include <Wire.h>
-#include <SPI.h>  
-#include <DS3231.h>
-#include <math.h>
-#include <avr/sleep.h>
-#include <avr/wdt.h>
-#include <SoftwareSerial.h>
-
-// Also, for float to string function
-#include<stdlib.h>
-
 Logger logger;
 
 ////////////////////////////
