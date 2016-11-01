@@ -139,14 +139,6 @@ bool LOG_ON_BUCKET_TIP; // Defaults to False, true if you should log every
                         // time an event (e.g., rain gage bucket tip) happens
 unsigned int rotation_count = 0;
 
-/////////////////////////
-// WATCHDOG INTERRUPT //
-/////////////////////////
-/*ISR (WDT_vect) 
-{
- MCUSR = 0;
- wdt_disable();  // disable watchdog
-}*/
 
 /////////////////////////
 // INSTANTIATE CLASSES //
@@ -163,7 +155,6 @@ SdFile datafile;
 SdFile otherfile; // for rain gage, camera timing, and anything else that 
                   // doesn't follow the standard logging cycle / regular timing
 
-// Datetime
 DateTime now;
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
@@ -175,22 +166,15 @@ DateTime now;
 // Constructor
 Logger::Logger(){}
 
-//void Logger::initialize(char* _logger_name, char* _filename, int _log_minutes, bool _ext_int, bool _LOG_ON_BUCKET_TIP){  Chad:old
-
 void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, int _hourInterval, int _minInterval, int _secInterval, bool _ext_int, bool _LOG_ON_BUCKET_TIP){
   /*
   Model automatically determined from the MCU type and is used to modify 
   pinout-dependent functions. There may be a need to add a board version in the 
   future, and I don't see a way around passing that via a human-coded variable. 
-
-  log_minutes is the number of minutes between logging intervals
-  The logger will wake up, decrement this value, check and check if it is <=0.
-  If so, it will log; otherwise, it will go back to sleep.
   */
   
   MCUSR = MCUSR & B11110111;  // Clear the reset flag, the WDRF bit (bit 3) of MCUSR for watchdog timer.
   wdt_disable();  //Disable Watch dog timer
-
 
   ///////////////////
   // SLEEP COUNTER //
@@ -247,12 +231,10 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, i
     Serial.println(F("Error: model name must be ""bottle"" or ""big""."));
     Serial.println(F("Stopping execution."));
     LEDwarn(100); // 100 quick flashes of the LED
-    // Do nothing until reset - maybe change this to sleep function so it doesn't drain its own batteries
-    while(1){}
-  }
+    sleepNow(); // Do nothing until reset
+    }
   
-  // From weather station code
-  // For power savings
+  // From weather station code For power savings
   // http://jeelabs.net/projects/11/wiki/Weather_station_code
   #ifndef cbi
   #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
@@ -285,69 +267,29 @@ void Logger::setupLogger(){
   // "DEFAULT" (VCC), UNLESS you are  absolutely sure that you need to and the
   // 3.3V regulator connected to the AREF pin is off. Otherwise, you will short
   // 1.1V (or VCC) against 3.3V and likely damage the MCU / fry the ADC(?)
-  analogReference(EXTERNAL); // Commented out in other code - check on how to make this all work
+  analogReference(EXTERNAL); 
 
-/*
-  ///////////////////////////////////
-  // CHECK IF LOG_MINUTES IS VALID //  **Chad-LOG_MINUTES is no longer used
-  ///////////////////////////////////
-
-  // Warn if log_minutes is bad.
-  // This only works for intervals of < 1 hour
-  if (log_minutes > 59){
-    Serial.println(F("CANNOT LOG AT INTERVALS OF >= 1 HOUR"));
-    Serial.println(F("PLEASE CHANGE <log_minutes> PASSED TO FUNCTION <sleep> TO AN INTEGER <= 59"));
-    LEDwarn(300); // 300 quick flashes of the LED - serious badness!
-  }
-  else if (log_minutes == -1){
-    Serial.println(F("Disabling time-lapse data logging (log_minutes = -1 is the call for this)"));
-    Serial.println(F("This also disables the ""Log Now"" button."));
-  }
-  // 0 will always log - so need to figure out what to do about that. maybe just decide hourly ok default?  */
-
-  ///////////////////////////////////
-  // CHECK FOR VALID LOG INTERVALS //
-  ///////////////////////////////////
-/*
-log_minutes=1; //**chad tempararily doing this till new alarm system is working.
-if (log_minutes > 59){
-    Serial.println(F("CANNOT LOG AT INTERVALS OF >= 1 HOUR"));
-    Serial.println(F("PLEASE CHANGE <log_minutes> PASSED TO FUNCTION <sleep> TO AN INTEGER <= 59"));
-    LEDwarn(300); // 300 quick flashes of the LED - serious badness!
-  }
-  else if (log_minutes == -1){
-    Serial.println(F("Disabling time-lapse data logging (log_minutes = -1 is the call for this)"));
-    Serial.println(F("This also disables the ""Log Now"" button."));
-  }
-
-  // 0 will always log - so need to figure out what to do about that. maybe just decide hourly ok default?
-*/
   //////////////
   // SET PINS //
   //////////////
 
   pinMode(wakePin,INPUT); // Interrupt to wake up
   digitalWrite(wakePin,HIGH); // enable internal 20K pull-up
-  // Set the rest of the pins: this is my pinModeRunning() function in other code,
-  // but really is just as good to plop in here
+  // Set the rest of the pins
   pinMode(CSpin,OUTPUT);
   pinMode(SensorPowerPin,OUTPUT);
   pinMode(LEDpin,OUTPUT);
   pinMode(SDpowerPin,OUTPUT);
   pinMode(ClockPowerPin,OUTPUT);
-  // Manual wake pin - only on the new bottle loggers
+  // Manual wake pin
   if (_model == bottle_logger){
     Serial.println(F("Setting manualWakePin"));
     pinMode(manualWakePin,INPUT);
     digitalWrite(manualWakePin,HIGH); // enable internal 20K pull-up
-    // FIX FIX FIX - PUT ALL PINS INTO "LOW" MODE, BASED ON LOGGER MODEL! COMPLETE COMPLETE!
-    //pinMode(6, OUTPUT);
-    //digitalWrite(6, LOW);
   }
   //Start out with SD, Sensor pins set LOW
   digitalWrite(SDpowerPin,LOW);
   digitalWrite(SensorPowerPin,LOW);
-
 
 ////////////
 // SERIAL //
@@ -355,8 +297,7 @@ if (log_minutes > 59){
 
 Serial.begin(38400);
 
-// Announce start
-announce_start();
+announce_start(); // Announce start
 
 ///////////////////
 // WIRE: I2C RTC //
@@ -374,11 +315,6 @@ RTCon();
 // Includes check whether you are talking to Python terminal
 startup_sequence();
 
-// Initialize watchdog timer for 8 second
-//watchdogSetup();
-
-//RTCsleep();
-
 ///////////////////
 // SD CARD SETUP //
 ///////////////////
@@ -386,7 +322,6 @@ startup_sequence();
 // Initialize SdFat or print a detailed error message and halt
 // Use half speed like the native library.
 // change to SPI_FULL_SPEED for more performance.
-
 
 name();
 
@@ -407,6 +342,13 @@ now = RTC.now();
 otherfile.print(now.unixtime());
 otherfile.print(",");
 end_logging_to_otherfile();
+
+if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {   
+  Serial.print(F("Opening "));
+  Serial.print(filename);
+  Serial.println(F(" for write failed"));
+delay(10);
+}  
 
 name();
 Serial.println(F("Logger initialization complete! Ciao bellos."));
@@ -506,10 +448,6 @@ if (_use_sleep_mode){
   {
     IS_LOGGING = false;           // Definitely not logging anymore
 
-//**chad    alarm2reset();   // Turns alarm 2 off and then turns it back
-                             // on so it will go off again next minute
-                             // NOT BACK ON ANYMORE
-
       /* Now is the time to set the sleep mode. In the Atmega8 datasheet
        * http://www.atmel.com/dyn/resources/prod_documents/doc2486.pdf on page 35
        * there is a list of sleep modes which explains which clocks and 
@@ -557,16 +495,6 @@ if (_use_sleep_mode){
        * In all but the IDLE sleep modes only LOW can be used.
        */
 
-      /*
-      if (log_minutes == -1 && extInt == false){
-        Serial.println(F("All inputs to wake from sleep disabled! Reprogram, please!"));
-      }
-      if (log_minutes != -1){
-        attachInterrupt(interruptNum, wakeUpNow, LOW); // wakeUpNow when wakePin gets LOW 
-      }*/
-
-//**chad attach inturrupt used to be here and run each cycle
-
       if (dayInterval && hourInterval && minInterval && secInterval == -1 && extInt == false){
         Serial.println(F("All inputs to wake from sleep disabled! Reprogram, please!"));
       }
@@ -580,54 +508,20 @@ if (_use_sleep_mode){
         attachInterrupt(1, wakeUpNow_tip, LOW);
       }
 
-      // Copied from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1243973204
-      //power_adc_disable();
-      //power_spi_disable();
-      //power_timer0_disable();
-      //power_timer1_disable();
-      //power_timer2_disable(); // uncommented because unlike forum poster, I don't rely
-                              // on an internal timer
-      //power_twi_disable();
-
-      // Clearing the Serial buffer: http://forum.arduino.cc/index.php?topic=134764.0
-      /*
-      delayMicroseconds(10000);
-      Serial.flush();
-      while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
-       UCSR0A |= 1 << TXC0;  // mark transmission not complete
-      while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
-      */
-      
-      // End Serial
-      //Serial.end();
-
       sleep_mode();            // here the device is actually put to sleep!!
-      //delay(2);                // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP.  
+                
+                              // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP.  
 
-      // After waking, run sleep mode function, and then remainder of this function (below)
       sleep_disable();         // first thing after waking from sleep:
                                // disable sleep...
 
-      // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this  to allow both measurements types!
+      // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this to allow both measurements types!
       // 06-11-2015: The above line commented to allow the rain gage to be read
       // at the same time as other readings
-                          // Maybe move this to specific post-wakeup code?
+      // Maybe move this to specific post-wakeup code?
       detachInterrupt(interruptNum);      // disables interrupt so the 
-                               // wakeUpNow code will not be executed 
-                               // during normal running time.
-
-      //delay(3); // Slight delay before I feel OK taking readings
-
-      // Copied from http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?num=1243973204
-      //power_all_enable();
-      /*
-      Serial.begin(38400);
-      Serial.flush();
-      while (!(UCSR0A & (1 << UDRE0)))  // Wait for empty transmit buffer
-       UCSR0A |= 1 << TXC0;  // mark transmission not complete
-      while (!(UCSR0A & (1 << TXC0)));   // Wait for the transmission to complete
-      */
-      //delay(1); //**Chad - this is needed for stability?.
+                                          // wakeUpNow code will not be executed 
+                                          // during normal running time.
   }
 
   // Must be defined outside of Logger class
@@ -660,35 +554,9 @@ if (_use_sleep_mode){
     }
   }
 
-
-  /*void Logger::alarm2reset() //**Chad changed these all to 1
-  {
-    // Reset alarm
-    //RTCon();
-    Clock.turnOffAlarm(1);
-    Clock.turnOffAlarm(2);
-    Clock.turnOnAlarm(1);
-    Clock.turnOnAlarm(2);
-   //delay(1);
-    // Not sure why, but have to use these "checking" functions, or else the clock
-    // won't realize that it's been reset.
-    // Here I'm just using them all; they're quick.
-    // But I could probably ignore the Alarm 1 ones
-    // Clock.checkAlarmEnabled(1);
-    Clock.checkAlarmEnabled(1);
-    Clock.checkAlarmEnabled(2);
-    //delay(1);
-    // Clock.checkIfAlarm(1);
-    Clock.checkIfAlarm(1);
-    Clock.checkIfAlarm(2);
-    //delay(1);
-    //RTCsleep();
-  }  Chad-function no longer needed */  
-
-
 void Logger::alarm(int _days ,int _hours, int _minutes, int _seconds){
 
-/* Retrieves everything you could want to know about alarm one. 
+/* Alarm bit info:
  * A1Dy true makes the alarm go on A1Day = Day of Week,
  * A1Dy false makes the alarm go on A1Day = Date of month.
  *
@@ -755,7 +623,7 @@ const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
     Clock.turnOnAlarm(1); //Turn on alarms.
     delay(1);
     Clock.turnOnAlarm(2);
-    delay(2);
+    delay(1);
 
 //displayAlarms(); delay(10);  //Uncomment to see alarms on serial monitor.
 
@@ -822,7 +690,7 @@ void Logger::displayAlarms(){
     Serial.print("not enabled");
   }
 	// display alarm bits
-	Serial.print('\n');
+//	Serial.print('\n');
 //	Serial.println(AlarmBits, BIN);
 //  Serial.println(Clock.getSecond());
 
@@ -837,20 +705,8 @@ void Logger::checkAlarms(){
 		  Serial.println("Alarm missed! Reset logger.");
       datafile.close();
       delay(30);
-  /*  bool Century, h12 = false;
-      bool PM;
-      _days = Clock.getDoW();
-      _hours = Clock.getHour(h12, PM);
-      _minutes = Clock.getMinute();
-      _seconds = Clock.getSecond()+10;  //Set first alarm to activate in 10 seconds.
-      if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
-      if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
-      if(_hours > 23){_hours = _hours - 24; _days++;}
-      if(_days > 7){_days = _days - 7;} 
-  */
+
       if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
-        // Just use Serial.println: don't kill batteries by aborting code 
-        // on error
         Serial.println(F("Error initializing SD card for writing"));
       }
       start_logging_to_otherfile("Alarm_miss.txt");
@@ -967,15 +823,10 @@ delay(2);
 
   void Logger::unixDatestamp(){
 
-    //RTCon(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
-    ////RTCsleep();
-
-    // SD
-    //SDpowerOn();
     datafile.print(now.unixtime());
     datafile.print(F(","));
-    //SDpowerOff();
+
     // Echo to serial
     Serial.print(now.unixtime());
     Serial.print(F(","));
@@ -984,9 +835,7 @@ delay(2);
   void Logger::endLine(){
     // Ends the line in the file; do this at end of recording instance
     // before going back to sleep
-    //SDpowerOn();
     datafile.println();
-    //SDpowerOff();
     Serial.println();
     }
 
@@ -1012,7 +861,7 @@ float Logger::_vdivR(int pin, float Rref, int adc_bits, bool Rref_on_GND_side){
   return _R;
 }
 
-////Delete when debug is finished
+////Debug tool for recording oversample readings
 float Logger::_vdivR_Debug(int pin, float Rref, int adc_bits, bool Rref_on_GND_side){
   // Same as public vidvR code, but returns value instead of 
   // saving it to a file
@@ -1057,11 +906,9 @@ void Logger::RTCsleep(){
 
 void Logger::SDpowerOn(){
   digitalWrite(SDpowerPin,HIGH);
-  //delay(10);
 }
 
 void Logger::SDpowerOff(){
-  //delay(10);
   digitalWrite(SDpowerPin,LOW);
 }
 
@@ -1078,8 +925,7 @@ void Logger::SDpowerOff(){
 }*/
 
 void Logger::sleep(){
-  // Go to sleep
-//  backtosleep:  **chad no longer needed
+
   IS_LOGGING = false; // not logging when sleeping!
 
   wdt_disable();  //Disable the watchdog timer
@@ -1090,8 +936,6 @@ void Logger::sleep(){
 void Logger::startLogging(){
   // Wake up
 
-  //wdt_enable(WDTO_8S);  // Enable the watchdog timer, must activate before checkAlarms();  (this did not work)
-  
   // Set the WDCE bit (bit 4) and the WDE bit (bit 3) 
   // of WDTCSR. The WDCE bit must be set in order to 
   // change WDE or the watchdog prescalers. Setting the 
@@ -1107,16 +951,12 @@ void Logger::startLogging(){
   // Enable the watchdog timer interupt.
   WDTCSR = WDTCSR | B01000000;
   MCUSR = MCUSR & B11110111;
-
   
-  //delay(1); // Is such a long delay necessary?  **Chad changed from 10.
-  
-  // Turn power on for everything -- wastes power, improves stability.
-  // Optimize this when you have time for sensor or logger failures
+  // Turn power on
   SDpowerOn();
   RTCon();
 
-  checkAlarms(); //**chad check and clear flag when power is on!  
+  checkAlarms(); //Check and clear flag 
 
   // First, check if there was a bucket tip from the rain gage, if present
   if (NEW_RAIN_BUCKET_TIP){
@@ -1140,65 +980,17 @@ void Logger::startLogging(){
       delay(5); // to make sure tips aren't double-counted
       digitalWrite(LEDpin, LOW);
     }
-
-    // FIND OUT HOW TO TELL PROGRAM TO LOG IF TIPPED AND NOT ON TIME
-    //          (done, but hack-ey)
-    // AND ALSO HOW TO NOT TO GO BACK TO SLEEP IF A CONDITION IS MET
-    // THAT WILL TELL IT TO DO CONTINUOUS LOGGING FOR SOME TIME
-    // AND HOW TO PASS THE FLAGS FOR THIS TO THE MAIN CODE FROM OUTSIDE
-
-/*    else{
-/*      //RTCon();  //Chad
-      int minute = Clock.getSecond(); //**Chad change Clock.getMinute(); to getSecond();
-      //RTCsleep();  //Chad
-      // Only wake if you really have to
-      if (minute % log_minutes == 0){  */
-/*        Serial.println(F("Logging!"));
-      }
-/*      else {
-        Serial.print(F("Going back to sleep for "));
-        Serial.print(log_minutes - minute % log_minutes);
-        if (log_minutes - minute % log_minutes == 1){
-          Serial.println(F(" more minute"));
-        }
-        else{
-          Serial.println(F(" more minutes"));
-        }
-        // Check right before going back to sleep if there has been a rain
-        // gauge bucket tip while it has been on
-        // This is a temporary solution!
-        if (NEW_RAIN_BUCKET_TIP){
-          TippingBucketRainGage();
-        }
-        delay(20); // finish printing
-        goto backtosleep;
-      }
-    }*/
   }
 
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
 
-  // SD and RTC on the whole time -- better this way
-  // Have dealt with errors in the past!
-  // With nothing writing to the card -- and things being generally slow.
-
   // Initialize logger
-  //SDpowerOn(); Turned on in sleep function.
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
-//    wdt_reset();
   }
-  // Open file to write data
   delay(10);
-  if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {   
-    Serial.print(F("Opening "));
-    Serial.print(filename);
-    Serial.println(F(" for write failed"));
-  delay(10);
-  }  
-  //digitalWrite(SDpowerPin,LOW);
   // Datestamp the start of the line
   unixDatestamp();
 }
@@ -1208,7 +1000,7 @@ void Logger::endLogging(){
   endLine();
   //SDpowerOn();
   // close the file: (This does the actual sync() step too - writes buffer)
-  datafile.close();
+  datafile.sync();
   delay(30);
   // THIS DELAY IS ***CRITICAL*** -- WITHOUT IT, THERE IS NOT SUFFICIENT
   // TIME TO WRITE THE DATA TO THE SD CARD!
@@ -1220,10 +1012,6 @@ void Logger::endLogging(){
   if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
   }
-
-//  SDpowerOff();
-
-//  RTCon();
 
   if (_use_sleep_mode){
     //Calculate for next alarm
@@ -1249,7 +1037,7 @@ void Logger::endLogging(){
 void Logger::startAnalog(){
   // Turn on power to analog sensors
   digitalWrite(SensorPowerPin,HIGH);
-  sbi(ADCSRA,ADEN);        // switch Analog to Digitalconverter ON **Chad, was in the wakeupnow function?
+  sbi(ADCSRA,ADEN);        // switch Analog to Digitalconverter ON
   delay(2);
 }
 
@@ -1275,11 +1063,8 @@ float pinValue = analogRead(pin);
   ///////////////
 
   // SD write
-  //SDpowerOn();
   datafile.print(pinValue, 1);
   datafile.print(",");
- 
-  //SDpowerOff();
   
   // Echo to serial
   Serial.print(pinValue, 1);
@@ -1298,11 +1083,8 @@ float pinValue = analogReadOversample(pin, bits);
   ///////////////
 
   // SD write
-  //SDpowerOn();
   datafile.print(pinValue,4);
   datafile.print(",");
- 
-  //SDpowerOff();
   
   // Echo to serial
   Serial.print(pinValue,4);
@@ -1338,12 +1120,10 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   ///////////////
 
   // SD write
-  //SDpowerOn();
 //  datafile.print(Rtherm, 2);
 //  datafile.print(F(","));
   datafile.print(T, 4);
   datafile.print(F(","));
-  //SDpowerOff();
   
   // Echo to serial
 //  Serial.print(Rtherm, 2);
@@ -1386,13 +1166,11 @@ float Logger::thermistorB_Debug(float R0,float B,float Rref,float T0degC,int the
   ///////////////
  
   // SD write
-  //SDpowerOn();
 //  datafile.print(Rtherm, 2);
 //  datafile.print(F(","));
   otherfile.print(T, 4);
   otherfile.print(F(","));
-  //SDpowerOff();
-  
+
   end_logging_to_otherfile();
 
   // Echo to serial
@@ -1442,12 +1220,10 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
   ///////////////
 
   // SD write
-  //SDpowerOn();
   //datafile.print(Vh_real);
   //datafile.print(F(","));
   datafile.print(RH, 4);
   datafile.print(F(","));
-  //SDpowerOff();
   
   // Echo to serial
   //Serial.print(Vh_real);
@@ -1497,12 +1273,10 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, float Vre
   // I think it will -- though if it is ratiometric, I think it should.
  
   // SD write
-  //SDpowerOn();
   datafile.print(V_humid_norm);
   datafile.print(F(","));
   datafile.print(RH);
   datafile.print(F(","));
-  //SDpowerOff();
   
   // Echo to serial
   Serial.print(V_humid_norm);
@@ -1576,13 +1350,12 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   ///////////////
   // SAVE DATA //
   ///////////////
-  //SDpowerOn();
   delay(10);
   datafile.print(meanRange);
   datafile.print(F(","));
   datafile.print(sigma);
   datafile.print(F(","));
-  //SDpowerOff();
+
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -1657,12 +1430,11 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   ///////////////
   // SAVE DATA //
   ///////////////
-  //SDpowerOn();
   datafile.print(meanRange);
   datafile.print(F(","));
   datafile.print(sigma);
   datafile.print(F(","));
-  //SDpowerOff();
+
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -1694,12 +1466,12 @@ void Logger::maxbotixHRXL_WR_analog_oneping(int sonicPin){
   ///////////////
   // SAVE DATA //
   ///////////////
-  //SDpowerOn();
+
   datafile.print(meanRange);
   datafile.print(F(","));
   //datafile.print(sigma);
   //datafile.print(F(","));
-  //SDpowerOff();
+
   // Echo to serial
   Serial.print(meanRange);
   Serial.print(F(","));
@@ -1755,7 +1527,6 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
   }
   // Write all values if so desired
   if (writeAll){
-    //SDpowerOn();
     for (int i=0; i<npings; i++){
       datafile.print(myranges[i]);
       datafile.print(F(","));
@@ -1763,17 +1534,16 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
       Serial.print(myranges[i]);
       Serial.print(F(","));
     }
-    //SDpowerOff();
+
   }
   // Always write the mean, standard deviation, and number of good returns
-  //SDpowerOn();
   datafile.print(mean_range);
   datafile.print(F(","));
   datafile.print(standard_deviation);
   datafile.print(F(","));
   datafile.print(npings_with_real_returns);
   datafile.print(F(","));
-  //SDpowerOff();
+
   // Echo to serial
   Serial.print(mean_range);
   Serial.print(F(","));
@@ -1902,7 +1672,6 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float V_A
   ///////////////
 
   // SD write
-  //SDpowerOn();
   datafile.print(Vout_x);
   datafile.print(F(","));
   datafile.print(Vout_y);
@@ -1911,7 +1680,6 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float V_A
   datafile.print(F(","));
   datafile.print(angle_y_degrees);
   datafile.print(F(","));
-  //SDpowerOff();
   
   // Echo to serial
   //int a = analogRead(xPin) - 512;
@@ -1973,14 +1741,12 @@ void Logger::Anemometer_reed_switch(int interrupt_number, unsigned long reading_
   ///////////////
 
   // SD write
-  //SDpowerOn();
   datafile.print(rotation_count);
   datafile.print(F(","));
   datafile.print(rotation_Hz, 4);
   datafile.print(F(","));
   datafile.print(wind_speed_meters_per_second, 4);
   datafile.print(F(","));
-  //SDpowerOff();
   
   // Echo to serial
   Serial.print(rotation_count);
@@ -2009,10 +1775,8 @@ void Logger::Wind_Vane_Inspeed(int vanePin){
   ///////////////
 
   // SD write
-  //SDpowerOn();
   datafile.print(Wind_angle);
   datafile.print(F(","));
-  //SDpowerOff();
   
   // Echo to serial
   Serial.print(Wind_angle);
@@ -2035,10 +1799,8 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, f
   ///////////////
 
   // SD write
-  //SDpowerOn();
   datafile.print(Radiation_W_m2, 4);
   datafile.print(F(","));
-  //SDpowerOff();
   
   // Echo to serial
   Serial.print(Radiation_W_m2, 4);
@@ -2233,12 +1995,10 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
     start_logging_to_otherfile("camera.txt");
 
     now = RTC.now();
-    //RTCsleep();
     // SD
-    //SDpowerOn();  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
     otherfile.print(now.unixtime());
     otherfile.print(",");
-    //SDpowerOff();
+
     // Echo to serial
     Serial.print(now.unixtime());
     Serial.print(F(","));
@@ -2324,10 +2084,9 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
   // Currently also echoes the return to serial port if it will
   // also be saved (sent to SD card)
   if (saveReturn){
-    //SDpowerOn();
     datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
     datafile.print(F(","));
-    //SDpowerOff();
+
   }
   // Echo to serial
   if (saveReturn || printReturn){
@@ -2365,22 +2124,20 @@ void Logger::TippingBucketRainGage(){
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
-//    wdt_reset();
+
   }
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
   now = RTC.now();
-  //RTCsleep();
+
   // SD
-  //SDpowerOn();  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
   otherfile.print(now.unixtime());
   otherfile.print(",");
-  //SDpowerOff();
+
   // Echo to serial
   Serial.print(now.unixtime());
   Serial.print(F(","));
   end_logging_to_otherfile();
-  //SDpowerOff();
 
   /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   pinMode(LEDpin, OUTPUT);
@@ -2416,7 +2173,6 @@ void Logger::TippingBucketRainGage(){
 }
 
 void Logger::start_logging_to_otherfile(char* filename){
-  //SDpowerOn();
   // open the file for write at end like the Native SD library
   if (!otherfile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 
@@ -2426,31 +2182,16 @@ void Logger::start_logging_to_otherfile(char* filename){
     Serial.println(F(" for write failed"));
     delay(10);
   }
-  //SDpowerOff();
-  // Datestamp the start of the line - modified from unixDateStamp function
-  //RTCon(); // Now using 3V3 regulator for sensors to power clock
-  /*now = RTC.now();
-  //RTCsleep();
-  // SD
-  //SDpowerOn();  //here to restart after RTCsleep function, remove when RTCsleep is fixed.
-  otherfile.print(now.unixtime());
-  otherfile.print(",");
-  //SDpowerOff();
-  // Echo to serial
-  Serial.print(now.unixtime());
-  Serial.print(F(","));*/  //removed from function
 }
 
 void Logger::end_logging_to_otherfile(){
   // Ends line and closes otherfile
   // Copied from endLine function
-  //SDpowerOn();
   otherfile.println();
   Serial.println();
   // close the file: (This does the actual sync() step too - writes buffer)
   otherfile.close();
   delay(10);
-  //SDpowerOff();
 }
 
 //reads a 5tm soil moisture probe and prints results to Serial
@@ -2604,12 +2345,10 @@ void Logger::DecagonGS1(int pin, float Vref){
   ///////////////
 
   // SD write
-  //SDpowerOn();
   datafile.print(voltage, 4);
   datafile.print(F(","));
   datafile.print(volumetric_water_content, 4);
   datafile.print(F(","));
-  //SDpowerOff();
   
   // Echo to serial
   Serial.print(voltage, 4);
@@ -2626,10 +2365,9 @@ void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
   // SAVE DATA //
   ///////////////
   
-  //SDpowerOn();
   datafile.print(_R);
   datafile.print(F(","));
-  //SDpowerOff();
+
   // Echo to serial
   Serial.print(_R);
   Serial.print(F(","));
@@ -2667,9 +2405,7 @@ void Logger::print_time(){
       exit_flag = 0; // Exit loop once this is done
       // Print times before setting clock
       for (int i=0; i<5; i++){
-        //RTCon(); // Now using 3V3 regulator for sensors to power clock
         now = RTC.now();
-        //RTCsleep();
         Serial.println(now.unixtime());
         if ( i<4 ){
           // No need to delay on the last time through
@@ -2710,8 +2446,6 @@ void Logger::startup_sequence(){
   int i;
   unsigned long unixtime_at_start;
   
-  //logger.RTCon();
-
   // Check if connected to computer with ALogTalk running to set the clock
   int millisthen = millis();
   while ( (millis() - millisthen) < 2000 && (comp == 0)){
@@ -2746,9 +2480,7 @@ void Logger::startup_sequence(){
     delay(1500);
     name();
     Serial.print(F("UNIX TIME STAMP ON MY WATCH IS: "));
-    //RTCon(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
-    //RTCsleep();
     unixtime_at_start = now.unixtime();
     Serial.println(unixtime_at_start);
     delay(1500);
@@ -2797,9 +2529,7 @@ void Logger::startup_sequence(){
   }
   else{
     // No serial; just blink
-    //RTCon(); // Now using 3V3 regulator for sensors to power clock
     now = RTC.now();
-    //RTCsleep();
     unixtime_at_start = now.unixtime();
     // Keep Serial just in case computer is connected w/out Python terminal
     Serial.print(F("Current UNIX time stamp according to logger is: "));
@@ -2816,31 +2546,7 @@ void Logger::startup_sequence(){
     delay(1000);
   }
   
-  //logger.RTCsleep();
-  
 }
-
-
-/*
-
-Void Logger::watchdogSetup(){
-cli();  // disable all interrupts
-wdt_reset();  // reset the WDT timer
-/*
-WDTCSR configuration:
-WDIE = 1: Interrupt Enable
-WDE = 1 :Reset Enable
-WDP3 = 1 :For 2000ms Time-out
-WDP2 = 1 :For 2000ms Time-out
-WDP1 = 1 :For 2000ms Time-out
-WDP0 = 1 :For 2000ms Time-out
-*//*
-// Enter Watchdog Configuration mode:
-WDTCSR |= (1<<WDCE) | (1<<WDE);
-// Set Watchdog settings:
-WDTCSR = (1<<WDIE) | (1<<WDE) | (1<<WDP3) | (1<<WDP2) | (1<<WDP1) | (1<<WDP0);
-sei();
-}*/
 
 void Logger::clockSet(){
 
@@ -2855,8 +2561,6 @@ void Logger::clockSet(){
   bool Century=false;
   bool h12;
   bool PM;
-
-  //RTCon(); // Now using 3V3 regulator for sensors to power clock
 
   DateTime nowPreSet = RTC.now();
 
@@ -2873,14 +2577,11 @@ void Logger::clockSet(){
 	Clock.setMinute(Minute);
 	Clock.setSecond(Second);
 
-  //RTCsleep();
-
 	// Give time at next five seconds
 	// Should use a DateTime object for this, b/c rollover is a potential
 	// problem, but this display is not mission-critical
 	for (int i=0; i<5; i++){
 	    delay(1000);
-      //RTCon();
 	    Serial.print(Clock.getYear(), DEC);
 	    Serial.print(F("-"));
 	    Serial.print(Clock.getMonth(Century), DEC);
@@ -2892,7 +2593,7 @@ void Logger::clockSet(){
 	    Serial.print(Clock.getMinute(), DEC);
 	    Serial.print(F(":"));
 	    Serial.println(Clock.getSecond(), DEC);
-      //RTCsleep();
+
 	}
   delay(1000);
   unsigned long unixtime_at_receive_string = nowPreSet.unixtime();
