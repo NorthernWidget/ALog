@@ -2358,6 +2358,57 @@ void Logger::DecagonGS1(int pin, float Vref){
 
 }
 
+// Honeywell_HSC_analog
+//////////////////////////////
+
+float Logger::Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, int pin){
+
+  
+  // Datasheet: http://sensing.honeywell.com/index.php?ci_id=151133  
+
+  // Read pin voltage
+  float reading = analogReadOversample(pin, 14);  //hardcoded for 14 bits
+  float Vout = reading/1023*3.3;
+  
+  // Apply transfer function 
+  float P;
+
+  if(TransferFunction == 1){
+  P = (Vout - 0.1*Vsupply) * ((Pmax-Pmin)/(0.8*Vsupply)) + Pmin;
+  }
+  if(TransferFunction == 2){
+  P = (Vout - 0.05*Vsupply) * ((Pmax-Pmin)/(0.9*Vsupply)) + Pmin;
+  }  
+  if(TransferFunction == 3){
+  P = (Vout - 0.05*Vsupply) * ((Pmax-Pmin)/(0.8*Vsupply)) + Pmin;
+  }
+  if(TransferFunction == 4){
+  P = (Vout - 0.04*Vsupply) * ((Pmax-Pmin)/(0.9*Vsupply)) + Pmin;
+  }
+
+char* _units[]={"mbar", "bar", "Pa", "KPa", "Mpa", "inH2O", "PSI", "why"};
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  datafile.print(P, 4);
+  datafile.print(F(" "));
+  datafile.print(_units[units]);
+  datafile.print(F(","));
+  
+  // Echo to serial
+  Serial.print(P, 4);
+  Serial.print(F(" "));
+  Serial.print(_units[units]);
+  Serial.print(F(","));
+
+  return P;
+
+}
+
+
 void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
   float _R = (pin, Rref, Rref_on_GND_side);
   
