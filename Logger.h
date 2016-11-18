@@ -130,7 +130,7 @@ class Logger {
     // The default interrupt is Pin 3, INT1 on ATmega328
     // because this is free for a rain gage on the ALog BottleLogger
     void TippingBucketRainGage();
-    float Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int Units, int Pin);
+    float Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, int pin);
 
   private:
     void pinUnavailable(int pin);
