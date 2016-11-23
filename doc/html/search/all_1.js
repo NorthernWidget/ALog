@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['logger',['Logger',['../classLogger.html',1,'Logger'],['../classLogger.html#abc41bfb031d896170c7675fa96a6b30c',1,'Logger::Logger()']]],
-  ['logger',['Logger',['../md_README.html',1,'']]]
+  ['hm1500lf_5fhumidity_5fwith_5fexternal_5ftemperature',['HM1500LF_humidity_with_external_temperature',['../classLogger.html#abf1b1f04c10ec9622e83d23c7e71db62',1,'Logger']]],
+  ['htm2500lf_5fhumidity_5ftemperature',['HTM2500LF_humidity_temperature',['../classLogger.html#a796603ef13ff8264574c9ac181fca0a4',1,'Logger']]]
 ];

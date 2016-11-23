@@ -157,11 +157,11 @@ SdFile otherfile; // for rain gage, camera timing, and anything else that
 
 DateTime now;
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-//!! LOGGER LIBRARY COMPONENTS !!//
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
+///////////////////////////////////
+///////////////////////////////////
+//// LOGGER LIBRARY COMPONENTS ////
+///////////////////////////////////
+///////////////////////////////////
 
 // Constructor
 Logger::Logger(){}
@@ -1056,6 +1056,20 @@ void Logger::endAnalog(){
 
 float Logger::readPin(int pin){
 
+  /**
+   * This function returns the analog to digital converter value (0 - 1023). 
+   * Results are displayed on the serial monitor and saved onto the SD card.
+   * 
+   * \b pin is the analog pin number to be read.
+   * 
+   * Example:
+   * ```
+   * logger.readPin(2);
+   * ```
+   * 
+   * 
+  */
+
 float pinValue = analogRead(pin);
 
   ///////////////
@@ -1075,6 +1089,29 @@ return pinValue;
 }
 
 float Logger::readPinOversample(int pin, int bits){
+
+  /**
+   * This function incorporates oversampling to extend the ADC precision
+   * past ten bits by taking more readings and statistically combing them.
+   * Results are displayed on the serial monitor and saved onto the SD card.
+   * 
+   * \b pin is the analog pin number to be read.
+   * 
+   * \b adc_bits is the reading precision in bits (2^adc_bits).
+   * The ATMega328 (Arduino Uno and ALog BottleLogger core chip)
+   * has a base ADC precision of 10 bits (returns values of 0-1023)
+   * A reasonable maximum precision gain is (base_value_bits)+6, so
+   * 16 bits is a reasonable maximum precision for the ALog BottleLogger.
+   * 
+   * Example:
+   * ```
+   * logger.readPinOversample(2, 12);
+   * ```
+   * 
+   * Readings that require more bits of precision will take longer.
+   * 
+   * 
+  */
 
 float pinValue = analogReadOversample(pin, bits);
 
@@ -1098,11 +1135,36 @@ return pinValue;
 //////////////////////////////
 
 float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side){
-  // R0 and T0 are thermistor calibrations
-  //
-  // EXAMPLES:
-  // thermistorB(10000,3950,30000,25,tempPin); // Cantherm from DigiKey
-  // thermistorB(10000,3988,13320,25,tempPin); // EPCOS, DigiKey # 495-2153-ND
+
+  /**
+   * This function measures temperature using a thermistor characterised with the B (or β) parameter Steinhart-Hart equation.
+   * The function compares the thermistor risistance with the reference resistor using a 14 bit precision voltage divider output reading.
+   * The function returns a float of the temperature in celsius.
+   * Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
+   * 
+   * \b R0 is a thermistor calibration.
+   * 
+   * \b B is the β parameter of the thermistor.
+   * 
+   * \b Rref is the resistance of the corresponding reference resistor for that analog pin.
+   * 
+   * \b T0degC is a thermistor calibration.
+   * 
+   * \b thermPin is the analog pin number to be read.
+   * 
+   * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * True if using Alog provided Reference resistor terminals.
+   * 
+   * Example:
+   * ```
+   * // Contherm from Digikey
+   * logger.thermistorB(10000,3950,30000,25,2);
+   * // EPCOS, DigiKey # 495-2153-ND
+   * logger.thermistorB(10000,3988,13320,25,1);
+   * ```
+   * 
+   * 
+  */
 
   // Voltage divider
   float Rtherm = _vdivR(thermPin,Rref,14,Rref_on_GND_side);
@@ -1139,11 +1201,39 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
 //////////////////////////////
 
 float Logger::thermistorB_Debug(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side){
-  // R0 and T0 are thermistor calibrations
-  //
-  // EXAMPLES:
-  // thermistorB(10000,3950,30000,25,tempPin); // Cantherm from DigiKey
-  // thermistorB(10000,3988,13320,25,tempPin); // EPCOS, DigiKey # 495-2153-ND
+
+  /**
+   * This function measures temperature using a thermistor characterised with the B (or β) parameter Steinhart-Hart equation.
+   * The function compares the thermistor risistance with the reference resistor using a 14 bit precision voltage divider output reading.
+   * The function returns a float of the temperature in celsius.
+   * Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
+   * 
+   * \b R0 is a thermistor calibration.
+   * 
+   * \b B is the β parameter of the thermistor.
+   * 
+   * \b Rref is the resistance of the corresponding reference resistor for that analog pin.
+   * 
+   * \b T0degC is a thermistor calibration.
+   * 
+   * \b thermPin is the analog pin number to be read.
+   * 
+   * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * True if using Alog provided Reference resistor terminals.
+   * 
+   * Example:
+   * ```
+   * // Contherm from Digikey
+   * logger.thermistorB(10000,3950,30000,25,2);
+   * // EPCOS, DigiKey # 495-2153-ND
+   * logger.thermistorB(10000,3988,13320,25,1);
+   * ```
+   * 
+   * "Debug" in this function name means that there is a file called
+   * "Oversample.txt" that contains all of the values read during the
+   * oversampling.
+   * 
+  */
   datafile.println();
   datafile.close();
 
@@ -1188,8 +1278,26 @@ float Logger::thermistorB_Debug(float R0,float B,float Rref,float T0degC,int the
 ///////////////////////////////////////////////
 
 void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref){
-  // Rref is for the thermistor input (resistance)
-  // humidity input is a voltage
+
+  /**
+   * This function measures the relative humidity of using a HTM2500 tempurature and relative humidity module.
+   * The relative humidity and temperature is measured using a 14 bit oversampling method.
+   * Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
+   * 
+   * \b humidPin is the analog pin connected to the humidity output voltage of the module.
+   * 
+   * \b thermPin is the analog pin connected to the tempurature output voltage of the module.
+   * 
+   * \b Rref is for the thermistor input (resistance)
+   * 
+   * Example:
+   * ```
+   * logger.HTM2500LF_humidity_temperature(1, 2, ?);
+
+   * ```
+   * *Andy* Rref is not used, why do we have this input?  It is hard coded as 10K.
+   * 
+  */
 
   // First, measure these pins
   // This will fully calculate and write the temperature data, too.
@@ -1234,17 +1342,43 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
 }
 
 
-// HTM2500LF Humidity and Temperature Sensor
+// HTM1500LF Humidity and Temperature Sensor
 // by TE Connectivity Measurement Specialties
 ///////////////////////////////////////////////
 
 void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin){
-  // humidity input is a voltage
-  // Rref is for 
-  
+
+  /**
+   * This function measures the relative humidity of using a HTM1500 relative humidity sensor and an external thermistor.
+   * The relative humidity and temperature is measured using a 14 bit oversampling method.
+   * Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
+   * 
+   * \b humidPin is the analog pin connected to the humidity output voltage of the module.
+   * 
+   * \b Vref *Andy*
+   * 
+   * \b R0 is a thermistor calibration.
+   * 
+   * \b B is the β parameter of the thermistor.
+   * 
+   * \b Rref is the resistance of the corresponding reference resistor for that analog pin.
+   * 
+   * \b T0degC is a thermistor calibration.
+   * 
+   * \b thermPin is the analog pin number to be read.
+   * 
+   * \b thermPin is the analog pin connected to the tempurature output voltage of the module.
+   * 
+   * Example:
+   * ```
+   * logger.HTM2500LF_humidity_temperature(1,?,10000,3950,10000,25,2);
+   * ```
+   * 
+  */
+
   // First, measure these pins
   // This will fully calculate and write the temperature data, too.
-  float V_humid_norm = analogRead(humidPin)/1023.; // 0-1
+  float V_humid_norm = analogReadOversample(humidPin, 14)/1023.; // 0-1
   // Will write temperature to file here
   float T = thermistorB(R0, B, Rref, T0degC, thermPin);
 
@@ -1273,15 +1407,15 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, float Vre
   // I think it will -- though if it is ratiometric, I think it should.
  
   // SD write
-  datafile.print(V_humid_norm);
-  datafile.print(F(","));
-  datafile.print(RH);
+  //datafile.print(V_humid_norm);
+  //datafile.print(F(","));
+  datafile.print(RH, 4);
   datafile.print(F(","));
   
   // Echo to serial
-  Serial.print(V_humid_norm);
-  Serial.print(F(","));
-  Serial.print(RH);
+  //Serial.print(V_humid_norm);
+  //Serial.print(F(","));
+  Serial.print(RH, 4);
   Serial.print(F(","));
 
 }
@@ -1292,8 +1426,30 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, float Vre
 //////////////////////////////////////////////////////////////
 
 void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool writeAll){
-  // Returns distance in cm
-  // set EX=99 if you don't need it
+  //    Should we oversample?
+
+  /**
+   * This function measures the distance between the ultrasonic sensor and an acustically reflective surface, typically water or snow.
+   * Measures distance in centimeters.
+   * Results are displayed on the serial monitor and saved onto the SD card.
+   * 
+   * \b nping is the number of range readings to take (number of pings).  The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.
+   * 
+   * \b EX is a digital output pin used for an excitation pulse.  If maxbotix sensor is continuously powered a reading will be taken when this pin is flashed high.
+   * Set to '99' if excitation pulse is not needed.
+   * 
+   * \b sonicPin is the analog input channel hooked up to the maxbotix sensor.
+   * 
+   * \b writeAll will write each reading of the sensor (each ping) to the serial monitor and SD card.
+   * 
+   * Example:
+   * ```
+   * logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);
+   * ```
+   * Note that sensor should be mounted away from supporting structure.
+   * For a mast that is 5 meters high (or higher) the sensor should be mounted at least 100cm away from the mast.
+   * For a mast that is 2.5 meters high (or lower) the sensor should be at least 75cm away from the mast.
+  */
   
   float range; // The most recent returned range
   float ranges[nping]; // Array of returned ranges
@@ -1365,6 +1521,7 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
 }
 
 void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeAll){
+
   // Returns distance in mm, +/- 5 mm
   // Each 10-bit ADC increment corresponds to 5 mm.
   // set EX=99 if you don't need it (or leave it clear -- this is default)
@@ -1372,6 +1529,29 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   // Basically only differs from older MB sensor function in its range scaling
   // and its added defaults.
   
+  /**
+   * This function measures the distance between the ultrasonic sensor and an acustically reflective surface, typically water or snow.
+   * Measures distance in milimeters.
+   * Results are displayed on the serial monitor and saved onto the SD card.
+   * 
+   * \b nping is the number of range readings to take (number of pings).  The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.
+   * 
+   * \b sonicPin is the analog input channel hooked up to the maxbotix sensor.
+   * 
+   * \b EX is a digital output pin used for an excitation pulse.  If maxbotix sensor is continuously powered a reading will be taken when this pin is flashed high.
+   * Set to '99' if excitation pulse is not needed.
+   * 
+   * \b writeAll will write each reading of the sensor (each ping) to the serial monitor and SD card.
+   * 
+   * Example:
+   * ```
+   * logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);
+   * ```
+   * Note that sensor should be mounted away from supporting structure.
+   * For a mast that is 5 meters high (or higher) the sensor should be mounted at least 100cm away from the mast.
+   * For a mast that is 2.5 meters high (or lower) the sensor should be at least 75cm away from the mast.
+  */
+
   float range; // The most recent returned range
   float ranges[nping]; // Array of returned ranges
   float sumRange = 0; // The sum of the ranges measured
@@ -1443,6 +1623,7 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
 
 }
 
+/* *Andy* DELETE THIS FUNCTION?
 void Logger::maxbotixHRXL_WR_analog_oneping(int sonicPin){
   // WRITTEN B/C SD WRITES FAILING WITH ANY FOR LOOP USAGE!
   // ACTUALLY, NOT JUST THIS -- REASSIGNING VARIABLE?
@@ -1461,7 +1642,7 @@ void Logger::maxbotixHRXL_WR_analog_oneping(int sonicPin){
   //delay(100);
   //analogRead(sonicPin);
   delay(300);
-  sp = analogRead(sonicPin);
+  sp = analogReadOversample(sonicPin, 14);
   meanRange = (sp + 1) * 5;
   ///////////////
   // SAVE DATA //
@@ -1478,7 +1659,7 @@ void Logger::maxbotixHRXL_WR_analog_oneping(int sonicPin){
   //Serial.print(sigma);
   //Serial.print(F(","));
 
-}
+}*/
 
 float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, int maxRange, bool RS232){
   // Stores the ranging output from the MaxBotix sensor
@@ -1808,9 +1989,41 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, f
 }
 
 float Logger::analogReadOversample(int pin, int adc_bits, int nsamples){
-  // Use basic analogRead if adc_bits == 10 (default)
-  // Otherwise, use library to oversample it
-  // Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
+
+  /**
+   * This function incorporates oversampling to extend the ADC precision
+   * past ten bits by taking more readings and statistically combing them.
+   * 
+   * It is often used within other sensor functinons to increase measurement
+   * precision.
+   * 
+   * \b pin is the analog pin number
+   * 
+   * \b adc_bits is the reading precision in bits (2^adc_bits).
+   * The ATMega328 (Arduino Uno and ALog BottleLogger core chip)
+   * has a base ADC precision of 10 bits (returns values of 0-1023)
+   * A reasonable maximum precision gain is (base_value_bits)+6, so
+   * 16 bits is a reasonable maximum precision for the ALog BottleLogger.
+   * 
+   * \b nsamples is the number of times you want to poll the particular 
+   * sensor and write the output to file.
+   * 
+   * Example:
+   * ```
+   * // 12-bit measurement of Pin 2
+   * // Leaves nsamples at its default value of 1 (single reading of sensor)
+   * logger.analogReadOversample(2, 12);
+   * ```
+   * 
+   * Readings that require more bits of precision will take longer.
+   * 
+   * For analog measurements which do not require more than 10 bits of precision, 
+   * use logger.readpin(int pin) or the standard Arduino "AnalogRead" function.
+   * 
+   * Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
+   * 
+   * 
+  */
 
   float analog_reading;
 
@@ -1853,21 +2066,22 @@ float Logger::analogReadOversample_Debug(int pin, int adc_bits, int nsamples){
    * It is often used within other sensor functinons to increase measurement
    * precision.
    * 
-   * \p pin is the analog pin number
+   * \b pin is the analog pin number
    * 
-   * \p adc_bits is the reading precision in bits (2^adc_bits).
+   * \b adc_bits is the reading precision in bits (2^adc_bits).
    * The ATMega328 (Arduino Uno and ALog BottleLogger core chip)
    * has a base ADC precision of 10 bits (returns values of 0-1023)
    * A reasonable maximum precision gain is (base_value_bits)+6, so
    * 16 bits is a reasonable maximum precision for the ALog BottleLogger.
    * 
-   * \p nsamples is the number of times you want to poll the particular 
+   * \b nsamples is the number of times you want to poll the particular 
    * sensor and write the output to file.
    * 
    * Example:
    * ```
-   * // 12-bit measurement of Pin 2; maintain default single reading
-   * analogReadOversample(2, 12)
+   * // 12-bit measurement of Pin 2
+   * // Leaves nsamples at its default value of 1 (single reading of sensor)
+   * logger.analogReadOversample(2, 12);
    * ```
    * 
    * "Debug" in this function name means that there is a file called
@@ -1876,8 +2090,8 @@ float Logger::analogReadOversample_Debug(int pin, int adc_bits, int nsamples){
    *
    * Readings that require more bits of precision will take longer.
    * 
-   * For basic analog measurements, you may also use the standard Arduino 
-   * "AnalogRead" function.
+   * For analog measurements which do not require more than 10 bits of precision, 
+   * use logger.readpin(int pin) or the standard Arduino "AnalogRead" function.
    * 
    * Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
    * 
@@ -2172,16 +2386,16 @@ void Logger::TippingBucketRainGage(){
   Serial.print(F(","));
   end_logging_to_otherfile();
 
-  /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
+  // START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   pinMode(LEDpin, OUTPUT);
   digitalWrite(LEDpin, HIGH);
-  /// END TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
+  // END TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   Serial.println(F("Tip!"));
   delay(50); // to make sure tips aren't double-counted
-  /// START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
+  // START TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   digitalWrite(LEDpin, LOW);
   pinMode(LEDpin, INPUT);
-  /// END TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
+  // END TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   NEW_RAIN_BUCKET_TIP = false;
   
   // Sets flag to log data if the "LOG_ON_BUCKET_TIP" flag is set "TRUE"
