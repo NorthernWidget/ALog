@@ -86,7 +86,6 @@ class Logger {
     void setupLogger();
     
     // Code for sleeping, starting up from sleep, synching SD card
-//    void sleep(int minutes); // soon to be deprecated: requires log_minutes to be declared twice, caused ADW some confusion
     void sleep();
     void startLogging();
     void endLogging();
@@ -122,13 +121,11 @@ class Logger {
     void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref);
     //void Barometer_BMP180();
     
-    // Sensors - special
-    // Rain gage - will wake logger up and cause it to log to a different file
-    /////////// PLACEHOLDER
+    // Sensors - triggered
     // Camera on/off function; decision made in end-user Arduino script
     void HackHD(int control_pin, bool want_camera_on);
-    // The default interrupt is Pin 3, INT1 on ATmega328
-    // because this is free for a rain gage on the ALog BottleLogger
+    // Rain gage - will wake logger up and cause it to log to a different file
+    // The default interrupt is Pin 3, INT1 on ATmega328 (ALog BottleLogger)
     void TippingBucketRainGage();
     float Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, int pin);
 
