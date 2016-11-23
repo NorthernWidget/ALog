@@ -1846,10 +1846,43 @@ float Logger::analogReadOversample(int pin, int adc_bits, int nsamples){
 }
 
 float Logger::analogReadOversample_Debug(int pin, int adc_bits, int nsamples){
-  // Use basic analogRead if adc_bits == 10 (default)
-  // Otherwise, use library to oversample it
-  // Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
-
+  /**
+   * This function incorporates oversampling to extend the ADC precision
+   * past ten bits by taking more readings and statistically combing them.
+   * 
+   * It is often used within other sensor functinons to increase measurement
+   * precision.
+   * 
+   * \p pin is the analog pin number
+   * 
+   * \p adc_bits is the reading precision in bits (2^adc_bits).
+   * The ATMega328 (Arduino Uno and ALog BottleLogger core chip)
+   * has a base ADC precision of 10 bits (returns values of 0-1023)
+   * A reasonable maximum precision gain is (base_value_bits)+6, so
+   * 16 bits is a reasonable maximum precision for the ALog BottleLogger.
+   * 
+   * \p nsamples is the number of times you want to poll the particular 
+   * sensor and write the output to file.
+   * 
+   * Example:
+   * ```
+   * // 12-bit measurement of Pin 2; maintain default single reading
+   * analogReadOversample(2, 12)
+   * ```
+   * 
+   * "Debug" in this function name means that there is a file called
+   * "Oversample.txt" that contains all of the values read during the
+   * oversampling.
+   *
+   * Readings that require more bits of precision will take longer.
+   * 
+   * For basic analog measurements, you may also use the standard Arduino 
+   * "AnalogRead" function.
+   * 
+   * Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
+   * 
+   * 
+  */
 
   start_logging_to_otherfile("Oversample.txt");
 

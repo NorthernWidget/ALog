@@ -1,0 +1,168 @@
+\hypertarget{classLogger}{}\section{Logger Class Reference}
+\label{classLogger}\index{Logger@{Logger}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classLogger_abc41bfb031d896170c7675fa96a6b30c}{Logger} ()
+\item 
+void {\bfseries initialize} (char $\ast$\+\_\+logger\+\_\+name, char $\ast$\+\_\+sitecode, int \+\_\+day\+Interval, int \+\_\+hour\+Interval, int \+\_\+min\+Interval, int \+\_\+sec\+Interval, bool \+\_\+ext\+\_\+int=false, bool \+\_\+\+L\+O\+G\+\_\+\+O\+N\+\_\+\+B\+U\+C\+K\+E\+T\+\_\+\+T\+IP=false)\hypertarget{classLogger_a9495e2c8e63850f3c7cfcc31e9d73ffe}{}\label{classLogger_a9495e2c8e63850f3c7cfcc31e9d73ffe}
+
+\item 
+void {\bfseries setup\+Logger} ()\hypertarget{classLogger_ab5e0bd543758c65a17b77553a0e9f0c9}{}\label{classLogger_ab5e0bd543758c65a17b77553a0e9f0c9}
+
+\item 
+void {\bfseries sleep} ()\hypertarget{classLogger_ad90ff8f29410f6b70cc6334391400a4e}{}\label{classLogger_ad90ff8f29410f6b70cc6334391400a4e}
+
+\item 
+void {\bfseries start\+Logging} ()\hypertarget{classLogger_a4a6c78dd1715b33ae4bbd6f66f116f77}{}\label{classLogger_a4a6c78dd1715b33ae4bbd6f66f116f77}
+
+\item 
+void {\bfseries end\+Logging} ()\hypertarget{classLogger_aa82814d61687debcf3b8dd6f46c9d549}{}\label{classLogger_aa82814d61687debcf3b8dd6f46c9d549}
+
+\item 
+void {\bfseries start\+Analog} ()\hypertarget{classLogger_af936c7f58e23316abb5614cbd31c7ced}{}\label{classLogger_af936c7f58e23316abb5614cbd31c7ced}
+
+\item 
+void {\bfseries end\+Analog} ()\hypertarget{classLogger_adca7be8a63592263c67f63766680d16f}{}\label{classLogger_adca7be8a63592263c67f63766680d16f}
+
+\item 
+bool {\bfseries get\+\_\+use\+\_\+sleep\+\_\+mode} ()\hypertarget{classLogger_acc758b6fdaac8099c492929aa7f1691d}{}\label{classLogger_acc758b6fdaac8099c492929aa7f1691d}
+
+\item 
+float {\bfseries read\+Pin} (int pin)\hypertarget{classLogger_a343fcabefb37e06429865a2e6a6e708a}{}\label{classLogger_a343fcabefb37e06429865a2e6a6e708a}
+
+\item 
+float {\bfseries read\+Pin\+Oversample} (int pin, int bits)\hypertarget{classLogger_a4e67526c65fa865f276a515a200af4aa}{}\label{classLogger_a4e67526c65fa865f276a515a200af4aa}
+
+\item 
+float {\bfseries analog\+Read\+Oversample} (int pin, int adc\+\_\+bits=10, int nsamples=1)\hypertarget{classLogger_afd26c9895a3b0314413c28a9fe236e2a}{}\label{classLogger_afd26c9895a3b0314413c28a9fe236e2a}
+
+\item 
+float \hyperlink{classLogger_a02c147268f3bd5bd55b8c632c9e5ab9f}{analog\+Read\+Oversample\+\_\+\+Debug} (int pin, int adc\+\_\+bits=10, int nsamples=1)
+\item 
+float {\bfseries thermistorB} (float R0, float B, float Rref, float T0degC, int therm\+Pin, bool Rref\+\_\+on\+\_\+\+G\+N\+D\+\_\+side=true)\hypertarget{classLogger_a0b35b861394160fb080afd78a1dea500}{}\label{classLogger_a0b35b861394160fb080afd78a1dea500}
+
+\item 
+float {\bfseries thermistor\+B\+\_\+\+Debug} (float R0, float B, float Rref, float T0degC, int therm\+Pin, bool Rref\+\_\+on\+\_\+\+G\+N\+D\+\_\+side=true)\hypertarget{classLogger_aeb80eea2ce978d61a67b1c5904ba4428}{}\label{classLogger_aeb80eea2ce978d61a67b1c5904ba4428}
+
+\item 
+void {\bfseries ultrasonic\+M\+B\+\_\+analog\+\_\+1cm} (int nping, int EX, int sonic\+Pin, bool write\+All)\hypertarget{classLogger_a362a1462166d63ddc613eaa1e86f9854}{}\label{classLogger_a362a1462166d63ddc613eaa1e86f9854}
+
+\item 
+float {\bfseries maxbotix\+H\+R\+X\+L\+\_\+\+W\+R\+\_\+\+Serial} (int Ex, int Rx, int nping, bool write\+All, int max\+Range, bool R\+S232=false)\hypertarget{classLogger_a302ced2e1130c711f4ae1f8b1fc2b2a0}{}\label{classLogger_a302ced2e1130c711f4ae1f8b1fc2b2a0}
+
+\item 
+void {\bfseries maxbotix\+H\+R\+X\+L\+\_\+\+W\+R\+\_\+analog} (int nping=10, int sonic\+Pin=A0, int EX=99, bool write\+All=true)\hypertarget{classLogger_acd4f2c5017d9a36b88ab345082b4551f}{}\label{classLogger_acd4f2c5017d9a36b88ab345082b4551f}
+
+\item 
+void {\bfseries maxbotix\+H\+R\+X\+L\+\_\+\+W\+R\+\_\+analog\+\_\+oneping} (int sonic\+Pin)\hypertarget{classLogger_a889b3e76b0f8e21f9a8cc67b35169fdf}{}\label{classLogger_a889b3e76b0f8e21f9a8cc67b35169fdf}
+
+\item 
+void {\bfseries Decagon\+G\+S1} (int pin, float Vref)\hypertarget{classLogger_aefe17c5e9cf9b1581c36812d5a87fac1}{}\label{classLogger_aefe17c5e9cf9b1581c36812d5a87fac1}
+
+\item 
+void {\bfseries vdivR} (int pin, float Rref, bool Rref\+\_\+on\+\_\+\+G\+N\+D\+\_\+side=true)\hypertarget{classLogger_a1204f15e95e4119774c616807e9736bf}{}\label{classLogger_a1204f15e95e4119774c616807e9736bf}
+
+\item 
+void {\bfseries vdiv\+R\+\_\+\+Debug} (int pin, float Rref, bool Rref\+\_\+on\+\_\+\+G\+N\+D\+\_\+side=true)\hypertarget{classLogger_a8d318b089ca5fc2c3079f17c8495527a}{}\label{classLogger_a8d318b089ca5fc2c3079f17c8495527a}
+
+\item 
+void {\bfseries flex} (int flex\+Pin, float Rref, float calib1, float calib2)\hypertarget{classLogger_a75a7e7b6833aac586436198173137ad5}{}\label{classLogger_a75a7e7b6833aac586436198173137ad5}
+
+\item 
+void {\bfseries linear\+Potentiometer} (int linpot\+Pin, float Rref, float slope, float intercept)\hypertarget{classLogger_a7bd8c5c0c3240c8624ab71784ee1ef35}{}\label{classLogger_a7bd8c5c0c3240c8624ab71784ee1ef35}
+
+\item 
+void {\bfseries Atlas\+Scientific} (char $\ast$command, int soft\+Ser\+RX=6, int soft\+Ser\+TX=7, uint32\+\_\+t baud\+Rate=38400, bool print\+Return=true, bool save\+Return=true)\hypertarget{classLogger_a9fdcbb56e3e4910ac895ee150fe1b9ed}{}\label{classLogger_a9fdcbb56e3e4910ac895ee150fe1b9ed}
+
+\item 
+void {\bfseries H\+T\+M2500\+L\+F\+\_\+humidity\+\_\+temperature} (int humid\+Pin, int therm\+Pin, float Rref)\hypertarget{classLogger_a796603ef13ff8264574c9ac181fca0a4}{}\label{classLogger_a796603ef13ff8264574c9ac181fca0a4}
+
+\item 
+void {\bfseries H\+M1500\+L\+F\+\_\+humidity\+\_\+with\+\_\+external\+\_\+temperature} (int humid\+Pin, float Vref, float R0, float B, float Rref, float T0degC, int therm\+Pin)\hypertarget{classLogger_abf1b1f04c10ec9622e83d23c7e71db62}{}\label{classLogger_abf1b1f04c10ec9622e83d23c7e71db62}
+
+\item 
+void {\bfseries Inclinometer\+\_\+\+S\+C\+A100\+T\+\_\+\+D02\+\_\+analog\+\_\+\+Tcorr} (int x\+Pin, int y\+Pin, float V\+\_\+\+A\+DC, float V\+DD, float R0, float B, float Rref, float T0degC, int therm\+Pin)\hypertarget{classLogger_a9370d0cb9d503ccf0a43983dff943be8}{}\label{classLogger_a9370d0cb9d503ccf0a43983dff943be8}
+
+\item 
+void {\bfseries Anemometer\+\_\+reed\+\_\+switch} (int interrupt\+\_\+number, unsigned long reading\+\_\+duration\+\_\+milliseconds, float meters\+\_\+per\+\_\+second\+\_\+per\+\_\+rotation)\hypertarget{classLogger_a3b2c1d7e8f475892bd411cb806af3fae}{}\label{classLogger_a3b2c1d7e8f475892bd411cb806af3fae}
+
+\item 
+void {\bfseries Wind\+\_\+\+Vane\+\_\+\+Inspeed} (int vane\+Pin)\hypertarget{classLogger_a31c3cba5ff5722fb66bf540bfbe8b25d}{}\label{classLogger_a31c3cba5ff5722fb66bf540bfbe8b25d}
+
+\item 
+void {\bfseries Pyranometer} (int analog\+Pin, float raw\+\_\+m\+V\+\_\+per\+\_\+\+W\+\_\+per\+\_\+m2, float gain, float V\+\_\+ref)\hypertarget{classLogger_ae6155de6a37f16e5ab08d9cb7f84780e}{}\label{classLogger_ae6155de6a37f16e5ab08d9cb7f84780e}
+
+\item 
+void {\bfseries Hack\+HD} (int control\+\_\+pin, bool want\+\_\+camera\+\_\+on)\hypertarget{classLogger_a923b296832bd4222da649ebc66427ac1}{}\label{classLogger_a923b296832bd4222da649ebc66427ac1}
+
+\item 
+void \hyperlink{classLogger_a290239fff83685a02c0d9084c1a80b03}{Tipping\+Bucket\+Rain\+Gage} ()
+\item 
+float {\bfseries Honeywell\+\_\+\+H\+S\+C\+\_\+analog} (float Vsupply, float Pmin, float Pmax, int Transfer\+Function, int units, int pin)\hypertarget{classLogger_a5394217d07aa6fc896bc007d232b834f}{}\label{classLogger_a5394217d07aa6fc896bc007d232b834f}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\index{Logger@{Logger}!Logger@{Logger}}
+\index{Logger@{Logger}!Logger@{Logger}}
+\subsubsection[{\texorpdfstring{Logger()}{Logger()}}]{\setlength{\rightskip}{0pt plus 5cm}Logger\+::\+Logger (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classLogger_abc41bfb031d896170c7675fa96a6b30c}{}\label{classLogger_abc41bfb031d896170c7675fa96a6b30c}
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!// ! L\+O\+G\+G\+ER L\+I\+B\+R\+A\+RY C\+O\+M\+P\+O\+N\+E\+N\+TS !!// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!// 
+
+\subsection{Member Function Documentation}
+\index{Logger@{Logger}!analog\+Read\+Oversample\+\_\+\+Debug@{analog\+Read\+Oversample\+\_\+\+Debug}}
+\index{analog\+Read\+Oversample\+\_\+\+Debug@{analog\+Read\+Oversample\+\_\+\+Debug}!Logger@{Logger}}
+\subsubsection[{\texorpdfstring{analog\+Read\+Oversample\+\_\+\+Debug(int pin, int adc\+\_\+bits=10, int nsamples=1)}{analogReadOversample_Debug(int pin, int adc_bits=10, int nsamples=1)}}]{\setlength{\rightskip}{0pt plus 5cm}float Logger\+::analog\+Read\+Oversample\+\_\+\+Debug (
+\begin{DoxyParamCaption}
+\item[{int}]{pin, }
+\item[{int}]{adc\+\_\+bits = {\ttfamily 10}, }
+\item[{int}]{nsamples = {\ttfamily 1}}
+\end{DoxyParamCaption}
+)}\hypertarget{classLogger_a02c147268f3bd5bd55b8c632c9e5ab9f}{}\label{classLogger_a02c147268f3bd5bd55b8c632c9e5ab9f}
+This function incorporates oversampling to extend the A\+DC precision past ten bits by taking more readings and statistically combing them.
+
+It is often used within other sensor functinons to increase measurement precision.
+
+{\ttfamily pin} is the analog pin number
+
+{\ttfamily adc\+\_\+bits} is the reading precision in bits (2$^\wedge$adc\+\_\+bits). The A\+T\+Mega328 (Arduino Uno and A\+Log Bottle\+Logger core chip) has a base A\+DC precision of 10 bits (returns values of 0-\/1023) A reasonable maximum precision gain is (base\+\_\+value\+\_\+bits)+6, so 16 bits is a reasonable maximum precision for the A\+Log Bottle\+Logger.
+
+{\ttfamily nsamples} is the number of times you want to poll the particular sensor and write the output to file.
+
+Example\+: 
+\begin{DoxyCode}
+\textcolor{comment}{// 12-bit measurement of Pin 2; maintain default single reading}
+analogReadOversample(2, 12)
+\end{DoxyCode}
+
+
+\char`\"{}\+Debug\char`\"{} in this function name means that there is a file called \char`\"{}\+Oversample.\+txt\char`\"{} that contains all of the values read during the oversampling.
+
+Readings that require more bits of precision will take longer.
+
+For basic analog measurements, you may also use the standard Arduino \char`\"{}\+Analog\+Read\char`\"{} function.
+
+Based on e\+R\+Ca\+Guy\+\_\+\+New\+Analog\+Read\+::take\+Samples(uint8\+\_\+t analog\+Pin)\index{Logger@{Logger}!Tipping\+Bucket\+Rain\+Gage@{Tipping\+Bucket\+Rain\+Gage}}
+\index{Tipping\+Bucket\+Rain\+Gage@{Tipping\+Bucket\+Rain\+Gage}!Logger@{Logger}}
+\subsubsection[{\texorpdfstring{Tipping\+Bucket\+Rain\+Gage()}{TippingBucketRainGage()}}]{\setlength{\rightskip}{0pt plus 5cm}void Logger\+::\+Tipping\+Bucket\+Rain\+Gage (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classLogger_a290239fff83685a02c0d9084c1a80b03}{}\label{classLogger_a290239fff83685a02c0d9084c1a80b03}
+S\+T\+A\+RT T\+E\+M\+P\+O\+R\+A\+RY C\+O\+DE TO N\+O\+TE B\+U\+C\+K\+ET T\+IP R\+E\+S\+P\+O\+N\+SE
+
+E\+ND T\+E\+M\+P\+O\+R\+A\+RY C\+O\+DE TO N\+O\+TE B\+U\+C\+K\+ET T\+IP R\+E\+S\+P\+O\+N\+SE
+
+S\+T\+A\+RT T\+E\+M\+P\+O\+R\+A\+RY C\+O\+DE TO N\+O\+TE B\+U\+C\+K\+ET T\+IP R\+E\+S\+P\+O\+N\+SE
+
+E\+ND T\+E\+M\+P\+O\+R\+A\+RY C\+O\+DE TO N\+O\+TE B\+U\+C\+K\+ET T\+IP R\+E\+S\+P\+O\+N\+SE 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+Logger.\+h\item 
+Logger.\+cpp\end{DoxyCompactItemize}
