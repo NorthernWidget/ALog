@@ -1369,23 +1369,29 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
              float ADC_resolution_nbits){
 
   /**
-   * This function measures the relative humidity of using a HTM1500 relative humidity sensor and an external thermistor.
-   * The relative humidity and temperature is measured using a 14 bit oversampling method.
-   * Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
+   * This function measures the relative humidity of using a HTM1500 relative 
+   * humidity sensor and an external thermistor.
+   * The relative humidity and temperature is measured using a 14 bit 
+   * oversampling method.
+   * Results are displayed on the serial monitor and saved onto the SD card 
+   * to four decimal places.
    * 
-   * \b humidPin is the analog pin connected to the humidity output voltage of the module.
+   * \b humidPin is the analog pin connected to the humidity output voltage 
+   * of the module.
    * 
    * \b R0 is a thermistor calibration.
    * 
    * \b B is the β parameter of the thermistor.
    * 
-   * \b Rref is the resistance of the corresponding reference resistor for that analog pin.
+   * \b Rref is the resistance of the corresponding reference resistor for 
+   * that analog pin.
    * 
    * \b T0degC is a thermistor calibration.
    * 
    * \b thermPin is the analog pin number to be read.
    * 
-   * \b thermPin is the analog pin connected to the tempurature output voltage of the module.
+   * \b thermPin is the analog pin connected to the tempurature output voltage 
+   * of the module.
    * 
    * Example:
    * ```
@@ -1447,26 +1453,34 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   //    Should we oversample?
 
   /**
-   * This function measures the distance between the ultrasonic sensor and an acustically reflective surface, typically water or snow.
+   * This function measures the distance between the ultrasonic sensor and an 
+   * acustically reflective surface, typically water or snow.
    * Measures distance in centimeters.
    * Results are displayed on the serial monitor and saved onto the SD card.
    * 
-   * \b nping is the number of range readings to take (number of pings).  The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.
+   * \b nping is the number of range readings to take (number of pings).  
+   * The mean range will be calculated and output to the serial monitor and 
+   * SD card followed by the standard deviation.
    * 
-   * \b EX is a digital output pin used for an excitation pulse.  If maxbotix sensor is continuously powered a reading will be taken when this pin is flashed high.
+   * \b EX is a digital output pin used for an excitation pulse.  If maxbotix 
+   * sensor is continuously powered a reading will be taken when this pin is 
+   * flashed high.
    * Set to '99' if excitation pulse is not needed.
    * 
    * \b sonicPin is the analog input channel hooked up to the maxbotix sensor.
    * 
-   * \b writeAll will write each reading of the sensor (each ping) to the serial monitor and SD card.
+   * \b writeAll will write each reading of the sensor (each ping) to the 
+   * serial monitor and SD card.
    * 
    * Example:
    * ```
    * logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);
    * ```
    * Note that sensor should be mounted away from supporting structure.
-   * For a mast that is 5 meters high (or higher) the sensor should be mounted at least 100cm away from the mast.
-   * For a mast that is 2.5 meters high (or lower) the sensor should be at least 75cm away from the mast.
+   * For a mast that is 5 meters high (or higher) the sensor should be 
+   * mounted at least 100cm away from the mast.
+   * For a mast that is 2.5 meters high (or lower) the sensor should be 
+   * at least 75cm away from the mast.
   */
   
   float range; // The most recent returned range
@@ -1476,8 +1490,8 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
 
 //  Serial.println();
   // Get range measurements
-  // Get rid of any trash; Serial.flush() unnecessary; main thing that is important is
-  // getting the 2 pings of junk out of the way
+  // Get rid of any trash; Serial.flush() unnecessary; main thing that 
+  // is important is getting the 2 pings of junk out of the way
   Serial.flush();
   for (int i=1; i<=2; i++){
     if(EX != 99){
@@ -1640,44 +1654,6 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   Serial.print(F(","));
 
 }
-
-/* *Andy* DELETE THIS FUNCTION?
-void Logger::maxbotixHRXL_WR_analog_oneping(int sonicPin){
-  // WRITTEN B/C SD WRITES FAILING WITH ANY FOR LOOP USAGE!
-  // ACTUALLY, NOT JUST THIS -- REASSIGNING VARIABLE?
-  // Returns distance in mm, +/- 5 mm
-  // Each 10-bit ADC increment corresponds to 5 mm.
-  // set EX=99 if you don't need it (or leave it clear -- this is default)
-  // Default nping=10 and sonicPin=A0
-  // Basically only differs from older MB sensor function in its range scaling
-  // and its added defaults.
-  
-  int meanRange; // The average range over all the pings
-  int sp; // analog reading of sonic pin; probably unnecessary, but Arduino warns against having too many fcns w/ artihmetic, I think
-
-  // Get the first readings out of the way before doing the real one  
-  //analogRead(sonicPin);
-  //delay(100);
-  //analogRead(sonicPin);
-  delay(300);
-  sp = analogReadOversample(sonicPin, 14);
-  meanRange = (sp + 1) * 5;
-  ///////////////
-  // SAVE DATA //
-  ///////////////
-
-  datafile.print(meanRange);
-  datafile.print(F(","));
-  //datafile.print(sigma);
-  //datafile.print(F(","));
-
-  // Echo to serial
-  Serial.print(meanRange);
-  Serial.print(F(","));
-  //Serial.print(sigma);
-  //Serial.print(F(","));
-
-}*/
 
 float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, int maxRange, bool RS232){
   // Stores the ranging output from the MaxBotix sensor
