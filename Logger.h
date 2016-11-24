@@ -60,7 +60,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <math.h>
 #include <avr/sleep.h>
 #include <avr/wdt.h>
-#include <stdlib.h> // For turning incoming ASCII character strings into int with atol
+#include <stdlib.h> // For turning incoming ASCII character
+                    // strings into int with atol
 
 // Sensor-centric libraries
 //#include <Adafruit_Sensor.h>
@@ -82,7 +83,9 @@ class Logger {
     Logger();
     
     // Initialization
-    void initialize(char* _logger_name, char* _sitecode, int _dayInterval, int _hourInterval, int _minInterval, int _secInterval, bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false);
+    void initialize(char* _logger_name, char* _sitecode, int _dayInterval, \
+                    int _hourInterval, int _minInterval, int _secInterval, \
+                    bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false);
     void setupLogger();
     
     // Code for sleeping, starting up from sleep, synching SD card
@@ -99,26 +102,49 @@ class Logger {
     float readPin(int pin);
     float readPinOversample(int pin, int bits);
     float analogReadOversample(int pin, int adc_bits=10, int nsamples=1);
-    float analogReadOversample_Debug(int pin, int adc_bits=10, int nsamples=1);  //debug tool delete when finished
-    float thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side=true);
-    float thermistorB_Debug(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side=true); //delete when done debugging
-    void ultrasonicMB_analog_1cm(int nping,int EX,int sonicPin,bool writeAll); // Print order: Distance [cm], standard deviation [cm]
-    float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, int maxRange, bool RS232=false);
-    void maxbotixHRXL_WR_analog(int nping=10,int sonicPin=A0,int EX=99,bool writeAll=true); // Print order: Distance [cm], standard deviation [cm]
-    //void decagon5TE(int excitPin, int dataPin); // Print order: Dielectric permittivity [-unitless-], Electrical Conductivity [dS/m], Temperature [degrees C]
+    //debug tool delete when finished
+    float analogReadOversample_Debug(int pin, int adc_bits=10, int nsamples=1);
+    float thermistorB(float R0, float B, float Rref, float T0degC, \
+                      int thermPin, bool Rref_on_GND_side=true);
+    //debug tool delete when finished
+    float thermistorB_Debug(float R0, float B, float Rref, float T0degC, \
+                            int thermPin, bool Rref_on_GND_side=true);
+    // Print order: Distance [cm], standard deviation [cm]
+    void ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, \
+                                 bool writeAll);
+    float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, \
+                                 int maxRange, bool RS232=false);
+    // Print order: Distance [cm], standard deviation [cm]
+    void maxbotixHRXL_WR_analog(int nping=10, int sonicPin=A0, int EX=99, \
+                                bool writeAll=true);
+    // Print order: Dielectric permittivity [-unitless-], 
+    // Electrical Conductivity [dS/m], Temperature [degrees C]
+    //void decagon5TE(int excitPin, int dataPin);
     void maxbotixHRXL_WR_analog_oneping(int sonicPin);
     void DecagonGS1(int pin, float Vref);
     void vdivR(int pin, float Rref, bool Rref_on_GND_side=true);
-    void vdivR_Debug(int pin, float Rref, bool Rref_on_GND_side=true);  //debug tool delete when finished
+    //debug tool delete when finished
+    void vdivR_Debug(int pin, float Rref, bool Rref_on_GND_side=true);
     void flex(int flexPin, float Rref, float calib1, float calib2);
-    void linearPotentiometer(int linpotPin, float Rref, float slope, float intercept);
-    void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
+    void linearPotentiometer(int linpotPin, float Rref, float slope, \
+                             float intercept);
+    void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, \
+                         uint32_t baudRate=38400, bool printReturn=true, \
+                         bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref);
-    void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin);
-    void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float V_ADC, float VDD, float R0, float B, float Rref, float T0degC, int thermPin);
-    void Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation);
+    void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, \
+                                        float R0, float B, float Rref, \
+                                        float T0degC, int thermPin);
+    void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
+                                               float V_ADC, float VDD, \
+                                               float R0, float B, float Rref, \
+                                               float T0degC, int thermPin);
+    void Anemometer_reed_switch(int interrupt_number, 
+                                unsigned long reading_duration_milliseconds, \
+                                float meters_per_second_per_rotation);
     void Wind_Vane_Inspeed(int vanePin);
-    void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref);
+    void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
+                     float gain, float V_ref);
     //void Barometer_BMP180();
     
     // Sensors - triggered
@@ -127,7 +153,8 @@ class Logger {
     // Rain gage - will wake logger up and cause it to log to a different file
     // The default interrupt is Pin 3, INT1 on ATmega328 (ALog BottleLogger)
     void TippingBucketRainGage();
-    float Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, int pin);
+    float Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, \
+                               int TransferFunction, int units, int pin);
 
   private:
     void pinUnavailable(int pin);
@@ -137,7 +164,8 @@ class Logger {
     void sleepNow();
     void sleepNow_nap();
     // wakeUpNow defined outside of class; see above
-    void alarm(int dayInterval ,int hourInterval, int minInterval, int secInterval);
+    void alarm(int dayInterval ,int hourInterval, int minInterval, \
+               int secInterval);
     void displayAlarms(); //debug tool delete if desired.
     void checkAlarms();  //debug tool delete if desired. 
     void checkTime();   //debug tool delete if desired. 
@@ -170,11 +198,15 @@ class Logger {
 		byte& Hour, byte& Minute, byte& Second);
     
     // Sensor utility codes
-    float _vdivR(int pin, float Rref, int adc_bits=10, bool Rref_on_GND_side=true);
-    float _vdivR_Debug(int pin, float Rref, int adc_bits=10, bool Rref_on_GND_side=true); //Debug tool delete when finished
+    float _vdivR(int pin, float Rref, int adc_bits=10, \
+                 bool Rref_on_GND_side=true);
+    //Debug tool delete when finished
+    float _vdivR_Debug(int pin, float Rref, int adc_bits=10, \
+                       bool Rref_on_GND_side=true);
     int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
     int maxbotix_Serial_parse(int Ex);
-    float standard_deviation_from_array(float values[], int nvalues, float mean);
+    float standard_deviation_from_array(float values[], int nvalues, \
+                                        float mean);
     float standard_deviation_from_array(int values[], int nvalues, float mean);
 
     
