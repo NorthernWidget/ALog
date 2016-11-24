@@ -1277,40 +1277,57 @@ float Logger::thermistorB_Debug(float R0,float B,float Rref,float T0degC,int the
 // by TE Connectivity Measurement Specialties
 ///////////////////////////////////////////////
 
-void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rref){
+void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
+                                float Rref_therm, float ADC_resolution_nbits){
 
   /**
-   * This function measures the relative humidity of using a HTM2500 tempurature and relative humidity module.
-   * The relative humidity and temperature is measured using a 14 bit oversampling method.
-   * Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
+   * This function measures the relative humidity of using a HTM2500
+   * tempurature and relative humidity module.
+   * The relative humidity and temperature is measured using a 14 bit
+   * oversampling method.
+   * Results are displayed on the serial monitor and saved onto the SD 
+   * card to four decimal places.
    * 
-   * \b humidPin is the analog pin connected to the humidity output voltage of the module.
+   * \b humidPin is the analog pin connected to the humidity output voltage 
+   * of the module.
    * 
-   * \b thermPin is the analog pin connected to the tempurature output voltage of the module.
+   * \b thermPin is the analog pin connected to the tempurature output voltage 
+   * of the module.
    * 
-   * \b Rref is for the thermistor input (resistance)
+   * \b Rref_therm is the value of the reference resistor that you use
+   * with the built-in thermistor (reference resistor supplied separately,
+   * placed in appropriate slot in header)
+   *
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10)
    * 
    * Example:
    * ```
    * logger.HTM2500LF_humidity_temperature(1, 2, ?);
-
    * ```
-   * *Andy* Rref is not used, why do we have this input?  It is hard coded as 10K.
-   * 
+   *
+   * This function is designed for ratiometric operation -- that is, the 
+   * humidity sensor must be powered by the same voltage regulator that is
+   * connected to the the analog reference pin -- for the ALog v2.0, this is
+   * a high-precision 3V3 regulator.
   */
 
   // First, measure these pins
   // This will fully calculate and write the temperature data, too.
-  float V_humid_norm = analogReadOversample(humidPin, 14)/1023.; // 0-1
-  float Tmin = thermistorB(10000, 3347, 10000, 25, thermPin, false);
-  float Ttyp = thermistorB(10000, 3380, 10000, 25, thermPin, false);
-  float Tmax = thermistorB(10000, 3413, 10000, 25, thermPin, false);
-  
+  // Normalized to 0-1 range
+  float V_humid_norm = analogReadOversample(humidPin, ADC_resolution_nbits) \
+                                                                 /1023.; // 0-1
+  // Commenting out low and high temperature readings;
+  // can calculate these after the fact, if needed
+  // float Tmin = thermistorB(10000, 3347, Rref_therm, 25, thermPin, false);
+  float Ttyp = thermistorB(10000, 3347, Rref_therm, 25, thermPin, false);
+  //float Tmax = thermistorB(10000, 3413, Rref_therm, 25, thermPin, false);
   // Then, convert the normalized voltage into a humidity reading
   // The calibration is created for a 5V input, but the data sheet says it
   // is ratiometric, so I think I will just renormalize the voltage to
   // pretend that it is 5V input in order to get the right input values
-  // for the equation. Just multiply by 5!
+  // for the equation. Just multiply by 5, and then I can use the equation
+  // that is designed for 5V!
   
   // T error is small, and has a small effect on humidity -- much smaller 
   // than published error (see data sheet) -- maybe eventually code error
@@ -1346,7 +1363,10 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, float Rr
 // by TE Connectivity Measurement Specialties
 ///////////////////////////////////////////////
 
-void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin){
+void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
+             float R0_therm, float B_therm, float Rref_therm, \
+             float T0degC_therm, int thermPin_therm, \
+             float ADC_resolution_nbits){
 
   /**
    * This function measures the relative humidity of using a HTM1500 relative humidity sensor and an external thermistor.
@@ -1354,8 +1374,6 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, float Vre
    * Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
    * 
    * \b humidPin is the analog pin connected to the humidity output voltage of the module.
-   * 
-   * \b Vref *Andy*
    * 
    * \b R0 is a thermistor calibration.
    * 
