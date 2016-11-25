@@ -839,35 +839,13 @@ delay(2);
     Serial.println();
     }
 
-float Logger::_vdivR(int pin, float Rref, int adc_bits, bool Rref_on_GND_side){
+float Logger::_vdivR(int pin, float Rref, int adc_bits, \
+                     bool Rref_on_GND_side, bool oversample_debug){
   // Same as public vidvR code, but returns value instead of 
   // saving it to a file
   float _ADC;
   float _R;
-  _ADC = analogReadOversample(pin, adc_bits);
-  float _ADCnorm = _ADC/1023.0; // Normalize to 0-1
-  if(Rref_on_GND_side){
-    // Standard case for the provided slots for reference resistors
-    // This is the default.
-    _R = Rref/_ADCnorm - Rref; // R1 = (R2*Vin)/Vout - R2
-  }
-  else {
-    // This could happen if an external sensor has a different setup for
-    // its known and unknown resistors; in this case, place the reference
-    // resistor between the analog pin and 3V3. (The sensor, internally, 
-    // has its thermistor connected to GND.)
-    _R = Rref * (1. / ((1./_ADCnorm) - 1.)); // R2 = R1* (1 / ((Vin/Vout) - 1))
-  }
-  return _R;
-}
-
-////Debug tool for recording oversample readings
-float Logger::_vdivR_Debug(int pin, float Rref, int adc_bits, bool Rref_on_GND_side){
-  // Same as public vidvR code, but returns value instead of 
-  // saving it to a file
-  float _ADC;
-  float _R;
-  _ADC = analogReadOversample_Debug(pin, adc_bits);
+  _ADC = analogReadOversample_Debug(pin, adc_bits, 1, oversample_debug);
   float _ADCnorm = _ADC/1023.0; // Normalize to 0-1
   if(Rref_on_GND_side){
     // Standard case for the provided slots for reference resistors
@@ -1136,7 +1114,7 @@ return pinValue;
 
 float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
                           int thermPin, bool Rref_on_GND_side, \
-                          uint8_t ADC_resolution_nbits){
+                          uint8_t ADC_resolution_nbits, bool debug){
 
   /**
    * This function measures temperature using a thermistor characterised with the B (or β) parameter Steinhart-Hart equation.
@@ -1157,6 +1135,9 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
    * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals.
    * 
+   * \b oversample_debug is true if you want a separate file, "Oversample.txt", 
+   * to record every individual reading used in the oversampling
+   * 
    * Example:
    * ```
    * // Contherm from Digikey
@@ -1169,7 +1150,12 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
   */
 
   // Voltage divider
-  float Rtherm = _vdivR(thermPin, Rref, ADC_resolution_nbits, Rref_on_GND_side);
+  float Rtherm = _vdivR(thermPin, Rref, ADC_resolution_nbits, \
+                        Rref_on_GND_side, oversample_debug);
+  }
+   * "Debug" in this function name means that there is a file called
+   * "Oversample.txt" that contains all of the values read during the
+   * oversampling.
   
   // B-value thermistor equations
   float T0 = T0degC + 273.15;
@@ -1197,82 +1183,6 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
 
   return T;
 
-}
-
-// Thermistor - with b-value //Temp debugging code - delete
-//////////////////////////////
-
-float Logger::thermistorB_Debug(float R0, float B, float Rref, float T0degC, int thermPin, bool Rref_on_GND_side){
-
-  /**
-   * This function measures temperature using a thermistor characterised with the B (or β) parameter Steinhart-Hart equation.
-   * The function compares the thermistor risistance with the reference resistor using a 14 bit precision voltage divider output reading.
-   * The function returns a float of the temperature in celsius.
-   * Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
-   * 
-   * \b R0 is a thermistor calibration.
-   * 
-   * \b B is the β parameter of the thermistor.
-   * 
-   * \b Rref is the resistance of the corresponding reference resistor for that analog pin.
-   * 
-   * \b T0degC is a thermistor calibration.
-   * 
-   * \b thermPin is the analog pin number to be read.
-   * 
-   * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
-   * True if using Alog provided Reference resistor terminals.
-   * 
-   * Example:
-   * ```
-   * // Contherm from Digikey
-   * logger.thermistorB(10000,3950,30000,25,2);
-   * // EPCOS, DigiKey # 495-2153-ND
-   * logger.thermistorB(10000,3988,13320,25,1);
-   * ```
-   * 
-   * "Debug" in this function name means that there is a file called
-   * "Oversample.txt" that contains all of the values read during the
-   * oversampling.
-   * 
-  */
-  datafile.println();
-  datafile.close();
-
-  delay(30);
-
-
-  // Voltage divider
-  float Rtherm = _vdivR_Debug(thermPin,Rref,14,Rref_on_GND_side);
- 
-  // B-value thermistor equations
-  float T0 = T0degC + 273.15;
-  float Rinf = R0*exp(-B/T0);
-  float T = B / log(Rtherm/Rinf);
-  
-  // Convert to celsius
-  T = T - 273.15;
-  
-  ///////////////
-  // SAVE DATA //
-  ///////////////
- 
-  // SD write
-//  datafile.print(Rtherm, 2);
-//  datafile.print(F(","));
-  otherfile.print(T, 4);
-  otherfile.print(F(","));
-
-  end_logging_to_otherfile();
-
-  // Echo to serial
-//  Serial.print(Rtherm, 2);
-//  Serial.print(F(","));
-//  Serial.print(T, 4);
-//  Serial.print(F(","));
-
-  return T;
-  
 }
 
 // HTM2500LF Humidity and Temperature Sensor
@@ -1990,149 +1900,88 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
   Serial.print(F(","));
 }
 
-float Logger::analogReadOversample(int pin, int adc_bits, int nsamples){
+float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
+                                   bool debug){
 
   /**
    * This function incorporates oversampling to extend the ADC precision
    * past ten bits by taking more readings and statistically combing them.
-   * 
-   * It is often used within other sensor functinons to increase measurement
-   * precision.
-   * 
-   * \b pin is the analog pin number
-   * 
-   * \b adc_bits is the reading precision in bits (2^adc_bits).
-   * The ATMega328 (Arduino Uno and ALog BottleLogger core chip)
-   * has a base ADC precision of 10 bits (returns values of 0-1023)
-   * A reasonable maximum precision gain is (base_value_bits)+6, so
-   * 16 bits is a reasonable maximum precision for the ALog BottleLogger.
-   * 
-   * \b nsamples is the number of times you want to poll the particular 
-   * sensor and write the output to file.
-   * 
-   * Example:
-   * ```
-   * // 12-bit measurement of Pin 2
-   * // Leaves nsamples at its default value of 1 (single reading of sensor)
-   * logger.analogReadOversample(2, 12);
-   * ```
-   * 
-   * Readings that require more bits of precision will take longer.
-   * 
-   * For analog measurements which do not require more than 10 bits of precision, 
-   * use logger.readpin(int pin) or the standard Arduino "AnalogRead" function.
-   * 
-   * Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
-   * 
-   * 
-  */
-
-  float analog_reading;
-
-  uint8_t n = adc_bits - 10; //"rightshift" value, AKA: "n"
-  unsigned long oversample_num = 1UL<<(2*n); //4^n; best & fastest method to do 4 to a power
-  unsigned int divisor = 1<<n; //same thing as 2^n
-
-  //outer loop: get the number of samples to avg
-  unsigned long reading_sum = 0;
-  for (unsigned long i=0; i<nsamples; i++)
-  {
-    //inner loop: do oversampling, per AVR121 Application Note, in order to enhance resolution of 10-bit ADC
-    unsigned long inner_sum = 0;
-    for (unsigned long j=0; j<oversample_num; j++)
-    {
-      inner_sum += analogRead(pin); //take a 10-bit reading on the Arduino ADC
-    }
-    //Convert these many 10-bit samples to a single higher-resolution sample:
-    //Standard Method:
-    //unsigned int reading = inner_sum >> n; //See AVR121 Application Note
-    //Rounding Method (to nearest integer):
-    unsigned long reading = (inner_sum + (unsigned long)divisor/2UL) >> n; //See AVR121 
-    reading_sum += reading;
-  }
-  float avg_reading = (float)reading_sum/(float)nsamples;
-
-  // Normalize to 10 bits for all of the stuff here that expects that
-  float precision_above_ten = pow(2., adc_bits - 10.);
-  // float avg_reading_norm_to_ten_bits = ... keeping old name
-  analog_reading = avg_reading / precision_above_ten; // 0-1023, but float
-
-  return analog_reading;
-}
-
-float Logger::analogReadOversample_Debug(int pin, int adc_bits, int nsamples){
-  /**
-   * This function incorporates oversampling to extend the ADC precision
-   * past ten bits by taking more readings and statistically combing them.
-   * 
-   * It is often used within other sensor functinons to increase measurement
-   * precision.
-   * 
-   * \b pin is the analog pin number
-   * 
-   * \b adc_bits is the reading precision in bits (2^adc_bits).
-   * The ATMega328 (Arduino Uno and ALog BottleLogger core chip)
-   * has a base ADC precision of 10 bits (returns values of 0-1023)
-   * A reasonable maximum precision gain is (base_value_bits)+6, so
-   * 16 bits is a reasonable maximum precision for the ALog BottleLogger.
-   * 
-   * \b nsamples is the number of times you want to poll the particular 
-   * sensor and write the output to file.
-   * 
-   * Example:
-   * ```
-   * // 12-bit measurement of Pin 2
-   * // Leaves nsamples at its default value of 1 (single reading of sensor)
-   * logger.analogReadOversample(2, 12);
-   * ```
-   * 
-   * "Debug" in this function name means that there is a file called
-   * "Oversample.txt" that contains all of the values read during the
-   * oversampling.
    *
+   * Returns a floating point number between 0 and 1023 in order to be 
+   * intechangable with the Arduino core AnalogRead() function
+   * 
+   * It is often used within other sensor functinons to increase measurement
+   * precision.
+   * 
+   * \b pin is the analog pin number
+   * 
+   * \b adc_bits is the reading precision in bits (2^adc_bits).
+   * The ATMega328 (Arduino Uno and ALog BottleLogger core chip)
+   * has a base ADC precision of 10 bits (returns values of 0-1023)
+   * A reasonable maximum precision gain is (base_value_bits)+6, so
+   * 16 bits is a reasonable maximum precision for the ALog BottleLogger.
+   * 
+   * \b nsamples is the number of times you want to poll the particular 
+   * sensor and write the output to file.
+   * 
+   * \b debug is a flag that, if true, will write all of the values read during
+   * the oversampling to "Oversample.txt".
+   * 
+   * Example:
+   * ```
+   * // 12-bit measurement of Pin 2
+   * // Leaves nsamples at its default value of 1 (single reading of sensor)
+   * logger.analogReadOversample(2, 12);
+   * ```
+   * 
    * Readings that require more bits of precision will take longer.
    * 
-   * For analog measurements which do not require more than 10 bits of precision, 
+   * For analog measurements that do not require more than 10 bits of precision, 
    * use logger.readpin(int pin) or the standard Arduino "AnalogRead" function.
    * 
    * Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
    * 
    * 
   */
-
-  start_logging_to_otherfile("Oversample.txt");
-
+  
+  if(debug){
+    start_logging_to_otherfile("Oversample.txt");
+  }
   float analog_reading;
 
   uint8_t n = adc_bits - 10; //"rightshift" value, AKA: "n"
-  unsigned long oversample_num = 1UL<<(2*n); //4^n; best & fastest method to do 4 to a power
-  unsigned int divisor = 1<<n; //same thing as 2^n
+  // Bit shift to calculate 4^n
+  // (Best and fastest method to calculate 4 to a power)
+  unsigned long oversample_num = 1UL<<(2*n);
+  // Bit shift to calculate 2^n
+  unsigned int divisor = 1<<n;
 
   //outer loop: get the number of samples to avg
   unsigned long reading_sum = 0;
   for (unsigned long i=0; i<nsamples; i++)
   {
-    //inner loop: do oversampling, per AVR121 Application Note, in order to enhance resolution of 10-bit ADC
+    //inner loop: do oversampling, per AVR121 Application Note,
+    // in order to enhance resolution of 10-bit ADC
     unsigned long inner_sum = 0;
-
     for (unsigned long j=0; j<oversample_num; j++)
     {
       inner_sum += analogRead(pin); //take a 10-bit reading on the Arduino ADC
-      otherfile.print(analogRead(pin));
-      otherfile.print(F(","));
+      if(debug){
+        otherfile.print(analogRead(pin));
+        otherfile.print(F(","));
+      }
     }
     //Convert these many 10-bit samples to a single higher-resolution sample:
     //Standard Method:
     //unsigned int reading = inner_sum >> n; //See AVR121 Application Note
     //Rounding Method (to nearest integer):
-    unsigned long reading = (inner_sum + (unsigned long)divisor/2UL) >> n; //See AVR121 
+    unsigned long reading = (inner_sum + (unsigned long)divisor/2UL) >> n;
     reading_sum += reading;
   }
   float avg_reading = (float)reading_sum/(float)nsamples;
 
   // Normalize to 10 bits for all of the stuff here that expects that
   float precision_above_ten = pow(2., adc_bits - 10.);
-  // float avg_reading_norm_to_ten_bits = ... keeping old name
   analog_reading = avg_reading / precision_above_ten; // 0-1023, but float
 
   return analog_reading;
