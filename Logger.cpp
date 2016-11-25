@@ -1134,7 +1134,9 @@ return pinValue;
 // Thermistor - with b-value
 //////////////////////////////
 
-float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side){
+float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
+                          int thermPin, bool Rref_on_GND_side, \
+                          uint8_t ADC_resolution_nbits){
 
   /**
    * This function measures temperature using a thermistor characterised with the B (or β) parameter Steinhart-Hart equation.
@@ -1167,7 +1169,7 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
   */
 
   // Voltage divider
-  float Rtherm = _vdivR(thermPin,Rref,14,Rref_on_GND_side);
+  float Rtherm = _vdivR(thermPin, Rref, ADC_resolution_nbits, Rref_on_GND_side);
   
   // B-value thermistor equations
   float T0 = T0degC + 273.15;
@@ -1200,7 +1202,7 @@ float Logger::thermistorB(float R0,float B,float Rref,float T0degC,int thermPin,
 // Thermistor - with b-value //Temp debugging code - delete
 //////////////////////////////
 
-float Logger::thermistorB_Debug(float R0,float B,float Rref,float T0degC,int thermPin,bool Rref_on_GND_side){
+float Logger::thermistorB_Debug(float R0, float B, float Rref, float T0degC, int thermPin, bool Rref_on_GND_side){
 
   /**
    * This function measures temperature using a thermistor characterised with the B (or β) parameter Steinhart-Hart equation.
@@ -1278,7 +1280,7 @@ float Logger::thermistorB_Debug(float R0,float B,float Rref,float T0degC,int the
 ///////////////////////////////////////////////
 
 void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
-                                float Rref_therm, float ADC_resolution_nbits){
+                                float Rref_therm, uint8_t ADC_resolution_nbits){
 
   /**
    * This function measures the relative humidity of using a HTM2500
@@ -1366,7 +1368,7 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
 void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
              float R0_therm, float B_therm, float Rref_therm, \
              float T0degC_therm, int thermPin_therm, \
-             float ADC_resolution_nbits){
+             uint8_t ADC_resolution_nbits){
 
   /**
    * This function measures the relative humidity of using a HTM1500 relative 
@@ -1777,6 +1779,8 @@ int Logger::maxbotix_Serial_parse(int Ex){
   return r3;
 }
 
+// CURRENTLY NOT USED -- ADW DOES NOT TRUST SOFTWARE SERIAL TO MAINTAIN
+// TIMING (AND NOT HANG)
 int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
   // Excites the MaxBotix sensor and receives its ranging output
   char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
@@ -1810,21 +1814,19 @@ int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
   //return atol(r2); // Return integer values in mm; no parsing of error values
 }
 
-void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float V_ADC, float VDD, float R0, float B, float Rref, float T0degC, int thermPin){
+void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
+                                                   float V_ADC, float VDD, \
+                                                   float R0, float B, \
+                                                   float Rref, float T0degC, \
+                                                   int thermPin, \
+                                                   float ADC_resolution_nbits){
   // +/- 90 degree inclinometer, measures +/- 1.0g
   // Needs 4.75--5.25V input
   // This function works with the analog outputs
   // Turned on and off by a switching 5V charge pump or boost converter
   
-  //int _ADCx = analogRead(xPin);
-  //int _ADCy = analogRead(yPin);
-  
-  //float Vout_x = (_ADCx / 1023.) * VDD;
-  //float Vout_y = (_ADCy / 1023.) * VDD;
-
-  // Hard-code the oversampling for now
-  float Vout_x = (analogReadOversample(xPin, 14) / 1023.) * V_ADC;
-  float Vout_y = (analogReadOversample(yPin, 14) / 1023.) * V_ADC;
+  float Vout_x = (analogReadOversample(xPin, ADC_resolution_nbits) / 1023.) * V_ADC;
+  float Vout_y = (analogReadOversample(yPin, ADC_resolution_nbits) / 1023.) * V_ADC;
   
   float Offset = VDD/2.;
   float Sensitivity = 2.;
@@ -1876,7 +1878,10 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, float V_A
 
 }
 
-void Logger::Anemometer_reed_switch(int interrupt_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation){
+void Logger::Anemometer_reed_switch(int interrupt_number, \
+                                    unsigned long \
+                                      reading_duration_milliseconds, \
+                                    float meters_per_second_per_rotation){
   // Meters per second per rotation:
   // Inspeed anemometer that we have: 2.5 mph/Hz
   //                                  = 1.1176 (m/s)/Hz
@@ -1958,14 +1963,17 @@ void Logger::Wind_Vane_Inspeed(int vanePin){
   Serial.print(F(","));
 }
 
-void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref){
+void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
+                         float gain, float V_ref, \
+                         uint8_t ADC_resolution_nbits){
   // Using an instrumentation amplifier with a Pyranometer
   // Kipp and Zonen: nominal raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
   // Actual raw output is based on calibration
   
-  // Hard-code the oversampling for now to 14 bits
+  // V
   // Vref V --> mV
-  float Vin = (analogReadOversample(analogPin, 14) / 1023.) * V_ref * 1000.;
+  float Vin = (analogReadOversample(analogPin, ADC_resolution_nbits) / 1023.) \
+              * V_ref * 1000.;
   //float Vin = V_ref * 1000. * analogRead(analogPin) / 1023.; // No oversampling
   float Radiation_W_m2 = Vin / (raw_mV_per_W_per_m2 * gain);
   
@@ -2551,32 +2559,13 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 //  }
 //}
 
-void Logger::DecagonGS1(int pin, float Vref){
+void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
   // Vref in volts
   float _ADC;
   float voltage;
   float volumetric_water_content;
-  //unsigned long inner_sum = 0;
-  //_ADC = analogReadOversample(pin, 14); // 0-1023
-  //_ADC = analogRead(pin);
-  _ADC = analogReadOversample(pin, 14);
+  _ADC = analogReadOversample(pin, ADC_resolution_nbits);
   voltage = Vref * _ADC / 1023.;
-  
-  // Will not write to SD card, even when oversampling is down to just this
-  // small amount of code/overhead! For either the unsigned long or float cases.
-  // But will send values back to Serial.
-  // Why???
-  // Was power issue with too much clock on/off
-  /*  
-  // 14 bit reading
-  for (int j=0; j<256; j++)
-  {
-    _ADC += analogRead(pin)/256.;
-    //inner_sum += analogRead(pin); //take a 10-bit reading on the Arduino ADC
-  }
-  //_ADC = inner_sum / 256.;
-  voltage = Vref * _ADC / 1023.;
-  */
   
   // Standard Decagon equation -- linear, for up to 60% VWC
   volumetric_water_content = 0.494 * voltage - 0.554;
@@ -2602,13 +2591,13 @@ void Logger::DecagonGS1(int pin, float Vref){
 // Honeywell_HSC_analog
 //////////////////////////////
 
-float Logger::Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, int pin){
+float Logger::Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, int pin, uint8_t ADC_resolution_nbits){
 
   
   // Datasheet: http://sensing.honeywell.com/index.php?ci_id=151133  
 
   // Read pin voltage
-  float reading = analogReadOversample(pin, 14);  //hardcoded for 14 bits
+  float reading = analogReadOversample(pin, ADC_resolution_nbits);  //hardcoded for 14 bits
   float Vout = reading/1023*3.3;
   
   // Apply transfer function 
