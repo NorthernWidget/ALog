@@ -104,12 +104,9 @@ class Logger {
     float analogReadOversample(int pin, int adc_bits=10, int nsamples=1, \
                                debug=false);
     //debug tool delete when finished
-    float analogReadOversample_Debug(int pin, int adc_bits=10, int nsamples=1);
     float thermistorB(float R0, float B, float Rref, float T0degC, \
-                      int thermPin, bool Rref_on_GND_side=true);
-    //debug tool delete when finished
-    float thermistorB_Debug(float R0, float B, float Rref, float T0degC, \
-                            int thermPin, bool Rref_on_GND_side=true);
+                      int thermPin, uint8_t ADC_resolution_nbits=14, \
+                      bool Rref_on_GND_side=true; bool oversample_debug=false);
     // Print order: Distance [cm], standard deviation [cm]
     void ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, \
                                  bool writeAll);
@@ -122,34 +119,34 @@ class Logger {
     // Electrical Conductivity [dS/m], Temperature [degrees C]
     //void decagon5TE(int excitPin, int dataPin);
     void maxbotixHRXL_WR_analog_oneping(int sonicPin);
-    void DecagonGS1(int pin, float Vref);
+    void DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits=14);
     void vdivR(int pin, float Rref, bool Rref_on_GND_side=true);
     //debug tool delete when finished
     void vdivR_Debug(int pin, float Rref, bool Rref_on_GND_side=true);
     void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, \
-                             float intercept);
+                             float intercept, uint8_t ADC_resolution_nbits=14);
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, \
                          uint32_t baudRate=38400, bool printReturn=true, \
                          bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
                                         float Rref_therm, \
-                                        float ADC_resolution_nbits=14);
+                                        uint8_t ADC_resolution_nbits=14);
     void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, \
                                         float R0, float B, float Rref, \
                                         float T0degC, int thermPin,
-                                        float ADC_resolution_nbits=14);
+                                        uint8_t ADC_resolution_nbits=14);
     void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
                                                float V_ADC, float VDD, \
                                                float R0, float B, float Rref, \
                                                float T0degC, int thermPin,
-                                               float ADC_resolution_nbits=14);
+                                               uint8_t ADC_resolution_nbits=14);
     void Anemometer_reed_switch(int interrupt_number, 
                                 unsigned long reading_duration_milliseconds, \
                                 float meters_per_second_per_rotation);
     void Wind_Vane_Inspeed(int vanePin);
     void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
-                     float gain, float V_ref);
+                     float gain, float V_ref, uint8_t ADC_resolution_nbits=14);
     //void Barometer_BMP180();
     
     // Sensors - triggered
@@ -159,7 +156,8 @@ class Logger {
     // The default interrupt is Pin 3, INT1 on ATmega328 (ALog BottleLogger)
     void TippingBucketRainGage();
     float Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, \
-                               int TransferFunction, int units, int pin);
+                               int TransferFunction, int units, int pin,
+                               uint8_t ADC_resolution_nbits=14);
 
   private:
     void pinUnavailable(int pin);

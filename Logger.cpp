@@ -1113,8 +1113,8 @@ return pinValue;
 //////////////////////////////
 
 float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
-                          int thermPin, bool Rref_on_GND_side, \
-                          uint8_t ADC_resolution_nbits, bool debug){
+                          int thermPin, uint8_t ADC_resolution_nbits,
+                          bool Rref_on_GND_side, bool oversample_debug){
 
   /**
    * This function measures temperature using a thermistor characterised with the B (or β) parameter Steinhart-Hart equation.
@@ -1902,7 +1902,6 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
 
 float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
                                    bool debug){
-
   /**
    * This function incorporates oversampling to extend the ADC precision
    * past ten bits by taking more readings and statistically combing them.
@@ -2446,7 +2445,7 @@ float Logger::Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int Tr
   // Datasheet: http://sensing.honeywell.com/index.php?ci_id=151133  
 
   // Read pin voltage
-  float reading = analogReadOversample(pin, ADC_resolution_nbits);  //hardcoded for 14 bits
+  float reading = analogReadOversample(pin, ADC_resolution_nbits);
   float Vout = reading/1023*3.3;
   
   // Apply transfer function 
@@ -2509,7 +2508,8 @@ void Logger::flex(int flexPin, float Rref, float calib1, float calib2){
   // FINISH WRITING CODE
 }
 
-void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, float intercept){
+void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
+                                 float intercept, uint8_t ADC_resolution_nbits){
   float _Rpot = _vdivR(linpotPin, Rref);
   float _dist = slope*_Rpot + intercept;
 }
@@ -2565,7 +2565,8 @@ void Logger::announce_start(){
   Serial.println(F(" = this logger's name."));
   Serial.println();
   delay(100);
-  Serial.println(F("********************** Logger initializing. **********************"));
+  Serial.println(\
+    F("********************** Logger initializing. **********************"));
 }
 
 void Logger::startup_sequence(){
