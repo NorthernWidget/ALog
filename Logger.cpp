@@ -1117,35 +1117,45 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
                           bool Rref_on_GND_side, bool oversample_debug){
 
   /**
-   * This function measures temperature using a thermistor characterised with the B (or β) parameter Steinhart-Hart equation.
-   * The function compares the thermistor risistance with the reference resistor using a 14 bit precision voltage divider output reading.
-   * The function returns a float of the temperature in celsius.
-   * Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
+   * This function measures temperature using a thermistor characterised with 
+   * the B (or β) parameter equation, which is a simplification of the 
+   * Steinhart-Hart equation
    * 
-   * \b R0 is a thermistor calibration.
+   * The function compares the thermistor risistance with the reference 
+   * resistor using a voltage divider.
    * 
-   * \b B is the β parameter of the thermistor.
+   * It returns a float of the temperature in degrees celsius.
+   * Results are displayed on the serial monitor and saved onto the SD 
+   * card to four decimal places.
    * 
-   * \b Rref is the resistance of the corresponding reference resistor for that analog pin.
+   * \b R0 is the resistance of the thermistor at the known temperature
+   * \b T0degC
    * 
-   * \b T0degC is a thermistor calibration.
+   * \b B is the β parameter of the thermistor
+   * 
+   * \b Rref is the resistance of the corresponding reference resistor for \
+   * the analog pin set by \b ThermPin (below).
+   * 
+   * \b T0degC is the temperature at which \b R0 was calibrated.
    * 
    * \b thermPin is the analog pin number to be read.
    * 
    * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
-   * True if using Alog provided Reference resistor terminals.
+   * True if using Alog provided Reference resistor terminals. If false, 
+   * the reference resitor must be instead connected via the screw terminals.
+   * This is set true for external sensors that are built to require a
+   * VCC-side reference resistor.
    * 
    * \b oversample_debug is true if you want a separate file, "Oversample.txt", 
-   * to record every individual reading used in the oversampling
+   * to record every individual reading used in the oversampling.
    * 
    * Example:
    * ```
-   * // Contherm from Digikey
-   * logger.thermistorB(10000,3950,30000,25,2);
-   * // EPCOS, DigiKey # 495-2153-ND
-   * logger.thermistorB(10000,3988,13320,25,1);
+   * // Contherm from Digikey, 14-bit precision
+   * logger.thermistorB(10000, 3950, 30000, 25, 2, 14);
+   * // EPCOS, DigiKey # 495-2153-ND, 14-bit precision
+   * logger.thermistorB(10000, 3988, 13320, 25, 1, 14);
    * ```
-   * 
    * 
   */
 
@@ -1170,14 +1180,10 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
   ///////////////
 
   // SD write
-//  datafile.print(Rtherm, 2);
-//  datafile.print(F(","));
   datafile.print(T, 4);
   datafile.print(F(","));
   
   // Echo to serial
-//  Serial.print(Rtherm, 2);
-//  Serial.print(F(","));
   Serial.print(T, 4);
   Serial.print(F(","));
 
@@ -1248,23 +1254,20 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
   //float Vh_real = 3300 * V_humid_norm; // switching 3.3V basis
   
   // RH in percent
-  //float RH = ( (-1.9206E-9 * Vh**3) + (1.437E-5 * Vh**2) + (3.421E-3 * Vh) - 12.4 ) / (1 + (Ttyp - 23) * 2.4E-3);
-  // Got to use the pow(base, int) function or do multiplication the long way...
-  float RH = ( (-1.9206E-9 * Vh*Vh*Vh) + (1.437E-5 * Vh*Vh) + (3.421E-3 * Vh) - 12.4 ) / (1 + (Ttyp - 23) * 2.4E-3);
+  // Must use the pow(base, int) function or do multiplication the long way...
+  float RH = ( (-1.9206E-9 * Vh*Vh*Vh) + (1.437E-5 * Vh*Vh) + \
+               (3.421E-3 * Vh) - 12.4 ) \
+             / (1 + (Ttyp - 23) * 2.4E-3);
   
   ///////////////
   // SAVE DATA //
   ///////////////
 
   // SD write
-  //datafile.print(Vh_real);
-  //datafile.print(F(","));
   datafile.print(RH, 4);
   datafile.print(F(","));
   
   // Echo to serial
-  //Serial.print(Vh_real);
-  //Serial.print(",");
   Serial.print(RH, 4);
   Serial.print(F(","));
 
@@ -1332,7 +1335,8 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
   
   // RH in percent
   // Got to use the pow(base, int) function or do multiplication the long way...
-  float RH_no_T_corr = (-1.91E-9 * Vh*Vh*Vh) + (1.33E-5 * Vh*Vh) + (9.56E-3 * Vh);
+  float RH_no_T_corr = (-1.91E-9 * Vh*Vh*Vh) + \
+                       (1.33E-5 * Vh*Vh) + (9.56E-3 * Vh);
   float RH = RH_no_T_corr + 0.05 * (T - 23);
   
   ///////////////
@@ -1362,13 +1366,15 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
 //////////////////////////////////////////////////////////////
 
 void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool writeAll){
-  //    Should we oversample?
 
   /**
    * This function measures the distance between the ultrasonic sensor and an 
    * acustically reflective surface, typically water or snow.
    * Measures distance in centimeters.
    * Results are displayed on the serial monitor and saved onto the SD card.
+   *
+   * This is for the older MaxBotix sensors, whose maximum precision is
+   * in centimeters.
    * 
    * \b nping is the number of range readings to take (number of pings).  
    * The mean range will be calculated and output to the serial monitor and 
@@ -1464,7 +1470,9 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
 
 }
 
-void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeAll){
+void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
+                                    bool writeAll \
+                                    uint8_t ADC_resolution_nbits){
 
   // Returns distance in mm, +/- 5 mm
   // Each 10-bit ADC increment corresponds to 5 mm.
@@ -1474,26 +1482,39 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, bool writeA
   // and its added defaults.
   
   /**
-   * This function measures the distance between the ultrasonic sensor and an acustically reflective surface, typically water or snow.
+   * This function measures the distance between the ultrasonic sensor and an \
+   * acoustically-reflective surface, typically water or snow.
    * Measures distance in milimeters.
    * Results are displayed on the serial monitor and saved onto the SD card.
    * 
-   * \b nping is the number of range readings to take (number of pings).  The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.
+   * \b nping is the number of range readings to take (number of pings).  
+   * The mean range will be calculated and output to the serial monitor 
+   * and SD card followed by the standard deviation.
    * 
    * \b sonicPin is the analog input channel hooked up to the maxbotix sensor.
    * 
-   * \b EX is a digital output pin used for an excitation pulse.  If maxbotix sensor is continuously powered a reading will be taken when this pin is flashed high.
-   * Set to '99' if excitation pulse is not needed.
+   * \b EX is a digital output pin used for an excitation pulse.  *
+   * If maxbotix sensor is continuously powered, a reading will be taken when 
+   * this pin is flashed high. Set to '99' if excitation pulse is not needed.
    * 
-   * \b writeAll will write each reading of the sensor (each ping) to the serial monitor and SD card.
+   * \b writeAll will write each reading of the sensor (each ping) 
+   * to the serial monitor and SD card.
+   * 
+   * \
    * 
    * Example:
    * ```
    * logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);
    * ```
    * Note that sensor should be mounted away from supporting structure.
-   * For a mast that is 5 meters high (or higher) the sensor should be mounted at least 100cm away from the mast.
-   * For a mast that is 2.5 meters high (or lower) the sensor should be at least 75cm away from the mast.
+   * * For a mast that is 5 meters high (or higher) the sensor should be 
+   *   mounted at least 100cm away from the mast.
+   * * For a mast that is 2.5 meters high (or lower) the sensor should be at 
+   *   least 75cm away from the mast.
+   * However, in our tests, the sensors with filtering algorithms function
+   * perfectly well even close to the mask, and this increases rigidity of
+   * the installation.
+   *
   */
 
   float range; // The most recent returned range
@@ -2269,7 +2290,21 @@ void Logger::TippingBucketRainGage(){
   }
 }
 
+// call back for file timestamps
+void Logger::_internalDateTime(uint16_t* date, uint16_t* time) {
+  char timestamp[30];
+  DateTime now = RTC.now();
+  // return date using FAT_DATE macro to format fields
+  *date = FAT_DATE(now.year(), now.month(), now.day());
+  // return time using FAT_TIME macro to format fields
+  *time = FAT_TIME(now.hour(), now.minute(), now.second());
+}
+
 void Logger::start_logging_to_otherfile(char* filename){
+  // Callback to set date and time
+  // Following: https://forum.arduino.cc/index.php?topic=348562.0
+  // See: https://github.com/NorthernWidget/Logger/issues/6
+  SdFile::dateTimeCallback(_internalDateTime);
   // open the file for write at end like the Native SD library
   if (!otherfile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 

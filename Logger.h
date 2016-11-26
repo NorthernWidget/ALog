@@ -114,7 +114,8 @@ class Logger {
                                  int maxRange, bool RS232=false);
     // Print order: Distance [cm], standard deviation [cm]
     void maxbotixHRXL_WR_analog(int nping=10, int sonicPin=A0, int EX=99, \
-                                bool writeAll=true);
+                                bool writeAll=true, \
+                                uint8_t ADC_resolution_nbits=13);
     // Print order: Dielectric permittivity [-unitless-], 
     // Electrical Conductivity [dS/m], Temperature [degrees C]
     //void decagon5TE(int excitPin, int dataPin);
@@ -179,6 +180,7 @@ class Logger {
     
     // Time
     void unixDatestamp();
+    _internalDateTime(uint16_t* date, uint16_t* time) // Callback: SD DT stamp
     
     // Logger-computer communications
     void name();
