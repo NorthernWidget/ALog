@@ -119,11 +119,10 @@ class Logger {
     // Print order: Dielectric permittivity [-unitless-], 
     // Electrical Conductivity [dS/m], Temperature [degrees C]
     //void decagon5TE(int excitPin, int dataPin);
-    void maxbotixHRXL_WR_analog_oneping(int sonicPin);
     void DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits=14);
-    void vdivR(int pin, float Rref, bool Rref_on_GND_side=true);
+    void vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits=10, bool Rref_on_GND_side=true);
     //debug tool delete when finished
-    void vdivR_Debug(int pin, float Rref, bool Rref_on_GND_side=true);
+    void vdivR_Debug(int pin, float Rref, uint8_t ADC_resolution_nbits=10, bool Rref_on_GND_side=true);
     // SENSOR DOES NOT STABLIIZE: COMMENTING OUT
     //void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, \
@@ -204,11 +203,9 @@ class Logger {
 		byte& Hour, byte& Minute, byte& Second);
     
     // Sensor utility codes
-    float _vdivR(int pin, float Rref, int adc_bits=10, \
+    float _vdivR(int pin, float Rref, uint8_t adc_bits=10, \
                  bool Rref_on_GND_side=true);
     //Debug tool delete when finished
-    float _vdivR_Debug(int pin, float Rref, int adc_bits=10, \
-                       bool Rref_on_GND_side=true);
     int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
     int maxbotix_Serial_parse(int Ex);
     float standard_deviation_from_array(float values[], int nvalues, \

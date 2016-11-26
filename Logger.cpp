@@ -833,7 +833,7 @@ delay(2);
     Serial.println();
     }
 
-float Logger::_vdivR(int pin, float Rref, int adc_bits, \
+float Logger::_vdivR(int pin, float Rref, uint8_t adc_bits, \
                      bool Rref_on_GND_side, bool oversample_debug){
   // Same as public vidvR code, but returns value instead of 
   // saving it to a file
@@ -1056,7 +1056,7 @@ float Logger::readPin(int pin){
   Serial.print(pinValue, 1);
   Serial.print(",");
 
-return pinValue;
+  return pinValue;
 
 }
 
@@ -1101,7 +1101,7 @@ float Logger::readPinOversample(int pin, int bits){
   Serial.print(pinValue,4);
   Serial.print(",");
 
-return pinValue;
+  return pinValue;
 
 }
 
@@ -2479,10 +2479,19 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 //}
 
 void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
+  /**
+   * Ruggedized Decagon Devices soil moisture sensor
+   * 
+   * \b pin Analog pin number
+   * 
+   * \b V_ref is the reference voltage of the ADC; on the ALog, this is
+   * a precision 3.3V regulator (unless a special unit without this regulator
+   * is ordered; the regulator uses significant power)
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10)   * 
-
+   */
+  
   // Vref in volts
   float _ADC;
   float voltage;
@@ -2514,13 +2523,19 @@ void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
 // Honeywell_HSC_analog
 //////////////////////////////
 
-float Logger::Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, int pin, uint8_t ADC_resolution_nbits){
+float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, uint8_t ADC_resolution_nbits){
+  /**
+   * Cost-effective pressure sensor from Honeywell
+   * 
+   * Datasheet: http://sensing.honeywell.com/index.php?ci_id=151133
+   * 
+   * \b pin \b NOTDONENOTDONE!!!!!!!!!!
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10)   * 
-
-  
-  // Datasheet: http://sensing.honeywell.com/index.php?ci_id=151133  
+   */
+   
+  //   
 
   // Read pin voltage
   float reading = analogReadOversample(pin, ADC_resolution_nbits);
@@ -2564,10 +2579,27 @@ char* _units[]={"mbar", "bar", "Pa", "KPa", "Mpa", "inH2O", "PSI", "why"};
 
 }
 
-
-void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
-  float _R = (pin, Rref, Rref_on_GND_side);
+void Logger::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, bool Rref_on_GND_side){
+  /**
+   * Resistance from a simple voltage divider
+   * 
+   * \b pin Analog pin number
+   * 
+   * \b Rref Resistance value of reference resistor [ohms]
+   * 
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10)   * 
+   * 
+   * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * True if using Alog provided Reference resistor terminals. If false, 
+   * the reference resitor must be instead connected via the screw terminals.
+   * This is set true for external sensors that are built to require a
+   * VCC-side reference resistor.
+   * 
+   */
   
+  float _R = _vdivR(pin, Rref, ADC_resolution_nbits, Rref_on_GND_side);
+
   ///////////////
   // SAVE DATA //
   ///////////////
@@ -2590,15 +2622,49 @@ void Logger::flex(int flexPin, float Rref, float calib1, float calib2){
 */
 
 void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
-                                 float intercept, uint8_t ADC_resolution_nbits){
-
+                                 float intercept, \
+                                 uint8_t ADC_resolution_nbits, \
+                                 bool Rref_on_GND_side){
+  /**
+   * Distance based on resistance in a sliding potentiometer whose resistance
+   * may be described as a linear function
+   * 
+   * \b linpotPin Analog pin number
+   * 
+   * \b Rref Resistance value of reference resistor [ohms]
+   *
+   * \b slope Slope of the line (distance = (slope)R + R0)
+   *
+   * \b intercept (R0) of the line (distance = (slope)R + R0)
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10)   * 
+   * 
+   * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * True if using Alog provided Reference resistor terminals. If false, 
+   * the reference resitor must be instead connected via the screw terminals.
+   * This is set true for external sensors that are built to require a
+   * VCC-side reference resistor.
+   * 
+   * The output units will be whatever you have used to create your linear 
+   * calibration equation
+   * 
+   */
 
-
-  float _Rpot = _vdivR(linpotPin, Rref);
+  float _Rpot = _vdivR(linpotPin, Rref, ADC_resolution_nbits, Rref_on_GND_side);
   float _dist = slope*_Rpot + intercept;
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+  
+  datafile.print(_dist);
+  datafile.print(F(","));
+
+  // Echo to serial
+  Serial.print(_dist);
+  Serial.print(F(","));
+
 }
 
 
