@@ -337,8 +337,8 @@ Serial.println(F("card initialized."));
 Serial.println();
 LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
 
-start_logging_to_otherfile("StartTimes.txt");
 now = RTC.now();
+start_logging_to_otherfile("StartTimes.txt");
 otherfile.print(now.unixtime());
 otherfile.print(",");
 end_logging_to_otherfile();
@@ -1048,7 +1048,7 @@ float Logger::readPin(int pin){
    * 
   */
 
-float pinValue = analogRead(pin);
+  float pinValue = analogRead(pin);
 
   ///////////////
   // SAVE DATA //
@@ -1086,12 +1086,14 @@ float Logger::readPinOversample(int pin, int bits){
    * logger.readPinOversample(2, 12);
    * ```
    * 
+   * Output values will range from 0-1023, but be floating-point.
+   * 
    * Readings that require more bits of precision will take longer.
    * 
    * 
   */
 
-float pinValue = analogReadOversample(pin, bits);
+  float pinValue = analogReadOversample(pin, bits);
 
   ///////////////
   // SAVE DATA //
@@ -1139,6 +1141,9 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
    * \b T0degC is the temperature at which \b R0 was calibrated.
    * 
    * \b thermPin is the analog pin number to be read.
+   * 
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10)   * 
    * 
    * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
@@ -1303,10 +1308,11 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
    * 
    * \b T0degC is a thermistor calibration.
    * 
-   * \b thermPin is the analog pin number to be read.
-   * 
    * \b thermPin is the analog pin connected to the tempurature output voltage 
    * of the module.
+   * 
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10)
    * 
    * Example:
    * ```
@@ -1500,7 +1506,8 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
    * \b writeAll will write each reading of the sensor (each ping) 
    * to the serial monitor and SD card.
    * 
-   * \
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10)   * 
    * 
    * Example:
    * ```
@@ -1897,14 +1904,35 @@ void Logger::Wind_Vane_Inspeed(int vanePin){
 void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
                          float gain, float V_ref, \
                          uint8_t ADC_resolution_nbits){
-  // Using an instrumentation amplifier with a Pyranometer
-  // Kipp and Zonen: nominal raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
-  // Actual raw output is based on calibration
-  
+  /**
+   * Pyranometer wtih instrumentation amplifier
+   * 
+   * Pyranomiter is from Kipp and Zonen
+   * 
+   * nominal raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
+   * 
+   * Actual raw output is based on calibration.
+   * 
+   * \b analogPin is the pin that receives the amplified voltage input
+   * 
+   * \b raw_mV_per_W_per_m2 is the conversion factor of the pyranometer:
+   * number of millivolts per (watt/meter^2).
+   * This does not include amplification!
+   * 
+   * \b gain is the amplification factor
+   * 
+   * \b V_ref is the reference voltage of the ADC; on the ALog, this is
+   * a precision 3.3V regulator (unless a special unit without this regulator
+   * is ordered; the regulator uses significant power)
+   * 
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10)   * 
+   */
+   
   // V
   // Vref V --> mV
   float Vin = (analogReadOversample(analogPin, ADC_resolution_nbits) / 1023.) \
-              * V_ref * 1000.;
+               * V_ref * 1000.;
   //float Vin = V_ref * 1000. * analogRead(analogPin) / 1023.; // No oversampling
   float Radiation_W_m2 = Vin / (raw_mV_per_W_per_m2 * gain);
   
@@ -2443,6 +2471,10 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 //}
 
 void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
+   * 
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10)   * 
+
   // Vref in volts
   float _ADC;
   float voltage;
@@ -2475,6 +2507,9 @@ void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
 //////////////////////////////
 
 float Logger::Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, int pin, uint8_t ADC_resolution_nbits){
+   * 
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10)   * 
 
   
   // Datasheet: http://sensing.honeywell.com/index.php?ci_id=151133  
@@ -2538,13 +2573,22 @@ void Logger::vdivR(int pin, float Rref, bool Rref_on_GND_side){
 
 }
 
+/*
+SENSOR DOES NOT STABILIZE (FLEXFORCE SENSOR)
 void Logger::flex(int flexPin, float Rref, float calib1, float calib2){
   float _Rflex = _vdivR(flexPin, Rref);
   // FINISH WRITING CODE
 }
+*/
 
 void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
                                  float intercept, uint8_t ADC_resolution_nbits){
+
+   * 
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10)   * 
+
+
   float _Rpot = _vdivR(linpotPin, Rref);
   float _dist = slope*_Rpot + intercept;
 }

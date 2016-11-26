@@ -124,7 +124,8 @@ class Logger {
     void vdivR(int pin, float Rref, bool Rref_on_GND_side=true);
     //debug tool delete when finished
     void vdivR_Debug(int pin, float Rref, bool Rref_on_GND_side=true);
-    void flex(int flexPin, float Rref, float calib1, float calib2);
+    // SENSOR DOES NOT STABLIIZE: COMMENTING OUT
+    //void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, \
                              float intercept, uint8_t ADC_resolution_nbits=14);
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, \
