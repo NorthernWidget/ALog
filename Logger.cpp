@@ -1175,7 +1175,7 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
    * \b thermPin is the analog pin number to be read.
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
-   * number of bits of ADC resolution used (oversampling for >10)   * 
+   * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
    * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
@@ -1539,20 +1539,24 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
    * to the serial monitor and SD card.
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
-   * number of bits of ADC resolution used (oversampling for >10)   * 
+   * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
    * Example:
    * ```
    * logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);
    * ```
-   * Note that sensor should be mounted away from supporting structure.
+   * Note that sensor should be mounted away from supporting structure. These 
+   * are the standard recommendations:
    * * For a mast that is 5 meters high (or higher) the sensor should be 
    *   mounted at least 100cm away from the mast.
    * * For a mast that is 2.5 meters high (or lower) the sensor should be at 
    *   least 75cm away from the mast.
-   * However, in our tests, the sensors with filtering algorithms function
-   * perfectly well even close to the mask, and this increases rigidity of
-   * the installation.
+   * 
+   * <b>However, in our tests, the sensors with filtering algorithms function
+   * perfectly well even when positioned close to the mast, and a short mast
+   * increases the rigidity of the installation. This was tested in the lab 
+   * by placing the MaxBotix sensor flush with table legs and testing distance
+   * readings to the floor.</b>
    *
   */
 
@@ -1644,12 +1648,25 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int npings, \
    * \b npings Number of pings over which you average; each ping itself 
    * includes ten short readings that the sensor internally processes
    * 
+   * \b writeAll will write each reading of the sensor (each ping) 
+   * to the serial monitor and SD card.
+   * 
    * \b maxRange The range (in mm) at which the logger maxes out; this will
    * be remembered to check for errors and to become a nodata values
    * 
    * \b RS232 this is set true if you use inverse (i.e. RS232-style) logic;
-   * it works at standard logger voltages (i.e. it is not true RS232).
+   * it works at standard logger voltages (i.e. it is not true RS232). If 
+   * false, TTL logic will be used.
    * 
+   * 
+   * Example:
+   * ```
+   * // Digital pin 7 controlling sensor excitation, averaging over 10 pings,
+   * // not recording the results of each ping, and with a maximum range of 
+   * // 5000 mm using standard TTL logic
+   * logger.maxbotixHRXL_WR_Serial(7, 10, false, 5000, false)
+   * 
+   * ```
    */
   
   // Stores the ranging output from the MaxBotix sensor
@@ -1818,10 +1835,29 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
                                                    float Rref, float T0degC, \
                                                    int thermPin, \
                                                    float ADC_resolution_nbits){
-  // +/- 90 degree inclinometer, measures +/- 1.0g
-  // Needs 4.75--5.25V input
-  // This function works with the analog outputs
-  // Turned on and off by a switching 5V charge pump or boost converter
+  /**
+   * * +/- 90 degree inclinometer, measures +/- 1.0g
+   * * Needs 4.75--5.25V input
+   * * In typical usage, turned on and off by a switching 5V charge pump or 
+   *   boost converter
+   * 
+   * \b xPin Analog pin number corresponding to x-oriented tilts
+   * 
+   * \b yPin Analog pin number corresponding to y-oriented tilts
+   * 
+   * \b V_ADC, called \b Vref in other functions, is the voltage of the
+   * analog-digital comparator.
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+   * 
+  */
   
   float Vout_x = (analogReadOversample(xPin, ADC_resolution_nbits) / 1023.) * V_ADC;
   float Vout_y = (analogReadOversample(yPin, ADC_resolution_nbits) / 1023.) * V_ADC;
@@ -1986,7 +2022,14 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
    * is ordered; the regulator uses significant power)
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
-   * number of bits of ADC resolution used (oversampling for >10)   * 
+   * number of bits of ADC resolution used (oversampling for >10 bits)
+   * 
+   * Example:
+   * ```
+   * // Using precision voltage reference and 16-bit resolution (highest
+   * // defensible oversampling resolution)
+   * logger.Pyranometer(A0, 0.0136, 120, 3.300, 16)
+   * ```
    */
    
   // V
@@ -2049,6 +2092,11 @@ float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
    * 
    * Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
    * 
+   * Example:
+   * ```
+   * // Take a single sample at 14-bit resolution and store it as "myReading"
+   * myReading = logger.analogReadOversample(A3, 14, 1)
+   * ```
    * 
   */
   
@@ -2627,7 +2675,14 @@ void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
    * is ordered; the regulator uses significant power)
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
-   * number of bits of ADC resolution used (oversampling for >10)   * 
+   * number of bits of ADC resolution used (oversampling for >10 bits)
+   * 
+   * Example:
+   * ```
+   * // Using a non-precision Rref that is slightly off
+   * logger.DecagonGS1(A1, 3.27, 14)
+   * ```
+   * 
    */
   
   // Vref in volts
@@ -2769,7 +2824,7 @@ void Logger::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, bool Rref_
    * \b Rref Resistance value of reference resistor [ohms]
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
-   * number of bits of ADC resolution used (oversampling for >10)   * 
+   * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
    * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
@@ -2777,6 +2832,12 @@ void Logger::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, bool Rref_
    * This is set true for external sensors that are built to require a
    * VCC-side reference resistor.
    * 
+   * Example:
+   * ```
+   * // Use standard reference resistor headers: let last parameter be false 
+   * // (default)
+   * logger.vdivR(A2, 10000, 12)
+   * ```
    */
   
   float _R = _vdivR(pin, Rref, ADC_resolution_nbits, Rref_on_GND_side);
@@ -2819,7 +2880,7 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
    * \b intercept (R0) of the line (distance = (slope)R + R0)
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
-   * number of bits of ADC resolution used (oversampling for >10)   * 
+   * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
    * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
@@ -2830,6 +2891,14 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
    * The output units will be whatever you have used to create your linear 
    * calibration equation
    * 
+   * Example:
+   * ```
+   * // Using a 0-10k ohm radio tuner with units in mm and a perfect intercept;
+   * // maintaining default 14-bit readings with standard-side (ALog header)
+   * // reference resistor set-up
+   * logger.linearPotentiometer(A0, 5000, 0.0008)
+   * 
+   * ```
    */
 
   float _Rpot = _vdivR(linpotPin, Rref, ADC_resolution_nbits, Rref_on_GND_side);
