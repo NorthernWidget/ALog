@@ -2647,9 +2647,6 @@ void Logger::end_logging_to_otherfile(){
   delay(10);
 }
 
-//reads a 5tm soil moisture probe and prints results to Serial
-// Modified from Steve Hicks' code for an LCD reader by Andy Wickert
-
 void Logger::Decagon5TE(int excitPin, int dataPin){
   /**
    * Reads a Decagon Devices 5TE soil moisture probe.
@@ -2671,10 +2668,11 @@ void Logger::Decagon5TE(int excitPin, int dataPin){
    * 
    * Example:
    * ```
-   * decagon5TE(7, 8);
+   * logger.Decagon5TE(7, 8);
    * ```
    * 
    */
+   
   SoftwareSerial mySerial(excitPin, dataPin);  //5tm's red wire (serial data out) connected to pin 5, pin 6 goes nowhere
   int Epsilon_Raw, Sigma_Raw, T_Raw;   //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
   char dataStream[14];   // Max 14 characters: 4x3 + 2 spaces

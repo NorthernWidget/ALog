@@ -109,12 +109,11 @@ class Logger {
     void maxbotixHRXL_WR_analog(int nping=10, int sonicPin=A0, int EX=99, \
          bool writeAll=true, \
          uint8_t ADC_resolution_nbits=13);
-    void decagon5TE(int excitPin, int dataPin); // Poorly-tested
+    void Decagon5TE(int excitPin, int dataPin); // Poorly-tested
     void DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits=14);
     void vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits=10, \
          bool Rref_on_GND_side=true);
-    // SENSOR READING DOES NOT STABLIIZE CHANGES CONSISTENTLY WITH TIME.
-    // COMMENTING OUT
+    // FLEX SENSOR READING DOES NOT STABLIIZE: CHANGES CONSISTENTLY WITH TIME.
     //void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, \
          float intercept=0, uint8_t ADC_resolution_nbits=14);
