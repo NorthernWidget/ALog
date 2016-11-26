@@ -43,15 +43,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // INCLUDE LIBRARIES //
 ///////////////////////
 
-// Due to the release of Arduino 1.0, I need to check the version and 
-// import libraries based on that.
-//#if ARDUINO < 100
-//#include <WProgram.h>
-//#include <NewSoftSerial.h> // in case Decagon loggers are used / Digital IO is needed -- becomes Software Serial in Arduino 1.0 and greater
-//#else
+// Arduino 1.0 libraries now default; no if/else
 #include <Arduino.h>
 #include <SoftwareSerial.h>
-//#endif
 
 // Standard libraries
 #include <SdFat.h>
@@ -136,7 +130,7 @@ class Logger {
     void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
          float Vref, float Vsupply, float R0, float B, float Rref, \
          float T0degC, int thermPin, uint8_t ADC_resolution_nbits=14);
-    void Anemometer_reed_switch(int interrupt_number, 
+    void Anemometer_reed_switch(int interrupt_pin_number, 
          unsigned long reading_duration_milliseconds, \
          float meters_per_second_per_rotation);
     void Wind_Vane_Inspeed(int vanePin);
