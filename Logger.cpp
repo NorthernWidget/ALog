@@ -192,6 +192,10 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
    * \b _secInterval: How many seconds to wait before logging again; can range
    * from 0-59.
    * 
+   * If all time-setting functions are 0, then the logger will not sleep, and
+   * instead will log continuously. This sets the flag "_use_sleep_mode" 
+   * to be false.
+   * 
    * \b _ext_int: External interrupt, set to be a tipping-bucket rain gauge,
    * that triggers event-based logging of a timestamp
    * 
@@ -420,6 +424,12 @@ void Logger::setupLogger(){
 /////////////////////////////////////////////
 
   bool Logger::get_use_sleep_mode(){
+    /**
+     * * True if the logger is going to sleep between 
+     *   pases through the data-reading loop.
+     * * False if the logger is looping over its logging step (inside
+     *   void loop() in the *.ino code) continuously without sleeping
+     */
     return _use_sleep_mode;
   }
 
@@ -945,9 +955,13 @@ void Logger::sleep(){
 void Logger::startLogging(){
   /**
    * Wakes the logger: sets the watchdog timer (a failsafe in case the logger 
-   * hangs), checks and clears alarm flags, looks for rain gauge bucket tips, 
-   * and starts to log to "datafile", if it can. If it cannot reach the card,
-   * it sends out an LED warning message of 20 rapid flashes.
+   * hangs), checks and clears alarm flags, looks for rain gauge bucket tips
+   * (if they occur during the middle of a logging event (ignore) or if they
+   * include a command to read all sensors with a tip),
+   * and starts to log to "datafile", if it can.
+   * 
+   * <b>If the logger cannot reach the SD card,
+   * it sends out an LED warning message of 20 rapid flashes.</b>
    */
   // Wake up
 
@@ -1015,7 +1029,18 @@ void Logger::startLogging(){
 }
 
 void Logger::endLogging(){
-  // Ends line, turns of SD card, and resets alarm: ready to sleep
+  /**
+   * Ends line, turns of SD card, and resets alarm: ready to sleep.
+   * 
+   * Also runs tipping bucket rain gauge code (function that records time 
+   * stamp) if one is attached and activated.
+   * 
+   * \b IMPORTANT: If the logger is not writing data to the card, and the card 
+   * is properly
+   * inserted, the manually-set delay here may be the problem. We think we
+   * have made it long enough, but because it is hard-coded, there could be
+   * an unforeseen circumstance in which it is not!
+   */
   endLine();
   //SDpowerOn();
   // close the file: (This does the actual sync() step too - writes buffer)
@@ -1054,14 +1079,18 @@ void Logger::endLogging(){
 }
 
 void Logger::startAnalog(){
-  // Turn on power to analog sensors
+  /**
+   * Turn on power to analog sensors
+   */
   digitalWrite(SensorPowerPin,HIGH);
   sbi(ADCSRA,ADEN);        // switch Analog to Digitalconverter ON
   delay(2);
 }
 
 void Logger::endAnalog(){
-  // Turn off power to analog sensors
+  /**
+   * Turn off power to analog sensors
+   */
   digitalWrite(SensorPowerPin,LOW);
   delay(2);
 }
