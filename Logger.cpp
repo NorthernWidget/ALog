@@ -839,7 +839,7 @@ float Logger::_vdivR(int pin, float Rref, uint8_t adc_bits, \
   // saving it to a file
   float _ADC;
   float _R;
-  _ADC = analogReadOversample_Debug(pin, adc_bits, 1, oversample_debug);
+  _ADC = analogReadOversample(pin, adc_bits, 1, oversample_debug);
   float _ADCnorm = _ADC/1023.0; // Normalize to 0-1
   if(Rref_on_GND_side){
     // Standard case for the provided slots for reference resistors
@@ -2129,29 +2129,81 @@ void _anemometer_count_increment(){
 }
 
 void Logger::HackHD(int control_pin, bool want_camera_on){
+  /**
+   * Control the HackHD camera: this function turns the HackHD on or off
+   * and records the time stamp from when the HackHD turns on/off in a file
+   * called "camera.txt".
+   * 
+   * Because this function turns the camera on or off, you have to ensure
+   * that you write a mechanism to keep it on for some time in your code. This 
+   * could be checking the time each time you wake and deciding what to do,
+   * for example. In short: this function is a lower-level utility that 
+   * requires the end-user to write the rest of the camera control sequence
+   * themselves.
+   * 
+   * \b control_pin is the pin connected to the HackHD on/off switch;
+   * Dropping control_pin to GND for 200 ms turns camera on or off.
+   * 
+   * \b want_camera_on is true if you want to turn the camera on, false if 
+   * you want to turn the camera off.
+   * 
+   * \b CAMERA_IS_ON is a global varaible attached to this function that 
+   * saves the state of the camera; it will be compared to "want_camera_on",
+   * such that this function will do nothing if the camera is already on (or
+   * off) and you want it on (or off).
+   * 
+   * Power requirements:
+   * 
+   * * 0.2 mA quiescent current draw;
+   * * 600 mA while recording
+   * 
+   * Example (not tested):
+   * 
+   * ```
+   * // Before "setup":
+   * uint32_t t_camera_timeout_start_unixtime;
+   * int timeout_secs = 300;
+   * book camera_on = false;
+   * // ...
+   * 
+   * // Inside "loop":
+   * // Turn the camera on after some triggering event, and keep it on for as 
+   * // long as this condition is met, and for at least 5 minutes afterwards.
+   * // 
+   * // >> some code to measure a variable's "distance"
+   * // ...
+   * // 
+   * if (distance < 1500){
+   *   logger.HackHD(8, true);
+   *   camera_on = true; // Maybe I can get a global variable from this library
+   *                     // or have HackHD function return the camera state?
+   *   now = RTC.now();
+   *   // Reset the timeout clock
+   *   t_camera_timeout_start_unixtime = now.unixtime(); 
+   * }
+   * else if(camera_on){
+   *   now = RTC.now();
+   *   // If timed out, turn it off.
+   *   if ((t_camera_timeout_start_unixtime - now.unixtime()) > timeout_secs){
+   *     logger.HackHD(8, false);
+   *     camera_on = false;
+   *   }
+   * }
+   * ```
+   * 
+   * This example could be used to capture flow during a flash flood.
+   * See:
+   * * Website: http://instaar.colorado.edu/~wickert/atvis/
+   * * AGU poster: https://www.researchgate.net/publication/241478936_The_Automatically_Triggered_Video_or_Imaging_Station_ATVIS_An_Inexpensive_Way_to_Catch_Geomorphic_Events_on_Camera
+   * 
+   */
+
 //void Logger::HackHD(int control_pin, int indicator_pin, bool want_camera_on){
-  // 0.2 mA quiescent current draw
-  // 600 mA while recording
-  // Use audio outut pin as indicative of whether the camera is on or not:
-  // HIGH on, LOW off. This is "indicator_pin".
   // Drop control_pin to GND to turn camera on or off
-  //startAnalog();
-  //delay(5000);
-  // Analog functionality is off unless I explicity turn on the 3V3 regulator
-  // Indicator seems to be 909 for off, and 1023 for on.
-  //int indicator = 0
-  //int indicator_pin = A1;
-  //int indicator = analogRead(indicator_pin);
-  //Serial.print(indicator);
-  //endAnalog();
-  // So I check if it is > 1000
-  //bool CAMERA_IS_ON = (indicator > 1000);
-  //bool CAMERA_IS_ON = (indicator > 0); // unnecessary holdover, and just if(indicator)
   Serial.print(F("C"));
   Serial.print(F("Camera is on"));
   Serial.print(want_camera_on);
   // Turn camera on or off if needed
-  //if ( (CAMERA_IS_ON == 0 && want_camera_on == 1) || (CAMERA_IS_ON == 1 && want_camera_on == 0)){
   if (CAMERA_IS_ON != want_camera_on){
     pinMode(control_pin, OUTPUT);
     digitalWrite(control_pin, LOW);
@@ -2163,6 +2215,7 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
     start_logging_to_otherfile("camera.txt");
 
     now = RTC.now();
+    
     // SD
     otherfile.print(now.unixtime());
     otherfile.print(",");
@@ -2183,14 +2236,43 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
 }
 
 void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32_t baudRate, bool printReturn, bool saveReturn){
-  // * "command" is the command sent to the Atlas Scientific product.
-  //   see the data sheet as well as the above quick lists
+  /**
+   * Generalized serial interface for Atlas Scientific sensors. It uses 
+   * SoftwareSerial AND THEREFORE IS LIKELY UNSTABLE AFTER A FEW DAYS IN THE
+   * FIELD. The watchdog timer SHOULD BE ABLE TO CATCH THIS, but this has not
+   * yet been tested.
+   * 
+   * Code in comments is on the way to replacing this with hardware serial.
+   * It is also possible to replace this with I2C code, which will be more
+   * versitile: can connect many sensors to same I2C port, so long as they
+   * remain isolated.
+   * 
+   * \b command is the instruction code sent to the Atlas Scientific product.
+   * See the data sheet for your specific sensor.
+   * 
+   * \b softSerRx is the software serial receive port
+   * 
+   * \b softSerTx is the software serial transmit port
+   * 
+   * \b baudRate is set by the Atlas Scientific sensor's baud rate.
+   * 
+   * \b printReturn is true if you determines whether you care about (i.e. want 
+   * to print) the Serial response, and false if you would just like to clear 
+   * the buffer.
+   *
+   * \b saveReturn is true if you want to save the response to the SD card.
+   * 
+   * Example:
+   * ```
+   * // read a pH probe using pins 7 and 8 as Rx and Tx, and save its results:
+   * logger.AtlasScientific("R", 7, 8)
+   * ```
+   * 
+   */
+
+  // Serial Number is from an old version of the code
   // SerialNumber and baudRate default to 0 and 38400, respectively.
   // SerialNumber could be changed for Arduino Mega.
-  // baudRate will stay constant insofar as Atlas sensors' baud rates do.
-  // getReturn determines whether you care about the Serial response, or whether
-  // you would just like to clear the buffer.
-  //
 
   // Check if re-instantiating class causes problems -- maybe this is what 
   // happened with Nick's loggers (but then why different times before
@@ -2204,6 +2286,7 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
   //Serial2.println("L,0\r");
   
   /*
+  // HARDWARE SERIAL
   uint32_t start_millis_clear_buffer = millis();
   Serial2.write(13); // Clear buffer -- carriage return
   while ( (millis() - start_millis_clear_buffer < 500) || Serial2.available() ){
@@ -2228,21 +2311,18 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
   
   delay(100);
 
-  //delay();
-  
-  
-  uint32_t start_millis = millis(); // Safety guard in case all data not received -- won't hang for > 30 seconds
+  // Safety guard in case all data not received -- won't hang for > t_timeout
+  // milliseconds
+  t_timeout = 5000;
+  uint32_t start_millis = millis();
   bool endflag = false;
   
-  // "5000" just to ensure that there is no hang if signal isn't good
-  while ((millis() - start_millis < 5000) && !endflag){
-    // used to have if (printReturn || saveReturn) here, but
-    // should read return either way
+  // t_timeout just to ensure that there is no hang if signal isn't good
+  while ((millis() - start_millis < t_timeout) && !endflag){
     if (mySerial.available()){
       inChar = mySerial.read();
       // Serial.print(inChar); // uncomment for debugging input from sensor
       if (inChar != '\r'){
-        //sensorString[i] = inChar;
         sensorString += inChar;
       }
       else{
@@ -2250,30 +2330,17 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
       }
     }
   }
-  // save iff both getReturn and saveReturn are true
-  // Currently also echoes the return to serial port if it will
-  // also be saved (sent to SD card)
   if (saveReturn){
     datafile.print(sensorString); // Should work without clock's CSpinRTC -- digging into object that is already made
     datafile.print(F(","));
-
   }
   // Echo to serial
   if (saveReturn || printReturn){
     Serial.print(sensorString);
     Serial.print(F(","));
   }
-  /*
-  else if (printReturn){ // so !savereturn
-    Serial.println();
-    Serial.print("Sensor returns: ");
-    Serial.println(sensorString);
-    Serial.println();
-  }
-  */
-  
+
   // Get rid of the incoming Serial stream
-  //while (_tx_buffer->head != _tx_buffer->tail); // get rid of the rest of the buffer after Line 1
   while( mySerial.read() != -1 );
 
   mySerial.end();
