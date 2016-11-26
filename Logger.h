@@ -125,7 +125,7 @@ class Logger {
     // COMMENTING OUT
     //void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, \
-         float intercept, uint8_t ADC_resolution_nbits=14);
+         float intercept=0, uint8_t ADC_resolution_nbits=14);
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, \
          uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
@@ -134,8 +134,8 @@ class Logger {
          float R0, float B, float Rref, float T0degC, int thermPin, \
          uint8_t ADC_resolution_nbits=14);
     void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
-         float V_ADC, float VDD, float R0, float B, float Rref, float T0degC, \
-         int thermPin, uint8_t ADC_resolution_nbits=14);
+         float Vref, float Vsupply, float R0, float B, float Rref, \
+         float T0degC, int thermPin, uint8_t ADC_resolution_nbits=14);
     void Anemometer_reed_switch(int interrupt_number, 
          unsigned long reading_duration_milliseconds, \
          float meters_per_second_per_rotation);

@@ -1331,16 +1331,16 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
    * \b humidPin is the analog pin connected to the humidity output voltage 
    * of the module.
    * 
-   * \b R0 is a thermistor calibration.
+   * \b R0_therm is a thermistor calibration.
    * 
-   * \b B is the β parameter of the thermistor.
+   * \b B_therm is the B- or β- parameter of the thermistor.
    * 
-   * \b Rref is the resistance of the corresponding reference resistor for 
+   * \b Rref_therm is the resistance of the corresponding reference resistor for 
    * that analog pin.
    * 
-   * \b T0degC is a thermistor calibration.
+   * \b T0degC_therm is a thermistor calibration.
    * 
-   * \b thermPin is the analog pin connected to the tempurature output voltage 
+   * \b thermPin_therm is the analog pin connected to the tempurature output voltage 
    * of the module.
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
@@ -1830,14 +1830,14 @@ int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
 */
 
 void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
-                                                   float V_ADC, float VDD, \
-                                                   float R0, float B, \
-                                                   float Rref, float T0degC, \
-                                                   int thermPin, \
-                                                   float ADC_resolution_nbits){
+             float Vref, float Vsupply, float R0_therm, float B_therm, \
+             float Rref_therm, float T0degC_therm, int thermPin_therm, \
+             float ADC_resolution_nbits){
   /**
+   * Inclinometer, including temperature correction from an external sensor.
+   * 
    * * +/- 90 degree inclinometer, measures +/- 1.0g
-   * * Needs 4.75--5.25V input
+   * * Needs 4.75--5.25V input (Vsupply)
    * * In typical usage, turned on and off by a switching 5V charge pump or 
    *   boost converter
    * 
@@ -1845,28 +1845,48 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
    * 
    * \b yPin Analog pin number corresponding to y-oriented tilts
    * 
-   * \b V_ADC, called \b Vref in other functions, is the voltage of the
-   * analog-digital comparator.
+   * \b Vref is the reference voltage of the analog-digital comparator; it is
+   * 3.3V on the ALog.
+   * 
+   * \b Vsupply is the input voltage that drives the sensor, and is typically
+   * ~5V.
    * 
    * 
+   * \b humidPin is the analog pin connected to the humidity output voltage 
+   * of the module.
    * 
+   * \b R0_therm is a thermistor calibration.
    * 
+   * \b B_therm is the B- or β- parameter of the thermistor.
    * 
+   * \b Rref_therm is the resistance of the corresponding reference resistor for 
+   * that analog pin.
    * 
+   * \b T0degC_therm is a thermistor calibration.
    * 
+   * \b thermPin_therm is the analog pin connected to the tempurature output voltage 
+   * of the module.
    * 
+   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * number of bits of ADC resolution used (oversampling for >10).
+   * It is applied to both the inclinomter and its temperature correction
    * 
+   * Example:
+   * ```
+   * logger.Inclinometer_SCA100T_D02_analog_Tcorr(6, 2, 3.285, 5.191, \
+   *        10080.4120953, 3298.34232031, 10000, 25, 0);
+   * ```
    * 
   */
   
-  float Vout_x = (analogReadOversample(xPin, ADC_resolution_nbits) / 1023.) * V_ADC;
-  float Vout_y = (analogReadOversample(yPin, ADC_resolution_nbits) / 1023.) * V_ADC;
+  float Vout_x = (analogReadOversample(xPin, ADC_resolution_nbits) / 1023.) * Vref;
+  float Vout_y = (analogReadOversample(yPin, ADC_resolution_nbits) / 1023.) * Vref;
   
-  float Offset = VDD/2.;
+  float Offset = Vsupply/2.;
   float Sensitivity = 2.;
 
   // Temperature correction
-  float T = thermistorB(R0, B, Rref, T0degC, thermPin);
+  float T = thermistorB(R0, B, Rref, T0degC, thermPin, ADC_resolution_nbits);
   // Sensitivity correction for Scorr
   float Scorr = -0.00011 * T*T + 0.0022 * T + 0.0408;
   
