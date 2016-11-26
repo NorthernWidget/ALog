@@ -1365,7 +1365,7 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
 // 1 cm = 1 10-bit ADC interval
 //////////////////////////////////////////////////////////////
 
-void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool writeAll){
+void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool writeAll){
 
   /**
    * This function measures the distance between the ultrasonic sensor and an 
@@ -1412,18 +1412,18 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, bool write
   // is important is getting the 2 pings of junk out of the way
   Serial.flush();
   for (int i=1; i<=2; i++){
-    if(EX != 99){
-      digitalWrite(EX,HIGH);
+    if(Ex != 99){
+      digitalWrite(Ex,HIGH);
         delay(1);
-      digitalWrite(EX,LOW);
+      digitalWrite(Ex,LOW);
       }
     delay(100);
     }
   for(int i=1;i<=nping;i++){
-    if(EX != 99){
-      digitalWrite(EX,HIGH);
+    if(Ex != 99){
+      digitalWrite(Ex,HIGH);
         delay(1);
-      digitalWrite(EX,LOW);
+      digitalWrite(Ex,LOW);
       }
     delay(100);
     range = analogRead(sonicPin);
@@ -1589,7 +1589,31 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
 
 }
 
-float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, int maxRange, bool RS232){
+float Logger::maxbotixHRXL_WR_Serial(int Ex, int npings, \
+                                     bool writeAll, int maxRange, bool RS232){
+  /**
+   * Uses the UART interface to record data from a MaxBotix sensor.
+   * 
+   * NOTE: THIS HAS CUASED LOGGERS TO FREEZE IN THE PAST; WHILE IT IS QUITE
+   * LIKELY THAT THE ISSUE IS NOW SOLVED, MORE TESTING IS REQUIRED.
+   * (ADW, 26 NOVEMBER 2016) (maybe solved w/ HW Serial?)
+   * 
+   * \b Ex Excitation pin that turns the sensor on; if this is not needed (i.e. 
+   * you are turning main power off and on instead), then just set this to a 
+   * value that is not a pin, and ensure that you turn the power to the sensor
+   * off and on outside of this function
+   * 
+   * \b npings Number of pings over which you average; each ping itself 
+   * includes ten short readings that the sensor internally processes
+   * 
+   * \b maxRange The range (in mm) at which the logger maxes out; this will
+   * be remembered to check for errors and to become a nodata values
+   * 
+   * \b RS232 this is set true if you use inverse (i.e. RS232-style) logic;
+   * it works at standard logger voltages (i.e. it is not true RS232).
+   * 
+   */
+  
   // Stores the ranging output from the MaxBotix sensor
   int myranges[npings]; // Declare an array to store the ranges [mm] // Should be int, but float for passing to fcns
   // Get nodata value - 5000 or 9999 based on logger max range (in meters)
@@ -1604,6 +1628,7 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int Rx, int npings, bool writeAll, 
   }
   // Put all of the range values in the array 
   for (int i=0; i<npings; i++){
+    // Must add int Rx to use this; currently, don't trust SoftwareSerial
     // myranges[i] = maxbotix_soft_Serial_parse(Ex, Rx, RS232);
     myranges[i] = maxbotix_Serial_parse(Ex);
   }
@@ -1682,6 +1707,7 @@ float Logger::standard_deviation_from_array(int values[], int nvalues, float mea
 }
 
 int Logger::maxbotix_Serial_parse(int Ex){
+  // NOTE: Currently assumes only one Serial port.
   // Excites the MaxBotix sensor and receives its ranging output
   char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
   Serial.end(); // End 38400 bps computer comms
@@ -1711,6 +1737,7 @@ int Logger::maxbotix_Serial_parse(int Ex){
   return r3;
 }
 
+/*
 // CURRENTLY NOT USED -- ADW DOES NOT TRUST SOFTWARE SERIAL TO MAINTAIN
 // TIMING (AND NOT HANG)
 int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
@@ -1745,6 +1772,7 @@ int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
   return r3;
   //return atol(r2); // Return integer values in mm; no parsing of error values
 }
+*/
 
 void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
                                                    float V_ADC, float VDD, \
@@ -2168,6 +2196,8 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
   // happened with Nick's loggers (but then why different times before
   // failure?
   // Same name, so maybe overwrite memory in same place?
+  // Also, general timing issues with software serial; consider using 
+  // hardware serial for this function.
   SoftwareSerial mySerial(softSerRX, softSerTX);
 
   mySerial.begin(baudRate);
@@ -2688,7 +2718,7 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
 }
 
 
-// NEW STUFF:
+// NEW STUFF: (MAINLY) INTERNAL FUNCTIONS
 
 void Logger::name(){
   // Self-identify before talking

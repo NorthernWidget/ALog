@@ -110,7 +110,7 @@ class Logger {
     // Print order: Distance [cm], standard deviation [cm]
     void ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, \
                                  bool writeAll);
-    float maxbotixHRXL_WR_Serial(int Ex, int Rx, int nping, bool writeAll, \
+    float maxbotixHRXL_WR_Serial(int Ex, int nping, bool writeAll, \
                                  int maxRange, bool RS232=false);
     // Print order: Distance [cm], standard deviation [cm]
     void maxbotixHRXL_WR_analog(int nping=10, int sonicPin=A0, int EX=99, \
@@ -205,8 +205,8 @@ class Logger {
     // Sensor utility codes
     float _vdivR(int pin, float Rref, uint8_t adc_bits=10, \
                  bool Rref_on_GND_side=true);
-    //Debug tool delete when finished
-    int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
+    // I don't trust the software serial version
+    //int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
     int maxbotix_Serial_parse(int Ex);
     float standard_deviation_from_array(float values[], int nvalues, \
                                         float mean);
