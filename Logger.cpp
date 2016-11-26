@@ -1932,13 +1932,37 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
 
 }
 
-void Logger::Anemometer_reed_switch(int interrupt_number, \
-                                    unsigned long \
-                                      reading_duration_milliseconds, \
-                                    float meters_per_second_per_rotation){
-  // Meters per second per rotation:
-  // Inspeed anemometer that we have: 2.5 mph/Hz
-  //                                  = 1.1176 (m/s)/Hz
+void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
+             unsigned long reading_duration_milliseconds, \
+             float meters_per_second_per_rotation){
+  /** 
+   * 
+   * Anemometer that flips a reed switch each time it spins.
+   * 
+   * \b interrupt_pin_number is the digital pin number corresponding to
+   * the appropriate interrupt; it uses the Arduino digitalPinToInterrupt(n_pin)
+   * function to properly attach the interrupt
+   * 
+   * \b reading_duration_milliseconds How long will you count revolutions?
+   * Shorter durations save power, longer durations increase accuracy;
+   * very long durations will produce long-term averages. Typical values are
+   * a few seconds.
+   * 
+   * \b meters_per_second_per_rotation: Conversion factor between revolutions
+   * and wind speed. For the Inspeed Vortex wind sensor that we have used
+   * (http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp),
+   * this is: <b>2.5 mph/Hz = 1.1176 (m/s)/Hz</b>
+   * 
+   * This function depends on the global variable \b rotation_count.
+   * 
+   * Example:
+   * ```
+   * // 4-second reading with Inspeed Vortex wind sensor on digital pin 3
+   * // (interrupt 1), returned in meters per second
+   * logger.Anemometer_reed_switch(3, 4000, 1.1176);
+   * ```
+   * 
+   */
 
   // I plan for no more than 40 Hz (100 mph), so will have a delay of
   // 10 ms between rotations to debounce the input. This should allow
@@ -1952,20 +1976,20 @@ void Logger::Anemometer_reed_switch(int interrupt_number, \
   float wind_speed_meters_per_second;
   float reading_duration_seconds = reading_duration_milliseconds / 1000.;
 
-  pinMode(3, INPUT);
-  digitalWrite(3, HIGH);
+  pinMode(interrupt_pin_number, INPUT);
+  digitalWrite(interrupt_pin_number, HIGH);
   
   unsigned long millis_start = millis();
-  attachInterrupt(1, _anemometer_count_increment, FALLING);
+  attachInterrupt(digitalPinToInterrupt(interrupt_pin_number), \
+                  _anemometer_count_increment, FALLING);
 
   // Avoid rollovers by comparing unsigned integers with the 
   // same number of bits
+  // Wait in while loop while interrupt can increment counter.
   while (millis() - millis_start <= reading_duration_milliseconds){
-    //rotation_count_local = rotation_count;
-    //sleepNow_nap();
-    //rotation_count ++;
   }
-  detachInterrupt(1);
+  detachInterrupt(digitalPinToInterrupt(digitalPinToInterrupt \
+                                        (interrupt_pin_number) );
   
   rotation_Hz = rotation_count / reading_duration_seconds;
   wind_speed_meters_per_second = rotation_Hz * meters_per_second_per_rotation;
