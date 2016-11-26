@@ -297,6 +297,10 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
 
 void Logger::setupLogger(){
 
+  /**
+   * Sets all pins, alarms, clock, SD card, etc: everything needed for the
+   * ALog to run properly.
+   */
   Serial.println(F("Beginning logger setup."));
 
   // We use a 3.3V regulator that we can switch on and off (to conserve power) 
@@ -329,66 +333,66 @@ void Logger::setupLogger(){
   digitalWrite(SDpowerPin,LOW);
   digitalWrite(SensorPowerPin,LOW);
 
-////////////
-// SERIAL //
-////////////
+  ////////////
+  // SERIAL //
+  ////////////
 
-Serial.begin(38400);
+  Serial.begin(38400);
 
-announce_start(); // Announce start
+  announce_start(); // Announce start
 
-///////////////////
-// WIRE: I2C RTC //
-///////////////////
+  ///////////////////
+  // WIRE: I2C RTC //
+  ///////////////////
 
-Wire.begin();
+  Wire.begin();
 
-SDpowerOn();
-RTCon();
+  SDpowerOn();
+  RTCon();
 
-/////////////////
-// CHECK CLOCK //
-/////////////////
+  /////////////////
+  // CHECK CLOCK //
+  /////////////////
 
-// Includes check whether you are talking to Python terminal
-startup_sequence();
+  // Includes check whether you are talking to Python terminal
+  startup_sequence();
 
-///////////////////
-// SD CARD SETUP //
-///////////////////
+  ///////////////////
+  // SD CARD SETUP //
+  ///////////////////
 
-// Initialize SdFat or print a detailed error message and halt
-// Use half speed like the native library.
-// change to SPI_FULL_SPEED for more performance.
+  // Initialize SdFat or print a detailed error message and halt
+  // Use half speed like the native library.
+  // change to SPI_FULL_SPEED for more performance.
 
-name();
+  name();
 
-delay(5);
-Serial.print(F("Initializing SD card..."));
-if (!sd.begin(CSpin, SPI_HALF_SPEED)){
-  Serial.println(F("Card failed, or not present"));
-  LEDwarn(20); // 20 quick flashes of the LED
-  sd.initErrorHalt();
-}
+  delay(5);
+  Serial.print(F("Initializing SD card..."));
+  if (!sd.begin(CSpin, SPI_HALF_SPEED)){
+    Serial.println(F("Card failed, or not present"));
+    LEDwarn(20); // 20 quick flashes of the LED
+    sd.initErrorHalt();
+  }
 
-Serial.println(F("card initialized."));
-Serial.println();
-LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
+  Serial.println(F("card initialized."));
+  Serial.println();
+  LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
 
-start_logging_to_otherfile("StartTimes.txt");
-otherfile.print(now.unixtime());
-otherfile.print(",");
-end_logging_to_otherfile();
+  start_logging_to_otherfile("StartTimes.txt");
+  otherfile.print(now.unixtime());
+  otherfile.print(",");
+  end_logging_to_otherfile();
 
-start_logging_to_datafile();
+  start_logging_to_datafile();
 
-name();
-Serial.println(F("Logger initialization complete! Ciao bellos."));
+  name();
+  Serial.println(F("Logger initialization complete! Ciao bellos."));
 
-delay(10);
+  delay(10);
 
-Clock.checkIfAlarm(1); //Clear alarm flags
-Clock.checkIfAlarm(2); //Clear alarm flags
+  Clock.checkIfAlarm(1); //Clear alarm flags
+  Clock.checkIfAlarm(2); //Clear alarm flags
 
     bool Century, h12 = false;
     bool PM;
@@ -401,14 +405,14 @@ Clock.checkIfAlarm(2); //Clear alarm flags
     if(_hours > 23){_hours = _hours - 24; _days++;}
     if(_days > 7){_days = _days - 7;} 
 
-alarm( _days, _hours, _minutes, _seconds);  //Set first alarm.
-checkTime();  // Verify time
-displayAlarms();  // Verify Alarms
-delay(10);
-if (_use_sleep_mode){
-  SDpowerOff();
-  RTCsleep();
-  }
+  alarm( _days, _hours, _minutes, _seconds);  //Set first alarm.
+  checkTime();  // Verify time
+  displayAlarms();  // Verify Alarms
+  delay(10);
+  if (_use_sleep_mode){
+    SDpowerOff();
+    RTCsleep();
+    }
 }
 
 /////////////////////////////////////////////
@@ -926,16 +930,11 @@ void Logger::SDpowerOff(){
 // PUBLIC UTILITY FUNCTIONS TO IMPLEMENT LOGGER IN SKETCH //
 ////////////////////////////////////////////////////////////
 
-
-/*void Logger::sleep(){
-  // Maintain backwards compatibility with code that requires "log_minutes"
-  // to be defined separately from initialize step. (A bad idea, right? Will
-  // remove this compatibility once it seems to no longer be a problem.)
-  sleep(log_minutes);
-}*/
-
 void Logger::sleep(){
-
+  /**
+   * Sets the "IS_LOGGING" flag to false, disables the watchdog timer, and 
+   * puts the logger to sleep.
+   */
   IS_LOGGING = false; // not logging when sleeping!
 
   wdt_disable();  //Disable the watchdog timer
@@ -944,6 +943,11 @@ void Logger::sleep(){
 }
 
 void Logger::startLogging(){
+  /**
+   * Wakes the logger: sets the watchdog timer (a failsafe in case the logger 
+   * hangs), checks and clears alarm flags, looks for rain gauge bucket tips, 
+   * and starts to log to "datafile".
+   */
   // Wake up
 
   // Set the WDCE bit (bit 4) and the WDE bit (bit 3) 
@@ -992,7 +996,7 @@ void Logger::startLogging(){
     }
   }
 
-  pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
+  pinMode(SDpowerPin, OUTPUT); // Seemed to have forgotten between loops... ?
 
   // Initialize logger
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
