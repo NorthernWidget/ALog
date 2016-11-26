@@ -2484,7 +2484,7 @@ void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
    * 
    * \b pin Analog pin number
    * 
-   * \b V_ref is the reference voltage of the ADC; on the ALog, this is
+   * \b Vref is the reference voltage of the ADC; on the ALog, this is
    * a precision 3.3V regulator (unless a special unit without this regulator
    * is ordered; the regulator uses significant power)
    * 
@@ -2523,13 +2523,33 @@ void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
 // Honeywell_HSC_analog
 //////////////////////////////
 
-float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Pmin, float Pmax, int TransferFunction, int units, uint8_t ADC_resolution_nbits){
+float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
+                                   float Pmin, float Pmax, \
+                                   int TransferFunction_number, int units, \
+                                   uint8_t ADC_resolution_nbits){
   /**
    * Cost-effective pressure sensor from Honeywell
    * 
    * Datasheet: http://sensing.honeywell.com/index.php?ci_id=151133
    * 
-   * \b pin \b NOTDONENOTDONE!!!!!!!!!!
+   * \b pin Analog pin number
+   * 
+   * \b Vsupply Supply voltage to sensor
+   * 
+   * \b Vref is the reference voltage of the ADC; on the ALog, this is
+   * a precision 3.3V regulator (unless a special unit without this regulator
+   * is ordered; the regulator uses significant power)
+   * 
+   * \b Pmin Minimum pressure in range of sensor
+   * 
+   * \b Pmax Maximum pressure in range of sensor
+   * 
+   * \b Pmax Maximum pressure in range of sensor
+   * 
+   * \b TransferFunction_number: 1, 2, 3, or 4: which transfer function is 
+   * used to convert voltage to pressure
+   * 
+   * \b Units: the units of the sensor
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10)   * 
@@ -2544,20 +2564,20 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Pmin, float Pma
   // Apply transfer function 
   float P;
 
-  if(TransferFunction == 1){
+  if(TransferFunction_number == 1){
   P = (Vout - 0.1*Vsupply) * ((Pmax-Pmin)/(0.8*Vsupply)) + Pmin;
   }
-  if(TransferFunction == 2){
+  if(TransferFunction_number == 2){
   P = (Vout - 0.05*Vsupply) * ((Pmax-Pmin)/(0.9*Vsupply)) + Pmin;
   }  
-  if(TransferFunction == 3){
+  if(TransferFunction_number == 3){
   P = (Vout - 0.05*Vsupply) * ((Pmax-Pmin)/(0.8*Vsupply)) + Pmin;
   }
-  if(TransferFunction == 4){
+  if(TransferFunction_number == 4){
   P = (Vout - 0.04*Vsupply) * ((Pmax-Pmin)/(0.9*Vsupply)) + Pmin;
   }
 
-char* _units[]={"mbar", "bar", "Pa", "KPa", "Mpa", "inH2O", "PSI", "why"};
+  char* _units[]={"mbar", "bar", "Pa", "KPa", "Mpa", "inH2O", "PSI", "why"};
 
   ///////////////
   // SAVE DATA //
