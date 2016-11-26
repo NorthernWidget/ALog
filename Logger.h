@@ -109,9 +109,7 @@ class Logger {
     void maxbotixHRXL_WR_analog(int nping=10, int sonicPin=A0, int EX=99, \
          bool writeAll=true, \
          uint8_t ADC_resolution_nbits=13);
-    // Print order: Dielectric permittivity [-unitless-], 
-    // Electrical Conductivity [dS/m], Temperature [degrees C]
-    //void decagon5TE(int excitPin, int dataPin);
+    void decagon5TE(int excitPin, int dataPin); // Poorly-tested
     void DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits=14);
     void vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits=10, \
          bool Rref_on_GND_side=true);

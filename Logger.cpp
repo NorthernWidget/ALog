@@ -2650,10 +2650,32 @@ void Logger::end_logging_to_otherfile(){
 //reads a 5tm soil moisture probe and prints results to Serial
 // Modified from Steve Hicks' code for an LCD reader by Andy Wickert
 
-/*
-void Logger::decagon5TE(int excitPin, int dataPin){
-
-  NewSoftSerial mySerial(excitPin, dataPin);  //5tm's red wire (serial data out) connected to pin 5, pin 6 goes nowhere
+void Logger::Decagon5TE(int excitPin, int dataPin){
+  /**
+   * Reads a Decagon Devices 5TE soil moisture probe.
+   * NEEDS TESTING with current ALog version.
+   * 
+   * Returns Dielectric permittivity [-unitless-], electrical conductivity 
+   * [dS/m], and temperature [degrees C].
+   * Soil moisture is calculated through postprocessing.
+   * 
+   * Uses \b SoftwareSerial, and therefore has the potential to go unstable; 
+   * however, we have a time limit, so this won't crash the logger: it will 
+   * just keep the logger from recording good data.
+   *
+   * Modified from Steve Hicks' code for an LCD reader by Andy Wickert
+   * 
+   * \b excitPin activates the probe and powers it
+   * 
+   * \b dataPin receives incoming serial data at 1200 bps
+   * 
+   * Example:
+   * ```
+   * decagon5TE(7, 8);
+   * ```
+   * 
+   */
+  SoftwareSerial mySerial(excitPin, dataPin);  //5tm's red wire (serial data out) connected to pin 5, pin 6 goes nowhere
   int Epsilon_Raw, Sigma_Raw, T_Raw;   //temporary integer variables to store the 3 parts of the incoming serial stream from the 5TM
   char dataStream[14];   // Max 14 characters: 4x3 + 2 spaces
   int startflag=1;
@@ -2664,11 +2686,16 @@ void Logger::decagon5TE(int excitPin, int dataPin){
 
   if(startflag){
     digitalWrite(excitPin,HIGH);
+    delay(100); // max. time for probe's comms to start up (see datasheet)
     startMillis = millis();
     startflag=0;
     Serial.println(startMillis);
   }
 
+  // Start serial port
+  // Using standard Decagon DDI Serial; simpler than SDI-12
+  mySerial.begin(1200); // 1200 bits per second
+  
   // OK if it takes longer, so long as data stream is continuous
   // so we don't break out of inner while loop, and we start 
   // receiving before 200 ms is up
@@ -2740,18 +2767,17 @@ void Logger::decagon5TE(int excitPin, int dataPin){
       float T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
     }
     
-*/    ///////////////
+    ///////////////
     // SAVE DATA //
     ///////////////
-/*
-    digitalWrite(SDpowerPin,HIGH);    
+
     datafile.print(Epsilon_a);
     datafile.print(F(","));
     datafile.print(EC);
     datafile.print(F(","));
     datafile.print(T);
     datafile.print(F(","));
-    digitalWrite(SDpowerPin,LOW);
+    
     // Echo to serial
     Serial.print(Epsilon_a);
     Serial.print(F(","));
@@ -2759,9 +2785,8 @@ void Logger::decagon5TE(int excitPin, int dataPin){
     Serial.print(F(","));
     Serial.print(T);
     Serial.print(F(","));
-*/
-//  }
-//}
+  }
+}
 
 void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
   /**
