@@ -15,10 +15,14 @@ int Log_Interval_Seconds = 0; //Valid range is 0-59 seconds
 int Log_Interval_Minutes = 0; //Valid range is 0-59 minutes
 int Log_Interval_Hours = 0; //Valid range is 0-23 hours
 int Log_Interval_Days = 0; //Valid range is 0-6 days
-bool external_interrupt = false; // e.g., rain gage
+// external_interrupt is true for a tipping bucket rain gauge
+bool external_interrupt = false;
 
 void setup(){
-  logger.initialize(dataLoggerName, fileName, Log_Interval_Days, Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, external_interrupt);logger.setupLogger();
+  logger.initialize(dataLoggerName, fileName, Log_Interval_Days, \
+      Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds,
+      external_interrupt)
+  logger.setupLogger();
 }
 
 void loop(){

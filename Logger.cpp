@@ -135,8 +135,9 @@ char* logger_name;
 // For interrupt from sensor
 bool extInt;
 bool NEW_RAIN_BUCKET_TIP = false; // flag
-bool LOG_ON_BUCKET_TIP; // Defaults to False, true if you should log every 
-                        // time an event (e.g., rain gage bucket tip) happens
+bool LOG_ALL_SENSORS_ON_BUCKET_TIP; // Defaults to False, true if you should 
+                                    // all sensors every time an event (e.g., 
+                                    // rain gage bucket tip) happens
 unsigned int rotation_count = 0;
 
 
@@ -166,11 +167,14 @@ DateTime now;
 // Constructor
 Logger::Logger(){}
 
-void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, int _hourInterval, int _minInterval, int _secInterval, bool _ext_int, bool _LOG_ON_BUCKET_TIP){
-  /*
-  Model automatically determined from the MCU type and is used to modify 
-  pinout-dependent functions. There may be a need to add a board version in the 
-  future, and I don't see a way around passing that via a human-coded variable. 
+void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
+                        int _hourInterval, int _minInterval, int _secInterval, \
+                        bool _ext_int, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP){
+  /**
+   * Pass all variables needed to initialize logging
+   * Logger model does not need to be set:
+   * It is automatically determined from the MCU type and is used to
+   * modify pinout-dependent functions.
   */
   
   MCUSR = MCUSR & B11110111;  // Clear the reset flag, the WDRF bit (bit 3) of MCUSR for watchdog timer.
@@ -198,7 +202,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, i
   }
   
   // Assign the global and changable variables to input values
-  LOG_ON_BUCKET_TIP = _LOG_ON_BUCKET_TIP;
+  LOG_ALL_SENSORS_ON_BUCKET_TIP = _LOG_ALL_SENSORS_ON_BUCKET_TIP;
 
   //////////////////////////////////////////
   // EXTERNAL INTERRUPT (E.G., RAIN GAGE) //
@@ -209,8 +213,6 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, i
   if (extInt){
     pinMode(extInt, INPUT);
     digitalWrite(3, HIGH); // enable internal 20K pull-up
-    //pinMode(6, INPUT);
-    //digitalWrite(6, LOW);
   }
   
   ////////////
@@ -933,7 +935,7 @@ void Logger::startLogging(){
   // First, check if there was a bucket tip from the rain gage, if present
   if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
-    if (LOG_ON_BUCKET_TIP){
+    if (LOG_ALL_SENSORS_ON_BUCKET_TIP){
       // If we want data recorded when the bucket tips, we don't want it to 
       // interrupt a current logging step.
       // And IS_LOGGING will just stay true if we're interrupting that.
@@ -2348,9 +2350,11 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
 }
 
 void Logger::TippingBucketRainGage(){
-
-  // Uses the interrupt to read a tipping bucket rain gage.
-  // Then prints date stamp
+  /**
+   * Uses the interrupt to read a tipping bucket rain gage.
+   * Then prints date stamp
+   * 
+  */
 
   detachInterrupt(1);
 
@@ -2388,8 +2392,9 @@ void Logger::TippingBucketRainGage(){
   // END TEMPORARY CODE TO NOTE BUCKET TIP RESPONSE
   NEW_RAIN_BUCKET_TIP = false;
   
-  // Sets flag to log data if the "LOG_ON_BUCKET_TIP" flag is set "TRUE"
-  if (LOG_ON_BUCKET_TIP){
+  // Sets flag to log data if the "LOG_ALL_SENSORS_ON_BUCKET_TIP" flag is set 
+  // "TRUE"
+  if (LOG_ALL_SENSORS_ON_BUCKET_TIP){
     IS_LOGGING = true;
   }
   

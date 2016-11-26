@@ -147,9 +147,6 @@ class Logger {
     // Sensors - triggered
     // Camera on/off function; decision made in end-user Arduino script
     void HackHD(int control_pin, bool want_camera_on);
-    // Rain gage - will wake logger up and cause it to log to a different file
-    // The default interrupt is Pin 3, INT1 on ATmega328 (ALog BottleLogger)
-    void TippingBucketRainGage();
     float Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, \
           int TransferFunction_number, int units, int pin,
           uint8_t ADC_resolution_nbits=14);
@@ -206,6 +203,11 @@ class Logger {
           float mean);
     float standard_deviation_from_array(int values[], int nvalues, float mean);
 
+    // Special sensor codes
+    // Rain gage - will wake logger up and cause it to log to a different file
+    // The default interrupt is Pin 3, INT1 on ATmega328 (ALog BottleLogger).
+    // This runs of bool _ext_int = true in loger.initialize()
+    void TippingBucketRainGage();
     
     // Logging
     void start_logging_to_datafile();
