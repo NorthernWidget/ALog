@@ -51,9 +51,9 @@ logger.startAnalog();
 //Units: 5 = inH2O
 //Units: 6 = PSI
 
-//Example: logger.Honeywell_HSC_analog(3.3, 0, 30, 1, 6, 1);
+//Example: logger.Honeywell_HSC_analog(A1, 5, 3.3, 0, 30, 1, 6);
 
-logger.Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int Units, int Pin);
+logger.Honeywell_HSC_analog(int pin, float Vsupply, vRef, float Pmin, float Pmax, int TransferFunction_number, int units);
 
 logger.endAnalog();
 

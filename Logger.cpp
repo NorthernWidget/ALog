@@ -171,10 +171,46 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
                         int _hourInterval, int _minInterval, int _secInterval, \
                         bool _ext_int, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP){
   /**
-   * Pass all variables needed to initialize logging
-   * Logger model does not need to be set:
-   * It is automatically determined from the MCU type and is used to
+   * Pass all variables needed to initialize logging.
+   * 
+   * \b _logger_name: Name associated with this data logger; often helps to
+   * relate it to the project or site
+   * 
+   * \b _filename: Name of main data file saved to SD card; often helps to
+   * relate it to the project or site; used to be limited to 8.3, but now
+   * is not.
+   * 
+   * \b _dayInterval: How many days to wait before logging again; can range
+   * from 0-6.
+   * 
+   * \b _hourInterval: How many hours to wait before logging again; can range
+   * from 0-24.
+   * 
+   * \b _minInterval: How many minutes to wait before logging again; can range
+   * from 0-59.
+   * 
+   * \b _secInterval: How many seconds to wait before logging again; can range
+   * from 0-59.
+   * 
+   * \b _ext_int: External interrupt, set to be a tipping-bucket rain gauge,
+   * that triggers event-based logging of a timestamp
+   * 
+   * \b _LOG_ALL_SENSORS_ON_BUCKET_TIP: Flag that tells the logger to read
+   * every sensor when the bucket tips (if _ext_int is true) and write their
+   * outputs to "datafile" (i.e. the main data file whose name you specify
+   * with \b _filename; this is in addition to writing the timestamp of the
+   * rain gauge bucket tip.
+   * 
+   * Data logger model does not need to be set:
+   * it is automatically determined from the MCU type and is used to
    * modify pinout-dependent functions.
+   * 
+   * Example:
+   * ```
+   * \\ Log every five minutes
+   * logger.initialize('TestLogger01', 'lab_bench_test.alog', 0, 0, 5, 0)
+   * ```
+   * 
   */
   
   MCUSR = MCUSR & B11110111;  // Clear the reset flag, the WDRF bit (bit 3) of MCUSR for watchdog timer.
@@ -2634,6 +2670,8 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
    * 
    * Datasheet: http://sensing.honeywell.com/index.php?ci_id=151133
    * 
+   * See also the \b Honeywell_HSC_analog example.
+   * 
    * \b pin Analog pin number
    * 
    * \b Vsupply Supply voltage to sensor
@@ -2650,18 +2688,39 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
    * 
    * \b TransferFunction_number: 1, 2, 3, or 4: which transfer function is 
    * used to convert voltage to pressure
+   * * TransferFunction: 1 = 10% to 90% of Vsupply 
+   *   ("A" in second to last digit of part number)
+   * * TransferFunction: 2 = 5% to 95% of Vsupply
+   *   ("A" in second to last digit of part number)
+   * * TransferFunction: 3 = 5% to 85% of Vsupply
+   *   ("A" in second to last digit of part number)
+   * * TransferFunction: 4 = 4% to 94% of Vsupply
+   *   ("A" in second to last digit of part number)
    * 
-   * \b Units: the units of the sensor
+   * \b Units: Output units
+   * * Units: 0 = mbar
+   * * Units: 1 = bar
+   * * Units: 2 = Pa
+   * * Units: 3 = KPa
+   * * Units: 4 = MPa
+   * * Units: 5 = inH2O
+   * * Units: 6 = PSI
    * 
    * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
-   * number of bits of ADC resolution used (oversampling for >10)   * 
+   * number of bits of ADC resolution used (oversampling for >10 bits)
+   * 
+   * Example:
+   * ```
+   * logger.Honeywell_HSC_analog(A1, 5, 3.3, 0, 30, 1, 6);
+   * ```
+   * 
    */
    
   //   
 
   // Read pin voltage
   float reading = analogReadOversample(pin, ADC_resolution_nbits);
-  float Vout = reading/1023*3.3;
+  float Vout = reading/1023*Vref;
   
   // Apply transfer function 
   float P;
