@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['maxbotixhrxl_5fwr_5fanalog',['maxbotixHRXL_WR_analog',['../classLogger.html#acd4f2c5017d9a36b88ab345082b4551f',1,'Logger']]]
+  ['get_5fuse_5fsleep_5fmode',['get_use_sleep_mode',['../classLogger.html#acc758b6fdaac8099c492929aa7f1691d',1,'Logger']]]
 ];

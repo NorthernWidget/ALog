@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['readpin',['readPin',['../classLogger.html#a343fcabefb37e06429865a2e6a6e708a',1,'Logger']]],
-  ['readpinoversample',['readPinOversample',['../classLogger.html#a4e67526c65fa865f276a515a200af4aa',1,'Logger']]]
+  ['get_5fuse_5fsleep_5fmode',['get_use_sleep_mode',['../classLogger.html#acc758b6fdaac8099c492929aa7f1691d',1,'Logger']]]
 ];

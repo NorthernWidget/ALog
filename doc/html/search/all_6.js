@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['ultrasonicmb_5fanalog_5f1cm',['ultrasonicMB_analog_1cm',['../classLogger.html#a362a1462166d63ddc613eaa1e86f9854',1,'Logger']]]
+  ['linearpotentiometer',['linearPotentiometer',['../classLogger.html#a12dc18b7b16c91de5f7a3af7edb381a9',1,'Logger']]],
+  ['logger',['Logger',['../classLogger.html',1,'']]],
+  ['logger',['Logger',['../md_README.html',1,'']]]
 ];

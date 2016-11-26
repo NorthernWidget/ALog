@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['thermistorb',['thermistorB',['../classLogger.html#a0b35b861394160fb080afd78a1dea500',1,'Logger']]],
-  ['thermistorb_5fdebug',['thermistorB_Debug',['../classLogger.html#aeb80eea2ce978d61a67b1c5904ba4428',1,'Logger']]]
+  ['inclinometer_5fsca100t_5fd02_5fanalog_5ftcorr',['Inclinometer_SCA100T_D02_analog_Tcorr',['../classLogger.html#a91ffb193feceb75b2e19a3617d00455c',1,'Logger']]],
+  ['initialize',['initialize',['../classLogger.html#a9495e2c8e63850f3c7cfcc31e9d73ffe',1,'Logger']]]
 ];
