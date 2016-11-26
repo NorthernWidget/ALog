@@ -337,18 +337,12 @@ Serial.println(F("card initialized."));
 Serial.println();
 LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
 
-now = RTC.now();
 start_logging_to_otherfile("StartTimes.txt");
 otherfile.print(now.unixtime());
 otherfile.print(",");
 end_logging_to_otherfile();
 
-if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {   
-  Serial.print(F("Opening "));
-  Serial.print(filename);
-  Serial.println(F(" for write failed"));
-delay(10);
-}  
+start_logging_to_datafile();
 
 name();
 Serial.println(F("Logger initialization complete! Ciao bellos."));
@@ -2326,6 +2320,20 @@ void Logger::_internalDateTime(uint16_t* date, uint16_t* time) {
   *date = FAT_DATE(now.year(), now.month(), now.day());
   // return time using FAT_TIME macro to format fields
   *time = FAT_TIME(now.hour(), now.minute(), now.second());
+}
+
+void Logger::start_logging_to_datafile(){
+  // Callback to set date and time
+  // Following: https://forum.arduino.cc/index.php?topic=348562.0
+  // See: https://github.com/NorthernWidget/Logger/issues/6
+  SdFile::dateTimeCallback(_internalDateTime);
+  // Open the file for writing
+  if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {   
+    Serial.print(F("Opening "));
+    Serial.print(filename);
+    Serial.println(F(" for write failed"));
+  delay(10);
+  }
 }
 
 void Logger::start_logging_to_otherfile(char* filename){

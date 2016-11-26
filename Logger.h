@@ -217,6 +217,7 @@ class Logger {
 
     
     // Logging
+    void start_logging_to_datafile();
     void start_logging_to_otherfile(char* filename);
     void end_logging_to_otherfile();
     void endLine();
