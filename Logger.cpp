@@ -946,7 +946,8 @@ void Logger::startLogging(){
   /**
    * Wakes the logger: sets the watchdog timer (a failsafe in case the logger 
    * hangs), checks and clears alarm flags, looks for rain gauge bucket tips, 
-   * and starts to log to "datafile".
+   * and starts to log to "datafile", if it can. If it cannot reach the card,
+   * it sends out an LED warning message of 20 rapid flashes.
    */
   // Wake up
 
@@ -1003,6 +1004,10 @@ void Logger::startLogging(){
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
+    // WARN THE END USER -- new feature after conversations with Amanda and 
+    // Crystal about SD cards not being seated correctly, and/or just not 
+    // knowing if they are.
+    LEDwarn(20);
   }
   delay(10);
   // Datestamp the start of the line
