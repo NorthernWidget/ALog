@@ -2017,13 +2017,30 @@ void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
 }
 
 void Logger::Wind_Vane_Inspeed(int vanePin){
-  // Resistance changes with rotation
-  // This is for the eVane2
-  // Connect one wire to power supply, one wire to analog pin, one wire to GND
-  // From documentation:
-  // 5 - 95% of power supply input voltage = 0 to 360 degrees of rotation
-  // Uses Hall Effect Sensor
-  // Don't forget to use set screw to zero wind sensor before starting!
+  /**
+   * Wind vane: resistance changes with angle to wind.
+   * 
+   * \b vanePin is the analog pin that reads the wind vane resistance
+   * 
+   * This function is specialized for the Inspeed eVane2.
+   * Here, a resistance of 0 equates to wind from the north, and 
+   * resistence increases in a clockwise direction.
+   * 
+   * Connect one wire to power supply, one wire to analog pin, one wire to GND
+   * 
+   * From documentation:
+   * * 5 - 95% of power supply input voltage = 0 to 360 degrees of rotation.
+   * * Uses Hall Effect Sensor
+   * * Don't forget to use set screw to zero wind sensor before starting!
+   * 
+   * Example:
+   * ```
+   * // After setting up and zeroing the eVane to North, you wire it to 
+   * // analog pin 7 on the ALog
+   * logger.Wind_Vane_Inspeed(A7);
+   * ```
+   * 
+   */
   float Vin_normalized = (analogRead(vanePin) / 1023.);
   float Vin_stretched = (Vin_normalized - 0.05) / 0.9;
   float Wind_angle = Vin_stretched * 360.; // Degrees -- azimuth
