@@ -1,12 +1,26 @@
-/*
+/**
+@file Logger.cpp
+
 Data logger library
-Written by Andy Wickert
-September-October 2011
+Designed for the ALog
+Modules should work for any Arduino-based board with minimal modificiation
+Goals: (1) Manage logger utility functions, largely behind-the-scenes
+       (2) Simplify data logger operations to one-line calls
+
+Written by Andy Wickert, 2011-2016, and Chad Sandell, 2016
+Started 27 September 2011
+
+Designed to greatly simplify Arduino sketches 
+for the ALog and reduce what the end 
+user needs to do into relatively simple 
+one-line calls.
 
 # LICENSE: GNU GPL v3
 
-Logger.cpp is part of Logger, an Arduino library written by Andrew D. Wickert.
-Copyright (C) 2011-2013, Andrew D. Wickert
+Logger.cpp is part of Logger, an Arduino library written by Andrew D. Wickert
+and Chad T. Sandell
+Copyright (C) 2011-2015, Andrew D. Wickert
+Copyright (C) 2016, Andrew D. Wickert and Chad T. Sandell
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -20,7 +34,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
 ////////////////////////////////////////////////////
@@ -164,6 +177,29 @@ DateTime now;
 ///////////////////////////////////
 ///////////////////////////////////
 
+/**
+ * @brief 
+ * Logger library for the Arduino-based ALog data logger
+ * 
+ * @details
+ * ALog data logger library: methods to:
+ * * Initialize the data logger
+ * * Sleep and wake
+ * * Interact with the real-time clock (RTC)
+ * * Write data to the SD card
+ * * Manage power
+ * * Interact with a range of sensors
+ *
+ * All help documentation here assumes you have created an instance of the 
+ * "Logger"
+ * ```
+ * logger Logger();
+ * ```
+ *
+*/
+
+
+
 // Constructor
 Logger::Logger(){}
 
@@ -171,40 +207,42 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
                         int _hourInterval, int _minInterval, int _secInterval, \
                         bool _ext_int, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP){
   /**
+   * @brief 
    * Pass all variables needed to initialize logging.
    * 
-   * \b _logger_name: Name associated with this data logger; often helps to
+   * @param _logger_name: Name associated with this data logger; often helps to
    * relate it to the project or site
    * 
-   * \b _filename: Name of main data file saved to SD card; often helps to
+   * @param _filename: Name of main data file saved to SD card; often helps to
    * relate it to the project or site; used to be limited to 8.3, but now
    * is not.
    * 
-   * \b _dayInterval: How many days to wait before logging again; can range
+   * @param _dayInterval: How many days to wait before logging again; can range
    * from 0-6.
    * 
-   * \b _hourInterval: How many hours to wait before logging again; can range
+   * @param _hourInterval: How many hours to wait before logging again; can range
    * from 0-24.
    * 
-   * \b _minInterval: How many minutes to wait before logging again; can range
+   * @param _minInterval: How many minutes to wait before logging again; can range
    * from 0-59.
    * 
-   * \b _secInterval: How many seconds to wait before logging again; can range
+   * @param _secInterval: How many seconds to wait before logging again; can range
    * from 0-59.
    * 
    * If all time-setting functions are 0, then the logger will not sleep, and
    * instead will log continuously. This sets the flag "_use_sleep_mode" 
    * to be false.
    * 
-   * \b _ext_int: External interrupt, set to be a tipping-bucket rain gauge,
+   * @param _ext_int: External interrupt, set to be a tipping-bucket rain gauge,
    * that triggers event-based logging of a timestamp
    * 
-   * \b _LOG_ALL_SENSORS_ON_BUCKET_TIP: Flag that tells the logger to read
+   * @param _LOG_ALL_SENSORS_ON_BUCKET_TIP: Flag that tells the logger to read
    * every sensor when the bucket tips (if _ext_int is true) and write their
    * outputs to "datafile" (i.e. the main data file whose name you specify
    * with \b _filename; this is in addition to writing the timestamp of the
    * rain gauge bucket tip.
    * 
+   * @details
    * Data logger model does not need to be set:
    * it is automatically determined from the MCU type and is used to
    * modify pinout-dependent functions.
@@ -212,7 +250,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
    * Example:
    * ```
    * \\ Log every five minutes
-   * logger.initialize('TestLogger01', 'lab_bench_test.alog', 0, 0, 5, 0)
+   * logger.initialize('TestLogger01', 'lab_bench_test.alog', 0, 0, 5, 0);
    * ```
    * 
   */
@@ -302,6 +340,10 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
 void Logger::setupLogger(){
 
   /**
+   * @brief 
+   * Readies the ALog to begin measurements
+   * 
+   * @details
    * Sets all pins, alarms, clock, SD card, etc: everything needed for the
    * ALog to run properly.
    */
@@ -425,6 +467,9 @@ void Logger::setupLogger(){
 
   bool Logger::get_use_sleep_mode(){
     /**
+     * @brief Does the logger enter a low-power sleep mode? T/F.
+     * 
+     * @details
      * * True if the logger is going to sleep between 
      *   pases through the data-reading loop.
      * * False if the logger is looping over its logging step (inside
@@ -942,6 +987,10 @@ void Logger::SDpowerOff(){
 
 void Logger::sleep(){
   /**
+   * @brief 
+   * Puts the ALog data logger into a low-power sleep mode
+   * 
+   * @details
    * Sets the "IS_LOGGING" flag to false, disables the watchdog timer, and 
    * puts the logger to sleep.
    */
@@ -954,6 +1003,10 @@ void Logger::sleep(){
 
 void Logger::startLogging(){
   /**
+   * @brief 
+   * Wakes the logger and starts logging
+   * 
+   * @details
    * Wakes the logger: sets the watchdog timer (a failsafe in case the logger 
    * hangs), checks and clears alarm flags, looks for rain gauge bucket tips
    * (if they occur during the middle of a logging event (ignore) or if they
@@ -1030,6 +1083,10 @@ void Logger::startLogging(){
 
 void Logger::endLogging(){
   /**
+   * @brief 
+   * Endslogging and returns to sleep
+   * 
+   * @details
    * Ends line, turns of SD card, and resets alarm: ready to sleep.
    * 
    * Also runs tipping bucket rain gauge code (function that records time 
@@ -1080,7 +1137,7 @@ void Logger::endLogging(){
 
 void Logger::startAnalog(){
   /**
-   * Turn on power to analog sensors
+   * @brief Turn on power to analog sensors
    */
   digitalWrite(SensorPowerPin,HIGH);
   sbi(ADCSRA,ADEN);        // switch Analog to Digitalconverter ON
@@ -1089,7 +1146,7 @@ void Logger::startAnalog(){
 
 void Logger::endAnalog(){
   /**
-   * Turn off power to analog sensors
+   * @brief Turn off power to analog sensors
    */
   digitalWrite(SensorPowerPin,LOW);
   delay(2);
@@ -1105,10 +1162,13 @@ void Logger::endAnalog(){
 float Logger::readPin(int pin){
 
   /**
+   * @brief Read the analog value of a pin.
+   * 
+   * @details
    * This function returns the analog to digital converter value (0 - 1023). 
    * Results are displayed on the serial monitor and saved onto the SD card.
    * 
-   * \b pin is the analog pin number to be read.
+   * @param pin is the analog pin number to be read.
    * 
    * Example:
    * ```
@@ -1139,13 +1199,17 @@ float Logger::readPin(int pin){
 float Logger::readPinOversample(int pin, int bits){
 
   /**
+   * @brief 
+   * Read the analog value of a pin, with extra resolution from oversampling
+   * 
+   * @details
    * This function incorporates oversampling to extend the ADC precision
    * past ten bits by taking more readings and statistically combing them.
    * Results are displayed on the serial monitor and saved onto the SD card.
    * 
-   * \b pin is the analog pin number to be read.
+   * @param pin is the analog pin number to be read.
    * 
-   * \b adc_bits is the reading precision in bits (2^adc_bits).
+   * @param adc_bits is the reading precision in bits (2^adc_bits).
    * The ATMega328 (Arduino Uno and ALog BottleLogger core chip)
    * has a base ADC precision of 10 bits (returns values of 0-1023)
    * A reasonable maximum precision gain is (base_value_bits)+6, so
@@ -1189,6 +1253,10 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
                           bool Rref_on_GND_side, bool oversample_debug){
 
   /**
+   * @brief 
+   * Read the analog value of a pin, with extra resolution from oversampling
+   * 
+   * @details
    * This function measures temperature using a thermistor characterised with 
    * the B (or β) parameter equation, which is a simplification of the 
    * Steinhart-Hart equation
@@ -1200,28 +1268,28 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
    * Results are displayed on the serial monitor and saved onto the SD 
    * card to four decimal places.
    * 
-   * \b R0 is the resistance of the thermistor at the known temperature
-   * \b T0degC
+   * @param R0 is the resistance of the thermistor at the known temperature
+   * @param T0degC
    * 
-   * \b B is the β parameter of the thermistor
+   * @param B is the β parameter of the thermistor
    * 
-   * \b Rref is the resistance of the corresponding reference resistor for \
+   * @param Rref is the resistance of the corresponding reference resistor for \
    * the analog pin set by \b ThermPin (below).
    * 
-   * \b T0degC is the temperature at which \b R0 was calibrated.
+   * @param T0degC is the temperature at which \b R0 was calibrated.
    * 
-   * \b thermPin is the analog pin number to be read.
+   * @param thermPin is the analog pin number to be read.
    * 
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
-   * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * @param Rref_on_GND-Side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
    * the reference resitor must be instead connected via the screw terminals.
    * This is set true for external sensors that are built to require a
    * VCC-side reference resistor.
    * 
-   * \b oversample_debug is true if you want a separate file, "Oversample.txt", 
+   * @param oversample_debug is true if you want a separate file, "Oversample.txt", 
    * to record every individual reading used in the oversampling.
    * 
    * Example:
@@ -1238,9 +1306,6 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
   float Rtherm = _vdivR(thermPin, Rref, ADC_resolution_nbits, \
                         Rref_on_GND_side, oversample_debug);
   }
-   * "Debug" in this function name means that there is a file called
-   * "Oversample.txt" that contains all of the values read during the
-   * oversampling.
   
   // B-value thermistor equations
   float T0 = T0degC + 273.15;
@@ -1274,24 +1339,26 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
                                 float Rref_therm, uint8_t ADC_resolution_nbits){
 
   /**
-   * This function measures the relative humidity of using a HTM2500
+   * @brief HTM2500LF Relative humidity and temperature sensor
+   * 
+   * @details This function measures the relative humidity of using a HTM2500
    * tempurature and relative humidity module.
    * The relative humidity and temperature is measured using a 14 bit
    * oversampling method.
    * Results are displayed on the serial monitor and saved onto the SD 
    * card to four decimal places.
    * 
-   * \b humidPin is the analog pin connected to the humidity output voltage 
+   * @param humidPin is the analog pin connected to the humidity output voltage 
    * of the module.
    * 
-   * \b thermPin is the analog pin connected to the tempurature output voltage 
+   * @param thermPin is the analog pin connected to the tempurature output voltage 
    * of the module.
    * 
-   * \b Rref_therm is the value of the reference resistor that you use
+   * @param Rref_therm is the value of the reference resistor that you use
    * with the built-in thermistor (reference resistor supplied separately,
    * placed in appropriate slot in header)
    *
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10)
    * 
    * Example:
@@ -1359,29 +1426,32 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
              uint8_t ADC_resolution_nbits){
 
   /**
-   * This function measures the relative humidity of using a HTM1500 relative 
-   * humidity sensor and an external thermistor.
+   * @brief HM1500LF Relative humidity sensor with external temperature
+   * correction
+   *
+   * @details This function measures the relative humidity of using a HTM1500  
+   * relative humidity sensor and an external thermistor.
    * The relative humidity and temperature is measured using a 14 bit 
    * oversampling method.
    * Results are displayed on the serial monitor and saved onto the SD card 
    * to four decimal places.
    * 
-   * \b humidPin is the analog pin connected to the humidity output voltage 
+   * @param humidPin is the analog pin connected to the humidity output voltage 
    * of the module.
    * 
-   * \b R0_therm is a thermistor calibration.
+   * @param R0_therm is a thermistor calibration.
    * 
-   * \b B_therm is the B- or β- parameter of the thermistor.
+   * @param B_therm is the B- or β- parameter of the thermistor.
    * 
-   * \b Rref_therm is the resistance of the corresponding reference resistor for 
+   * @param Rref_therm is the resistance of the corresponding reference resistor for 
    * that analog pin.
    * 
-   * \b T0degC_therm is a thermistor calibration.
+   * @param T0degC_therm is a thermistor calibration.
    * 
-   * \b thermPin_therm is the analog pin connected to the tempurature output voltage 
+   * @param thermPin_therm is the analog pin connected to the tempurature output voltage 
    * of the module.
    * 
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10)
    * 
    * Example:
@@ -1444,6 +1514,10 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
 void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool writeAll){
 
   /**
+   * @brief Old 1-cm resolution Maxbotix ultrasonic rangefinders: analog
+   * measurements
+   * 
+   * @details
    * This function measures the distance between the ultrasonic sensor and an 
    * acustically reflective surface, typically water or snow.
    * Measures distance in centimeters.
@@ -1452,18 +1526,18 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool write
    * This is for the older MaxBotix sensors, whose maximum precision is
    * in centimeters.
    * 
-   * \b nping is the number of range readings to take (number of pings).  
+   * @param nping is the number of range readings to take (number of pings).  
    * The mean range will be calculated and output to the serial monitor and 
    * SD card followed by the standard deviation.
    * 
-   * \b EX is a digital output pin used for an excitation pulse.  If maxbotix 
+   * @param EX is a digital output pin used for an excitation pulse.  If maxbotix 
    * sensor is continuously powered a reading will be taken when this pin is 
    * flashed high.
    * Set to '99' if excitation pulse is not needed.
    * 
-   * \b sonicPin is the analog input channel hooked up to the maxbotix sensor.
+   * @param sonicPin is the analog input channel hooked up to the maxbotix sensor.
    * 
-   * \b writeAll will write each reading of the sensor (each ping) to the 
+   * @param writeAll will write each reading of the sensor (each ping) to the 
    * serial monitor and SD card.
    * 
    * Example:
@@ -1549,34 +1623,29 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool write
 void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
                                     bool writeAll \
                                     uint8_t ADC_resolution_nbits){
-
-  // Returns distance in mm, +/- 5 mm
-  // Each 10-bit ADC increment corresponds to 5 mm.
-  // set EX=99 if you don't need it (or leave it clear -- this is default)
-  // Default nping=10 and sonicPin=A0
-  // Basically only differs from older MB sensor function in its range scaling
-  // and its added defaults.
-  
   /**
+   * @brief Newer 1-mm precision MaxBotix rangefinders: analog readings
+   * 
+   * @details
    * This function measures the distance between the ultrasonic sensor and an \
    * acoustically-reflective surface, typically water or snow.
    * Measures distance in milimeters.
    * Results are displayed on the serial monitor and saved onto the SD card.
    * 
-   * \b nping is the number of range readings to take (number of pings).  
+   * @param nping is the number of range readings to take (number of pings).  
    * The mean range will be calculated and output to the serial monitor 
    * and SD card followed by the standard deviation.
    * 
-   * \b sonicPin is the analog input channel hooked up to the maxbotix sensor.
+   * @param sonicPin is the analog input channel hooked up to the maxbotix sensor.
    * 
-   * \b EX is a digital output pin used for an excitation pulse.  *
+   * @param EX is a digital output pin used for an excitation pulse.  *
    * If maxbotix sensor is continuously powered, a reading will be taken when 
    * this pin is flashed high. Set to '99' if excitation pulse is not needed.
    * 
-   * \b writeAll will write each reading of the sensor (each ping) 
+   * @param writeAll will write each reading of the sensor (each ping) 
    * to the serial monitor and SD card.
    * 
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
    * Example:
@@ -1672,27 +1741,29 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
 float Logger::maxbotixHRXL_WR_Serial(int Ex, int npings, \
                                      bool writeAll, int maxRange, bool RS232){
   /**
+   * @brief
    * Uses the UART interface to record data from a MaxBotix sensor.
    * 
+   * @details
    * NOTE: THIS HAS CUASED LOGGERS TO FREEZE IN THE PAST; WHILE IT IS QUITE
    * LIKELY THAT THE ISSUE IS NOW SOLVED, MORE TESTING IS REQUIRED.
    * (ADW, 26 NOVEMBER 2016) (maybe solved w/ HW Serial?)
    * 
-   * \b Ex Excitation pin that turns the sensor on; if this is not needed (i.e. 
+   * @param Ex Excitation pin that turns the sensor on; if this is not needed (i.e. 
    * you are turning main power off and on instead), then just set this to a 
    * value that is not a pin, and ensure that you turn the power to the sensor
    * off and on outside of this function
    * 
-   * \b npings Number of pings over which you average; each ping itself 
+   * @param npings Number of pings over which you average; each ping itself 
    * includes ten short readings that the sensor internally processes
    * 
-   * \b writeAll will write each reading of the sensor (each ping) 
+   * @param writeAll will write each reading of the sensor (each ping) 
    * to the serial monitor and SD card.
    * 
-   * \b maxRange The range (in mm) at which the logger maxes out; this will
+   * @param maxRange The range (in mm) at which the logger maxes out; this will
    * be remembered to check for errors and to become a nodata values
    * 
-   * \b RS232 this is set true if you use inverse (i.e. RS232-style) logic;
+   * @param RS232 this is set true if you use inverse (i.e. RS232-style) logic;
    * it works at standard logger voltages (i.e. it is not true RS232). If 
    * false, TTL logic will be used.
    * 
@@ -1702,7 +1773,7 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int npings, \
    * // Digital pin 7 controlling sensor excitation, averaging over 10 pings,
    * // not recording the results of each ping, and with a maximum range of 
    * // 5000 mm using standard TTL logic
-   * logger.maxbotixHRXL_WR_Serial(7, 10, false, 5000, false)
+   * logger.maxbotixHRXL_WR_Serial(7, 10, false, 5000, false);
    * 
    * ```
    */
@@ -1872,40 +1943,42 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
              float Rref_therm, float T0degC_therm, int thermPin_therm, \
              float ADC_resolution_nbits){
   /**
+   * @brief 
    * Inclinometer, including temperature correction from an external sensor.
    * 
+   * @details
    * * +/- 90 degree inclinometer, measures +/- 1.0g
    * * Needs 4.75--5.25V input (Vsupply)
    * * In typical usage, turned on and off by a switching 5V charge pump or 
    *   boost converter
    * 
-   * \b xPin Analog pin number corresponding to x-oriented tilts
+   * @param xPin Analog pin number corresponding to x-oriented tilts
    * 
-   * \b yPin Analog pin number corresponding to y-oriented tilts
+   * @param yPin Analog pin number corresponding to y-oriented tilts
    * 
-   * \b Vref is the reference voltage of the analog-digital comparator; it is
+   * @param Vref is the reference voltage of the analog-digital comparator; it is
    * 3.3V on the ALog.
    * 
-   * \b Vsupply is the input voltage that drives the sensor, and is typically
+   * @param Vsupply is the input voltage that drives the sensor, and is typically
    * ~5V.
    * 
    * 
-   * \b humidPin is the analog pin connected to the humidity output voltage 
+   * @param humidPin is the analog pin connected to the humidity output voltage 
    * of the module.
    * 
-   * \b R0_therm is a thermistor calibration.
+   * @param R0_therm is a thermistor calibration.
    * 
-   * \b B_therm is the B- or β- parameter of the thermistor.
+   * @param B_therm is the B- or β- parameter of the thermistor.
    * 
-   * \b Rref_therm is the resistance of the corresponding reference resistor for 
+   * @param Rref_therm is the resistance of the corresponding reference resistor for 
    * that analog pin.
    * 
-   * \b T0degC_therm is a thermistor calibration.
+   * @param T0degC_therm is a thermistor calibration.
    * 
-   * \b thermPin_therm is the analog pin connected to the tempurature output voltage 
+   * @param thermPin_therm is the analog pin connected to the tempurature output voltage 
    * of the module.
    * 
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10).
    * It is applied to both the inclinomter and its temperature correction
    * 
@@ -1974,23 +2047,24 @@ void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
              unsigned long reading_duration_milliseconds, \
              float meters_per_second_per_rotation){
   /** 
-   * 
+   * @brief
    * Anemometer that flips a reed switch each time it spins.
    * 
-   * \b interrupt_pin_number is the digital pin number corresponding to
+   * @param interrupt_pin_number is the digital pin number corresponding to
    * the appropriate interrupt; it uses the Arduino digitalPinToInterrupt(n_pin)
    * function to properly attach the interrupt
    * 
-   * \b reading_duration_milliseconds How long will you count revolutions?
+   * @param reading_duration_milliseconds How long will you count revolutions?
    * Shorter durations save power, longer durations increase accuracy;
    * very long durations will produce long-term averages. Typical values are
    * a few seconds.
    * 
-   * \b meters_per_second_per_rotation: Conversion factor between revolutions
+   * @param meters_per_second_per_rotation: Conversion factor between revolutions
    * and wind speed. For the Inspeed Vortex wind sensor that we have used
    * (http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp),
    * this is: <b>2.5 mph/Hz = 1.1176 (m/s)/Hz</b>
    * 
+   * @details
    * This function depends on the global variable \b rotation_count.
    * 
    * Example:
@@ -2056,10 +2130,12 @@ void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
 
 void Logger::Wind_Vane_Inspeed(int vanePin){
   /**
+   * @brief
    * Wind vane: resistance changes with angle to wind.
    * 
-   * \b vanePin is the analog pin that reads the wind vane resistance
+   * @param vanePin is the analog pin that reads the wind vane resistance
    * 
+   * @details
    * This function is specialized for the Inspeed eVane2.
    * Here, a resistance of 0 equates to wind from the north, and 
    * resistence increases in a clockwise direction.
@@ -2100,34 +2176,36 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
                          float gain, float V_ref, \
                          uint8_t ADC_resolution_nbits){
   /**
+   * @brief
    * Pyranometer wtih instrumentation amplifier
    * 
+   * @details
    * Pyranomiter is from Kipp and Zonen
    * 
    * nominal raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2
    * 
    * Actual raw output is based on calibration.
    * 
-   * \b analogPin is the pin that receives the amplified voltage input
+   * @param analogPin is the pin that receives the amplified voltage input
    * 
-   * \b raw_mV_per_W_per_m2 is the conversion factor of the pyranometer:
+   * @param raw_mV_per_W_per_m2 is the conversion factor of the pyranometer:
    * number of millivolts per (watt/meter^2).
    * This does not include amplification!
    * 
-   * \b gain is the amplification factor
+   * @param gain is the amplification factor
    * 
-   * \b V_ref is the reference voltage of the ADC; on the ALog, this is
+   * @param V_ref is the reference voltage of the ADC; on the ALog, this is
    * a precision 3.3V regulator (unless a special unit without this regulator
    * is ordered; the regulator uses significant power)
    * 
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
    * Example:
    * ```
    * // Using precision voltage reference and 16-bit resolution (highest
    * // defensible oversampling resolution)
-   * logger.Pyranometer(A0, 0.0136, 120, 3.300, 16)
+   * logger.Pyranometer(A0, 0.0136, 120, 3.300, 16);
    * ```
    */
    
@@ -2154,6 +2232,10 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
 float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
                                    bool debug){
   /**
+   * @brief 
+   * Higher analog resolution through oversampling
+   * 
+   * @details
    * This function incorporates oversampling to extend the ADC precision
    * past ten bits by taking more readings and statistically combing them.
    *
@@ -2163,18 +2245,18 @@ float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
    * It is often used within other sensor functinons to increase measurement
    * precision.
    * 
-   * \b pin is the analog pin number
+   * @param pin is the analog pin number
    * 
-   * \b adc_bits is the reading precision in bits (2^adc_bits).
+   * @param adc_bits is the reading precision in bits (2^adc_bits).
    * The ATMega328 (Arduino Uno and ALog BottleLogger core chip)
    * has a base ADC precision of 10 bits (returns values of 0-1023)
    * A reasonable maximum precision gain is (base_value_bits)+6, so
    * 16 bits is a reasonable maximum precision for the ALog BottleLogger.
    * 
-   * \b nsamples is the number of times you want to poll the particular 
+   * @param nsamples is the number of times you want to poll the particular 
    * sensor and write the output to file.
    * 
-   * \b debug is a flag that, if true, will write all of the values read during
+   * @param debug is a flag that, if true, will write all of the values read during
    * the oversampling to "Oversample.txt".
    * 
    * Example:
@@ -2194,7 +2276,7 @@ float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
    * Example:
    * ```
    * // Take a single sample at 14-bit resolution and store it as "myReading"
-   * myReading = logger.analogReadOversample(A3, 14, 1)
+   * myReading = logger.analogReadOversample(A3, 14, 1);
    * ```
    * 
   */
@@ -2315,6 +2397,10 @@ void _anemometer_count_increment(){
 
 void Logger::HackHD(int control_pin, bool want_camera_on){
   /**
+   * @brief 
+   * HackHD camera control function
+   * 
+   * @details
    * Control the HackHD camera: this function turns the HackHD on or off
    * and records the time stamp from when the HackHD turns on/off in a file
    * called "camera.txt".
@@ -2326,13 +2412,13 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
    * requires the end-user to write the rest of the camera control sequence
    * themselves.
    * 
-   * \b control_pin is the pin connected to the HackHD on/off switch;
+   * @param control_pin is the pin connected to the HackHD on/off switch;
    * Dropping control_pin to GND for 200 ms turns camera on or off.
    * 
-   * \b want_camera_on is true if you want to turn the camera on, false if 
+   * @param want_camera_on is true if you want to turn the camera on, false if 
    * you want to turn the camera off.
    * 
-   * \b CAMERA_IS_ON is a global varaible attached to this function that 
+   * @param CAMERA_IS_ON is a global varaible attached to this function that 
    * saves the state of the camera; it will be compared to "want_camera_on",
    * such that this function will do nothing if the camera is already on (or
    * off) and you want it on (or off).
@@ -2422,6 +2508,10 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
 
 void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32_t baudRate, bool printReturn, bool saveReturn){
   /**
+   * @brief 
+   * Atlas Scientific sensors: water properties and chemistry.
+   * 
+   * @details
    * Generalized serial interface for Atlas Scientific sensors. It uses 
    * SoftwareSerial AND THEREFORE IS LIKELY UNSTABLE AFTER A FEW DAYS IN THE
    * FIELD. The watchdog timer SHOULD BE ABLE TO CATCH THIS, but this has not
@@ -2432,25 +2522,25 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
    * versitile: can connect many sensors to same I2C port, so long as they
    * remain isolated.
    * 
-   * \b command is the instruction code sent to the Atlas Scientific product.
+   * @param command is the instruction code sent to the Atlas Scientific product.
    * See the data sheet for your specific sensor.
    * 
-   * \b softSerRx is the software serial receive port
+   * @param softSerRx is the software serial receive port
    * 
-   * \b softSerTx is the software serial transmit port
+   * @param softSerTx is the software serial transmit port
    * 
-   * \b baudRate is set by the Atlas Scientific sensor's baud rate.
+   * @param baudRate is set by the Atlas Scientific sensor's baud rate.
    * 
-   * \b printReturn is true if you determines whether you care about (i.e. want 
+   * @param printReturn is true if you determines whether you care about (i.e. want 
    * to print) the Serial response, and false if you would just like to clear 
    * the buffer.
    *
-   * \b saveReturn is true if you want to save the response to the SD card.
+   * @param saveReturn is true if you want to save the response to the SD card.
    * 
    * Example:
    * ```
    * // read a pH probe using pins 7 and 8 as Rx and Tx, and save its results:
-   * logger.AtlasScientific("R", 7, 8)
+   * logger.AtlasScientific("R", 7, 8);
    * ```
    * 
    */
@@ -2534,7 +2624,11 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
 
 void Logger::TippingBucketRainGage(){
   /**
-   * Uses the interrupt to read a tipping bucket rain gage.
+   * @brief 
+   * Tipping-bucket rain gauge
+   * 
+   * @details
+   * Uses the interrupt to read a tipping-bucket rain gage.
    * Then prints date stamp
    * 
   */
@@ -2649,7 +2743,10 @@ void Logger::end_logging_to_otherfile(){
 
 void Logger::Decagon5TE(int excitPin, int dataPin){
   /**
+   * @brief 
    * Reads a Decagon Devices 5TE soil moisture probe.
+   * 
+   * @details
    * NEEDS TESTING with current ALog version.
    * 
    * Returns Dielectric permittivity [-unitless-], electrical conductivity 
@@ -2662,9 +2759,9 @@ void Logger::Decagon5TE(int excitPin, int dataPin){
    *
    * Modified from Steve Hicks' code for an LCD reader by Andy Wickert
    * 
-   * \b excitPin activates the probe and powers it
+   * @param excitPin activates the probe and powers it
    * 
-   * \b dataPin receives incoming serial data at 1200 bps
+   * @param dataPin receives incoming serial data at 1200 bps
    * 
    * Example:
    * ```
@@ -2788,21 +2885,22 @@ void Logger::Decagon5TE(int excitPin, int dataPin){
 
 void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
   /**
-   * Ruggedized Decagon Devices soil moisture sensor
+   * @brief Ruggedized Decagon Devices soil moisture sensor
    * 
-   * \b pin Analog pin number
+   * @param pin Analog pin number
    * 
-   * \b Vref is the reference voltage of the ADC; on the ALog, this is
+   * @param Vref is the reference voltage of the ADC; on the ALog, this is
    * a precision 3.3V regulator (unless a special unit without this regulator
    * is ordered; the regulator uses significant power)
    * 
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
+   * @details
    * Example:
    * ```
    * // Using a non-precision Rref that is slightly off
-   * logger.DecagonGS1(A1, 3.27, 14)
+   * logger.DecagonGS1(A1, 3.27, 14);
    * ```
    * 
    */
@@ -2843,27 +2941,29 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
                                    int TransferFunction_number, int units, \
                                    uint8_t ADC_resolution_nbits){
   /**
+   * @brief
    * Cost-effective pressure sensor from Honeywell
    * 
+   * @details
    * Datasheet: http://sensing.honeywell.com/index.php?ci_id=151133
    * 
    * See also the \b Honeywell_HSC_analog example.
    * 
-   * \b pin Analog pin number
+   * @param pin Analog pin number
    * 
-   * \b Vsupply Supply voltage to sensor
+   * @param Vsupply Supply voltage to sensor
    * 
-   * \b Vref is the reference voltage of the ADC; on the ALog, this is
+   * @param Vref is the reference voltage of the ADC; on the ALog, this is
    * a precision 3.3V regulator (unless a special unit without this regulator
    * is ordered; the regulator uses significant power)
    * 
-   * \b Pmin Minimum pressure in range of sensor
+   * @param Pmin Minimum pressure in range of sensor
    * 
-   * \b Pmax Maximum pressure in range of sensor
+   * @param Pmax Maximum pressure in range of sensor
    * 
-   * \b Pmax Maximum pressure in range of sensor
+   * @param Pmax Maximum pressure in range of sensor
    * 
-   * \b TransferFunction_number: 1, 2, 3, or 4: which transfer function is 
+   * @param TransferFunction_number: 1, 2, 3, or 4: which transfer function is 
    * used to convert voltage to pressure
    * * TransferFunction: 1 = 10% to 90% of Vsupply 
    *   ("A" in second to last digit of part number)
@@ -2874,7 +2974,7 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
    * * TransferFunction: 4 = 4% to 94% of Vsupply
    *   ("A" in second to last digit of part number)
    * 
-   * \b Units: Output units
+   * @param Units: Output units
    * * Units: 0 = mbar
    * * Units: 1 = bar
    * * Units: 2 = Pa
@@ -2883,7 +2983,7 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
    * * Units: 5 = inH2O
    * * Units: 6 = PSI
    * 
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
    * Example:
@@ -2939,26 +3039,28 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
 
 void Logger::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, bool Rref_on_GND_side){
   /**
+   * @brief
    * Resistance from a simple voltage divider
    * 
-   * \b pin Analog pin number
+   * @param pin Analog pin number
    * 
-   * \b Rref Resistance value of reference resistor [ohms]
+   * @param Rref Resistance value of reference resistor [ohms]
    * 
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
-   * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * @param Rref_on_GND-Side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
    * the reference resitor must be instead connected via the screw terminals.
    * This is set true for external sensors that are built to require a
    * VCC-side reference resistor.
    * 
+   * @details
    * Example:
    * ```
    * // Use standard reference resistor headers: let last parameter be false 
    * // (default)
-   * logger.vdivR(A2, 10000, 12)
+   * logger.vdivR(A2, 10000, 12);
    * ```
    */
   
@@ -2990,21 +3092,25 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
                                  uint8_t ADC_resolution_nbits, \
                                  bool Rref_on_GND_side){
   /**
+   * @brief
+   * Linear potentiometer (radio tuner) to measure distance
+   * 
+   * @details
    * Distance based on resistance in a sliding potentiometer whose resistance
    * may be described as a linear function
    * 
-   * \b linpotPin Analog pin number
+   * @param linpotPin Analog pin number
    * 
-   * \b Rref Resistance value of reference resistor [ohms]
+   * @param Rref Resistance value of reference resistor [ohms]
    *
-   * \b slope Slope of the line (distance = (slope)R + R0)
+   * @param slope Slope of the line (distance = (slope)R + R0)
    *
-   * \b intercept (R0) of the line (distance = (slope)R + R0)
+   * @param intercept (R0) of the line (distance = (slope)R + R0)
    * 
-   * \b ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
+   * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
-   * \b Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * @param Rref_on_GND-Side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
    * the reference resitor must be instead connected via the screw terminals.
    * This is set true for external sensors that are built to require a
@@ -3018,9 +3124,9 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
    * // Using a 0-10k ohm radio tuner with units in mm and a perfect intercept;
    * // maintaining default 14-bit readings with standard-side (ALog header)
    * // reference resistor set-up
-   * logger.linearPotentiometer(A0, 5000, 0.0008)
-   * 
+   * logger.linearPotentiometer(A0, 5000, 0.0008);
    * ```
+   * 
    */
 
   float _Rpot = _vdivR(linpotPin, Rref, ADC_resolution_nbits, Rref_on_GND_side);
