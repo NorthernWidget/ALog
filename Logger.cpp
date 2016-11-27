@@ -2060,7 +2060,8 @@ void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
    * 
    * @param interrupt_pin_number is the digital pin number corresponding to
    * the appropriate interrupt; it uses the Arduino digitalPinToInterrupt(n_pin)
-   * function to properly attach the interrupt
+   * function to properly attach the interrupt. On the ALog BottleLogger, this
+   * number will always be \b 3.
    * 
    * @param reading_duration_milliseconds How long will you count revolutions?
    * Shorter durations save power, longer durations increase accuracy;
