@@ -1,21 +1,30 @@
-/**********************************************
+/**
+@file
 
-Logger.h
+# Logger.h
 
-Data logger library header
+Data logger library header<br>
+Designed for the ALog<br>
+Modules should work for any Arduino-based board with minimal modificiation.<br>
+Goals:
+1. Manage logger utility functions, largely behind-the-scenes
+2. Simplify data logger operations to one-line calls
 
-Andy Wickert, started 27 September 2011
+Written by Andy Wickert, 2011-2016, and Chad Sandell, 2016<br>
+Started 27 September 2011
 
 Designed to greatly simplify Arduino sketches 
-for my data logger and reduce what the end 
+for the ALog and reduce what the end 
 user needs to do into relatively simple 
 one-line calls.
 
+## LICENSE: GNU GPL v3
 
-# LICENSE: GNU GPL v3
+Logger.h is part of Logger, an Arduino library written by Andrew D. Wickert
+and Chad T. Sandell.
 
-Logger.h is part of Logger, an Arduino library written by Andrew D. Wickert.
-Copyright (C) 2011-2013, Andrew D. Wickert
+Copyright (C) 2011-2015, Andrew D. Wickert<br>
+Copyright (C) 2016, Andrew D. Wickert and Chad T. Sandell
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -29,8 +38,8 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-**********************************************/
 
 /////////////////////////////////
 // DEFINE SELF / INCLUDE GUARD //
