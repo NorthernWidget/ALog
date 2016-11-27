@@ -151,7 +151,14 @@ bool NEW_RAIN_BUCKET_TIP = false; // flag
 bool LOG_ALL_SENSORS_ON_BUCKET_TIP; // Defaults to False, true if you should 
                                     // all sensors every time an event (e.g., 
                                     // rain gage bucket tip) happens
+                                    
+// Rotation count for anemometer
 unsigned int rotation_count = 0;
+
+// Flag for whether or not there is a sensor in the UART port.
+// If there is, disable the time-setting protocols; these will be triggered
+// by detection of the sensor.
+// bool sensor_on_UART,
 
 
 /////////////////////////
@@ -206,6 +213,7 @@ Logger::Logger(){}
 void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
                         int _hourInterval, int _minInterval, int _secInterval, \
                         bool _ext_int, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP){
+                        // bool _sensor_on_UART,
   /**
    * @brief 
    * Pass all variables needed to initialize logging.
@@ -3200,17 +3208,32 @@ void Logger::announce_start(){
     F("********************** Logger initializing. **********************"));
 }
 
+// Handshake function
+void Logger::establishContact() {
+  while (Serial.available() <= 0) {
+    Serial.print('A');   // send a capital A
+    delay(300);
+  }
+}
+
 void Logger::startup_sequence(){
-  boolean comp = false;
+  bool connected_to_computer = false;
   char handshake[4];
   char handshake_test[5] = "alog"; // 5 chars, incl. termination
   int ntrue = 0;
   int i;
   unsigned long unixtime_at_start;
   
-  // Check if connected to computer with ALogTalk running to set the clock
+  // First, throw away any garbage on the incoming Serial line
+  while(Serial.available() > 0)
+    Serial.read();
+  
+  // Then check if connected to computer with ALogTalk running to set the clock
+  // Do so by first pinging the computer, and then waiting for a handshake.
   int millisthen = millis();
-  while ( (millis() - millisthen) < 2000 && (comp == 0)){
+  while ( (millis() - millisthen) < 2000 && (connected_to_computer == 0)){
+    establishContact();
+    // Serial is available if establishContact exits on its own
     if ( Serial.available() ){
       i = 0;
       while( Serial.available() && (i < 4)){
@@ -3223,17 +3246,20 @@ void Logger::startup_sequence(){
         }
       }
       if (ntrue == 4){
-        comp = true;
+        connected_to_computer = true;
       }
     }
   }
   
-  // Run through startup sequence, including clock setting if comp is true
+  // Run through startup sequence, including clock setting if 
+  // connected_to_computer is true
   name();
   Serial.println(F("HELLO, COMPUTER."));
   delay(50);
-  //if ( Serial.available() ){ // To allow clock setting, uncomment this and comment the above section that sets "comp"
-  if ( comp ){
+  //if ( Serial.available() ){ // To allow clock setting, uncomment this and 
+  // comment the above section that sets "connected_to_computer"...
+  // that is, unless you can make the handshake work!
+  if ( connected_to_computer ){
     delay(1000); // Give Python time to print
     name();
     Serial.print(F("LOGGING TO FILE ["));
@@ -3265,7 +3291,8 @@ void Logger::startup_sequence(){
       print_time();
       delay(1500);
       name();
-      Serial.println(F("Would you like to set the logger's clock to the computer's time? (y/n)"));
+      Serial.println(F("Would you like to set the logger's clock \
+                        to the computer's time? (y/n)"));
       boolean waiting = 1;
       char yn;
       while ( waiting ){
@@ -3301,7 +3328,7 @@ void Logger::startup_sequence(){
       LEDtimeWrong(3);
     }
   }
-  if ( comp ){
+  if ( connected_to_computer ){
     delay(1500);
     name();
     Serial.println(F("Now beginning to log."));
