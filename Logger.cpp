@@ -1313,7 +1313,6 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
   // Voltage divider
   float Rtherm = _vdivR(thermPin, Rref, ADC_resolution_nbits, \
                         Rref_on_GND_side, oversample_debug);
-  }
   
   // B-value thermistor equations
   float T0 = T0degC + 273.15;
@@ -1473,7 +1472,8 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
   // This will fully calculate and write the temperature data, too.
   float V_humid_norm = analogReadOversample(humidPin, 14)/1023.; // 0-1
   // Will write temperature to file here
-  float T = thermistorB(R0, B, Rref, T0degC, thermPin);
+  float T = thermistorB(R0_therm, B_therm, Rref_therm, T0degC_therm, \
+                        thermPin_therm);
 
   // Then, convert the normalized voltage into a humidity reading
   // The calibration is created for a 5V input, but the data sheet says it
@@ -1629,7 +1629,7 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool write
 }
 
 void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
-                                    bool writeAll \
+                                    bool writeAll, \
                                     uint8_t ADC_resolution_nbits){
   /**
    * @brief Newer 1-mm precision MaxBotix rangefinders: analog readings
@@ -1949,7 +1949,7 @@ int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
 void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
              float Vref, float Vsupply, float R0_therm, float B_therm, \
              float Rref_therm, float T0degC_therm, int thermPin_therm, \
-             float ADC_resolution_nbits){
+             uint8_t ADC_resolution_nbits){
   /**
    * @brief 
    * Inclinometer, including temperature correction from an external sensor.
@@ -1998,14 +1998,17 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
    * 
   */
   
-  float Vout_x = (analogReadOversample(xPin, ADC_resolution_nbits) / 1023.) * Vref;
-  float Vout_y = (analogReadOversample(yPin, ADC_resolution_nbits) / 1023.) * Vref;
+  float Vout_x = (analogReadOversample(xPin, ADC_resolution_nbits) / 1023.) \
+                 * Vref;
+  float Vout_y = (analogReadOversample(yPin, ADC_resolution_nbits) / 1023.) \
+                 * Vref;
   
   float Offset = Vsupply/2.;
   float Sensitivity = 2.;
 
   // Temperature correction
-  float T = thermistorB(R0, B, Rref, T0degC, thermPin, ADC_resolution_nbits);
+  float T = thermistorB(R0_therm, B_therm, Rref_therm, T0degC_therm, \
+                        thermPin_therm, ADC_resolution_nbits);
   // Sensitivity correction for Scorr
   float Scorr = -0.00011 * T*T + 0.0022 * T + 0.0408;
   
@@ -2109,8 +2112,7 @@ void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
   // Wait in while loop while interrupt can increment counter.
   while (millis() - millis_start <= reading_duration_milliseconds){
   }
-  detachInterrupt(digitalPinToInterrupt(digitalPinToInterrupt \
-                                        (interrupt_pin_number) );
+  detachInterrupt(digitalPinToInterrupt(interrupt_pin_number));
   
   rotation_Hz = rotation_count / reading_duration_seconds;
   wind_speed_meters_per_second = rotation_Hz * meters_per_second_per_rotation;
@@ -2597,7 +2599,7 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
 
   // Safety guard in case all data not received -- won't hang for > t_timeout
   // milliseconds
-  t_timeout = 5000;
+  int t_timeout = 5000;
   uint32_t start_millis = millis();
   bool endflag = false;
   
@@ -2700,21 +2702,7 @@ void Logger::TippingBucketRainGage(){
   }
 }
 
-// call back for file timestamps
-void Logger::_internalDateTime(uint16_t* date, uint16_t* time) {
-  char timestamp[30];
-  DateTime now = RTC.now();
-  // return date using FAT_DATE macro to format fields
-  *date = FAT_DATE(now.year(), now.month(), now.day());
-  // return time using FAT_TIME macro to format fields
-  *time = FAT_TIME(now.hour(), now.minute(), now.second());
-}
-
 void Logger::start_logging_to_datafile(){
-  // Callback to set date and time
-  // Following: https://forum.arduino.cc/index.php?topic=348562.0
-  // See: https://github.com/NorthernWidget/Logger/issues/6
-  SdFile::dateTimeCallback(_internalDateTime);
   // Open the file for writing
   if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {   
     Serial.print(F("Opening "));
@@ -2725,10 +2713,6 @@ void Logger::start_logging_to_datafile(){
 }
 
 void Logger::start_logging_to_otherfile(char* filename){
-  // Callback to set date and time
-  // Following: https://forum.arduino.cc/index.php?topic=348562.0
-  // See: https://github.com/NorthernWidget/Logger/issues/6
-  SdFile::dateTimeCallback(_internalDateTime);
   // open the file for write at end like the Native SD library
   if (!otherfile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 
@@ -2828,6 +2812,11 @@ void Logger::Decagon5TE(int excitPin, int dataPin){
     digitalWrite(excitPin,LOW);
     Serial.println(dataStream);
     endflag=0;
+    
+    // Declare to make C++ happy
+    float Epsilon_a;
+    float EC;
+    float T;
 
     // parse the array into 3 integers  (for the 5TM, y is always 0)
     sscanf (dataStream, "%d %d %d", &Epsilon_Raw, &Sigma_Raw, &T_Raw);     
@@ -2838,37 +2827,41 @@ void Logger::Decagon5TE(int excitPin, int dataPin){
     // Dielectric permittivity [-unitless-]
     if (Epsilon_Raw == 4095){
       // Error alert!
-      char Epsilon_a[6] = "ERROR";
+      //delete Epsilon_a;
+      //char Epsilon_a[6] = "ERROR";
+      Epsilon_a = -9999;
     }
     else {
-      float Epsilon_a = Epsilon_Raw/50.;
+      Epsilon_a = Epsilon_Raw/50.;
     }
     // Electrical Conductivity [dS/m]
     if (Sigma_Raw == 1023){
       // Error alert!
-      char EC[6] = "ERROR";
+      //char EC[6] = "ERROR";
+      EC = -9999;
     }
     else if (Sigma_Raw <= 700){
-      float EC = Sigma_Raw/100.;
+      EC = Sigma_Raw/100.;
     }
     else {
       // (i.e. Sigma_Raw > 700, but no elif needed so long as input string
       // parses correctly... hmm, should maybe protect against that)
-      float EC = (700. + 5.*(Sigma_Raw- 700.))/100.;
+      EC = (700. + 5.*(Sigma_Raw- 700.))/100.;
     }
     // Temperature [degrees C]
     // Combined both steps of the operation as given in the manual
     if (T_Raw == 1023){
       // Error alert!
-      char T[6] = "ERROR";
+      // char T[6] = "ERROR";
+      T = -9999;
     }
     else if (T_Raw <= 900){
-      float T = (T_Raw - 400.) / 10.;
+      T = (T_Raw - 400.) / 10.;
     }
     else {
       // (i.e. T_Raw > 900, but no elif needed so long as input string
       // parses correctly... hmm, should maybe protect against that)
-      float T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
+      T = ((900. + 5.*(T_Raw-900.) - 400.)) / 10.;
     }
     
     ///////////////
@@ -3210,7 +3203,7 @@ void Logger::announce_start(){
 }
 
 // Handshake function
-void Logger::establishContact() {
+void Logger::establishContact(){
   while (Serial.available() <= 0) {
     Serial.print('A');   // send a capital A
     delay(300);
@@ -3443,4 +3436,24 @@ void Logger::GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW,
 	Second = Temp1*10 + Temp2;
 }
 
+////////////////////////
+// Non-class function //
+////////////////////////
 
+// call back for file timestamps
+// See https://forum.arduino.cc/index.php?topic=72739.0
+// and https://forum.arduino.cc/index.php?topic=348562.0
+void _internalDateTime(uint16_t* date, uint16_t* time) {
+  DateTime now = RTC.now();
+  // return date using FAT_DATE macro to format fields
+  *date = FAT_DATE(now.year(), now.month(), now.day());
+  // return time using FAT_TIME macro to format fields
+  *time = FAT_TIME(now.hour(), now.minute(), now.second());
+}
+
+/*
+  // Callback to set date and time
+  // Following: https://forum.arduino.cc/index.php?topic=348562.0
+  // See: https://github.com/NorthernWidget/Logger/issues/6
+  SdFile::dateTimeCallback(_internalDateTime);
+*/

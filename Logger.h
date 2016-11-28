@@ -104,11 +104,11 @@ class Logger {
     // Sensors - standard procedure (wake up, log, sleep)
     float readPin(int pin);
     float readPinOversample(int pin, int bits);
-    float analogReadOversample(int pin, int adc_bits=10, int nsamples=1, \
-          debug=false);
+    float analogReadOversample(int pin, uint8_t adc_bits=10, int nsamples=1, \
+          bool debug=false);
     float thermistorB(float R0, float B, float Rref, float T0degC, \
           int thermPin, uint8_t ADC_resolution_nbits=14, \
-          bool Rref_on_GND_side=true; bool oversample_debug=false);
+          bool Rref_on_GND_side=true, bool oversample_debug=false);
     // Print order: Distance [cm], standard deviation [cm]
     void ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, \
          bool writeAll);
@@ -125,17 +125,19 @@ class Logger {
     // FLEX SENSOR READING DOES NOT STABLIIZE: CHANGES CONSISTENTLY WITH TIME.
     //void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, \
-         float intercept=0, uint8_t ADC_resolution_nbits=14);
+         float intercept=0, uint8_t ADC_resolution_nbits=14, \
+         bool Rref_on_GND_side=true);
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, \
          uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
          float Rref_therm, uint8_t ADC_resolution_nbits=14);
-    void HM1500LF_humidity_with_external_temperature(int humidPin, float Vref, \
-         float R0, float B, float Rref, float T0degC, int thermPin, \
-         uint8_t ADC_resolution_nbits=14);
+    void HM1500LF_humidity_with_external_temperature(int humidPin, \
+         float R0_therm, float B_therm, float Rref_therm, float T0degC_therm, \
+         int thermPin_therm, uint8_t ADC_resolution_nbits=14);
     void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
-         float Vref, float Vsupply, float R0, float B, float Rref, \
-         float T0degC, int thermPin, uint8_t ADC_resolution_nbits=14);
+         float Vref, float Vsupply, float R0_therm, float B_therm, \
+         float Rref_therm, float T0degC_therm, int thermPin_therm, \
+         uint8_t ADC_resolution_nbits=14);
     void Anemometer_reed_switch(int interrupt_pin_number, 
          unsigned long reading_duration_milliseconds, \
          float meters_per_second_per_rotation);
@@ -147,8 +149,8 @@ class Logger {
     // Sensors - triggered
     // Camera on/off function; decision made in end-user Arduino script
     void HackHD(int control_pin, bool want_camera_on);
-    float Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, \
-          int TransferFunction_number, int units, int pin,
+    float Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
+          float Pmin, float Pmax, int TransferFunction_number, int units, \
           uint8_t ADC_resolution_nbits=14);
 
   private:
@@ -171,7 +173,7 @@ class Logger {
     
     // Time
     void unixDatestamp();
-    _internalDateTime(uint16_t* date, uint16_t* time) // Callback: SD DT stamp
+    void _internalDateTime(uint16_t* date, uint16_t* time); // Callback: SD DT stamp
     
     // Logger-computer communications
     void name();
@@ -179,6 +181,7 @@ class Logger {
     void set_time_main();
     void announce_start();
     void startup_sequence();
+    void establishContact();
     
     // Clock power
     void RTCon();
@@ -195,7 +198,7 @@ class Logger {
     
     // Sensor utility codes
     float _vdivR(int pin, float Rref, uint8_t adc_bits=10, \
-          bool Rref_on_GND_side=true);
+          bool Rref_on_GND_side=true, bool oversample_debug=false);
     // I don't trust the software serial version
     //int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
     int maxbotix_Serial_parse(int Ex);
