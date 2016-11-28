@@ -3,6 +3,8 @@
 \subsection*{Public Member Functions}
 \begin{DoxyCompactItemize}
 \item 
+\hyperlink{classLogger_abc41bfb031d896170c7675fa96a6b30c}{Logger} ()
+\begin{DoxyCompactList}\small\item\em \hyperlink{classLogger}{Logger} library for the Arduino-\/based A\+Log data logger. \end{DoxyCompactList}\item 
 void \hyperlink{classLogger_a9495e2c8e63850f3c7cfcc31e9d73ffe}{initialize} (char $\ast$\+\_\+logger\+\_\+name, char $\ast$\+\_\+sitecode, int \+\_\+day\+Interval, int \+\_\+hour\+Interval, int \+\_\+min\+Interval, int \+\_\+sec\+Interval, bool \+\_\+ext\+\_\+int=false, bool \+\_\+\+L\+O\+G\+\_\+\+O\+N\+\_\+\+B\+U\+C\+K\+E\+T\+\_\+\+T\+IP=false)
 \item 
 void \hyperlink{classLogger_ab5e0bd543758c65a17b77553a0e9f0c9}{setup\+Logger} ()
@@ -61,6 +63,34 @@ float \hyperlink{classLogger_a71ea885397f448ac03675b1e9a93ecfd}{Honeywell\+\_\+\
 \end{DoxyCompactItemize}
 
 
+\subsection{Constructor \& Destructor Documentation}
+\index{Logger@{Logger}!Logger@{Logger}}
+\index{Logger@{Logger}!Logger@{Logger}}
+\subsubsection[{\texorpdfstring{Logger()}{Logger()}}]{\setlength{\rightskip}{0pt plus 5cm}Logger\+::\+Logger (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\hypertarget{classLogger_abc41bfb031d896170c7675fa96a6b30c}{}\label{classLogger_abc41bfb031d896170c7675fa96a6b30c}
+
+
+\hyperlink{classLogger}{Logger} library for the Arduino-\/based A\+Log data logger. 
+
+A\+Log data logger library\+: methods to\+:
+\begin{DoxyItemize}
+\item Initialize the data logger
+\item Sleep and wake
+\item Interact with the real-\/time clock (R\+TC)
+\item Write data to the SD card
+\item Manage power
+\item Interact with a range of sensors
+\end{DoxyItemize}
+
+All help documentation here assumes you have created an instance of the \char`\"{}\+Logger\char`\"{} 
+\begin{DoxyCode}
+logger \hyperlink{classLogger_abc41bfb031d896170c7675fa96a6b30c}{Logger}();
+\end{DoxyCode}
+ 
+
 \subsection{Member Function Documentation}
 \index{Logger@{Logger}!analog\+Read\+Oversample@{analog\+Read\+Oversample}}
 \index{analog\+Read\+Oversample@{analog\+Read\+Oversample}!Logger@{Logger}}
@@ -72,20 +102,25 @@ float \hyperlink{classLogger_a71ea885397f448ac03675b1e9a93ecfd}{Honeywell\+\_\+\
 \item[{debug}]{ = {\ttfamily false}}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a73193a90982ddcb31ad0b401ec0e71fa}{}\label{classLogger_a73193a90982ddcb31ad0b401ec0e71fa}
+Higher analog resolution through oversampling
+
 This function incorporates oversampling to extend the A\+DC precision past ten bits by taking more readings and statistically combing them.
 
 Returns a floating point number between 0 and 1023 in order to be intechangable with the Arduino core Analog\+Read() function
 
 It is often used within other sensor functinons to increase measurement precision.
 
-{\bfseries pin} is the analog pin number
 
-{\bfseries adc\+\_\+bits} is the reading precision in bits (2$^\wedge$adc\+\_\+bits). The A\+T\+Mega328 (Arduino Uno and A\+Log Bottle\+Logger core chip) has a base A\+DC precision of 10 bits (returns values of 0-\/1023) A reasonable maximum precision gain is (base\+\_\+value\+\_\+bits)+6, so 16 bits is a reasonable maximum precision for the A\+Log Bottle\+Logger.
-
-{\bfseries nsamples} is the number of times you want to poll the particular sensor and write the output to file.
-
-{\bfseries debug} is a flag that, if true, will write all of the values read during the oversampling to \char`\"{}\+Oversample.\+txt\char`\"{}.
-
+\begin{DoxyParams}{Parameters}
+{\em pin} & is the analog pin number\\
+\hline
+{\em adc\+\_\+bits} & is the reading precision in bits (2$^\wedge$adc\+\_\+bits). The A\+T\+Mega328 (Arduino Uno and A\+Log Bottle\+Logger core chip) has a base A\+DC precision of 10 bits (returns values of 0-\/1023) A reasonable maximum precision gain is (base\+\_\+value\+\_\+bits)+6, so 16 bits is a reasonable maximum precision for the A\+Log Bottle\+Logger.\\
+\hline
+{\em nsamples} & is the number of times you want to poll the particular sensor and write the output to file.\\
+\hline
+{\em debug} & is a flag that, if true, will write all of the values read during the oversampling to \char`\"{}\+Oversample.\+txt\char`\"{}.\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 \textcolor{comment}{// 12-bit measurement of Pin 2}
@@ -103,7 +138,7 @@ Based on e\+R\+Ca\+Guy\+\_\+\+New\+Analog\+Read\+::take\+Samples(uint8\+\_\+t an
 Example\+: 
 \begin{DoxyCode}
 \textcolor{comment}{// Take a single sample at 14-bit resolution and store it as "myReading"}
-myReading = logger.analogReadOversample(A3, 14, 1)
+myReading = logger.analogReadOversample(A3, 14, 1);
 \end{DoxyCode}
 \index{Logger@{Logger}!Anemometer\+\_\+reed\+\_\+switch@{Anemometer\+\_\+reed\+\_\+switch}}
 \index{Anemometer\+\_\+reed\+\_\+switch@{Anemometer\+\_\+reed\+\_\+switch}!Logger@{Logger}}
@@ -116,12 +151,15 @@ myReading = logger.analogReadOversample(A3, 14, 1)
 )}\hypertarget{classLogger_a6c6a43a1b86f88c2a5e33d14c992e510}{}\label{classLogger_a6c6a43a1b86f88c2a5e33d14c992e510}
 Anemometer that flips a reed switch each time it spins.
 
-{\bfseries interrupt\+\_\+pin\+\_\+number} is the digital pin number corresponding to the appropriate interrupt; it uses the Arduino digital\+Pin\+To\+Interrupt(n\+\_\+pin) function to properly attach the interrupt
 
-{\bfseries reading\+\_\+duration\+\_\+milliseconds} How long will you count revolutions? Shorter durations save power, longer durations increase accuracy; very long durations will produce long-\/term averages. Typical values are a few seconds.
-
-{\bfseries meters\+\_\+per\+\_\+second\+\_\+per\+\_\+rotation\+:} Conversion factor between revolutions and wind speed. For the Inspeed Vortex wind sensor that we have used (\href{http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp}{\tt http\+://www.\+inspeed.\+com/anemometers/\+Vortex\+\_\+\+Wind\+\_\+\+Sensor.\+asp}), this is\+: {\bfseries 2.\+5 mph/\+Hz = 1.\+1176 (m/s)/\+Hz}
-
+\begin{DoxyParams}{Parameters}
+{\em interrupt\+\_\+pin\+\_\+number} & is the digital pin number corresponding to the appropriate interrupt; it uses the Arduino digital\+Pin\+To\+Interrupt(n\+\_\+pin) function to properly attach the interrupt\\
+\hline
+{\em reading\+\_\+duration\+\_\+milliseconds} & How long will you count revolutions? Shorter durations save power, longer durations increase accuracy; very long durations will produce long-\/term averages. Typical values are a few seconds.\\
+\hline
+{\em meters\+\_\+per\+\_\+second\+\_\+per\+\_\+rotation} & Conversion factor between revolutions and wind speed. For the Inspeed Vortex wind sensor that we have used (\href{http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp}{\tt http\+://www.\+inspeed.\+com/anemometers/\+Vortex\+\_\+\+Wind\+\_\+\+Sensor.\+asp}), this is\+: {\bfseries 2.\+5 mph/\+Hz = 1.\+1176 (m/s)/\+Hz}\\
+\hline
+\end{DoxyParams}
 This function depends on the global variable {\bfseries rotation\+\_\+count}.
 
 Example\+: 
@@ -142,26 +180,31 @@ logger.Anemometer\_reed\_switch(3, 4000, 1.1176);
 \item[{bool}]{save\+Return = {\ttfamily true}}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a9fdcbb56e3e4910ac895ee150fe1b9ed}{}\label{classLogger_a9fdcbb56e3e4910ac895ee150fe1b9ed}
+Atlas Scientific sensors\+: water properties and chemistry.
+
 Generalized serial interface for Atlas Scientific sensors. It uses Software\+Serial A\+ND T\+H\+E\+R\+E\+F\+O\+RE IS L\+I\+K\+E\+LY U\+N\+S\+T\+A\+B\+LE A\+F\+T\+ER A F\+EW D\+A\+YS IN T\+HE F\+I\+E\+LD. The watchdog timer S\+H\+O\+U\+LD BE A\+B\+LE TO C\+A\+T\+CH T\+H\+IS, but this has not yet been tested.
 
 Code in comments is on the way to replacing this with hardware serial. It is also possible to replace this with I2C code, which will be more versitile\+: can connect many sensors to same I2C port, so long as they remain isolated.
 
-{\bfseries command} is the instruction code sent to the Atlas Scientific product. See the data sheet for your specific sensor.
 
-{\bfseries soft\+Ser\+Rx} is the software serial receive port
-
-{\bfseries soft\+Ser\+Tx} is the software serial transmit port
-
-{\bfseries baud\+Rate} is set by the Atlas Scientific sensor\textquotesingle{}s baud rate.
-
-{\bfseries print\+Return} is true if you determines whether you care about (i.\+e. want to print) the Serial response, and false if you would just like to clear the buffer.
-
-{\bfseries save\+Return} is true if you want to save the response to the SD card.
-
+\begin{DoxyParams}{Parameters}
+{\em command} & is the instruction code sent to the Atlas Scientific product. See the data sheet for your specific sensor.\\
+\hline
+{\em soft\+Ser\+Rx} & is the software serial receive port\\
+\hline
+{\em soft\+Ser\+Tx} & is the software serial transmit port\\
+\hline
+{\em baud\+Rate} & is set by the Atlas Scientific sensor\textquotesingle{}s baud rate.\\
+\hline
+{\em print\+Return} & is true if you determines whether you care about (i.\+e. want to print) the Serial response, and false if you would just like to clear the buffer.\\
+\hline
+{\em save\+Return} & is true if you want to save the response to the SD card.\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 \textcolor{comment}{// read a pH probe using pins 7 and 8 as Rx and Tx, and save its results:}
-logger.AtlasScientific(\textcolor{stringliteral}{"R"}, 7, 8)
+logger.AtlasScientific(\textcolor{stringliteral}{"R"}, 7, 8);
 \end{DoxyCode}
 \index{Logger@{Logger}!Decagon5\+TE@{Decagon5\+TE}}
 \index{Decagon5\+TE@{Decagon5\+TE}!Logger@{Logger}}
@@ -171,7 +214,9 @@ logger.AtlasScientific(\textcolor{stringliteral}{"R"}, 7, 8)
 \item[{int}]{data\+Pin}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a40ae372dee7f672a6d6f33ab441e4da1}{}\label{classLogger_a40ae372dee7f672a6d6f33ab441e4da1}
-Reads a Decagon Devices 5\+TE soil moisture probe. N\+E\+E\+DS T\+E\+S\+T\+I\+NG with current A\+Log version.
+Reads a Decagon Devices 5\+TE soil moisture probe.
+
+N\+E\+E\+DS T\+E\+S\+T\+I\+NG with current A\+Log version.
 
 Returns Dielectric permittivity \mbox{[}-\/unitless-\/\mbox{]}, electrical conductivity \mbox{[}d\+S/m\mbox{]}, and temperature \mbox{[}degrees C\mbox{]}. Soil moisture is calculated through postprocessing.
 
@@ -179,10 +224,13 @@ Uses {\bfseries Software\+Serial}, and therefore has the potential to go unstabl
 
 Modified from Steve Hicks\textquotesingle{} code for an L\+CD reader by Andy Wickert
 
-{\bfseries excit\+Pin} activates the probe and powers it
 
-{\bfseries data\+Pin} receives incoming serial data at 1200 bps
-
+\begin{DoxyParams}{Parameters}
+{\em excit\+Pin} & activates the probe and powers it\\
+\hline
+{\em data\+Pin} & receives incoming serial data at 1200 bps\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 logger.Decagon5TE(7, 8);
@@ -198,16 +246,19 @@ logger.Decagon5TE(7, 8);
 )}\hypertarget{classLogger_a84da6a9ec3d4d56fdc32d950b71f1a26}{}\label{classLogger_a84da6a9ec3d4d56fdc32d950b71f1a26}
 Ruggedized Decagon Devices soil moisture sensor
 
-{\bfseries pin} Analog pin number
 
-{\bfseries Vref} is the reference voltage of the A\+DC; on the A\+Log, this is a precision 3.\+3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)
-
+\begin{DoxyParams}{Parameters}
+{\em pin} & Analog pin number\\
+\hline
+{\em Vref} & is the reference voltage of the A\+DC; on the A\+Log, this is a precision 3.\+3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 \textcolor{comment}{// Using a non-precision Rref that is slightly off}
-logger.DecagonGS1(A1, 3.27, 14)
+logger.DecagonGS1(A1, 3.27, 14);
 \end{DoxyCode}
 \index{Logger@{Logger}!end\+Analog@{end\+Analog}}
 \index{end\+Analog@{end\+Analog}!Logger@{Logger}}
@@ -223,6 +274,8 @@ Turn off power to analog sensors\index{Logger@{Logger}!end\+Logging@{end\+Loggin
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_aa82814d61687debcf3b8dd6f46c9d549}{}\label{classLogger_aa82814d61687debcf3b8dd6f46c9d549}
+Endslogging and returns to sleep
+
 Ends line, turns of SD card, and resets alarm\+: ready to sleep.
 
 Also runs tipping bucket rain gauge code (function that records time stamp) if one is attached and activated.
@@ -234,6 +287,8 @@ Also runs tipping bucket rain gauge code (function that records time stamp) if o
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_acc758b6fdaac8099c492929aa7f1691d}{}\label{classLogger_acc758b6fdaac8099c492929aa7f1691d}
+Does the logger enter a low-\/power sleep mode? T/F.
+
 
 \begin{DoxyItemize}
 \item True if the logger is going to sleep between pases through the data-\/reading loop.
@@ -246,16 +301,21 @@ Also runs tipping bucket rain gauge code (function that records time stamp) if o
 \item[{bool}]{want\+\_\+camera\+\_\+on}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a923b296832bd4222da649ebc66427ac1}{}\label{classLogger_a923b296832bd4222da649ebc66427ac1}
+Hack\+HD camera control function
+
 Control the Hack\+HD camera\+: this function turns the Hack\+HD on or off and records the time stamp from when the Hack\+HD turns on/off in a file called \char`\"{}camera.\+txt\char`\"{}.
 
 Because this function turns the camera on or off, you have to ensure that you write a mechanism to keep it on for some time in your code. This could be checking the time each time you wake and deciding what to do, for example. In short\+: this function is a lower-\/level utility that requires the end-\/user to write the rest of the camera control sequence themselves.
 
-{\bfseries control\+\_\+pin} is the pin connected to the Hack\+HD on/off switch; Dropping control\+\_\+pin to G\+ND for 200 ms turns camera on or off.
 
-{\bfseries want\+\_\+camera\+\_\+on} is true if you want to turn the camera on, false if you want to turn the camera off.
-
-{\bfseries C\+A\+M\+E\+R\+A\+\_\+\+I\+S\+\_\+\+ON} is a global varaible attached to this function that saves the state of the camera; it will be compared to \char`\"{}want\+\_\+camera\+\_\+on\char`\"{}, such that this function will do nothing if the camera is already on (or off) and you want it on (or off).
-
+\begin{DoxyParams}{Parameters}
+{\em control\+\_\+pin} & is the pin connected to the Hack\+HD on/off switch; Dropping control\+\_\+pin to G\+ND for 200 ms turns camera on or off.\\
+\hline
+{\em want\+\_\+camera\+\_\+on} & is true if you want to turn the camera on, false if you want to turn the camera off.\\
+\hline
+{\em C\+A\+M\+E\+R\+A\+\_\+\+I\+S\+\_\+\+ON} & is a global varaible attached to this function that saves the state of the camera; it will be compared to \char`\"{}want\+\_\+camera\+\_\+on\char`\"{}, such that this function will do nothing if the camera is already on (or off) and you want it on (or off).\\
+\hline
+\end{DoxyParams}
 Power requirements\+:
 
 
@@ -318,22 +378,27 @@ This example could be used to capture flow during a flash flood. See\+:
 \item[{uint8\+\_\+t}]{A\+D\+C\+\_\+resolution\+\_\+nbits = {\ttfamily 14}}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_af0eda5a0be93a4d8505c7493d0f5e333}{}\label{classLogger_af0eda5a0be93a4d8505c7493d0f5e333}
+H\+M1500\+LF Relative humidity sensor with external temperature correction
+
 This function measures the relative humidity of using a H\+T\+M1500 relative humidity sensor and an external thermistor. The relative humidity and temperature is measured using a 14 bit oversampling method. Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
 
-{\bfseries humid\+Pin} is the analog pin connected to the humidity output voltage of the module.
 
-{\bfseries R0\+\_\+therm} is a thermistor calibration.
-
-{\bfseries B\+\_\+therm} is the B-\/ or β-\/ parameter of the thermistor.
-
-{\bfseries Rref\+\_\+therm} is the resistance of the corresponding reference resistor for that analog pin.
-
-{\bfseries T0deg\+C\+\_\+therm} is a thermistor calibration.
-
-{\bfseries therm\+Pin\+\_\+therm} is the analog pin connected to the tempurature output voltage of the module.
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10)
-
+\begin{DoxyParams}{Parameters}
+{\em humid\+Pin} & is the analog pin connected to the humidity output voltage of the module.\\
+\hline
+{\em R0\+\_\+therm} & is a thermistor calibration.\\
+\hline
+{\em B\+\_\+therm} & is the B-\/ or β-\/ parameter of the thermistor.\\
+\hline
+{\em Rref\+\_\+therm} & is the resistance of the corresponding reference resistor for that analog pin.\\
+\hline
+{\em T0deg\+C\+\_\+therm} & is a thermistor calibration.\\
+\hline
+{\em therm\+Pin\+\_\+therm} & is the analog pin connected to the tempurature output voltage of the module.\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10)\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 logger.HTM2500LF\_humidity\_temperature(1,?,10000,3950,10000,25,2);
@@ -357,27 +422,29 @@ Datasheet\+: \href{http://sensing.honeywell.com/index.php?ci_id=151133}{\tt http
 
 See also the {\bfseries Honeywell\+\_\+\+H\+S\+C\+\_\+analog} example.
 
-{\bfseries pin} Analog pin number
 
-{\bfseries Vsupply} Supply voltage to sensor
-
-{\bfseries Vref} is the reference voltage of the A\+DC; on the A\+Log, this is a precision 3.\+3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)
-
-{\bfseries Pmin} Minimum pressure in range of sensor
-
-{\bfseries Pmax} Maximum pressure in range of sensor
-
-{\bfseries Pmax} Maximum pressure in range of sensor
-
-{\bfseries Transfer\+Function\+\_\+number\+:} 1, 2, 3, or 4\+: which transfer function is used to convert voltage to pressure
+\begin{DoxyParams}{Parameters}
+{\em pin} & Analog pin number\\
+\hline
+{\em Vsupply} & Supply voltage to sensor\\
+\hline
+{\em Vref} & is the reference voltage of the A\+DC; on the A\+Log, this is a precision 3.\+3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)\\
+\hline
+{\em Pmin} & Minimum pressure in range of sensor\\
+\hline
+{\em Pmax} & Maximum pressure in range of sensor\\
+\hline
+{\em Pmax} & Maximum pressure in range of sensor\\
+\hline
+{\em Transfer\+Function\+\_\+number} & 1, 2, 3, or 4\+: which transfer function is used to convert voltage to pressure
 \begin{DoxyItemize}
 \item Transfer\+Function\+: 1 = 10\% to 90\% of Vsupply (\char`\"{}\+A\char`\"{} in second to last digit of part number)
 \item Transfer\+Function\+: 2 = 5\% to 95\% of Vsupply (\char`\"{}\+A\char`\"{} in second to last digit of part number)
 \item Transfer\+Function\+: 3 = 5\% to 85\% of Vsupply (\char`\"{}\+A\char`\"{} in second to last digit of part number)
 \item Transfer\+Function\+: 4 = 4\% to 94\% of Vsupply (\char`\"{}\+A\char`\"{} in second to last digit of part number)
-\end{DoxyItemize}
-
-{\bfseries Units\+:} Output units
+\end{DoxyItemize}\\
+\hline
+{\em Units} & Output units
 \begin{DoxyItemize}
 \item Units\+: 0 = mbar
 \item Units\+: 1 = bar
@@ -386,10 +453,11 @@ See also the {\bfseries Honeywell\+\_\+\+H\+S\+C\+\_\+analog} example.
 \item Units\+: 4 = M\+Pa
 \item Units\+: 5 = in\+H2O
 \item Units\+: 6 = P\+SI
-\end{DoxyItemize}
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)
-
+\end{DoxyItemize}\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 logger.Honeywell\_HSC\_analog(A1, 5, 3.3, 0, 30, 1, 6);
@@ -404,16 +472,21 @@ logger.Honeywell\_HSC\_analog(A1, 5, 3.3, 0, 30, 1, 6);
 \item[{uint8\+\_\+t}]{A\+D\+C\+\_\+resolution\+\_\+nbits = {\ttfamily 14}}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a4ccff7a14a6bddc8bb28e22b3b36d3cc}{}\label{classLogger_a4ccff7a14a6bddc8bb28e22b3b36d3cc}
+H\+T\+M2500\+LF Relative humidity and temperature sensor
+
 This function measures the relative humidity of using a H\+T\+M2500 tempurature and relative humidity module. The relative humidity and temperature is measured using a 14 bit oversampling method. Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
 
-{\bfseries humid\+Pin} is the analog pin connected to the humidity output voltage of the module.
 
-{\bfseries therm\+Pin} is the analog pin connected to the tempurature output voltage of the module.
-
-{\bfseries Rref\+\_\+therm} is the value of the reference resistor that you use with the built-\/in thermistor (reference resistor supplied separately, placed in appropriate slot in header)
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10)
-
+\begin{DoxyParams}{Parameters}
+{\em humid\+Pin} & is the analog pin connected to the humidity output voltage of the module.\\
+\hline
+{\em therm\+Pin} & is the analog pin connected to the tempurature output voltage of the module.\\
+\hline
+{\em Rref\+\_\+therm} & is the value of the reference resistor that you use with the built-\/in thermistor (reference resistor supplied separately, placed in appropriate slot in header)\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10)\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 logger.HTM2500LF\_humidity\_temperature(1, 2, ?);
@@ -445,28 +518,31 @@ Inclinometer, including temperature correction from an external sensor.
 \item In typical usage, turned on and off by a switching 5V charge pump or boost converter
 \end{DoxyItemize}
 
-{\bfseries x\+Pin} Analog pin number corresponding to x-\/oriented tilts
 
-{\bfseries y\+Pin} Analog pin number corresponding to y-\/oriented tilts
-
-{\bfseries Vref} is the reference voltage of the analog-\/digital comparator; it is 3.\+3V on the A\+Log.
-
-{\bfseries Vsupply} is the input voltage that drives the sensor, and is typically $\sim$5V.
-
-{\bfseries humid\+Pin} is the analog pin connected to the humidity output voltage of the module.
-
-{\bfseries R0\+\_\+therm} is a thermistor calibration.
-
-{\bfseries B\+\_\+therm} is the B-\/ or β-\/ parameter of the thermistor.
-
-{\bfseries Rref\+\_\+therm} is the resistance of the corresponding reference resistor for that analog pin.
-
-{\bfseries T0deg\+C\+\_\+therm} is a thermistor calibration.
-
-{\bfseries therm\+Pin\+\_\+therm} is the analog pin connected to the tempurature output voltage of the module.
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10). It is applied to both the inclinomter and its temperature correction
-
+\begin{DoxyParams}{Parameters}
+{\em x\+Pin} & Analog pin number corresponding to x-\/oriented tilts\\
+\hline
+{\em y\+Pin} & Analog pin number corresponding to y-\/oriented tilts\\
+\hline
+{\em Vref} & is the reference voltage of the analog-\/digital comparator; it is 3.\+3V on the A\+Log.\\
+\hline
+{\em Vsupply} & is the input voltage that drives the sensor, and is typically $\sim$5V.\\
+\hline
+{\em humid\+Pin} & is the analog pin connected to the humidity output voltage of the module.\\
+\hline
+{\em R0\+\_\+therm} & is a thermistor calibration.\\
+\hline
+{\em B\+\_\+therm} & is the B-\/ or β-\/ parameter of the thermistor.\\
+\hline
+{\em Rref\+\_\+therm} & is the resistance of the corresponding reference resistor for that analog pin.\\
+\hline
+{\em T0deg\+C\+\_\+therm} & is a thermistor calibration.\\
+\hline
+{\em therm\+Pin\+\_\+therm} & is the analog pin connected to the tempurature output voltage of the module.\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10). It is applied to both the inclinomter and its temperature correction\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 logger.Inclinometer\_SCA100T\_D02\_analog\_Tcorr(6, 2, 3.285, 5.191, \(\backslash\)
@@ -488,30 +564,36 @@ logger.Inclinometer\_SCA100T\_D02\_analog\_Tcorr(6, 2, 3.285, 5.191, \(\backslas
 )}\hypertarget{classLogger_a9495e2c8e63850f3c7cfcc31e9d73ffe}{}\label{classLogger_a9495e2c8e63850f3c7cfcc31e9d73ffe}
 Pass all variables needed to initialize logging.
 
-{\bfseries \+\_\+logger\+\_\+name\+:} Name associated with this data logger; often helps to relate it to the project or site
 
-{\bfseries \+\_\+filename\+:} Name of main data file saved to SD card; often helps to relate it to the project or site; used to be limited to 8.\+3, but now is not.
-
-{\bfseries \+\_\+day\+Interval\+:} How many days to wait before logging again; can range from 0-\/6.
-
-{\bfseries \+\_\+hour\+Interval\+:} How many hours to wait before logging again; can range from 0-\/24.
-
-{\bfseries \+\_\+min\+Interval\+:} How many minutes to wait before logging again; can range from 0-\/59.
-
-{\bfseries \+\_\+sec\+Interval\+:} How many seconds to wait before logging again; can range from 0-\/59.
-
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+logger\+\_\+name} & Name associated with this data logger; often helps to relate it to the project or site\\
+\hline
+{\em \+\_\+filename} & Name of main data file saved to SD card; often helps to relate it to the project or site; used to be limited to 8.\+3, but now is not.\\
+\hline
+{\em \+\_\+day\+Interval} & How many days to wait before logging again; can range from 0-\/6.\\
+\hline
+{\em \+\_\+hour\+Interval} & How many hours to wait before logging again; can range from 0-\/24.\\
+\hline
+{\em \+\_\+min\+Interval} & How many minutes to wait before logging again; can range from 0-\/59.\\
+\hline
+{\em \+\_\+sec\+Interval} & How many seconds to wait before logging again; can range from 0-\/59.\\
+\hline
+\end{DoxyParams}
 If all time-\/setting functions are 0, then the logger will not sleep, and instead will log continuously. This sets the flag \char`\"{}\+\_\+use\+\_\+sleep\+\_\+mode\char`\"{} to be false.
 
-{\bfseries \+\_\+ext\+\_\+int\+:} External interrupt, set to be a tipping-\/bucket rain gauge, that triggers event-\/based logging of a timestamp
 
-{\bfseries \+\_\+\+L\+O\+G\+\_\+\+A\+L\+L\+\_\+\+S\+E\+N\+S\+O\+R\+S\+\_\+\+O\+N\+\_\+\+B\+U\+C\+K\+E\+T\+\_\+\+T\+IP\+:} Flag that tells the logger to read every sensor when the bucket tips (if \+\_\+ext\+\_\+int is true) and write their outputs to \char`\"{}datafile\char`\"{} (i.\+e. the main data file whose name you specify with {\bfseries \+\_\+filename}; this is in addition to writing the timestamp of the rain gauge bucket tip.
-
+\begin{DoxyParams}{Parameters}
+{\em \+\_\+ext\+\_\+int} & External interrupt, set to be a tipping-\/bucket rain gauge, that triggers event-\/based logging of a timestamp\\
+\hline
+{\em \+\_\+\+L\+O\+G\+\_\+\+A\+L\+L\+\_\+\+S\+E\+N\+S\+O\+R\+S\+\_\+\+O\+N\+\_\+\+B\+U\+C\+K\+E\+T\+\_\+\+T\+IP} & Flag that tells the logger to read every sensor when the bucket tips (if \+\_\+ext\+\_\+int is true) and write their outputs to \char`\"{}datafile\char`\"{} (i.\+e. the main data file whose name you specify with {\bfseries \+\_\+filename}; this is in addition to writing the timestamp of the rain gauge bucket tip.\\
+\hline
+\end{DoxyParams}
 Data logger model does not need to be set\+: it is automatically determined from the M\+CU type and is used to modify pinout-\/dependent functions.
 
 Example\+: 
 \begin{DoxyCode}
 \(\backslash\)\(\backslash\) Log every five minutes
-logger.initialize(\textcolor{stringliteral}{'TestLogger01'}, \textcolor{stringliteral}{'lab\_bench\_test.alog'}, 0, 0, 5, 0)
+logger.initialize(\textcolor{stringliteral}{'TestLogger01'}, \textcolor{stringliteral}{'lab\_bench\_test.alog'}, 0, 0, 5, 0);
 \end{DoxyCode}
 \index{Logger@{Logger}!linear\+Potentiometer@{linear\+Potentiometer}}
 \index{linear\+Potentiometer@{linear\+Potentiometer}!Logger@{Logger}}
@@ -524,20 +606,25 @@ logger.initialize(\textcolor{stringliteral}{'TestLogger01'}, \textcolor{stringli
 \item[{uint8\+\_\+t}]{A\+D\+C\+\_\+resolution\+\_\+nbits = {\ttfamily 14}}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a12dc18b7b16c91de5f7a3af7edb381a9}{}\label{classLogger_a12dc18b7b16c91de5f7a3af7edb381a9}
+Linear potentiometer (radio tuner) to measure distance
+
 Distance based on resistance in a sliding potentiometer whose resistance may be described as a linear function
 
-{\bfseries linpot\+Pin} Analog pin number
 
-{\bfseries Rref} Resistance value of reference resistor \mbox{[}ohms\mbox{]}
-
-{\bfseries slope} Slope of the line (distance = (slope)R + R0)
-
-{\bfseries intercept} (R0) of the line (distance = (slope)R + R0)
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)
-
-{\bfseries Rref\+\_\+on\+\_\+\+G\+N\+D-\/\+Side} indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a V\+C\+C-\/side reference resistor.
-
+\begin{DoxyParams}{Parameters}
+{\em linpot\+Pin} & Analog pin number\\
+\hline
+{\em Rref} & Resistance value of reference resistor \mbox{[}ohms\mbox{]}\\
+\hline
+{\em slope} & Slope of the line (distance = (slope)R + R0)\\
+\hline
+{\em intercept} & (R0) of the line (distance = (slope)R + R0)\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)\\
+\hline
+{\em Rref\+\_\+on\+\_\+\+G\+N\+D-\/\+Side} & indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a V\+C\+C-\/side reference resistor.\\
+\hline
+\end{DoxyParams}
 The output units will be whatever you have used to create your linear calibration equation
 
 Example\+: 
@@ -545,7 +632,7 @@ Example\+:
 \textcolor{comment}{// Using a 0-10k ohm radio tuner with units in mm and a perfect intercept;}
 \textcolor{comment}{// maintaining default 14-bit readings with standard-side (ALog header)}
 \textcolor{comment}{// reference resistor set-up}
-logger.linearPotentiometer(A0, 5000, 0.0008)
+logger.linearPotentiometer(A0, 5000, 0.0008);
 \end{DoxyCode}
 \index{Logger@{Logger}!maxbotix\+H\+R\+X\+L\+\_\+\+W\+R\+\_\+analog@{maxbotix\+H\+R\+X\+L\+\_\+\+W\+R\+\_\+analog}}
 \index{maxbotix\+H\+R\+X\+L\+\_\+\+W\+R\+\_\+analog@{maxbotix\+H\+R\+X\+L\+\_\+\+W\+R\+\_\+analog}!Logger@{Logger}}
@@ -558,18 +645,23 @@ logger.linearPotentiometer(A0, 5000, 0.0008)
 \item[{uint8\+\_\+t}]{A\+D\+C\+\_\+resolution\+\_\+nbits = {\ttfamily 13}}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_aa05378a90963ceebf7dad0904a74f42f}{}\label{classLogger_aa05378a90963ceebf7dad0904a74f42f}
+Newer 1-\/mm precision Max\+Botix rangefinders\+: analog readings
+
 This function measures the distance between the ultrasonic sensor and an \textbackslash{} acoustically-\/reflective surface, typically water or snow. Measures distance in milimeters. Results are displayed on the serial monitor and saved onto the SD card.
 
-{\bfseries nping} is the number of range readings to take (number of pings). The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.
 
-{\bfseries sonic\+Pin} is the analog input channel hooked up to the maxbotix sensor.
-
-{\bfseries EX} is a digital output pin used for an excitation pulse. $\ast$ If maxbotix sensor is continuously powered, a reading will be taken when this pin is flashed high. Set to \textquotesingle{}99\textquotesingle{} if excitation pulse is not needed.
-
-{\bfseries write\+All} will write each reading of the sensor (each ping) to the serial monitor and SD card.
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)
-
+\begin{DoxyParams}{Parameters}
+{\em nping} & is the number of range readings to take (number of pings). The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.\\
+\hline
+{\em sonic\+Pin} & is the analog input channel hooked up to the maxbotix sensor.\\
+\hline
+{\em EX} & is a digital output pin used for an excitation pulse. $\ast$ If maxbotix sensor is continuously powered, a reading will be taken when this pin is flashed high. Set to \textquotesingle{}99\textquotesingle{} if excitation pulse is not needed.\\
+\hline
+{\em write\+All} & will write each reading of the sensor (each ping) to the serial monitor and SD card.\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 logger.ultrasonicMB\_analog\_1cm(10, 99, 2, 0);
@@ -595,22 +687,25 @@ Uses the U\+A\+RT interface to record data from a Max\+Botix sensor.
 
 N\+O\+TE\+: T\+H\+IS H\+AS C\+U\+A\+S\+ED L\+O\+G\+G\+E\+RS TO F\+R\+E\+E\+ZE IN T\+HE P\+A\+ST; W\+H\+I\+LE IT IS Q\+U\+I\+TE L\+I\+K\+E\+LY T\+H\+AT T\+HE I\+S\+S\+UE IS N\+OW S\+O\+L\+V\+ED, M\+O\+RE T\+E\+S\+T\+I\+NG IS R\+E\+Q\+U\+I\+R\+ED. (A\+DW, 26 N\+O\+V\+E\+M\+B\+ER 2016) (maybe solved w/ HW Serial?)
 
-{\bfseries Ex} Excitation pin that turns the sensor on; if this is not needed (i.\+e. you are turning main power off and on instead), then just set this to a value that is not a pin, and ensure that you turn the power to the sensor off and on outside of this function
 
-{\bfseries npings} Number of pings over which you average; each ping itself includes ten short readings that the sensor internally processes
-
-{\bfseries write\+All} will write each reading of the sensor (each ping) to the serial monitor and SD card.
-
-{\bfseries max\+Range} The range (in mm) at which the logger maxes out; this will be remembered to check for errors and to become a nodata values
-
-{\bfseries R\+S232} this is set true if you use inverse (i.\+e. R\+S232-\/style) logic; it works at standard logger voltages (i.\+e. it is not true R\+S232). If false, T\+TL logic will be used.
-
+\begin{DoxyParams}{Parameters}
+{\em Ex} & Excitation pin that turns the sensor on; if this is not needed (i.\+e. you are turning main power off and on instead), then just set this to a value that is not a pin, and ensure that you turn the power to the sensor off and on outside of this function\\
+\hline
+{\em npings} & Number of pings over which you average; each ping itself includes ten short readings that the sensor internally processes\\
+\hline
+{\em write\+All} & will write each reading of the sensor (each ping) to the serial monitor and SD card.\\
+\hline
+{\em max\+Range} & The range (in mm) at which the logger maxes out; this will be remembered to check for errors and to become a nodata values\\
+\hline
+{\em R\+S232} & this is set true if you use inverse (i.\+e. R\+S232-\/style) logic; it works at standard logger voltages (i.\+e. it is not true R\+S232). If false, T\+TL logic will be used.\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 \textcolor{comment}{// Digital pin 7 controlling sensor excitation, averaging over 10 pings,}
 \textcolor{comment}{// not recording the results of each ping, and with a maximum range of }
 \textcolor{comment}{// 5000 mm using standard TTL logic}
-logger.maxbotixHRXL\_WR\_Serial(7, 10, \textcolor{keyword}{false}, 5000, \textcolor{keyword}{false})
+logger.maxbotixHRXL\_WR\_Serial(7, 10, \textcolor{keyword}{false}, 5000, \textcolor{keyword}{false});
 \end{DoxyCode}
 \index{Logger@{Logger}!Pyranometer@{Pyranometer}}
 \index{Pyranometer@{Pyranometer}!Logger@{Logger}}
@@ -631,21 +726,24 @@ nominal raw\+\_\+output\+\_\+per\+\_\+\+W\+\_\+per\+\_\+m2\+\_\+in\+\_\+mV = 10.
 
 Actual raw output is based on calibration.
 
-{\bfseries analog\+Pin} is the pin that receives the amplified voltage input
 
-{\bfseries raw\+\_\+m\+V\+\_\+per\+\_\+\+W\+\_\+per\+\_\+m2} is the conversion factor of the pyranometer\+: number of millivolts per (watt/meter$^\wedge$2). This does not include amplification!
-
-{\bfseries gain} is the amplification factor
-
-{\bfseries V\+\_\+ref} is the reference voltage of the A\+DC; on the A\+Log, this is a precision 3.\+3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)
-
+\begin{DoxyParams}{Parameters}
+{\em analog\+Pin} & is the pin that receives the amplified voltage input\\
+\hline
+{\em raw\+\_\+m\+V\+\_\+per\+\_\+\+W\+\_\+per\+\_\+m2} & is the conversion factor of the pyranometer\+: number of millivolts per (watt/meter$^\wedge$2). This does not include amplification!\\
+\hline
+{\em gain} & is the amplification factor\\
+\hline
+{\em V\+\_\+ref} & is the reference voltage of the A\+DC; on the A\+Log, this is a precision 3.\+3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 \textcolor{comment}{// Using precision voltage reference and 16-bit resolution (highest}
 \textcolor{comment}{// defensible oversampling resolution)}
-logger.Pyranometer(A0, 0.0136, 120, 3.300, 16)
+logger.Pyranometer(A0, 0.0136, 120, 3.300, 16);
 \end{DoxyCode}
 \index{Logger@{Logger}!read\+Pin@{read\+Pin}}
 \index{read\+Pin@{read\+Pin}!Logger@{Logger}}
@@ -654,10 +752,15 @@ logger.Pyranometer(A0, 0.0136, 120, 3.300, 16)
 \item[{int}]{pin}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a343fcabefb37e06429865a2e6a6e708a}{}\label{classLogger_a343fcabefb37e06429865a2e6a6e708a}
+Read the analog value of a pin.
+
 This function returns the analog to digital converter value (0 -\/ 1023). Results are displayed on the serial monitor and saved onto the SD card.
 
-{\bfseries pin} is the analog pin number to be read.
 
+\begin{DoxyParams}{Parameters}
+{\em pin} & is the analog pin number to be read.\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 logger.readPin(2);
@@ -670,12 +773,17 @@ logger.readPin(2);
 \item[{int}]{bits}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a4e67526c65fa865f276a515a200af4aa}{}\label{classLogger_a4e67526c65fa865f276a515a200af4aa}
+Read the analog value of a pin, with extra resolution from oversampling
+
 This function incorporates oversampling to extend the A\+DC precision past ten bits by taking more readings and statistically combing them. Results are displayed on the serial monitor and saved onto the SD card.
 
-{\bfseries pin} is the analog pin number to be read.
 
-{\bfseries adc\+\_\+bits} is the reading precision in bits (2$^\wedge$adc\+\_\+bits). The A\+T\+Mega328 (Arduino Uno and A\+Log Bottle\+Logger core chip) has a base A\+DC precision of 10 bits (returns values of 0-\/1023) A reasonable maximum precision gain is (base\+\_\+value\+\_\+bits)+6, so 16 bits is a reasonable maximum precision for the A\+Log Bottle\+Logger.
-
+\begin{DoxyParams}{Parameters}
+{\em pin} & is the analog pin number to be read.\\
+\hline
+{\em adc\+\_\+bits} & is the reading precision in bits (2$^\wedge$adc\+\_\+bits). The A\+T\+Mega328 (Arduino Uno and A\+Log Bottle\+Logger core chip) has a base A\+DC precision of 10 bits (returns values of 0-\/1023) A reasonable maximum precision gain is (base\+\_\+value\+\_\+bits)+6, so 16 bits is a reasonable maximum precision for the A\+Log Bottle\+Logger.\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 logger.readPinOversample(2, 12);
@@ -691,6 +799,8 @@ Readings that require more bits of precision will take longer.\index{Logger@{Log
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_ab5e0bd543758c65a17b77553a0e9f0c9}{}\label{classLogger_ab5e0bd543758c65a17b77553a0e9f0c9}
+Readies the A\+Log to begin measurements
+
 Sets all pins, alarms, clock, SD card, etc\+: everything needed for the A\+Log to run properly.\index{Logger@{Logger}!sleep@{sleep}}
 \index{sleep@{sleep}!Logger@{Logger}}
 \subsubsection[{\texorpdfstring{sleep()}{sleep()}}]{\setlength{\rightskip}{0pt plus 5cm}void Logger\+::sleep (
@@ -698,6 +808,8 @@ Sets all pins, alarms, clock, SD card, etc\+: everything needed for the A\+Log t
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_ad90ff8f29410f6b70cc6334391400a4e}{}\label{classLogger_ad90ff8f29410f6b70cc6334391400a4e}
+Puts the A\+Log data logger into a low-\/power sleep mode
+
 Sets the \char`\"{}\+I\+S\+\_\+\+L\+O\+G\+G\+I\+N\+G\char`\"{} flag to false, disables the watchdog timer, and puts the logger to sleep.\index{Logger@{Logger}!start\+Analog@{start\+Analog}}
 \index{start\+Analog@{start\+Analog}!Logger@{Logger}}
 \subsubsection[{\texorpdfstring{start\+Analog()}{startAnalog()}}]{\setlength{\rightskip}{0pt plus 5cm}void Logger\+::start\+Analog (
@@ -712,6 +824,8 @@ Turn on power to analog sensors\index{Logger@{Logger}!start\+Logging@{start\+Log
 {}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a4a6c78dd1715b33ae4bbd6f66f116f77}{}\label{classLogger_a4a6c78dd1715b33ae4bbd6f66f116f77}
+Wakes the logger and starts logging
+
 Wakes the logger\+: sets the watchdog timer (a failsafe in case the logger hangs), checks and clears alarm flags, looks for rain gauge bucket tips (if they occur during the middle of a logging event (ignore) or if they include a command to read all sensors with a tip), and starts to log to \char`\"{}datafile\char`\"{}, if it can.
 
 {\bfseries If the logger cannot reach the SD card, it sends out an L\+ED warning message of 20 rapid flashes.}\index{Logger@{Logger}!thermistorB@{thermistorB}}
@@ -727,28 +841,35 @@ Wakes the logger\+: sets the watchdog timer (a failsafe in case the logger hangs
 \item[{bool}]{Rref\+\_\+on\+\_\+\+G\+N\+D\+\_\+side = {\ttfamily true;~bool~oversample\+\_\+debug=false}}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a343dbf1edb8745ea9672f579d3e8297e}{}\label{classLogger_a343dbf1edb8745ea9672f579d3e8297e}
+Read the analog value of a pin, with extra resolution from oversampling
+
 This function measures temperature using a thermistor characterised with the B (or β) parameter equation, which is a simplification of the Steinhart-\/\+Hart equation
 
 The function compares the thermistor risistance with the reference resistor using a voltage divider.
 
 It returns a float of the temperature in degrees celsius. Results are displayed on the serial monitor and saved onto the SD card to four decimal places.
 
-{\bfseries R0} is the resistance of the thermistor at the known temperature {\bfseries T0degC} 
 
-{\bfseries B} is the β parameter of the thermistor
-
-{\bfseries Rref} is the resistance of the corresponding reference resistor for \textbackslash{} the analog pin set by {\bfseries Therm\+Pin} (below).
-
-{\bfseries T0degC} is the temperature at which {\bfseries R0} was calibrated.
-
-{\bfseries therm\+Pin} is the analog pin number to be read.
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)
-
-{\bfseries Rref\+\_\+on\+\_\+\+G\+N\+D-\/\+Side} indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a V\+C\+C-\/side reference resistor.
-
-{\bfseries oversample\+\_\+debug} is true if you want a separate file, \char`\"{}\+Oversample.\+txt\char`\"{}, to record every individual reading used in the oversampling.
-
+\begin{DoxyParams}{Parameters}
+{\em R0} & is the resistance of the thermistor at the known temperature \\
+\hline
+{\em T0degC} & \\
+\hline
+{\em B} & is the β parameter of the thermistor\\
+\hline
+{\em Rref} & is the resistance of the corresponding reference resistor for \textbackslash{} the analog pin set by {\bfseries Therm\+Pin} (below).\\
+\hline
+{\em T0degC} & is the temperature at which {\bfseries R0} was calibrated.\\
+\hline
+{\em therm\+Pin} & is the analog pin number to be read.\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)\\
+\hline
+{\em Rref\+\_\+on\+\_\+\+G\+N\+D-\/\+Side} & indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a V\+C\+C-\/side reference resistor.\\
+\hline
+{\em oversample\+\_\+debug} & is true if you want a separate file, \char`\"{}\+Oversample.\+txt\char`\"{}, to record every individual reading used in the oversampling.\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 \textcolor{comment}{// Contherm from Digikey, 14-bit precision}
@@ -766,18 +887,23 @@ logger.thermistorB(10000, 3988, 13320, 25, 1, 14);
 \item[{bool}]{write\+All}
 \end{DoxyParamCaption}
 )}\hypertarget{classLogger_a362a1462166d63ddc613eaa1e86f9854}{}\label{classLogger_a362a1462166d63ddc613eaa1e86f9854}
+Old 1-\/cm resolution Maxbotix ultrasonic rangefinders\+: analog measurements
+
 This function measures the distance between the ultrasonic sensor and an acustically reflective surface, typically water or snow. Measures distance in centimeters. Results are displayed on the serial monitor and saved onto the SD card.
 
 This is for the older Max\+Botix sensors, whose maximum precision is in centimeters.
 
-{\bfseries nping} is the number of range readings to take (number of pings). The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.
 
-{\bfseries EX} is a digital output pin used for an excitation pulse. If maxbotix sensor is continuously powered a reading will be taken when this pin is flashed high. Set to \textquotesingle{}99\textquotesingle{} if excitation pulse is not needed.
-
-{\bfseries sonic\+Pin} is the analog input channel hooked up to the maxbotix sensor.
-
-{\bfseries write\+All} will write each reading of the sensor (each ping) to the serial monitor and SD card.
-
+\begin{DoxyParams}{Parameters}
+{\em nping} & is the number of range readings to take (number of pings). The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.\\
+\hline
+{\em EX} & is a digital output pin used for an excitation pulse. If maxbotix sensor is continuously powered a reading will be taken when this pin is flashed high. Set to \textquotesingle{}99\textquotesingle{} if excitation pulse is not needed.\\
+\hline
+{\em sonic\+Pin} & is the analog input channel hooked up to the maxbotix sensor.\\
+\hline
+{\em write\+All} & will write each reading of the sensor (each ping) to the serial monitor and SD card.\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 logger.ultrasonicMB\_analog\_1cm(10, 99, 2, 0);
@@ -794,19 +920,22 @@ logger.ultrasonicMB\_analog\_1cm(10, 99, 2, 0);
 )}\hypertarget{classLogger_ab1ae31b2bdb77c86fb6851907258171b}{}\label{classLogger_ab1ae31b2bdb77c86fb6851907258171b}
 Resistance from a simple voltage divider
 
-{\bfseries pin} Analog pin number
 
-{\bfseries Rref} Resistance value of reference resistor \mbox{[}ohms\mbox{]}
-
-{\bfseries A\+D\+C\+\_\+resolution\+\_\+nbits} (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)
-
-{\bfseries Rref\+\_\+on\+\_\+\+G\+N\+D-\/\+Side} indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a V\+C\+C-\/side reference resistor.
-
+\begin{DoxyParams}{Parameters}
+{\em pin} & Analog pin number\\
+\hline
+{\em Rref} & Resistance value of reference resistor \mbox{[}ohms\mbox{]}\\
+\hline
+{\em A\+D\+C\+\_\+resolution\+\_\+nbits} & (10-\/16 for the A\+Log Bottle\+Logger) is the number of bits of A\+DC resolution used (oversampling for $>$10 bits)\\
+\hline
+{\em Rref\+\_\+on\+\_\+\+G\+N\+D-\/\+Side} & indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a V\+C\+C-\/side reference resistor.\\
+\hline
+\end{DoxyParams}
 Example\+: 
 \begin{DoxyCode}
 \textcolor{comment}{// Use standard reference resistor headers: let last parameter be false }
 \textcolor{comment}{// (default)}
-logger.vdivR(A2, 10000, 12)
+logger.vdivR(A2, 10000, 12);
 \end{DoxyCode}
 \index{Logger@{Logger}!Wind\+\_\+\+Vane\+\_\+\+Inspeed@{Wind\+\_\+\+Vane\+\_\+\+Inspeed}}
 \index{Wind\+\_\+\+Vane\+\_\+\+Inspeed@{Wind\+\_\+\+Vane\+\_\+\+Inspeed}!Logger@{Logger}}
@@ -817,8 +946,11 @@ logger.vdivR(A2, 10000, 12)
 )}\hypertarget{classLogger_a31c3cba5ff5722fb66bf540bfbe8b25d}{}\label{classLogger_a31c3cba5ff5722fb66bf540bfbe8b25d}
 Wind vane\+: resistance changes with angle to wind.
 
-{\bfseries vane\+Pin} is the analog pin that reads the wind vane resistance
 
+\begin{DoxyParams}{Parameters}
+{\em vane\+Pin} & is the analog pin that reads the wind vane resistance\\
+\hline
+\end{DoxyParams}
 This function is specialized for the Inspeed e\+Vane2. Here, a resistance of 0 equates to wind from the north, and resistence increases in a clockwise direction.
 
 Connect one wire to power supply, one wire to analog pin, one wire to G\+ND
@@ -840,5 +972,5 @@ logger.Wind\_Vane\_Inspeed(A7);
 
 The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
 \item 
-Logger.\+h\item 
-Logger.\+cpp\end{DoxyCompactItemize}
+\hyperlink{Logger_8h}{Logger.\+h}\item 
+\hyperlink{Logger_8cpp}{Logger.\+cpp}\end{DoxyCompactItemize}

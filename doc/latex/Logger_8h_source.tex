@@ -1,0 +1,180 @@
+\hypertarget{Logger_8h_source}{}\section{Logger.\+h}
+
+\begin{DoxyCode}
+00001 
+00044 \textcolor{comment}{// DEFINE SELF / INCLUDE GUARD //}
+00047 \textcolor{comment}{}
+00048 \textcolor{preprocessor}{#ifndef Logger\_h}
+00049 \textcolor{preprocessor}{#define Logger\_h}
+00050 
+00052 \textcolor{comment}{// INCLUDE LIBRARIES //}
+00054 \textcolor{comment}{}
+00055 \textcolor{comment}{// Arduino 1.0 libraries now default; no if/else}
+00056 \textcolor{preprocessor}{#include <Arduino.h>}
+00057 \textcolor{preprocessor}{#include <SoftwareSerial.h>}
+00058 
+00059 \textcolor{comment}{// Standard libraries}
+00060 \textcolor{preprocessor}{#include <SdFat.h>}
+00061 \textcolor{preprocessor}{#include <Wire.h>}
+00062 \textcolor{preprocessor}{#include <DS3231.h>}
+00063 \textcolor{preprocessor}{#include <math.h>}
+00064 \textcolor{preprocessor}{#include <avr/sleep.h>}
+00065 \textcolor{preprocessor}{#include <avr/wdt.h>}
+00066 \textcolor{preprocessor}{#include <stdlib.h>} \textcolor{comment}{// For turning incoming ASCII character}
+00067                     \textcolor{comment}{// strings into int with atol}
+00068 
+00069 \textcolor{comment}{// Sensor-centric libraries}
+00070 \textcolor{comment}{//#include <Adafruit\_Sensor.h>}
+00071 \textcolor{comment}{//#include <Adafruit\_BMP085\_U.h>}
+00072 \textcolor{comment}{//#include <eRCaGuy\_NewAnalogRead.h>}
+00073 
+00074 \textcolor{comment}{// Outside of class definitions}
+00075 \textcolor{keywordtype}{void} wakeUpNow();
+00076 \textcolor{keywordtype}{void} wakeUpNow\_tip();
+00077 \textcolor{keywordtype}{void} \_ISR\_void();
+00078 \textcolor{keywordtype}{void} \_anemometer\_count\_increment();
+00079 
+00080 \textcolor{comment}{// The rest of the library}
+00081 
+\hypertarget{Logger_8h_source.tex_l00082}{}\hyperlink{classLogger}{00082} \textcolor{keyword}{class }\hyperlink{classLogger}{Logger} \{
+00083 
+00084   \textcolor{keyword}{public}:
+00085     \textcolor{comment}{// Constructor}
+00086     \hyperlink{classLogger_abc41bfb031d896170c7675fa96a6b30c}{Logger}();
+00087     
+00088     \textcolor{comment}{// Initialization}
+00089     \textcolor{keywordtype}{void} \hyperlink{classLogger_a9495e2c8e63850f3c7cfcc31e9d73ffe}{initialize}(\textcolor{keywordtype}{char}* \_logger\_name, \textcolor{keywordtype}{char}* \_sitecode, \textcolor{keywordtype}{int} \_dayInterval, \(\backslash\)
+00090          \textcolor{keywordtype}{int} \_hourInterval, \textcolor{keywordtype}{int} \_minInterval, \textcolor{keywordtype}{int} \_secInterval, \(\backslash\)
+00091          \textcolor{keywordtype}{bool} \_ext\_int=\textcolor{keyword}{false}, \textcolor{keywordtype}{bool} \_LOG\_ON\_BUCKET\_TIP=\textcolor{keyword}{false});
+00092     \textcolor{keywordtype}{void} \hyperlink{classLogger_ab5e0bd543758c65a17b77553a0e9f0c9}{setupLogger}();
+00093     
+00094     \textcolor{comment}{// Code for sleeping, starting up from sleep, synching SD card}
+00095     \textcolor{keywordtype}{void} \hyperlink{classLogger_ad90ff8f29410f6b70cc6334391400a4e}{sleep}();
+00096     \textcolor{keywordtype}{void} \hyperlink{classLogger_a4a6c78dd1715b33ae4bbd6f66f116f77}{startLogging}();
+00097     \textcolor{keywordtype}{void} \hyperlink{classLogger_aa82814d61687debcf3b8dd6f46c9d549}{endLogging}();
+00098     \textcolor{keywordtype}{void} \hyperlink{classLogger_af936c7f58e23316abb5614cbd31c7ced}{startAnalog}();
+00099     \textcolor{keywordtype}{void} \hyperlink{classLogger_adca7be8a63592263c67f63766680d16f}{endAnalog}();
+00100     
+00101     \textcolor{comment}{// Getters and setters}
+00102     \textcolor{keywordtype}{bool} \hyperlink{classLogger_acc758b6fdaac8099c492929aa7f1691d}{get\_use\_sleep\_mode}();
+00103     
+00104     \textcolor{comment}{// Sensors - standard procedure (wake up, log, sleep)}
+00105     \textcolor{keywordtype}{float} \hyperlink{classLogger_a343fcabefb37e06429865a2e6a6e708a}{readPin}(\textcolor{keywordtype}{int} pin);
+00106     \textcolor{keywordtype}{float} \hyperlink{classLogger_a4e67526c65fa865f276a515a200af4aa}{readPinOversample}(\textcolor{keywordtype}{int} pin, \textcolor{keywordtype}{int} bits);
+00107     \textcolor{keywordtype}{float} \hyperlink{classLogger_a73193a90982ddcb31ad0b401ec0e71fa}{analogReadOversample}(\textcolor{keywordtype}{int} pin, \textcolor{keywordtype}{int} adc\_bits=10, \textcolor{keywordtype}{int} nsamples=1, \(\backslash\)
+00108           debug=\textcolor{keyword}{false});
+00109     \textcolor{keywordtype}{float} \hyperlink{classLogger_a343dbf1edb8745ea9672f579d3e8297e}{thermistorB}(\textcolor{keywordtype}{float} R0, \textcolor{keywordtype}{float} B, \textcolor{keywordtype}{float} Rref, \textcolor{keywordtype}{float} T0degC, \(\backslash\)
+00110           \textcolor{keywordtype}{int} thermPin, uint8\_t ADC\_resolution\_nbits=14, \(\backslash\)
+00111           \textcolor{keywordtype}{bool} Rref\_on\_GND\_side=\textcolor{keyword}{true}; \textcolor{keywordtype}{bool} oversample\_debug=\textcolor{keyword}{false});
+00112     \textcolor{comment}{// Print order: Distance [cm], standard deviation [cm]}
+00113     \textcolor{keywordtype}{void} \hyperlink{classLogger_a362a1462166d63ddc613eaa1e86f9854}{ultrasonicMB\_analog\_1cm}(\textcolor{keywordtype}{int} nping, \textcolor{keywordtype}{int} EX, \textcolor{keywordtype}{int} sonicPin, \(\backslash\)
+00114          \textcolor{keywordtype}{bool} writeAll);
+00115     \textcolor{keywordtype}{float} \hyperlink{classLogger_a87ce56cb9c3dfc7abfd6308b2ee7dc10}{maxbotixHRXL\_WR\_Serial}(\textcolor{keywordtype}{int} Ex, \textcolor{keywordtype}{int} nping, \textcolor{keywordtype}{bool} writeAll, \(\backslash\)
+00116           \textcolor{keywordtype}{int} maxRange, \textcolor{keywordtype}{bool} RS232=\textcolor{keyword}{false});
+00117     \textcolor{comment}{// Print order: Distance [cm], standard deviation [cm]}
+00118     \textcolor{keywordtype}{void} \hyperlink{classLogger_aa05378a90963ceebf7dad0904a74f42f}{maxbotixHRXL\_WR\_analog}(\textcolor{keywordtype}{int} nping=10, \textcolor{keywordtype}{int} sonicPin=A0, \textcolor{keywordtype}{int} EX=99, \(\backslash\)
+00119          \textcolor{keywordtype}{bool} writeAll=\textcolor{keyword}{true}, \(\backslash\)
+00120          uint8\_t ADC\_resolution\_nbits=13);
+00121     \textcolor{keywordtype}{void} \hyperlink{classLogger_a40ae372dee7f672a6d6f33ab441e4da1}{Decagon5TE}(\textcolor{keywordtype}{int} excitPin, \textcolor{keywordtype}{int} dataPin); \textcolor{comment}{// Poorly-tested}
+00122     \textcolor{keywordtype}{void} \hyperlink{classLogger_a84da6a9ec3d4d56fdc32d950b71f1a26}{DecagonGS1}(\textcolor{keywordtype}{int} pin, \textcolor{keywordtype}{float} Vref, uint8\_t ADC\_resolution\_nbits=14);
+00123     \textcolor{keywordtype}{void} \hyperlink{classLogger_ab1ae31b2bdb77c86fb6851907258171b}{vdivR}(\textcolor{keywordtype}{int} pin, \textcolor{keywordtype}{float} Rref, uint8\_t ADC\_resolution\_nbits=10, \(\backslash\)
+00124          \textcolor{keywordtype}{bool} Rref\_on\_GND\_side=\textcolor{keyword}{true});
+00125     \textcolor{comment}{// FLEX SENSOR READING DOES NOT STABLIIZE: CHANGES CONSISTENTLY WITH TIME.}
+00126     \textcolor{comment}{//void flex(int flexPin, float Rref, float calib1, float calib2);}
+00127     \textcolor{keywordtype}{void} \hyperlink{classLogger_a12dc18b7b16c91de5f7a3af7edb381a9}{linearPotentiometer}(\textcolor{keywordtype}{int} linpotPin, \textcolor{keywordtype}{float} Rref, \textcolor{keywordtype}{float} slope, \(\backslash\)
+00128          \textcolor{keywordtype}{float} intercept=0, uint8\_t ADC\_resolution\_nbits=14);
+00129     \textcolor{keywordtype}{void} \hyperlink{classLogger_a9fdcbb56e3e4910ac895ee150fe1b9ed}{AtlasScientific}(\textcolor{keywordtype}{char}* command, \textcolor{keywordtype}{int} softSerRX=6, \textcolor{keywordtype}{int} softSerTX=7, \(\backslash\)
+00130          uint32\_t baudRate=38400, \textcolor{keywordtype}{bool} printReturn=\textcolor{keyword}{true}, \textcolor{keywordtype}{bool} saveReturn=\textcolor{keyword}{true});
+00131     \textcolor{keywordtype}{void} \hyperlink{classLogger_a4ccff7a14a6bddc8bb28e22b3b36d3cc}{HTM2500LF\_humidity\_temperature}(\textcolor{keywordtype}{int} humidPin, \textcolor{keywordtype}{int} thermPin, \(\backslash\)
+00132          \textcolor{keywordtype}{float} Rref\_therm, uint8\_t ADC\_resolution\_nbits=14);
+00133     \textcolor{keywordtype}{void} \hyperlink{classLogger_af0eda5a0be93a4d8505c7493d0f5e333}{HM1500LF\_humidity\_with\_external\_temperature}(\textcolor{keywordtype}{int} 
+      humidPin, \textcolor{keywordtype}{float} Vref, \(\backslash\)
+00134          \textcolor{keywordtype}{float} R0, \textcolor{keywordtype}{float} B, \textcolor{keywordtype}{float} Rref, \textcolor{keywordtype}{float} T0degC, \textcolor{keywordtype}{int} thermPin, \(\backslash\)
+00135          uint8\_t ADC\_resolution\_nbits=14);
+00136     \textcolor{keywordtype}{void} \hyperlink{classLogger_a91ffb193feceb75b2e19a3617d00455c}{Inclinometer\_SCA100T\_D02\_analog\_Tcorr}(\textcolor{keywordtype}{int} xPin, \textcolor{keywordtype}{int} yPin, \(\backslash\)
+00137          \textcolor{keywordtype}{float} Vref, \textcolor{keywordtype}{float} Vsupply, \textcolor{keywordtype}{float} R0, \textcolor{keywordtype}{float} B, \textcolor{keywordtype}{float} Rref, \(\backslash\)
+00138          \textcolor{keywordtype}{float} T0degC, \textcolor{keywordtype}{int} thermPin, uint8\_t ADC\_resolution\_nbits=14);
+00139     \textcolor{keywordtype}{void} \hyperlink{classLogger_a6c6a43a1b86f88c2a5e33d14c992e510}{Anemometer\_reed\_switch}(\textcolor{keywordtype}{int} interrupt\_pin\_number, 
+00140          \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{long} reading\_duration\_milliseconds, \(\backslash\)
+00141          \textcolor{keywordtype}{float} meters\_per\_second\_per\_rotation);
+00142     \textcolor{keywordtype}{void} \hyperlink{classLogger_a31c3cba5ff5722fb66bf540bfbe8b25d}{Wind\_Vane\_Inspeed}(\textcolor{keywordtype}{int} vanePin);
+00143     \textcolor{keywordtype}{void} \hyperlink{classLogger_ae4190ce7ccfd7b148a6151102a3bf93d}{Pyranometer}(\textcolor{keywordtype}{int} analogPin, \textcolor{keywordtype}{float} raw\_mV\_per\_W\_per\_m2, \(\backslash\)
+00144          \textcolor{keywordtype}{float} gain, \textcolor{keywordtype}{float} V\_ref, uint8\_t ADC\_resolution\_nbits=14);
+00145     \textcolor{comment}{//void Barometer\_BMP180();}
+00146     
+00147     \textcolor{comment}{// Sensors - triggered}
+00148     \textcolor{comment}{// Camera on/off function; decision made in end-user Arduino script}
+00149     \textcolor{keywordtype}{void} \hyperlink{classLogger_a923b296832bd4222da649ebc66427ac1}{HackHD}(\textcolor{keywordtype}{int} control\_pin, \textcolor{keywordtype}{bool} want\_camera\_on);
+00150     \textcolor{keywordtype}{float} \hyperlink{classLogger_a71ea885397f448ac03675b1e9a93ecfd}{Honeywell\_HSC\_analog}(\textcolor{keywordtype}{float} Vsupply, \textcolor{keywordtype}{float} Pmin, \textcolor{keywordtype}{float} Pmax, \(\backslash\)
+00151           \textcolor{keywordtype}{int} TransferFunction\_number, \textcolor{keywordtype}{int} units, \textcolor{keywordtype}{int} pin,
+00152           uint8\_t ADC\_resolution\_nbits=14);
+00153 
+00154   \textcolor{keyword}{private}:
+00155     \textcolor{keywordtype}{void} pinUnavailable(\textcolor{keywordtype}{int} pin);
+00156     \textcolor{keywordtype}{char} *nameFile(\textcolor{keywordtype}{char} * \_sitecode);
+00157 
+00158     \textcolor{comment}{// Sleep and alarms}
+00159     \textcolor{keywordtype}{void} sleepNow();
+00160     \textcolor{keywordtype}{void} sleepNow\_nap();
+00161     \textcolor{comment}{// wakeUpNow defined outside of class; see above}
+00162     \textcolor{keywordtype}{void} alarm(\textcolor{keywordtype}{int} dayInterval ,\textcolor{keywordtype}{int} hourInterval, \textcolor{keywordtype}{int} minInterval, \(\backslash\)
+00163          \textcolor{keywordtype}{int} secInterval);
+00164     \textcolor{keywordtype}{void} displayAlarms(); \textcolor{comment}{//debug tool delete if desired.}
+00165     \textcolor{keywordtype}{void} checkAlarms();  \textcolor{comment}{//debug tool delete if desired. }
+00166     \textcolor{keywordtype}{void} checkTime();   \textcolor{comment}{//debug tool delete if desired. }
+00167     \textcolor{comment}{// LED signals}
+00168     \textcolor{keywordtype}{void} LEDwarn(\textcolor{keywordtype}{int} nflash);
+00169     \textcolor{keywordtype}{void} LEDgood();
+00170     \textcolor{keywordtype}{void} LEDtimeWrong(\textcolor{keywordtype}{int} ncycles);
+00171     
+00172     \textcolor{comment}{// Time}
+00173     \textcolor{keywordtype}{void} unixDatestamp();
+00174     \_internalDateTime(uint16\_t* date, uint16\_t* time) \textcolor{comment}{// Callback: SD DT stamp}
+00175     
+00176     \textcolor{comment}{// Logger-computer communications}
+00177     \textcolor{keywordtype}{void} name();
+00178     \textcolor{keywordtype}{void} print\_time();
+00179     \textcolor{keywordtype}{void} set\_time\_main();
+00180     \textcolor{keywordtype}{void} announce\_start();
+00181     \textcolor{keywordtype}{void} startup\_sequence();
+00182     
+00183     \textcolor{comment}{// Clock power}
+00184     \textcolor{keywordtype}{void} RTCon();
+00185     \textcolor{keywordtype}{void} RTCsleep();
+00186     
+00187     \textcolor{comment}{// SD card power}
+00188     \textcolor{keywordtype}{void} SDpowerOn();
+00189     \textcolor{keywordtype}{void} SDpowerOff();
+00190     
+00191     \textcolor{comment}{// Clock setting}
+00192     \textcolor{keywordtype}{void} clockSet();
+00193     \textcolor{keywordtype}{void} GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW, 
+00194         byte& Hour, byte& Minute, byte& Second);
+00195     
+00196     \textcolor{comment}{// Sensor utility codes}
+00197     \textcolor{keywordtype}{float} \_vdivR(\textcolor{keywordtype}{int} pin, \textcolor{keywordtype}{float} Rref, uint8\_t adc\_bits=10, \(\backslash\)
+00198           \textcolor{keywordtype}{bool} Rref\_on\_GND\_side=\textcolor{keyword}{true});
+00199     \textcolor{comment}{// I don't trust the software serial version}
+00200     \textcolor{comment}{//int maxbotix\_soft\_Serial\_parse(int Ex, int Rx, bool RS232=false);}
+00201     \textcolor{keywordtype}{int} maxbotix\_Serial\_parse(\textcolor{keywordtype}{int} Ex);
+00202     \textcolor{keywordtype}{float} standard\_deviation\_from\_array(\textcolor{keywordtype}{float} values[], \textcolor{keywordtype}{int} nvalues, \(\backslash\)
+00203           \textcolor{keywordtype}{float} mean);
+00204     \textcolor{keywordtype}{float} standard\_deviation\_from\_array(\textcolor{keywordtype}{int} values[], \textcolor{keywordtype}{int} nvalues, \textcolor{keywordtype}{float} mean);
+00205 
+00206     \textcolor{comment}{// Special sensor codes}
+00207     \textcolor{comment}{// Rain gage - will wake logger up and cause it to log to a different file}
+00208     \textcolor{comment}{// The default interrupt is Pin 3, INT1 on ATmega328 (ALog BottleLogger).}
+00209     \textcolor{comment}{// This runs of bool \_ext\_int = true in loger.initialize()}
+00210     \textcolor{keywordtype}{void} TippingBucketRainGage();
+00211     
+00212     \textcolor{comment}{// Logging}
+00213     \textcolor{keywordtype}{void} start\_logging\_to\_datafile();
+00214     \textcolor{keywordtype}{void} start\_logging\_to\_otherfile(\textcolor{keywordtype}{char}* filename);
+00215     \textcolor{keywordtype}{void} end\_logging\_to\_otherfile();
+00216     \textcolor{keywordtype}{void} endLine();
+00217 
+00218 \};
+00219 
+00220 \textcolor{preprocessor}{#endif  }
+00221 
+\end{DoxyCode}

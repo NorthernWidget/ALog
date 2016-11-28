@@ -1,0 +1,76 @@
+\hypertarget{Logger_8h}{}\section{Logger.\+h File Reference}
+\label{Logger_8h}\index{Logger.\+h@{Logger.\+h}}
+{\ttfamily \#include $<$Arduino.\+h$>$}\\*
+{\ttfamily \#include $<$Software\+Serial.\+h$>$}\\*
+{\ttfamily \#include $<$Sd\+Fat.\+h$>$}\\*
+{\ttfamily \#include $<$Wire.\+h$>$}\\*
+{\ttfamily \#include $<$D\+S3231.\+h$>$}\\*
+{\ttfamily \#include $<$math.\+h$>$}\\*
+{\ttfamily \#include $<$avr/sleep.\+h$>$}\\*
+{\ttfamily \#include $<$avr/wdt.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+Include dependency graph for Logger.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{Logger_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=143pt]{Logger_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classLogger}{Logger}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries wake\+Up\+Now} ()\hypertarget{Logger_8h_adee29828901ea1b4f99ce305fa3e17bd}{}\label{Logger_8h_adee29828901ea1b4f99ce305fa3e17bd}
+
+\item 
+void {\bfseries wake\+Up\+Now\+\_\+tip} ()\hypertarget{Logger_8h_a1a3b380e75d68eef4c3913816773e1b5}{}\label{Logger_8h_a1a3b380e75d68eef4c3913816773e1b5}
+
+\item 
+void {\bfseries \+\_\+\+I\+S\+R\+\_\+void} ()\hypertarget{Logger_8h_a9c215a00c214c880d04481d256d8d522}{}\label{Logger_8h_a9c215a00c214c880d04481d256d8d522}
+
+\item 
+void {\bfseries \+\_\+anemometer\+\_\+count\+\_\+increment} ()\hypertarget{Logger_8h_aa2e4ccb5b638347db4da535aac7ac209}{}\label{Logger_8h_aa2e4ccb5b638347db4da535aac7ac209}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsection*{\hyperlink{Logger_8h}{Logger.\+h}}
+
+Data logger library header~\newline
+ Designed for the A\+Log~\newline
+ Modules should work for any Arduino-\/based board with minimal modificiation.~\newline
+ Goals\+:
+\begin{DoxyEnumerate}
+\item Manage logger utility functions, largely behind-\/the-\/scenes
+\item Simplify data logger operations to one-\/line calls
+\end{DoxyEnumerate}
+
+Written by Andy Wickert, 2011-\/2016, and Chad Sandell, 2016~\newline
+ Started 27 September 2011
+
+Designed to greatly simplify Arduino sketches for the A\+Log and reduce what the end user needs to do into relatively simple one-\/line calls.
+
+\subsubsection*{L\+I\+C\+E\+N\+SE\+: G\+NU G\+PL v3}
+
+\hyperlink{Logger_8h}{Logger.\+h} is part of \hyperlink{classLogger}{Logger}, an Arduino library written by Andrew D. Wickert and Chad T. Sandell.
+
+Copyright (C) 2011-\/2015, Andrew D. Wickert~\newline
+ Copyright (C) 2016, Andrew D. Wickert and Chad T. Sandell
+
+This program is free software\+: you can redistribute it and/or modify it under the terms of the G\+NU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but W\+I\+T\+H\+O\+UT A\+NY W\+A\+R\+R\+A\+N\+TY; without even the implied warranty of M\+E\+R\+C\+H\+A\+N\+T\+A\+B\+I\+L\+I\+TY or F\+I\+T\+N\+E\+SS F\+OR A P\+A\+R\+T\+I\+C\+U\+L\+AR P\+U\+R\+P\+O\+SE. See the G\+NU General Public License for more details.
+
+You should have received a copy of the G\+NU General Public License along with this program. If not, see \href{http://www.gnu.org/licenses/}{\tt http\+://www.\+gnu.\+org/licenses/}. 

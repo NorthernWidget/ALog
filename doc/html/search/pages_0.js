@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['logger',['Logger',['../md_README.html',1,'']]]
+  ['alog_20guide',['ALog Guide',['../index.html',1,'']]]
 ];

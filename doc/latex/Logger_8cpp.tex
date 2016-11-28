@@ -1,0 +1,187 @@
+\hypertarget{Logger_8cpp}{}\section{Logger.\+cpp File Reference}
+\label{Logger_8cpp}\index{Logger.\+cpp@{Logger.\+cpp}}
+{\ttfamily \#include $<$Logger.\+h$>$}\\*
+Include dependency graph for Logger.\+cpp\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{Logger_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bfseries cbi}(sfr,  bit)~(\+\_\+\+S\+F\+R\+\_\+\+B\+Y\+TE(sfr) \&= $\sim$\+\_\+\+BV(bit))\hypertarget{Logger_8cpp_ae70baf5399951da1e7ad45a0ed890832}{}\label{Logger_8cpp_ae70baf5399951da1e7ad45a0ed890832}
+
+\item 
+\#define {\bfseries sbi}(sfr,  bit)~(\+\_\+\+S\+F\+R\+\_\+\+B\+Y\+TE(sfr) $\vert$= \+\_\+\+BV(bit))\hypertarget{Logger_8cpp_ac4a5536d9bf092116f88b94797ddc882}{}\label{Logger_8cpp_ac4a5536d9bf092116f88b94797ddc882}
+
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void {\bfseries wake\+Up\+Now} ()\hypertarget{Logger_8cpp_adee29828901ea1b4f99ce305fa3e17bd}{}\label{Logger_8cpp_adee29828901ea1b4f99ce305fa3e17bd}
+
+\item 
+void {\bfseries wake\+Up\+Now\+\_\+tip} ()\hypertarget{Logger_8cpp_a1a3b380e75d68eef4c3913816773e1b5}{}\label{Logger_8cpp_a1a3b380e75d68eef4c3913816773e1b5}
+
+\item 
+datafile {\bfseries print} (T, 4)\hypertarget{Logger_8cpp_ad948da93eeff8ecd336bce8a4dc8736c}{}\label{Logger_8cpp_ad948da93eeff8ecd336bce8a4dc8736c}
+
+\item 
+datafile {\bfseries print} (F(\char`\"{},\char`\"{}))\hypertarget{Logger_8cpp_aa244f46a943139f91b84aac0134886b0}{}\label{Logger_8cpp_aa244f46a943139f91b84aac0134886b0}
+
+\item 
+void {\bfseries \+\_\+\+I\+S\+R\+\_\+void} ()\hypertarget{Logger_8cpp_a9c215a00c214c880d04481d256d8d522}{}\label{Logger_8cpp_a9c215a00c214c880d04481d256d8d522}
+
+\item 
+void {\bfseries \+\_\+anemometer\+\_\+count\+\_\+increment} ()\hypertarget{Logger_8cpp_aa2e4ccb5b638347db4da535aac7ac209}{}\label{Logger_8cpp_aa2e4ccb5b638347db4da535aac7ac209}
+
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const int {\bfseries bottle\+\_\+logger} =0\hypertarget{Logger_8cpp_a82b81447a86ec4d16506a446ead2d959}{}\label{Logger_8cpp_a82b81447a86ec4d16506a446ead2d959}
+
+\item 
+const int {\bfseries big\+\_\+log} =1\hypertarget{Logger_8cpp_a6e587b3167201135d66e618bc4e9d6eb}{}\label{Logger_8cpp_a6e587b3167201135d66e618bc4e9d6eb}
+
+\item 
+const int {\bfseries log\+\_\+mega} =2\hypertarget{Logger_8cpp_aa77c5809820d08b6b9906e4d5cc5c282}{}\label{Logger_8cpp_aa77c5809820d08b6b9906e4d5cc5c282}
+
+\item 
+const int {\bfseries S\+C\+Kpin} = 13\hypertarget{Logger_8cpp_aac8b4ff3c3a72eabbce5302c6a62b674}{}\label{Logger_8cpp_aac8b4ff3c3a72eabbce5302c6a62b674}
+
+\item 
+const int {\bfseries M\+I\+S\+Opin} = 12\hypertarget{Logger_8cpp_a89a5801f20cfb155fbae7a349e70da2a}{}\label{Logger_8cpp_a89a5801f20cfb155fbae7a349e70da2a}
+
+\item 
+const int {\bfseries M\+O\+S\+Ipin} = 11\hypertarget{Logger_8cpp_a7e790e9a217d45f2a6d85379bef6baad}{}\label{Logger_8cpp_a7e790e9a217d45f2a6d85379bef6baad}
+
+\item 
+const int {\bfseries C\+Spin} = 10\hypertarget{Logger_8cpp_a99da311d248bcae3ed3e157271f257a2}{}\label{Logger_8cpp_a99da311d248bcae3ed3e157271f257a2}
+
+\item 
+const int {\bfseries S\+D\+Apin} = A4\hypertarget{Logger_8cpp_a3e30838b685431b8951ec64dadf77804}{}\label{Logger_8cpp_a3e30838b685431b8951ec64dadf77804}
+
+\item 
+const int {\bfseries S\+C\+Lpin} = A5\hypertarget{Logger_8cpp_ad73f03b48a5c4f2b5dc2b5baf2b8e11a}{}\label{Logger_8cpp_ad73f03b48a5c4f2b5dc2b5baf2b8e11a}
+
+\item 
+const int {\bfseries Sensor\+Power\+Pin} = 4\hypertarget{Logger_8cpp_aac01d19cf572390930779f0cccb7e32d}{}\label{Logger_8cpp_aac01d19cf572390930779f0cccb7e32d}
+
+\item 
+const int {\bfseries S\+Dpower\+Pin} = 8\hypertarget{Logger_8cpp_a273294c2c60fa9968084103809f483c3}{}\label{Logger_8cpp_a273294c2c60fa9968084103809f483c3}
+
+\item 
+const int {\bfseries Clock\+Power\+Pin} = 6\hypertarget{Logger_8cpp_a59aa6300313960491e43e02f7aa48bc4}{}\label{Logger_8cpp_a59aa6300313960491e43e02f7aa48bc4}
+
+\item 
+const int {\bfseries L\+E\+Dpin} = 9\hypertarget{Logger_8cpp_a82504a11fb254521fd47f38bc9140370}{}\label{Logger_8cpp_a82504a11fb254521fd47f38bc9140370}
+
+\item 
+const int {\bfseries wake\+Pin} = 2\hypertarget{Logger_8cpp_ad48994183e177d334acf26db183b4c02}{}\label{Logger_8cpp_ad48994183e177d334acf26db183b4c02}
+
+\item 
+const int {\bfseries interrupt\+Num} = wake\+Pin-\/2\hypertarget{Logger_8cpp_aa7fe2f17315370b6970682d6e886a39a}{}\label{Logger_8cpp_aa7fe2f17315370b6970682d6e886a39a}
+
+\item 
+const int {\bfseries manual\+Wake\+Pin} = 5\hypertarget{Logger_8cpp_a3b3aee00057d1c0000acb96c8a1ae039}{}\label{Logger_8cpp_a3b3aee00057d1c0000acb96c8a1ae039}
+
+\item 
+int {\bfseries day\+Interval}\hypertarget{Logger_8cpp_a164655a5a5c1e0540e8a7068d14ce45d}{}\label{Logger_8cpp_a164655a5a5c1e0540e8a7068d14ce45d}
+
+\item 
+int {\bfseries hour\+Interval}\hypertarget{Logger_8cpp_ab77f56a33b8532217ce48f0b1245b612}{}\label{Logger_8cpp_ab77f56a33b8532217ce48f0b1245b612}
+
+\item 
+int {\bfseries min\+Interval}\hypertarget{Logger_8cpp_a02b6432e3c27c53a8dec52bdb89e727d}{}\label{Logger_8cpp_a02b6432e3c27c53a8dec52bdb89e727d}
+
+\item 
+int {\bfseries sec\+Interval}\hypertarget{Logger_8cpp_a3f8ea935eb97b1591ba876e9b9f5696c}{}\label{Logger_8cpp_a3f8ea935eb97b1591ba876e9b9f5696c}
+
+\item 
+int {\bfseries \+\_\+days}\hypertarget{Logger_8cpp_af007ef3fe6449bc365597a159ef593c0}{}\label{Logger_8cpp_af007ef3fe6449bc365597a159ef593c0}
+
+\item 
+int {\bfseries \+\_\+hours}\hypertarget{Logger_8cpp_ae9e72989946d1faad54881543c608cd0}{}\label{Logger_8cpp_ae9e72989946d1faad54881543c608cd0}
+
+\item 
+int {\bfseries \+\_\+minutes}\hypertarget{Logger_8cpp_aa8cbf9c20655f9f019790baf6a71e073}{}\label{Logger_8cpp_aa8cbf9c20655f9f019790baf6a71e073}
+
+\item 
+int {\bfseries \+\_\+seconds}\hypertarget{Logger_8cpp_a7084691e96b1daa3a2d70def71aaf1d9}{}\label{Logger_8cpp_a7084691e96b1daa3a2d70def71aaf1d9}
+
+\item 
+bool {\bfseries \+\_\+use\+\_\+sleep\+\_\+mode} = true\hypertarget{Logger_8cpp_a68393fac7d89166dd2dcfb912a1719d3}{}\label{Logger_8cpp_a68393fac7d89166dd2dcfb912a1719d3}
+
+\item 
+bool {\bfseries C\+A\+M\+E\+R\+A\+\_\+\+I\+S\+\_\+\+ON} = false\hypertarget{Logger_8cpp_a708f1306493fcf4780f4b3fee9913ca4}{}\label{Logger_8cpp_a708f1306493fcf4780f4b3fee9913ca4}
+
+\item 
+bool {\bfseries I\+S\+\_\+\+L\+O\+G\+G\+I\+NG} = false\hypertarget{Logger_8cpp_adf875ef298ce84c624410441199174a7}{}\label{Logger_8cpp_adf875ef298ce84c624410441199174a7}
+
+\item 
+char $\ast$ {\bfseries filename}\hypertarget{Logger_8cpp_aeac90097f29f7529968697163cea5c18}{}\label{Logger_8cpp_aeac90097f29f7529968697163cea5c18}
+
+\item 
+char $\ast$ {\bfseries logger\+\_\+name}\hypertarget{Logger_8cpp_a0ac67755b34868235cbf497710a5f3c4}{}\label{Logger_8cpp_a0ac67755b34868235cbf497710a5f3c4}
+
+\item 
+bool {\bfseries ext\+Int}\hypertarget{Logger_8cpp_a8ba3a8d681fc12076bc941ab2dfe11aa}{}\label{Logger_8cpp_a8ba3a8d681fc12076bc941ab2dfe11aa}
+
+\item 
+bool {\bfseries N\+E\+W\+\_\+\+R\+A\+I\+N\+\_\+\+B\+U\+C\+K\+E\+T\+\_\+\+T\+IP} = false\hypertarget{Logger_8cpp_aac008d9b5fb23b399e3d3acfcf598355}{}\label{Logger_8cpp_aac008d9b5fb23b399e3d3acfcf598355}
+
+\item 
+bool {\bfseries L\+O\+G\+\_\+\+A\+L\+L\+\_\+\+S\+E\+N\+S\+O\+R\+S\+\_\+\+O\+N\+\_\+\+B\+U\+C\+K\+E\+T\+\_\+\+T\+IP}\hypertarget{Logger_8cpp_a3907b2190de8be0458e0ba44d05aadd5}{}\label{Logger_8cpp_a3907b2190de8be0458e0ba44d05aadd5}
+
+\item 
+unsigned int {\bfseries rotation\+\_\+count} = 0\hypertarget{Logger_8cpp_a0ece0ecf78205e2187d9bd98896e6121}{}\label{Logger_8cpp_a0ece0ecf78205e2187d9bd98896e6121}
+
+\item 
+R\+T\+Clib {\bfseries R\+TC}\hypertarget{Logger_8cpp_a65da607d8fc2158dfe99dc25bd7f0a93}{}\label{Logger_8cpp_a65da607d8fc2158dfe99dc25bd7f0a93}
+
+\item 
+D\+S3231 {\bfseries Clock}\hypertarget{Logger_8cpp_a3a6ff5c7ec928df3cd8c33fb3a263bdf}{}\label{Logger_8cpp_a3a6ff5c7ec928df3cd8c33fb3a263bdf}
+
+\item 
+Sd\+Fat {\bfseries sd}\hypertarget{Logger_8cpp_a15e6b7e1f0fb2d1e0fe1654721bb5302}{}\label{Logger_8cpp_a15e6b7e1f0fb2d1e0fe1654721bb5302}
+
+\item 
+Sd\+File {\bfseries datafile}\hypertarget{Logger_8cpp_a1115547a6eea844c4f66793a4f7d6329}{}\label{Logger_8cpp_a1115547a6eea844c4f66793a4f7d6329}
+
+\item 
+Sd\+File {\bfseries otherfile}\hypertarget{Logger_8cpp_abf344448e6a83213262a3d1b902b192f}{}\label{Logger_8cpp_abf344448e6a83213262a3d1b902b192f}
+
+\item 
+Date\+Time {\bfseries now}\hypertarget{Logger_8cpp_ac023874b2154eac7297a7575008605fe}{}\label{Logger_8cpp_ac023874b2154eac7297a7575008605fe}
+
+\item 
+float {\bfseries T0} = T0degC + 273.\+15\hypertarget{Logger_8cpp_a4211ba1269f650e21964d32238a460b2}{}\label{Logger_8cpp_a4211ba1269f650e21964d32238a460b2}
+
+\item 
+float {\bfseries Rinf} = R0$\ast$exp(-\/B/T0)\hypertarget{Logger_8cpp_a64422a8cc6d3d23d8594ae6ca4981b18}{}\label{Logger_8cpp_a64422a8cc6d3d23d8594ae6ca4981b18}
+
+\item 
+float {\bfseries T} = B / log(Rtherm/Rinf)\hypertarget{Logger_8cpp_a41cbf5427272bfe22626d2473a63f2d4}{}\label{Logger_8cpp_a41cbf5427272bfe22626d2473a63f2d4}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Data logger library Designed for the A\+Log Modules should work for any Arduino-\/based board with minimal modificiation Goals\+: (1) Manage logger utility functions, largely behind-\/the-\/scenes (2) Simplify data logger operations to one-\/line calls
+
+Written by Andy Wickert, 2011-\/2016, and Chad Sandell, 2016 Started 27 September 2011
+
+Designed to greatly simplify Arduino sketches for the A\+Log and reduce what the end user needs to do into relatively simple one-\/line calls.
+
+\subsection*{L\+I\+C\+E\+N\+SE\+: G\+NU G\+PL v3}
+
+\hyperlink{Logger_8cpp}{Logger.\+cpp} is part of \hyperlink{classLogger}{Logger}, an Arduino library written by Andrew D. Wickert and Chad T. Sandell Copyright (C) 2011-\/2015, Andrew D. Wickert Copyright (C) 2016, Andrew D. Wickert and Chad T. Sandell
+
+This program is free software\+: you can redistribute it and/or modify it under the terms of the G\+NU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but W\+I\+T\+H\+O\+UT A\+NY W\+A\+R\+R\+A\+N\+TY; without even the implied warranty of M\+E\+R\+C\+H\+A\+N\+T\+A\+B\+I\+L\+I\+TY or F\+I\+T\+N\+E\+SS F\+OR A P\+A\+R\+T\+I\+C\+U\+L\+AR P\+U\+R\+P\+O\+SE. See the G\+NU General Public License for more details.
+
+You should have received a copy of the G\+NU General Public License along with this program. If not, see \href{http://www.gnu.org/licenses/}{\tt http\+://www.\+gnu.\+org/licenses/}. 

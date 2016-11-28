@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>Logger: Logger Class Reference</title>
+<title>Logger (for ALog): Logger Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,9 +22,10 @@
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
+  <td id="projectlogo"><img alt="Logo" src="ALog_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
-   <div id="projectname">Logger
-   &#160;<span id="projectnumber">2.0</span>
+   <div id="projectname">Logger (for ALog)
+   &#160;<span id="projectnumber">v0.2 for ALog 2.0</span>
    </div>
    <div id="projectbrief">Open-source Arduino-based field data logger</div>
   </td>
@@ -94,6 +95,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:abc41bfb031d896170c7675fa96a6b30c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#abc41bfb031d896170c7675fa96a6b30c">Logger</a> ()</td></tr>
+<tr class="memdesc:abc41bfb031d896170c7675fa96a6b30c"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classLogger.html">Logger</a> library for the Arduino-based ALog data logger.  <a href="#abc41bfb031d896170c7675fa96a6b30c">More...</a><br /></td></tr>
+<tr class="separator:abc41bfb031d896170c7675fa96a6b30c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9495e2c8e63850f3c7cfcc31e9d73ffe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a9495e2c8e63850f3c7cfcc31e9d73ffe">initialize</a> (char *_logger_name, char *_sitecode, int _dayInterval, int _hourInterval, int _minInterval, int _secInterval, bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false)</td></tr>
 <tr class="separator:a9495e2c8e63850f3c7cfcc31e9d73ffe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5e0bd543758c65a17b77553a0e9f0c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#ab5e0bd543758c65a17b77553a0e9f0c9">setupLogger</a> ()</td></tr>
@@ -151,6 +155,32 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a71ea885397f448ac03675b1e9a93ecfd"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a71ea885397f448ac03675b1e9a93ecfd">Honeywell_HSC_analog</a> (float Vsupply, float Pmin, float Pmax, int TransferFunction_number, int units, int pin, uint8_t ADC_resolution_nbits=14)</td></tr>
 <tr class="separator:a71ea885397f448ac03675b1e9a93ecfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a class="anchor" id="abc41bfb031d896170c7675fa96a6b30c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">Logger::Logger </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p><a class="el" href="classLogger.html">Logger</a> library for the Arduino-based ALog data logger. </p>
+<p>ALog data logger library: methods to:</p><ul>
+<li>Initialize the data logger</li>
+<li>Sleep and wake</li>
+<li>Interact with the real-time clock (RTC)</li>
+<li>Write data to the SD card</li>
+<li>Manage power</li>
+<li>Interact with a range of sensors</li>
+</ul>
+<p>All help documentation here assumes you have created an instance of the "Logger" </p><div class="fragment"><div class="line">logger <a class="code" href="classLogger.html#abc41bfb031d896170c7675fa96a6b30c">Logger</a>();</div></div><!-- fragment --> 
+</div>
+</div>
 <h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a73193a90982ddcb31ad0b401ec0e71fa"></a>
 <div class="memitem">
@@ -187,17 +217,23 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Higher analog resolution through oversampling</p>
 <p>This function incorporates oversampling to extend the ADC precision past ten bits by taking more readings and statistically combing them.</p>
 <p>Returns a floating point number between 0 and 1023 in order to be intechangable with the Arduino core AnalogRead() function</p>
 <p>It is often used within other sensor functinons to increase measurement precision.</p>
-<p><b>pin</b> is the analog pin number</p>
-<p><b>adc_bits</b> is the reading precision in bits (2^adc_bits). The ATMega328 (Arduino Uno and ALog BottleLogger core chip) has a base ADC precision of 10 bits (returns values of 0-1023) A reasonable maximum precision gain is (base_value_bits)+6, so 16 bits is a reasonable maximum precision for the ALog BottleLogger.</p>
-<p><b>nsamples</b> is the number of times you want to poll the particular sensor and write the output to file.</p>
-<p><b>debug</b> is a flag that, if true, will write all of the values read during the oversampling to "Oversample.txt".</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>is the analog pin number</td></tr>
+    <tr><td class="paramname">adc_bits</td><td>is the reading precision in bits (2^adc_bits). The ATMega328 (Arduino Uno and ALog BottleLogger core chip) has a base ADC precision of 10 bits (returns values of 0-1023) A reasonable maximum precision gain is (base_value_bits)+6, so 16 bits is a reasonable maximum precision for the ALog BottleLogger.</td></tr>
+    <tr><td class="paramname">nsamples</td><td>is the number of times you want to poll the particular sensor and write the output to file.</td></tr>
+    <tr><td class="paramname">debug</td><td>is a flag that, if true, will write all of the values read during the oversampling to "Oversample.txt".</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// 12-bit measurement of Pin 2</span></div><div class="line"><span class="comment">// Leaves nsamples at its default value of 1 (single reading of sensor)</span></div><div class="line">logger.analogReadOversample(2, 12);</div></div><!-- fragment --><p>Readings that require more bits of precision will take longer.</p>
 <p>For analog measurements that do not require more than 10 bits of precision, use logger.readpin(int pin) or the standard Arduino "AnalogRead" function.</p>
 <p>Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)</p>
-<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Take a single sample at 14-bit resolution and store it as &quot;myReading&quot;</span></div><div class="line">myReading = logger.analogReadOversample(A3, 14, 1)</div></div><!-- fragment -->
+<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Take a single sample at 14-bit resolution and store it as &quot;myReading&quot;</span></div><div class="line">myReading = logger.analogReadOversample(A3, 14, 1);</div></div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="a6c6a43a1b86f88c2a5e33d14c992e510"></a>
@@ -230,9 +266,14 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Anemometer that flips a reed switch each time it spins.</p>
-<p><b>interrupt_pin_number</b> is the digital pin number corresponding to the appropriate interrupt; it uses the Arduino digitalPinToInterrupt(n_pin) function to properly attach the interrupt</p>
-<p><b>reading_duration_milliseconds</b> How long will you count revolutions? Shorter durations save power, longer durations increase accuracy; very long durations will produce long-term averages. Typical values are a few seconds.</p>
-<p><b>meters_per_second_per_rotation:</b> Conversion factor between revolutions and wind speed. For the Inspeed Vortex wind sensor that we have used (<a href="http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp">http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp</a>), this is: <b>2.5 mph/Hz = 1.1176 (m/s)/Hz</b></p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">interrupt_pin_number</td><td>is the digital pin number corresponding to the appropriate interrupt; it uses the Arduino digitalPinToInterrupt(n_pin) function to properly attach the interrupt</td></tr>
+    <tr><td class="paramname">reading_duration_milliseconds</td><td>How long will you count revolutions? Shorter durations save power, longer durations increase accuracy; very long durations will produce long-term averages. Typical values are a few seconds.</td></tr>
+    <tr><td class="paramname">meters_per_second_per_rotation</td><td>Conversion factor between revolutions and wind speed. For the Inspeed Vortex wind sensor that we have used (<a href="http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp">http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp</a>), this is: <b>2.5 mph/Hz = 1.1176 (m/s)/Hz</b></td></tr>
+  </table>
+  </dd>
+</dl>
 <p>This function depends on the global variable <b>rotation_count</b>.</p>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// 4-second reading with Inspeed Vortex wind sensor on digital pin 3</span></div><div class="line"><span class="comment">// (interrupt 1), returned in meters per second</span></div><div class="line">logger.Anemometer_reed_switch(3, 4000, 1.1176);</div></div><!-- fragment -->
 </div>
@@ -284,15 +325,21 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Atlas Scientific sensors: water properties and chemistry.</p>
 <p>Generalized serial interface for Atlas Scientific sensors. It uses SoftwareSerial AND THEREFORE IS LIKELY UNSTABLE AFTER A FEW DAYS IN THE FIELD. The watchdog timer SHOULD BE ABLE TO CATCH THIS, but this has not yet been tested.</p>
 <p>Code in comments is on the way to replacing this with hardware serial. It is also possible to replace this with I2C code, which will be more versitile: can connect many sensors to same I2C port, so long as they remain isolated.</p>
-<p><b>command</b> is the instruction code sent to the Atlas Scientific product. See the data sheet for your specific sensor.</p>
-<p><b>softSerRx</b> is the software serial receive port</p>
-<p><b>softSerTx</b> is the software serial transmit port</p>
-<p><b>baudRate</b> is set by the Atlas Scientific sensor's baud rate.</p>
-<p><b>printReturn</b> is true if you determines whether you care about (i.e. want to print) the Serial response, and false if you would just like to clear the buffer.</p>
-<p><b>saveReturn</b> is true if you want to save the response to the SD card.</p>
-<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// read a pH probe using pins 7 and 8 as Rx and Tx, and save its results:</span></div><div class="line">logger.AtlasScientific(<span class="stringliteral">&quot;R&quot;</span>, 7, 8)</div></div><!-- fragment -->
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">command</td><td>is the instruction code sent to the Atlas Scientific product. See the data sheet for your specific sensor.</td></tr>
+    <tr><td class="paramname">softSerRx</td><td>is the software serial receive port</td></tr>
+    <tr><td class="paramname">softSerTx</td><td>is the software serial transmit port</td></tr>
+    <tr><td class="paramname">baudRate</td><td>is set by the Atlas Scientific sensor's baud rate.</td></tr>
+    <tr><td class="paramname">printReturn</td><td>is true if you determines whether you care about (i.e. want to print) the Serial response, and false if you would just like to clear the buffer.</td></tr>
+    <tr><td class="paramname">saveReturn</td><td>is true if you want to save the response to the SD card.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// read a pH probe using pins 7 and 8 as Rx and Tx, and save its results:</span></div><div class="line">logger.AtlasScientific(<span class="stringliteral">&quot;R&quot;</span>, 7, 8);</div></div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="a40ae372dee7f672a6d6f33ab441e4da1"></a>
@@ -318,12 +365,18 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Reads a Decagon Devices 5TE soil moisture probe. NEEDS TESTING with current ALog version.</p>
+<p>Reads a Decagon Devices 5TE soil moisture probe.</p>
+<p>NEEDS TESTING with current ALog version.</p>
 <p>Returns Dielectric permittivity [-unitless-], electrical conductivity [dS/m], and temperature [degrees C]. Soil moisture is calculated through postprocessing.</p>
 <p>Uses <b>SoftwareSerial</b>, and therefore has the potential to go unstable; however, we have a time limit, so this won't crash the logger: it will just keep the logger from recording good data.</p>
 <p>Modified from Steve Hicks' code for an LCD reader by Andy Wickert</p>
-<p><b>excitPin</b> activates the probe and powers it</p>
-<p><b>dataPin</b> receives incoming serial data at 1200 bps</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">excitPin</td><td>activates the probe and powers it</td></tr>
+    <tr><td class="paramname">dataPin</td><td>receives incoming serial data at 1200 bps</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line">logger.Decagon5TE(7, 8);</div></div><!-- fragment -->
 </div>
 </div>
@@ -357,10 +410,15 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Ruggedized Decagon Devices soil moisture sensor</p>
-<p><b>pin</b> Analog pin number</p>
-<p><b>Vref</b> is the reference voltage of the ADC; on the ALog, this is a precision 3.3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)</p>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</p>
-<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Using a non-precision Rref that is slightly off</span></div><div class="line">logger.DecagonGS1(A1, 3.27, 14)</div></div><!-- fragment -->
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>Analog pin number</td></tr>
+    <tr><td class="paramname">Vref</td><td>is the reference voltage of the ADC; on the ALog, this is a precision 3.3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Using a non-precision Rref that is slightly off</span></div><div class="line">logger.DecagonGS1(A1, 3.27, 14);</div></div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="adca7be8a63592263c67f63766680d16f"></a>
@@ -391,6 +449,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Endslogging and returns to sleep</p>
 <p>Ends line, turns of SD card, and resets alarm: ready to sleep.</p>
 <p>Also runs tipping bucket rain gauge code (function that records time stamp) if one is attached and activated.</p>
 <p><b>IMPORTANT:</b> If the logger is not writing data to the card, and the card is properly inserted, the manually-set delay here may be the problem. We think we have made it long enough, but because it is hard-coded, there could be an unforeseen circumstance in which it is not!</p>
@@ -409,6 +468,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Does the logger enter a low-power sleep mode? T/F.</p>
 <ul>
 <li>True if the logger is going to sleep between pases through the data-reading loop.</li>
 <li>False if the logger is looping over its logging step (inside void loop() in the *.ino code) continuously without sleeping</li>
@@ -439,11 +499,17 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>HackHD camera control function</p>
 <p>Control the HackHD camera: this function turns the HackHD on or off and records the time stamp from when the HackHD turns on/off in a file called "camera.txt".</p>
 <p>Because this function turns the camera on or off, you have to ensure that you write a mechanism to keep it on for some time in your code. This could be checking the time each time you wake and deciding what to do, for example. In short: this function is a lower-level utility that requires the end-user to write the rest of the camera control sequence themselves.</p>
-<p><b>control_pin</b> is the pin connected to the HackHD on/off switch; Dropping control_pin to GND for 200 ms turns camera on or off.</p>
-<p><b>want_camera_on</b> is true if you want to turn the camera on, false if you want to turn the camera off.</p>
-<p><b>CAMERA_IS_ON</b> is a global varaible attached to this function that saves the state of the camera; it will be compared to "want_camera_on", such that this function will do nothing if the camera is already on (or off) and you want it on (or off).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">control_pin</td><td>is the pin connected to the HackHD on/off switch; Dropping control_pin to GND for 200 ms turns camera on or off.</td></tr>
+    <tr><td class="paramname">want_camera_on</td><td>is true if you want to turn the camera on, false if you want to turn the camera off.</td></tr>
+    <tr><td class="paramname">CAMERA_IS_ON</td><td>is a global varaible attached to this function that saves the state of the camera; it will be compared to "want_camera_on", such that this function will do nothing if the camera is already on (or off) and you want it on (or off).</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Power requirements:</p>
 <ul>
 <li>0.2 mA quiescent current draw;</li>
@@ -516,14 +582,20 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>HM1500LF Relative humidity sensor with external temperature correction</p>
 <p>This function measures the relative humidity of using a HTM1500 relative humidity sensor and an external thermistor. The relative humidity and temperature is measured using a 14 bit oversampling method. Results are displayed on the serial monitor and saved onto the SD card to four decimal places.</p>
-<p><b>humidPin</b> is the analog pin connected to the humidity output voltage of the module.</p>
-<p><b>R0_therm</b> is a thermistor calibration.</p>
-<p><b>B_therm</b> is the B- or β- parameter of the thermistor.</p>
-<p><b>Rref_therm</b> is the resistance of the corresponding reference resistor for that analog pin.</p>
-<p><b>T0degC_therm</b> is a thermistor calibration.</p>
-<p><b>thermPin_therm</b> is the analog pin connected to the tempurature output voltage of the module.</p>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">humidPin</td><td>is the analog pin connected to the humidity output voltage of the module.</td></tr>
+    <tr><td class="paramname">R0_therm</td><td>is a thermistor calibration.</td></tr>
+    <tr><td class="paramname">B_therm</td><td>is the B- or β- parameter of the thermistor.</td></tr>
+    <tr><td class="paramname">Rref_therm</td><td>is the resistance of the corresponding reference resistor for that analog pin.</td></tr>
+    <tr><td class="paramname">T0degC_therm</td><td>is a thermistor calibration.</td></tr>
+    <tr><td class="paramname">thermPin_therm</td><td>is the analog pin connected to the tempurature output voltage of the module.</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10)</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line">logger.HTM2500LF_humidity_temperature(1,?,10000,3950,10000,25,2);</div></div><!-- fragment -->
 </div>
 </div>
@@ -583,19 +655,22 @@ Public Member Functions</h2></td></tr>
 <p>Cost-effective pressure sensor from Honeywell</p>
 <p>Datasheet: <a href="http://sensing.honeywell.com/index.php?ci_id=151133">http://sensing.honeywell.com/index.php?ci_id=151133</a></p>
 <p>See also the <b>Honeywell_HSC_analog</b> example.</p>
-<p><b>pin</b> Analog pin number</p>
-<p><b>Vsupply</b> Supply voltage to sensor</p>
-<p><b>Vref</b> is the reference voltage of the ADC; on the ALog, this is a precision 3.3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)</p>
-<p><b>Pmin</b> Minimum pressure in range of sensor</p>
-<p><b>Pmax</b> Maximum pressure in range of sensor</p>
-<p><b>Pmax</b> Maximum pressure in range of sensor</p>
-<p><b>TransferFunction_number:</b> 1, 2, 3, or 4: which transfer function is used to convert voltage to pressure</p><ul>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>Analog pin number</td></tr>
+    <tr><td class="paramname">Vsupply</td><td>Supply voltage to sensor</td></tr>
+    <tr><td class="paramname">Vref</td><td>is the reference voltage of the ADC; on the ALog, this is a precision 3.3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)</td></tr>
+    <tr><td class="paramname">Pmin</td><td>Minimum pressure in range of sensor</td></tr>
+    <tr><td class="paramname">Pmax</td><td>Maximum pressure in range of sensor</td></tr>
+    <tr><td class="paramname">Pmax</td><td>Maximum pressure in range of sensor</td></tr>
+    <tr><td class="paramname">TransferFunction_number</td><td>1, 2, 3, or 4: which transfer function is used to convert voltage to pressure<ul>
 <li>TransferFunction: 1 = 10% to 90% of Vsupply ("A" in second to last digit of part number)</li>
 <li>TransferFunction: 2 = 5% to 95% of Vsupply ("A" in second to last digit of part number)</li>
 <li>TransferFunction: 3 = 5% to 85% of Vsupply ("A" in second to last digit of part number)</li>
 <li>TransferFunction: 4 = 4% to 94% of Vsupply ("A" in second to last digit of part number)</li>
 </ul>
-<p><b>Units:</b> Output units</p><ul>
+</td></tr>
+    <tr><td class="paramname">Units</td><td>Output units<ul>
 <li>Units: 0 = mbar</li>
 <li>Units: 1 = bar</li>
 <li>Units: 2 = Pa</li>
@@ -604,7 +679,11 @@ Public Member Functions</h2></td></tr>
 <li>Units: 5 = inH2O</li>
 <li>Units: 6 = PSI</li>
 </ul>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</p>
+</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line">logger.Honeywell_HSC_analog(A1, 5, 3.3, 0, 30, 1, 6);</div></div><!-- fragment -->
 </div>
 </div>
@@ -643,11 +722,17 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>HTM2500LF Relative humidity and temperature sensor</p>
 <p>This function measures the relative humidity of using a HTM2500 tempurature and relative humidity module. The relative humidity and temperature is measured using a 14 bit oversampling method. Results are displayed on the serial monitor and saved onto the SD card to four decimal places.</p>
-<p><b>humidPin</b> is the analog pin connected to the humidity output voltage of the module.</p>
-<p><b>thermPin</b> is the analog pin connected to the tempurature output voltage of the module.</p>
-<p><b>Rref_therm</b> is the value of the reference resistor that you use with the built-in thermistor (reference resistor supplied separately, placed in appropriate slot in header)</p>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">humidPin</td><td>is the analog pin connected to the humidity output voltage of the module.</td></tr>
+    <tr><td class="paramname">thermPin</td><td>is the analog pin connected to the tempurature output voltage of the module.</td></tr>
+    <tr><td class="paramname">Rref_therm</td><td>is the value of the reference resistor that you use with the built-in thermistor (reference resistor supplied separately, placed in appropriate slot in header)</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10)</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line">logger.HTM2500LF_humidity_temperature(1, 2, ?);</div></div><!-- fragment --><p>This function is designed for ratiometric operation &ndash; that is, the humidity sensor must be powered by the same voltage regulator that is connected to the the analog reference pin &ndash; for the ALog v2.0, this is a high-precision 3V3 regulator.</p>
 
 </div>
@@ -729,17 +814,22 @@ Public Member Functions</h2></td></tr>
 <li>Needs 4.75&ndash;5.25V input (Vsupply)</li>
 <li>In typical usage, turned on and off by a switching 5V charge pump or boost converter</li>
 </ul>
-<p><b>xPin</b> Analog pin number corresponding to x-oriented tilts</p>
-<p><b>yPin</b> Analog pin number corresponding to y-oriented tilts</p>
-<p><b>Vref</b> is the reference voltage of the analog-digital comparator; it is 3.3V on the ALog.</p>
-<p><b>Vsupply</b> is the input voltage that drives the sensor, and is typically ~5V.</p>
-<p><b>humidPin</b> is the analog pin connected to the humidity output voltage of the module.</p>
-<p><b>R0_therm</b> is a thermistor calibration.</p>
-<p><b>B_therm</b> is the B- or β- parameter of the thermistor.</p>
-<p><b>Rref_therm</b> is the resistance of the corresponding reference resistor for that analog pin.</p>
-<p><b>T0degC_therm</b> is a thermistor calibration.</p>
-<p><b>thermPin_therm</b> is the analog pin connected to the tempurature output voltage of the module.</p>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10). It is applied to both the inclinomter and its temperature correction</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">xPin</td><td>Analog pin number corresponding to x-oriented tilts</td></tr>
+    <tr><td class="paramname">yPin</td><td>Analog pin number corresponding to y-oriented tilts</td></tr>
+    <tr><td class="paramname">Vref</td><td>is the reference voltage of the analog-digital comparator; it is 3.3V on the ALog.</td></tr>
+    <tr><td class="paramname">Vsupply</td><td>is the input voltage that drives the sensor, and is typically ~5V.</td></tr>
+    <tr><td class="paramname">humidPin</td><td>is the analog pin connected to the humidity output voltage of the module.</td></tr>
+    <tr><td class="paramname">R0_therm</td><td>is a thermistor calibration.</td></tr>
+    <tr><td class="paramname">B_therm</td><td>is the B- or β- parameter of the thermistor.</td></tr>
+    <tr><td class="paramname">Rref_therm</td><td>is the resistance of the corresponding reference resistor for that analog pin.</td></tr>
+    <tr><td class="paramname">T0degC_therm</td><td>is a thermistor calibration.</td></tr>
+    <tr><td class="paramname">thermPin_therm</td><td>is the analog pin connected to the tempurature output voltage of the module.</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10). It is applied to both the inclinomter and its temperature correction</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line">logger.Inclinometer_SCA100T_D02_analog_Tcorr(6, 2, 3.285, 5.191, \</div><div class="line">       10080.4120953, 3298.34232031, 10000, 25, 0);</div></div><!-- fragment -->
 </div>
 </div>
@@ -803,17 +893,27 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Pass all variables needed to initialize logging.</p>
-<p><b>_logger_name:</b> Name associated with this data logger; often helps to relate it to the project or site</p>
-<p><b>_filename:</b> Name of main data file saved to SD card; often helps to relate it to the project or site; used to be limited to 8.3, but now is not.</p>
-<p><b>_dayInterval:</b> How many days to wait before logging again; can range from 0-6.</p>
-<p><b>_hourInterval:</b> How many hours to wait before logging again; can range from 0-24.</p>
-<p><b>_minInterval:</b> How many minutes to wait before logging again; can range from 0-59.</p>
-<p><b>_secInterval:</b> How many seconds to wait before logging again; can range from 0-59.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">_logger_name</td><td>Name associated with this data logger; often helps to relate it to the project or site</td></tr>
+    <tr><td class="paramname">_filename</td><td>Name of main data file saved to SD card; often helps to relate it to the project or site; used to be limited to 8.3, but now is not.</td></tr>
+    <tr><td class="paramname">_dayInterval</td><td>How many days to wait before logging again; can range from 0-6.</td></tr>
+    <tr><td class="paramname">_hourInterval</td><td>How many hours to wait before logging again; can range from 0-24.</td></tr>
+    <tr><td class="paramname">_minInterval</td><td>How many minutes to wait before logging again; can range from 0-59.</td></tr>
+    <tr><td class="paramname">_secInterval</td><td>How many seconds to wait before logging again; can range from 0-59.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>If all time-setting functions are 0, then the logger will not sleep, and instead will log continuously. This sets the flag "_use_sleep_mode" to be false.</p>
-<p><b>_ext_int:</b> External interrupt, set to be a tipping-bucket rain gauge, that triggers event-based logging of a timestamp</p>
-<p><b>_LOG_ALL_SENSORS_ON_BUCKET_TIP:</b> Flag that tells the logger to read every sensor when the bucket tips (if _ext_int is true) and write their outputs to "datafile" (i.e. the main data file whose name you specify with <b>_filename</b>; this is in addition to writing the timestamp of the rain gauge bucket tip.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">_ext_int</td><td>External interrupt, set to be a tipping-bucket rain gauge, that triggers event-based logging of a timestamp</td></tr>
+    <tr><td class="paramname">_LOG_ALL_SENSORS_ON_BUCKET_TIP</td><td>Flag that tells the logger to read every sensor when the bucket tips (if _ext_int is true) and write their outputs to "datafile" (i.e. the main data file whose name you specify with <b>_filename</b>; this is in addition to writing the timestamp of the rain gauge bucket tip.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Data logger model does not need to be set: it is automatically determined from the MCU type and is used to modify pinout-dependent functions.</p>
-<p>Example: </p><div class="fragment"><div class="line">\\ Log every five minutes</div><div class="line">logger.initialize(<span class="stringliteral">&#39;TestLogger01&#39;</span>, <span class="stringliteral">&#39;lab_bench_test.alog&#39;</span>, 0, 0, 5, 0)</div></div><!-- fragment -->
+<p>Example: </p><div class="fragment"><div class="line">\\ Log every five minutes</div><div class="line">logger.initialize(<span class="stringliteral">&#39;TestLogger01&#39;</span>, <span class="stringliteral">&#39;lab_bench_test.alog&#39;</span>, 0, 0, 5, 0);</div></div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="a12dc18b7b16c91de5f7a3af7edb381a9"></a>
@@ -857,15 +957,21 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Linear potentiometer (radio tuner) to measure distance</p>
 <p>Distance based on resistance in a sliding potentiometer whose resistance may be described as a linear function</p>
-<p><b>linpotPin</b> Analog pin number</p>
-<p><b>Rref</b> Resistance value of reference resistor [ohms]</p>
-<p><b>slope</b> Slope of the line (distance = (slope)R + R0)</p>
-<p><b>intercept</b> (R0) of the line (distance = (slope)R + R0)</p>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</p>
-<p><b>Rref_on_GND-Side</b> indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a VCC-side reference resistor.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">linpotPin</td><td>Analog pin number</td></tr>
+    <tr><td class="paramname">Rref</td><td>Resistance value of reference resistor [ohms]</td></tr>
+    <tr><td class="paramname">slope</td><td>Slope of the line (distance = (slope)R + R0)</td></tr>
+    <tr><td class="paramname">intercept</td><td>(R0) of the line (distance = (slope)R + R0)</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</td></tr>
+    <tr><td class="paramname">Rref_on_GND-Side</td><td>indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a VCC-side reference resistor.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>The output units will be whatever you have used to create your linear calibration equation</p>
-<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Using a 0-10k ohm radio tuner with units in mm and a perfect intercept;</span></div><div class="line"><span class="comment">// maintaining default 14-bit readings with standard-side (ALog header)</span></div><div class="line"><span class="comment">// reference resistor set-up</span></div><div class="line">logger.linearPotentiometer(A0, 5000, 0.0008)</div></div><!-- fragment -->
+<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Using a 0-10k ohm radio tuner with units in mm and a perfect intercept;</span></div><div class="line"><span class="comment">// maintaining default 14-bit readings with standard-side (ALog header)</span></div><div class="line"><span class="comment">// reference resistor set-up</span></div><div class="line">logger.linearPotentiometer(A0, 5000, 0.0008);</div></div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="aa05378a90963ceebf7dad0904a74f42f"></a>
@@ -909,12 +1015,18 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Newer 1-mm precision MaxBotix rangefinders: analog readings</p>
 <p>This function measures the distance between the ultrasonic sensor and an \ acoustically-reflective surface, typically water or snow. Measures distance in milimeters. Results are displayed on the serial monitor and saved onto the SD card.</p>
-<p><b>nping</b> is the number of range readings to take (number of pings). The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.</p>
-<p><b>sonicPin</b> is the analog input channel hooked up to the maxbotix sensor.</p>
-<p><b>EX</b> is a digital output pin used for an excitation pulse. * If maxbotix sensor is continuously powered, a reading will be taken when this pin is flashed high. Set to '99' if excitation pulse is not needed.</p>
-<p><b>writeAll</b> will write each reading of the sensor (each ping) to the serial monitor and SD card.</p>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nping</td><td>is the number of range readings to take (number of pings). The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.</td></tr>
+    <tr><td class="paramname">sonicPin</td><td>is the analog input channel hooked up to the maxbotix sensor.</td></tr>
+    <tr><td class="paramname">EX</td><td>is a digital output pin used for an excitation pulse. * If maxbotix sensor is continuously powered, a reading will be taken when this pin is flashed high. Set to '99' if excitation pulse is not needed.</td></tr>
+    <tr><td class="paramname">writeAll</td><td>will write each reading of the sensor (each ping) to the serial monitor and SD card.</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line">logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);</div></div><!-- fragment --><p> Note that sensor should be mounted away from supporting structure. These are the standard recommendations:</p><ul>
 <li>For a mast that is 5 meters high (or higher) the sensor should be mounted at least 100cm away from the mast.</li>
 <li>For a mast that is 2.5 meters high (or lower) the sensor should be at least 75cm away from the mast.</li>
@@ -966,12 +1078,17 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Uses the UART interface to record data from a MaxBotix sensor.</p>
 <p>NOTE: THIS HAS CUASED LOGGERS TO FREEZE IN THE PAST; WHILE IT IS QUITE LIKELY THAT THE ISSUE IS NOW SOLVED, MORE TESTING IS REQUIRED. (ADW, 26 NOVEMBER 2016) (maybe solved w/ HW Serial?)</p>
-<p><b>Ex</b> Excitation pin that turns the sensor on; if this is not needed (i.e. you are turning main power off and on instead), then just set this to a value that is not a pin, and ensure that you turn the power to the sensor off and on outside of this function</p>
-<p><b>npings</b> Number of pings over which you average; each ping itself includes ten short readings that the sensor internally processes</p>
-<p><b>writeAll</b> will write each reading of the sensor (each ping) to the serial monitor and SD card.</p>
-<p><b>maxRange</b> The range (in mm) at which the logger maxes out; this will be remembered to check for errors and to become a nodata values</p>
-<p><b>RS232</b> this is set true if you use inverse (i.e. RS232-style) logic; it works at standard logger voltages (i.e. it is not true RS232). If false, TTL logic will be used.</p>
-<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Digital pin 7 controlling sensor excitation, averaging over 10 pings,</span></div><div class="line"><span class="comment">// not recording the results of each ping, and with a maximum range of </span></div><div class="line"><span class="comment">// 5000 mm using standard TTL logic</span></div><div class="line">logger.maxbotixHRXL_WR_Serial(7, 10, <span class="keyword">false</span>, 5000, <span class="keyword">false</span>)</div></div><!-- fragment -->
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">Ex</td><td>Excitation pin that turns the sensor on; if this is not needed (i.e. you are turning main power off and on instead), then just set this to a value that is not a pin, and ensure that you turn the power to the sensor off and on outside of this function</td></tr>
+    <tr><td class="paramname">npings</td><td>Number of pings over which you average; each ping itself includes ten short readings that the sensor internally processes</td></tr>
+    <tr><td class="paramname">writeAll</td><td>will write each reading of the sensor (each ping) to the serial monitor and SD card.</td></tr>
+    <tr><td class="paramname">maxRange</td><td>The range (in mm) at which the logger maxes out; this will be remembered to check for errors and to become a nodata values</td></tr>
+    <tr><td class="paramname">RS232</td><td>this is set true if you use inverse (i.e. RS232-style) logic; it works at standard logger voltages (i.e. it is not true RS232). If false, TTL logic will be used.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Digital pin 7 controlling sensor excitation, averaging over 10 pings,</span></div><div class="line"><span class="comment">// not recording the results of each ping, and with a maximum range of </span></div><div class="line"><span class="comment">// 5000 mm using standard TTL logic</span></div><div class="line">logger.maxbotixHRXL_WR_Serial(7, 10, <span class="keyword">false</span>, 5000, <span class="keyword">false</span>);</div></div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="ae4190ce7ccfd7b148a6151102a3bf93d"></a>
@@ -1019,12 +1136,17 @@ Public Member Functions</h2></td></tr>
 <p>Pyranomiter is from Kipp and Zonen</p>
 <p>nominal raw_output_per_W_per_m2_in_mV = 10./1000.; // 10 mV at 1000 W/m**2</p>
 <p>Actual raw output is based on calibration.</p>
-<p><b>analogPin</b> is the pin that receives the amplified voltage input</p>
-<p><b>raw_mV_per_W_per_m2</b> is the conversion factor of the pyranometer: number of millivolts per (watt/meter^2). This does not include amplification!</p>
-<p><b>gain</b> is the amplification factor</p>
-<p><b>V_ref</b> is the reference voltage of the ADC; on the ALog, this is a precision 3.3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)</p>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</p>
-<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Using precision voltage reference and 16-bit resolution (highest</span></div><div class="line"><span class="comment">// defensible oversampling resolution)</span></div><div class="line">logger.Pyranometer(A0, 0.0136, 120, 3.300, 16)</div></div><!-- fragment -->
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">analogPin</td><td>is the pin that receives the amplified voltage input</td></tr>
+    <tr><td class="paramname">raw_mV_per_W_per_m2</td><td>is the conversion factor of the pyranometer: number of millivolts per (watt/meter^2). This does not include amplification!</td></tr>
+    <tr><td class="paramname">gain</td><td>is the amplification factor</td></tr>
+    <tr><td class="paramname">V_ref</td><td>is the reference voltage of the ADC; on the ALog, this is a precision 3.3V regulator (unless a special unit without this regulator is ordered; the regulator uses significant power)</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Using precision voltage reference and 16-bit resolution (highest</span></div><div class="line"><span class="comment">// defensible oversampling resolution)</span></div><div class="line">logger.Pyranometer(A0, 0.0136, 120, 3.300, 16);</div></div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="a343fcabefb37e06429865a2e6a6e708a"></a>
@@ -1040,8 +1162,14 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Read the analog value of a pin.</p>
 <p>This function returns the analog to digital converter value (0 - 1023). Results are displayed on the serial monitor and saved onto the SD card.</p>
-<p><b>pin</b> is the analog pin number to be read.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>is the analog pin number to be read.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line">logger.readPin(2);</div></div><!-- fragment -->
 </div>
 </div>
@@ -1068,9 +1196,15 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Read the analog value of a pin, with extra resolution from oversampling</p>
 <p>This function incorporates oversampling to extend the ADC precision past ten bits by taking more readings and statistically combing them. Results are displayed on the serial monitor and saved onto the SD card.</p>
-<p><b>pin</b> is the analog pin number to be read.</p>
-<p><b>adc_bits</b> is the reading precision in bits (2^adc_bits). The ATMega328 (Arduino Uno and ALog BottleLogger core chip) has a base ADC precision of 10 bits (returns values of 0-1023) A reasonable maximum precision gain is (base_value_bits)+6, so 16 bits is a reasonable maximum precision for the ALog BottleLogger.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>is the analog pin number to be read.</td></tr>
+    <tr><td class="paramname">adc_bits</td><td>is the reading precision in bits (2^adc_bits). The ATMega328 (Arduino Uno and ALog BottleLogger core chip) has a base ADC precision of 10 bits (returns values of 0-1023) A reasonable maximum precision gain is (base_value_bits)+6, so 16 bits is a reasonable maximum precision for the ALog BottleLogger.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line">logger.readPinOversample(2, 12);</div></div><!-- fragment --><p>Output values will range from 0-1023, but be floating-point.</p>
 <p>Readings that require more bits of precision will take longer.</p>
 
@@ -1088,6 +1222,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Readies the ALog to begin measurements</p>
 <p>Sets all pins, alarms, clock, SD card, etc: everything needed for the ALog to run properly.</p>
 
 </div>
@@ -1104,6 +1239,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Puts the ALog data logger into a low-power sleep mode</p>
 <p>Sets the "IS_LOGGING" flag to false, disables the watchdog timer, and puts the logger to sleep.</p>
 
 </div>
@@ -1136,6 +1272,7 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Wakes the logger and starts logging</p>
 <p>Wakes the logger: sets the watchdog timer (a failsafe in case the logger hangs), checks and clears alarm flags, looks for rain gauge bucket tips (if they occur during the middle of a logging event (ignore) or if they include a command to read all sensors with a tip), and starts to log to "datafile", if it can.</p>
 <p><b>If the logger cannot reach the SD card, it sends out an LED warning message of 20 rapid flashes.</b></p>
 
@@ -1194,17 +1331,24 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Read the analog value of a pin, with extra resolution from oversampling</p>
 <p>This function measures temperature using a thermistor characterised with the B (or β) parameter equation, which is a simplification of the Steinhart-Hart equation</p>
 <p>The function compares the thermistor risistance with the reference resistor using a voltage divider.</p>
 <p>It returns a float of the temperature in degrees celsius. Results are displayed on the serial monitor and saved onto the SD card to four decimal places.</p>
-<p><b>R0</b> is the resistance of the thermistor at the known temperature <b>T0degC</b> </p>
-<p><b>B</b> is the β parameter of the thermistor</p>
-<p><b>Rref</b> is the resistance of the corresponding reference resistor for \ the analog pin set by <b>ThermPin</b> (below).</p>
-<p><b>T0degC</b> is the temperature at which <b>R0</b> was calibrated.</p>
-<p><b>thermPin</b> is the analog pin number to be read.</p>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</p>
-<p><b>Rref_on_GND-Side</b> indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a VCC-side reference resistor.</p>
-<p><b>oversample_debug</b> is true if you want a separate file, "Oversample.txt", to record every individual reading used in the oversampling.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">R0</td><td>is the resistance of the thermistor at the known temperature </td></tr>
+    <tr><td class="paramname">T0degC</td><td></td></tr>
+    <tr><td class="paramname">B</td><td>is the β parameter of the thermistor</td></tr>
+    <tr><td class="paramname">Rref</td><td>is the resistance of the corresponding reference resistor for \ the analog pin set by <b>ThermPin</b> (below).</td></tr>
+    <tr><td class="paramname">T0degC</td><td>is the temperature at which <b>R0</b> was calibrated.</td></tr>
+    <tr><td class="paramname">thermPin</td><td>is the analog pin number to be read.</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</td></tr>
+    <tr><td class="paramname">Rref_on_GND-Side</td><td>indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a VCC-side reference resistor.</td></tr>
+    <tr><td class="paramname">oversample_debug</td><td>is true if you want a separate file, "Oversample.txt", to record every individual reading used in the oversampling.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Contherm from Digikey, 14-bit precision</span></div><div class="line">logger.thermistorB(10000, 3950, 30000, 25, 2, 14);</div><div class="line"><span class="comment">// EPCOS, DigiKey # 495-2153-ND, 14-bit precision</span></div><div class="line">logger.thermistorB(10000, 3988, 13320, 25, 1, 14);</div></div><!-- fragment -->
 </div>
 </div>
@@ -1243,12 +1387,18 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<p>Old 1-cm resolution Maxbotix ultrasonic rangefinders: analog measurements</p>
 <p>This function measures the distance between the ultrasonic sensor and an acustically reflective surface, typically water or snow. Measures distance in centimeters. Results are displayed on the serial monitor and saved onto the SD card.</p>
 <p>This is for the older MaxBotix sensors, whose maximum precision is in centimeters.</p>
-<p><b>nping</b> is the number of range readings to take (number of pings). The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.</p>
-<p><b>EX</b> is a digital output pin used for an excitation pulse. If maxbotix sensor is continuously powered a reading will be taken when this pin is flashed high. Set to '99' if excitation pulse is not needed.</p>
-<p><b>sonicPin</b> is the analog input channel hooked up to the maxbotix sensor.</p>
-<p><b>writeAll</b> will write each reading of the sensor (each ping) to the serial monitor and SD card.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">nping</td><td>is the number of range readings to take (number of pings). The mean range will be calculated and output to the serial monitor and SD card followed by the standard deviation.</td></tr>
+    <tr><td class="paramname">EX</td><td>is a digital output pin used for an excitation pulse. If maxbotix sensor is continuously powered a reading will be taken when this pin is flashed high. Set to '99' if excitation pulse is not needed.</td></tr>
+    <tr><td class="paramname">sonicPin</td><td>is the analog input channel hooked up to the maxbotix sensor.</td></tr>
+    <tr><td class="paramname">writeAll</td><td>will write each reading of the sensor (each ping) to the serial monitor and SD card.</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Example: </p><div class="fragment"><div class="line">logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);</div></div><!-- fragment --><p> Note that sensor should be mounted away from supporting structure. For a mast that is 5 meters high (or higher) the sensor should be mounted at least 100cm away from the mast. For a mast that is 2.5 meters high (or lower) the sensor should be at least 75cm away from the mast.</p>
 
 </div>
@@ -1289,11 +1439,16 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Resistance from a simple voltage divider</p>
-<p><b>pin</b> Analog pin number</p>
-<p><b>Rref</b> Resistance value of reference resistor [ohms]</p>
-<p><b>ADC_resolution_nbits</b> (10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</p>
-<p><b>Rref_on_GND-Side</b> indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a VCC-side reference resistor.</p>
-<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Use standard reference resistor headers: let last parameter be false </span></div><div class="line"><span class="comment">// (default)</span></div><div class="line">logger.vdivR(A2, 10000, 12)</div></div><!-- fragment -->
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>Analog pin number</td></tr>
+    <tr><td class="paramname">Rref</td><td>Resistance value of reference resistor [ohms]</td></tr>
+    <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</td></tr>
+    <tr><td class="paramname">Rref_on_GND-Side</td><td>indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a VCC-side reference resistor.</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Use standard reference resistor headers: let last parameter be false </span></div><div class="line"><span class="comment">// (default)</span></div><div class="line">logger.vdivR(A2, 10000, 12);</div></div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="a31c3cba5ff5722fb66bf540bfbe8b25d"></a>
@@ -1310,7 +1465,12 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>Wind vane: resistance changes with angle to wind.</p>
-<p><b>vanePin</b> is the analog pin that reads the wind vane resistance</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vanePin</td><td>is the analog pin that reads the wind vane resistance</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>This function is specialized for the Inspeed eVane2. Here, a resistance of 0 equates to wind from the north, and resistence increases in a clockwise direction.</p>
 <p>Connect one wire to power supply, one wire to analog pin, one wire to GND</p>
 <p>From documentation:</p><ul>
@@ -1323,7 +1483,7 @@ Public Member Functions</h2></td></tr>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li><a class="el" href="Logger_8h_source.html">Logger.h</a></li>
-<li>Logger.cpp</li>
+<li><a class="el" href="Logger_8cpp.html">Logger.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
