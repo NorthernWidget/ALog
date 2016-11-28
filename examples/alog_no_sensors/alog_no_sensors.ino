@@ -21,8 +21,7 @@ bool external_interrupt = false;
 void setup(){
   logger.initialize(dataLoggerName, fileName, Log_Interval_Days, \
       Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds,
-      external_interrupt)
-  logger.setupLogger();
+      external_interrupt);logger.setupLogger();
 }
 
 void loop(){
