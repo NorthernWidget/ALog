@@ -423,7 +423,7 @@ void Logger::setupLogger(){
 
   delay(5);
 
-  // Callback to set date and time
+  // Callback to set date and time in SD card file metadata
   // Following: https://forum.arduino.cc/index.php?topic=348562.0
   // See: https://github.com/NorthernWidget/Logger/issues/6
   SdFile::dateTimeCallback(_internalDateTime);
@@ -812,8 +812,14 @@ void Logger::checkAlarms(){
       datafile.close();
       delay(30);
 
+      // Callback to set date and time in SD card file metadata
+      // Following: https://forum.arduino.cc/index.php?topic=348562.0
+      // See: https://github.com/NorthernWidget/Logger/issues/6
+      SdFile::dateTimeCallback(_internalDateTime);
+      
       if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
         Serial.println(F("Error initializing SD card for writing"));
+        LEDwarn(20);
       }
       start_logging_to_otherfile("Alarm_miss.txt");
 
@@ -1081,6 +1087,11 @@ void Logger::startLogging(){
 
   pinMode(SDpowerPin, OUTPUT); // Seemed to have forgotten between loops... ?
 
+  // Callback to set date and time in SD card file metadata
+  // Following: https://forum.arduino.cc/index.php?topic=348562.0
+  // See: https://github.com/NorthernWidget/Logger/issues/6
+  SdFile::dateTimeCallback(_internalDateTime);
+  
   // Initialize logger
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
@@ -2656,11 +2667,17 @@ void Logger::TippingBucketRainGage(){
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
   // might want to use a digitalread for better incorporation into normal logging cycle
   //SDpowerOn();
+
+  // Callback to set date and time in SD card file metadata
+  // Following: https://forum.arduino.cc/index.php?topic=348562.0
+  // See: https://github.com/NorthernWidget/Logger/issues/6
+  SdFile::dateTimeCallback(_internalDateTime);
+  
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
-
+    LEDwarn(20);
   }
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
@@ -3210,31 +3227,43 @@ void Logger::announce_start(){
 }
 
 // Handshake function
-void Logger::establishContact(){
+void Logger::establishContact_Tx(){
   while (Serial.available() <= 0) {
     Serial.print('A');   // send a capital A
     delay(300);
   }
 }
 
+bool Logger::establishContact_Rx(){
+  char in;
+  bool setclock = false;
+  in = Serial.read();   // send a capital A
+  if(in == 'A'){
+    Serial.println(F("ALog"));
+    setclock = true;
+  }
+  return setclock;
+}
+
 void Logger::startup_sequence(){
   bool connected_to_computer = false;
-  char handshake[4];
-  char handshake_test[5] = "alog"; // 5 chars, incl. termination
-  int ntrue = 0;
+  //char handshake[4];
+  //char handshake_test[5] = "alog"; // 5 chars, incl. termination
+  //int ntrue = 0;
   int i;
   unsigned long unixtime_at_start;
   
   // First, throw away any garbage on the incoming Serial line
   while(Serial.available() > 0)
     Serial.read();
-  
+    
   // Then check if connected to computer with ALogTalk running to set the clock
   // Do so by first pinging the computer, and then waiting for a handshake.
   int millisthen = millis();
-  while ( (millis() - millisthen) < 2000 && (connected_to_computer == 0)){
-    establishContact();
+  while ( (millis() - millisthen) < 10000 && (connected_to_computer == 0)){
+    connected_to_computer = establishContact_Rx();
     // Serial is available if establishContact exits on its own
+    /*
     if ( Serial.available() ){
       i = 0;
       while( Serial.available() && (i < 4)){
@@ -3250,6 +3279,7 @@ void Logger::startup_sequence(){
         connected_to_computer = true;
       }
     }
+    */
   }
   
   // Run through startup sequence, including clock setting if 

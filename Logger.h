@@ -180,7 +180,8 @@ class Logger {
     void set_time_main();
     void announce_start();
     void startup_sequence();
-    void establishContact();
+    void establishContact_Tx();
+    bool establishContact_Rx();
     
     // Clock power
     void RTCon();
