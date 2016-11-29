@@ -76,7 +76,7 @@ void wakeUpNow();
 void wakeUpNow_tip();
 void _ISR_void();
 void _anemometer_count_increment();
-
+void _internalDateTime(uint16_t* date, uint16_t* time); // Callback: SD DT stamp
 // The rest of the library
 
 class Logger {
@@ -173,7 +173,6 @@ class Logger {
     
     // Time
     void unixDatestamp();
-    void _internalDateTime(uint16_t* date, uint16_t* time); // Callback: SD DT stamp
     
     // Logger-computer communications
     void name();

@@ -422,6 +422,13 @@ void Logger::setupLogger(){
   name();
 
   delay(5);
+
+  // Callback to set date and time
+  // Following: https://forum.arduino.cc/index.php?topic=348562.0
+  // See: https://github.com/NorthernWidget/Logger/issues/6
+  SdFile::dateTimeCallback(_internalDateTime);
+  
+  delay(5);
   Serial.print(F("Initializing SD card..."));
   if (!sd.begin(CSpin, SPI_HALF_SPEED)){
     Serial.println(F("Card failed, or not present"));
@@ -3451,9 +3458,3 @@ void _internalDateTime(uint16_t* date, uint16_t* time) {
   *time = FAT_TIME(now.hour(), now.minute(), now.second());
 }
 
-/*
-  // Callback to set date and time
-  // Following: https://forum.arduino.cc/index.php?topic=348562.0
-  // See: https://github.com/NorthernWidget/Logger/issues/6
-  SdFile::dateTimeCallback(_internalDateTime);
-*/
