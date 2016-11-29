@@ -415,12 +415,11 @@ void Logger::setupLogger(){
   ///////////////////////////////////////////////////////////
   // SET FIRST ALARM TO OBTAIN INSTANT READING ON START-UP //
   ///////////////////////////////////////////////////////////
-  // CURRENTLY DISABLED BECAUSE IT CAUSES READINGS THAT ARE NOT EXACTLY
-  // ON THE MINUTES
-  /*
   Clock.checkIfAlarm(1); //Clear alarm flags
   Clock.checkIfAlarm(2); //Clear alarm flags
 
+  // ISSUE: THIS CAUSES READINGS THAT ARE NOT EXACTLY
+  // ON THE MINUTES
   bool Century, h12 = false;
   bool PM;
   _days = Clock.getDoW();
@@ -433,7 +432,7 @@ void Logger::setupLogger(){
   if(_days > 7){_days = _days - 7;}
 
   alarm( _days, _hours, _minutes, _seconds);  //Set first alarm.
-  */
+
   displayAlarms();  // Verify Alarms and display time
 
   delay(10);
@@ -479,6 +478,10 @@ void Logger::setupLogger(){
 
   delay(20);
 
+  if (_use_sleep_mode){
+    SDpowerOff();
+    RTCsleep();
+  }
 }
 
 /////////////////////////////////////////////
@@ -3199,6 +3202,12 @@ void Logger::print_time(){
     go = Serial.read();
     if( (go == 'g') && exit_flag ){
       exit_flag = 0; // Exit loop once this is done
+      // First, wait until we are at the top of the second
+      now = RTC.now();
+      unsigned long unixtimenow = now.unixtime();
+      while (now.unixtime() == unixtimenow){
+        now = RTC.now();
+      }
       // Print times before setting clock
       for (int i=0; i<5; i++){
         now = RTC.now();
