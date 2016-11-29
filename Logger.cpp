@@ -129,6 +129,7 @@ int _days;
 int _hours;
 int _minutes;
 int _seconds;
+
 // Use the sleep mode?
 bool _use_sleep_mode = true; // Defaults to true
 
@@ -410,7 +411,33 @@ void Logger::setupLogger(){
 
   // Includes check whether you are talking to Python terminal
   startup_sequence();
+  
+  ///////////////////////////////////////////////////////////
+  // SET FIRST ALARM TO OBTAIN INSTANT READING ON START-UP //
+  ///////////////////////////////////////////////////////////
+  // CURRENTLY DISABLED BECAUSE IT CAUSES READINGS THAT ARE NOT EXACTLY
+  // ON THE MINUTES
+  /*
+  Clock.checkIfAlarm(1); //Clear alarm flags
+  Clock.checkIfAlarm(2); //Clear alarm flags
 
+  bool Century, h12 = false;
+  bool PM;
+  _days = Clock.getDoW();
+  _hours = Clock.getHour(h12, PM);
+  _minutes = Clock.getMinute();
+  _seconds = Clock.getSecond()+5;  //Set first alarm to activate in 5 seconds.
+  if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
+  if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
+  if(_hours > 23){_hours = _hours - 24; _days++;}
+  if(_days > 7){_days = _days - 7;}
+
+  alarm( _days, _hours, _minutes, _seconds);  //Set first alarm.
+  */
+  displayAlarms();  // Verify Alarms and display time
+
+  delay(10);
+  
   ///////////////////
   // SD CARD SETUP //
   ///////////////////
@@ -450,30 +477,8 @@ void Logger::setupLogger(){
   name();
   Serial.println(F("Logger initialization complete! Ciao bellos."));
 
-  delay(10);
+  delay(20);
 
-  Clock.checkIfAlarm(1); //Clear alarm flags
-  Clock.checkIfAlarm(2); //Clear alarm flags
-
-    bool Century, h12 = false;
-    bool PM;
-    _days = Clock.getDoW();
-    _hours = Clock.getHour(h12, PM);
-    _minutes = Clock.getMinute();
-    _seconds = Clock.getSecond()+5;  //Set first alarm to activate in 5 seconds.
-    if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
-    if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
-    if(_hours > 23){_hours = _hours - 24; _days++;}
-    if(_days > 7){_days = _days - 7;} 
-
-  alarm( _days, _hours, _minutes, _seconds);  //Set first alarm.
-  checkTime();  // Verify time
-  displayAlarms();  // Verify Alarms
-  delay(10);
-  if (_use_sleep_mode){
-    SDpowerOff();
-    RTCsleep();
-    }
 }
 
 /////////////////////////////////////////////
@@ -739,14 +744,14 @@ const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
 void Logger::displayAlarms(){
   bool ADy, A12h, Apm;
   byte ADay, AHour, AMinute, ASecond, AlarmBits;
-  Serial.print("Alarm 1: ");
+  Serial.print(F("Alarm 1 (d/h/m/s): "));
 	Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
-	Serial.print(ADay, DEC);
 	if (ADy) {
-		Serial.print(" DoW");
+		Serial.print(F("DoW "));
 	} else {
-		Serial.print(" Date");
+		Serial.print(F("Date "));
 	}
+	Serial.print(ADay, DEC);
 	Serial.print(' ');
 	Serial.print(AHour, DEC);
 	Serial.print(' ');
@@ -756,28 +761,28 @@ void Logger::displayAlarms(){
 	Serial.print(' ');
 	if (A12h) {
 		if (Apm) {
-			Serial.print("pm");
+			Serial.print(F("pm"));
 		} else {
-			Serial.print("am");
+			Serial.print(F("am"));
 		}
 	}
 	if (Clock.checkAlarmEnabled(1)){
-		Serial.print("enabled");
+		Serial.print(F("enabled"));
   } else{
-    Serial.print("not enabled");
+    Serial.print(F("not enabled"));
     }
 	
 	Serial.print('\n');
 	// Display Alarm 2 information
-	Serial.print("Alarm 2: ");
+	Serial.print(F("Alarm 2 (d/h/m): "));
 	Clock.getA2Time(ADay, AHour, AMinute, AlarmBits, ADy, A12h, Apm);
-	Serial.print(ADay, DEC);
 	if (ADy){
-		Serial.print(" DoW");
+		Serial.print(F("DoW "));
 	} 
     else{
-    Serial.print(" Date");
-	  } 
+    Serial.print(F("Date "));
+  } 
+	Serial.print(ADay, DEC);
 	Serial.print(' ');
 	Serial.print(AHour, DEC);
 	Serial.print(' ');
@@ -785,22 +790,24 @@ void Logger::displayAlarms(){
 	Serial.print(' ');
 	if (A12h) {
 		if (Apm) {
-			Serial.print("pm ");
+			Serial.print(F("pm "));
 		} else {
-			Serial.print("am ");
+			Serial.print(F("am "));
 		}
 	}
 	if (Clock.checkAlarmEnabled(2)) {
-		Serial.print("enabled");
+		Serial.print(F("enabled"));
 	} else{
-    Serial.print("not enabled");
+    Serial.print(F("not enabled"));
   }
+  Serial.println();
 	// display alarm bits
-//	Serial.print('\n');
-//	Serial.println(AlarmBits, BIN);
-//  Serial.println(Clock.getSecond());
+  //	Serial.print('\n');
+  //	Serial.println(AlarmBits, BIN);
+  //  Serial.println(Clock.getSecond());
 
-checkTime();
+  // Finally, print the current time to Serial
+  displayTime();
 }
 
 void Logger::checkAlarms(){
@@ -808,8 +815,9 @@ void Logger::checkAlarms(){
 	
 	if (_use_sleep_mode){
 	  if (Clock.checkIfAlarm(2)) {
-		  Serial.println("Alarm missed! Reset logger.");
+		  Serial.println("Alarm missed! Resetting logger.");
       datafile.close();
+      LEDwarn(20);
       delay(30);
 
       // Callback to set date and time in SD card file metadata
@@ -819,7 +827,7 @@ void Logger::checkAlarms(){
       
       if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
         Serial.println(F("Error initializing SD card for writing"));
-        LEDwarn(20);
+        LEDwarn(40);
       }
       start_logging_to_otherfile("Alarm_miss.txt");
 
@@ -852,17 +860,17 @@ void Logger::checkAlarms(){
   }
 }
 
-void Logger::checkTime(){
-//Get current time:
-bool Century=false;
-bool h12 = false;
-bool PM;
-  Serial.print("GMT DATE/TIME: "); delay(5);
-	Serial.print(Clock.getYear(), DEC);
-	Serial.print(' ');
+void Logger::displayTime(){
+  //Get current time:
+  bool Century=false;
+  bool h12 = false;
+  bool PM;
+  Serial.print("UTC DATE/TIME: "); delay(5);
+	Serial.print(2000+Clock.getYear(), DEC);
+	Serial.print('.');
 	// then the month
 	Serial.print(Clock.getMonth(Century), DEC);
-	Serial.print(' ');
+	Serial.print('.');
 	// then the date
 	Serial.print(Clock.getDate(), DEC);
 	Serial.print(' ');
@@ -871,9 +879,9 @@ bool PM;
 	//Serial.print(' ');
 	// Finally the hour, minute, and second
 	Serial.print(Clock.getHour(h12, PM), DEC);
-	Serial.print(' ');
+	Serial.print(':');
 	Serial.print(Clock.getMinute(), DEC);
-	Serial.print(' ');
+	Serial.print(':');
 	Serial.print(Clock.getSecond(), DEC);
 	// Add AM/PM indicator
 	if (h12) {
@@ -883,9 +891,10 @@ bool PM;
 			Serial.println(" AM ");
 		}
 	} else {
-		Serial.println(" 24h GMT");
+		Serial.println(" 24h");
 	}
-delay(2);
+	// Enough time to print
+  delay(2);
 }
 
   void Logger::LEDwarn(int nflash)
@@ -894,9 +903,9 @@ delay(2);
     // has not properly initialized upon restart
     for(int i=0;i<=nflash;i++){
       digitalWrite(LEDpin,HIGH);
-      delay(50);
+      delay(40);
       digitalWrite(LEDpin,LOW);
-      delay(50);
+      delay(40);
     }
   }
 
@@ -1100,7 +1109,7 @@ void Logger::startLogging(){
     // WARN THE END USER -- new feature after conversations with Amanda and 
     // Crystal about SD cards not being seated correctly, and/or just not 
     // knowing if they are.
-    LEDwarn(20);
+    LEDwarn(40);
   }
   delay(10);
   // Datestamp the start of the line
@@ -2677,7 +2686,7 @@ void Logger::TippingBucketRainGage(){
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.println(F("Error initializing SD card for writing"));
-    LEDwarn(20);
+    LEDwarn(40);
   }
   delay(10);
   start_logging_to_otherfile("b_tips.txt");
@@ -3260,7 +3269,7 @@ void Logger::startup_sequence(){
   // Then check if connected to computer with ALogTalk running to set the clock
   // Do so by first pinging the computer, and then waiting for a handshake.
   int millisthen = millis();
-  while ( (millis() - millisthen) < 10000 && (connected_to_computer == 0)){
+  while ( (millis() - millisthen) < 2000 && (connected_to_computer == 0)){
     connected_to_computer = establishContact_Rx();
     // Serial is available if establishContact exits on its own
     /*

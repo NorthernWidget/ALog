@@ -165,7 +165,7 @@ class Logger {
          int secInterval);
     void displayAlarms(); //debug tool delete if desired.
     void checkAlarms();  //debug tool delete if desired. 
-    void checkTime();   //debug tool delete if desired. 
+    void displayTime();   //debug tool delete if desired. 
     // LED signals
     void LEDwarn(int nflash);
     void LEDgood();
