@@ -36,12 +36,12 @@ logger.startLogging();  // Wake up and initialize
 
 logger.startAnalog();
 
-//Honeywell_HSC_analog(float Vsupply, float Pmin, float Pmax, int TransferFunction, int Units, int Pin)
+//Honeywell_HSC_analog(int pin, float Vsupply, vRef, float Pmin, float Pmax, int TransferFunction_number, int units)
 
 //TransferFunction: 1 = 10% to 90% of Vsupply (A in second to last digit of part number)
-//TransferFunction: 2 = 5% to 95% of Vsupply (A in second to last digit of part number)
-//TransferFunction: 3 = 5% to 85% of Vsupply (A in second to last digit of part number)
-//TransferFunction: 4 = 4% to 94% of Vsupply (A in second to last digit of part number)
+//TransferFunction: 2 = 5% to 95% of Vsupply (B in second to last digit of part number)
+//TransferFunction: 3 = 5% to 85% of Vsupply (C in second to last digit of part number)
+//TransferFunction: 4 = 4% to 94% of Vsupply (F in second to last digit of part number)
 
 //Units: 0 = mbar
 //Units: 1 = bar

@@ -1288,7 +1288,7 @@ float Logger::readPinOversample(int pin, int bits){
 
 float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
                           int thermPin, uint8_t ADC_resolution_nbits,
-                          bool Rref_on_GND_side, bool oversample_debug){
+                          bool Rref_on_GND_side, bool oversample_debug, bool record_results){
 
   /**
    * @brief 
@@ -1330,6 +1330,9 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
    * @param oversample_debug is true if you want a separate file, "Oversample.txt", 
    * to record every individual reading used in the oversampling.
    * 
+   * @param record_results is true if you want to save results to the SD card and
+   * print to the serial monitor.
+
    * Example:
    * ```
    * // Contherm from Digikey, 14-bit precision
@@ -1355,7 +1358,8 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
   ///////////////
   // SAVE DATA //
   ///////////////
-
+  
+  if(record_results){
   // SD write
   datafile.print(T, 4);
   datafile.print(F(","));
@@ -1363,6 +1367,7 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
   // Echo to serial
   Serial.print(T, 4);
   Serial.print(F(","));
+}
 
   return T;
 
@@ -1416,9 +1421,9 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
                                                                  /1023.; // 0-1
   // Commenting out low and high temperature readings;
   // can calculate these after the fact, if needed
-  // float Tmin = thermistorB(10000, 3347, Rref_therm, 25, thermPin, false);
-  float Ttyp = thermistorB(10000, 3347, Rref_therm, 25, thermPin, false);
-  //float Tmax = thermistorB(10000, 3413, Rref_therm, 25, thermPin, false);
+  // float Tmin = thermistorB(10000, 3347, Rref_therm, 25, thermPin, false, false, false);
+  float Ttyp = thermistorB(10000, 3347, Rref_therm, 25, thermPin, ADC_resolution_nbits, false, false, false);
+  //float Tmax = thermistorB(10000, 3413, Rref_therm, 25, thermPin, false, false, false);
   // Then, convert the normalized voltage into a humidity reading
   // The calibration is created for a 5V input, but the data sheet says it
   // is ratiometric, so I think I will just renormalize the voltage to
@@ -1468,15 +1473,15 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
    *
    * @details This function measures the relative humidity of using a HTM1500  
    * relative humidity sensor and an external thermistor.
-   * The relative humidity and temperature is measured using a 14 bit 
+   * The relative humidity and temperature are measured using an 
    * oversampling method.
    * Results are displayed on the serial monitor and saved onto the SD card 
-   * to four decimal places.
+   * to four decimal places. Temperature and relative humidity are recorded.
    * 
    * @param humidPin is the analog pin connected to the humidity output voltage 
    * of the module.
    * 
-   * @param R0_therm is a thermistor calibration.
+   * @param R0_therm is the resistance of the thermistor at the known temperature.
    * 
    * @param B_therm is the B- or β- parameter of the thermistor.
    * 
@@ -1493,17 +1498,17 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
    * 
    * Example:
    * ```
-   * logger.HTM2500LF_humidity_temperature(1,?,10000,3950,10000,25,2);
+   * logger.HM1500LF_humidity_with_external_temperature1,10000,3950,10000,25,1,12);
    * ```
    * 
   */
 
   // First, measure these pins
   // This will fully calculate and write the temperature data, too.
-  float V_humid_norm = analogReadOversample(humidPin, 14)/1023.; // 0-1
+  float V_humid_norm = analogReadOversample(humidPin, ADC_resolution_nbits)/1023.; // 0-1
   // Will write temperature to file here
   float T = thermistorB(R0_therm, B_therm, Rref_therm, T0degC_therm, \
-                        thermPin_therm);
+                        thermPin_therm, ADC_resolution_nbits, true, false, true);
 
   // Then, convert the normalized voltage into a humidity reading
   // The calibration is created for a 5V input, but the data sheet says it
@@ -1688,7 +1693,7 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
    * 
    * Example:
    * ```
-   * logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);
+   * logger.maxbotixHRXL_WR_analog(10,A2,99,0);
    * ```
    * Note that sensor should be mounted away from supporting structure. These 
    * are the standard recommendations:
@@ -2038,7 +2043,7 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
 
   // Temperature correction
   float T = thermistorB(R0_therm, B_therm, Rref_therm, T0degC_therm, \
-                        thermPin_therm, ADC_resolution_nbits);
+                        thermPin_therm, ADC_resolution_nbits, true, false, false);
   // Sensitivity correction for Scorr
   float Scorr = -0.00011 * T*T + 0.0022 * T + 0.0408;
   
@@ -2365,45 +2370,90 @@ float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
   return analog_reading;
 }
 
-/*
+
 void Logger::Barometer_BMP180(){
-  // Borrowed/modified from "sensorapi"
-  // Commented out portions to add temperature support
-  //float temperature;
-  float pressure;
-  Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
 
-  sensors_event_t event;
-  bmp.getEvent(&event);
-  
-  if (event.pressure){
-    //temperature = bmp.getTemperature(&temperature);
-    pressure = event.pressure * 100.; // hPa to Pa
+  /**
+   * @brief 
+   * Read absolute pressure in mbar.  
+   * 
+   * @details
+   * This function reads the absolute pressure in mbar (hPa).  BMP180 sensor
+   * incorporates on board temperature correction.  Uses I2C protocol.  
+   * 
+   * Example:
+   * ```
+   * logger.Barometer_BMP180();
+   * ```
+   * 
+  */
+
+  SFE_BMP180 pressure;
+  char status;
+  double P;
+  double T;
+
+  if (pressure.begin())
+  {
+  // A temperature measurement is needed to calibrate a pressure reading.
+  // Start a temperature measurement:
+  // If request is successful, the number of ms to wait is returned.
+  // If request is unsuccessful, 0 is returned.
+  status = pressure.startTemperature();
+  if (status != 0)
+  {
+    delay(status);  //Wait for the measurement to complete:
+    // Retrieve the completed temperature measurement:
+    // Note that the measurement is stored in the variable T.
+    // Function returns 1 if successful, 0 if failure.
+    status = pressure.getTemperature(T);
+    if (status != 0)
+    {
+      // Start a pressure measurement:
+      // The parameter is the oversampling setting, from 0 to 3 (highest res, longest wait).
+      // If request is successful, the number of ms to wait is returned.
+      // If request is unsuccessful, 0 is returned.
+      status = pressure.startPressure(3);
+      if (status != 0)
+      {
+        delay(status);  // Wait for the measurement to complete:
+        // Retrieve the completed pressure measurement:
+        // Note that the measurement is stored in the variable P.
+        // Note also that the function requires the previous temperature 
+        // measurement (T).
+        // (If temperature is stable, you can do one temperature measurement
+        // for a number of pressure measurements.)
+        // Function returns 1 if successful, 0 if failure.
+        status = pressure.getPressure(P,T);
+        if (status != 0)
+        {
+          ///////////////
+          // SAVE DATA //
+          ///////////////
+
+          // SD write
+          //datafile.print(T);
+          //datafile.print(F(","));
+          datafile.print(P,2);
+          datafile.print(F(","));
+          
+          // Echo to serial
+          //Serial.print(T);
+          //Serial.print(F(","));
+          Serial.print(P);
+          Serial.print(F(","));
+          }
+          else Serial.println(F("Er retrieve P"));
+        }
+        else Serial.println(F("Er start P"));
+      }
+      else Serial.println(F("Er retrieve T"));
+    }
+    else Serial.println(F("Er start T"));
   }
-  else{
-    //temperature = -9999;
-    pressure = -9999;
-  }
-
-  ///////////////
-  // SAVE DATA //
-  ///////////////
-
-  // SD write
-  //SDpowerOn();
-  //datafile.print(temperature);
-  //datafile.print(F(","));
-  datafile.print(pressure);
-  datafile.print(F(","));
-  //SDpowerOff();
-  
-  // Echo to serial
-  //Serial.print(temperature);
-  //Serial.print(F(","));
-  Serial.print(pressure);
-  Serial.print(F(","));
+else Serial.println(F("BMP180 init fail"));
 }
-*/
+ 
   
 void Logger::sleepNow_nap()         // here we put the arduino to sleep between interrupt readings
 {
@@ -2581,7 +2631,7 @@ void Logger::AtlasScientific(char* command, int softSerRX, int softSerTX, uint32
    * Example:
    * ```
    * // read a pH probe using pins 7 and 8 as Rx and Tx, and save its results:
-   * logger.AtlasScientific("R", 7, 8);
+   * logger.AtlasScientific("R", D5, A7);
    * ```
    * 
    */

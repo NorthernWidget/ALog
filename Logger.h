@@ -66,10 +66,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h> // For turning incoming ASCII character
                     // strings into int with atol
 
+
 // Sensor-centric libraries
+#include <SFE_BMP180.h>
 //#include <Adafruit_Sensor.h>
 //#include <Adafruit_BMP085_U.h>
 //#include <eRCaGuy_NewAnalogRead.h>
+
 
 // Outside of class definitions
 void wakeUpNow();
@@ -108,7 +111,7 @@ class Logger {
           bool debug=false);
     float thermistorB(float R0, float B, float Rref, float T0degC, \
           int thermPin, uint8_t ADC_resolution_nbits=14, \
-          bool Rref_on_GND_side=true, bool oversample_debug=false);
+          bool Rref_on_GND_side=true, bool oversample_debug=false, bool record_results=true);
     // Print order: Distance [cm], standard deviation [cm]
     void ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, \
          bool writeAll);
@@ -144,7 +147,7 @@ class Logger {
     void Wind_Vane_Inspeed(int vanePin);
     void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
          float gain, float V_ref, uint8_t ADC_resolution_nbits=14);
-    //void Barometer_BMP180();
+    void Barometer_BMP180();
     
     // Sensors - triggered
     // Camera on/off function; decision made in end-user Arduino script
