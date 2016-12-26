@@ -2453,6 +2453,53 @@ void Logger::Barometer_BMP180(){
   }
 else Serial.println(F("BMP180 init fail"));
 }
+
+void Logger::_sensor_function_template(int pin, float param1, float param2, 
+                                       bool flag){
+  /**
+   * @brief 
+   * Function to help lay out a new sensor interface.
+   * This need not be "void": it may return a value as well.
+   * 
+   * @details
+   * Details about sensor go here
+   * 
+   * @param pin You often need to specify interface pins
+   * 
+   * @param param1 A variable for the sensor or to interpret its value
+   * 
+   * @param param2 A variable for the sensor or to interpret its value
+   * 
+   * @param flag Something that helps to set an option
+   * 
+   * Example (made up):
+   * ```
+   * logger.Example(A2, 1021.3, 15.2, True);
+   * ```
+   * 
+  */
+  
+  float Vout_normalized_analog_example = analogReadOversample(xPin, \
+            ADC_resolution_nbits) / 1023.)
+  
+  float Some_variable = Vout_normalized_analog_example * param1 / param2
+  if (flag){
+    Some_variable /= 2.
+  }
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // SD write
+  datafile.print(Some_variable);
+  datafile.print(F(","));
+  
+  // Echo to serial
+  Serial.print(Some_variable);
+  Serial.print(F(","));
+
+}
  
   
 void Logger::sleepNow_nap()         // here we put the arduino to sleep between interrupt readings
