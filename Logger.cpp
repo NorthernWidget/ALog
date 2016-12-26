@@ -3111,14 +3111,14 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
 
   // SD write
   datafile.print(P, 4);
-  datafile.print(F(" "));
-  datafile.print(_units[units]);
+  //datafile.print(F(" "));
+  //datafile.print(_units[units]);
   datafile.print(F(","));
   
   // Echo to serial
   Serial.print(P, 4);
-  Serial.print(F(" "));
-  Serial.print(_units[units]);
+  //Serial.print(F(" "));
+  //Serial.print(_units[units]);
   Serial.print(F(","));
 
   return P;
@@ -3314,6 +3314,11 @@ bool Logger::establishContact_Rx(){
 }
 
 void Logger::startup_sequence(){
+  // Turn on power to all sensors: important for I2C sensors that may need
+  // power to not pull on clock
+  pinMode(SensorPowerPin, OUTPUT);
+  digitalWrite(SensorPowerPin, HIGH);
+  
   bool connected_to_computer = false;
   //char handshake[4];
   //char handshake_test[5] = "alog"; // 5 chars, incl. termination
@@ -3434,6 +3439,7 @@ void Logger::startup_sequence(){
     delay(1000);
   }
   
+  digitalWrite(SensorPowerPin, LOW);
 }
 
 void Logger::clockSet(){
