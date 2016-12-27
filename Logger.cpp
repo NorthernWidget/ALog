@@ -153,6 +153,13 @@ bool LOG_ALL_SENSORS_ON_BUCKET_TIP; // Defaults to False, true if you should
                                     // all sensors every time an event (e.g., 
                                     // rain gage bucket tip) happens
                                     
+// Flag for first logging attempt after booting up
+// Starts out as True, and is set False at endLogging()
+// When True, writes header information to a separate file.
+// This tells the user if the logger reboots, and save the full history
+// of headers
+bool first_log_after_booting_up = true;
+
 // Rotation count for anemometer
 unsigned int rotation_count = 0;
 
@@ -176,6 +183,10 @@ SdFat sd;
 SdFile datafile;
 SdFile otherfile; // for rain gage, camera timing, and anything else that 
                   // doesn't follow the standard logging cycle / regular timing
+SdFile headerfile; // Holds header data; re-printed on each reboot for a full 
+                   // history of the logger's activity and to see if it has 
+                   // rebooted while in the field (e.g., due to the 
+                   // watchdog timer rescuing it from hanging)
 
 DateTime now;
 
@@ -211,8 +222,9 @@ DateTime now;
 // Constructor
 Logger::Logger(){}
 
-void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
-                        int _hourInterval, int _minInterval, int _secInterval, \
+void Logger::initialize(char* _logger_name, char* _datafilename, \
+                        int _dayInterval, int _hourInterval, \
+                        int _minInterval, int _secInterval, \
                         bool _ext_int, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP){
                         // bool _sensor_on_UART,
   /**
@@ -273,7 +285,7 @@ void Logger::initialize(char* _logger_name, char* _filename, int _dayInterval, \
   
   // Assign the global variables (not intended to change) to the input values
   logger_name = _logger_name;
-  filename = _filename;
+  datafilename = _datafilename;
   dayInterval = _dayInterval;
   hourInterval = _hourInterval;
   minInterval = _minInterval;
@@ -472,6 +484,7 @@ void Logger::setupLogger(){
   end_logging_to_otherfile();
 
   start_logging_to_datafile();
+  start_logging_to_headerfile();
 
   name();
   Serial.println(F("Logger initialization complete! Ciao bellos."));
@@ -832,6 +845,8 @@ void Logger::checkAlarms(){
         Serial.println(F("Error initializing SD card for writing"));
         LEDwarn(40);
       }
+      // Prepare to record times when the alarms were missed and the watchdog
+      // timer was needed to reset the logger
       start_logging_to_otherfile("Alarm_miss.txt");
 
       bool ADy, A12h, Apm;
@@ -947,6 +962,13 @@ void Logger::displayTime(){
 
   void Logger::unixDatestamp(){
 
+    if (first_log_after_booting_up){
+      now = RTC.now();
+      // One row for date stamp; the next for real header info
+      headerfile.print(now.unixtime());
+      headerfile.println();
+    }
+
     now = RTC.now();
     datafile.print(now.unixtime());
     datafile.print(F(","));
@@ -961,7 +983,7 @@ void Logger::displayTime(){
     // before going back to sleep
     datafile.println();
     Serial.println();
-    }
+  }
 
 float Logger::_vdivR(int pin, float Rref, uint8_t adc_bits, \
                      bool Rref_on_GND_side, bool oversample_debug){
@@ -1138,8 +1160,15 @@ void Logger::endLogging(){
    */
   endLine();
   //SDpowerOn();
-  // close the file: (This does the actual sync() step too - writes buffer)
+  // Write all of the data to the file
+  // The buffer is 256 bytes, I think -- so need to use this in-between
+  // if there are too many data
   datafile.sync();
+  // Headerfile should be closed at this point, and not reopened
+  if (first_log_after_booting_up){
+    headerfile.close()
+    first_log_after_booting_up = false; // the job is done.
+  }
   delay(30);
   // THIS DELAY IS ***CRITICAL*** -- WITHOUT IT, THERE IS NOT SUFFICIENT
   // TIME TO WRITE THE DATA TO THE SD CARD!
@@ -1222,6 +1251,12 @@ float Logger::readPin(int pin){
   // SAVE DATA //
   ///////////////
 
+  if (first_log_after_booting_up){
+    headerfile.print("Analog pin value");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
   // SD write
   datafile.print(pinValue, 1);
   datafile.print(",");
@@ -1271,6 +1306,12 @@ float Logger::readPinOversample(int pin, int bits){
   // SAVE DATA //
   ///////////////
 
+  if (first_log_after_booting_up){
+    headerfile.print("Analog pin value");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
   // SD write
   datafile.print(pinValue,4);
   datafile.print(",");
@@ -1287,8 +1328,9 @@ float Logger::readPinOversample(int pin, int bits){
 //////////////////////////////
 
 float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
-                          int thermPin, uint8_t ADC_resolution_nbits,
-                          bool Rref_on_GND_side, bool oversample_debug, bool record_results){
+                          int thermPin, uint8_t ADC_resolution_nbits, \
+                          bool Rref_on_GND_side, bool oversample_debug, \
+                          bool record_results){
 
   /**
    * @brief 
@@ -1360,14 +1402,21 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
   ///////////////
   
   if(record_results){
-  // SD write
-  datafile.print(T, 4);
-  datafile.print(F(","));
-  
-  // Echo to serial
-  Serial.print(T, 4);
-  Serial.print(F(","));
-}
+
+    if (first_log_after_booting_up){
+      headerfile.print("Temperature [degC]");
+      headerfile.print(",");
+      headerfile.sync();
+    }
+
+    // SD write
+    datafile.print(T, 4);
+    datafile.print(F(","));
+    
+    // Echo to serial
+    Serial.print(T, 4);
+    Serial.print(F(","));
+  }
 
   return T;
 
@@ -1447,13 +1496,25 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
   // SAVE DATA //
   ///////////////
 
+  if (first_log_after_booting_up){
+    headerfile.print("Relative humidity [%]");
+    headerfile.print(",");
+    headerfile.print("Temperature [degC]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
   // SD write
   datafile.print(RH, 4);
+  datafile.print(F(","));
+  datafile.print(Ttyp, 2);
   datafile.print(F(","));
   
   // Echo to serial
   Serial.print(RH, 4);
   Serial.print(F(","));
+  datafile.print(Ttyp, 2);
+  datafile.print(F(","));
 
 }
 
@@ -1534,6 +1595,12 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
 
   // Print normalized 0-1 voltage in case my 5V conversion doesn't work the way
   // I think it will -- though if it is ratiometric, I think it should.
+
+  if (first_log_after_booting_up){
+    headerfile.print("Relative humidity [%]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
  
   // SD write
   //datafile.print(V_humid_norm);
@@ -1623,6 +1690,11 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool write
     ranges[i-1] = range; // 10-bit ADC value = range in cm
                          // C is 0-indexed, hence the "-1"
     if (writeAll){
+      if (first_log_after_booting_up){
+        headerfile.print("Distance [cm]");
+        headerfile.print(",");
+        headerfile.sync();
+      }
       Serial.print(range);
       Serial.print(F(","));
       //SDpowerOn();
@@ -1649,7 +1721,17 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool write
   ///////////////
   // SAVE DATA //
   ///////////////
+  
   delay(10);
+
+  if (first_log_after_booting_up){
+    headerfile.print("Mean distance [cm]");
+    headerfile.print(",");
+    headerfile.print("Standard deviation distance [cm]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
   datafile.print(meanRange);
   datafile.print(F(","));
   datafile.print(sigma);
@@ -1742,6 +1824,11 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
     ranges[i-1] = range; // 10-bit ADC value (1--1024) * 5 = range in mm
                          // C is 0-indexed, hence the "-1"
     if (writeAll){
+      if (first_log_after_booting_up){
+        headerfile.print("Distance [mm]");
+        headerfile.print(",");
+        headerfile.sync();
+      }
       Serial.print(range, 0);
       Serial.print(F(","));
       //SDpowerOn();
@@ -1768,6 +1855,15 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
   ///////////////
   // SAVE DATA //
   ///////////////
+  
+  if (first_log_after_booting_up){
+    headerfile.print("Mean distance [mm]");
+    headerfile.print(",");
+    headerfile.print("Standard deviation distance [mm]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
   datafile.print(meanRange);
   datafile.print(F(","));
   datafile.print(sigma);
@@ -1877,6 +1973,21 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int npings, \
     }
 
   }
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+  
+  if (first_log_after_booting_up){
+    headerfile.print("Mean distance [mm]");
+    headerfile.print(",");
+    headerfile.print("Standard deviation distance [mm]");
+    headerfile.print(",");
+    headerfile.print("Number of readings with non-error returns");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
   // Always write the mean, standard deviation, and number of good returns
   datafile.print(mean_range);
   datafile.print(F(","));
@@ -2043,7 +2154,8 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
 
   // Temperature correction
   float T = thermistorB(R0_therm, B_therm, Rref_therm, T0degC_therm, \
-                        thermPin_therm, ADC_resolution_nbits, true, false, false);
+                        thermPin_therm, ADC_resolution_nbits, \
+                        true, false, false);
   // Sensitivity correction for Scorr
   float Scorr = -0.00011 * T*T + 0.0022 * T + 0.0408;
   
@@ -2058,6 +2170,18 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
   ///////////////
   // SAVE DATA //
   ///////////////
+
+  if (first_log_after_booting_up){
+    headerfile.print("Inclinometer voltage (x-axis) [V]");
+    headerfile.print(",");
+    headerfile.print("Inclinometer voltage (y-axis) [V]");
+    headerfile.print(",");
+    headerfile.print("Inclinometer tilt (x-axis) [degrees]");
+    headerfile.print(",");
+    headerfile.print("Inclinometer tilt (y-axis) [degrees]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
 
   // SD write
   datafile.print(Vout_x);
@@ -2155,6 +2279,18 @@ void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
   ///////////////
   // SAVE DATA //
   ///////////////
+
+  if (first_log_after_booting_up){
+    headerfile.print("Number of rotations");
+    headerfile.print(",");
+    headerfile.print("Rotation frequency [Hz]");
+    headerfile.print(",");
+    headerfile.print("Wind speed [m/s]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+  // Note: should estimate error based on +/- 1 rotation (depending on whether 
+  // just starting or just ending at the measurement start time)
 
   // SD write
   datafile.print(rotation_count);
@@ -2265,6 +2401,12 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
   ///////////////
   // SAVE DATA //
   ///////////////
+
+  if (first_log_after_booting_up){
+    headerfile.print("Radiation [W/m^2]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
 
   // SD write
   datafile.print(Radiation_W_m2, 4);
@@ -2431,6 +2573,12 @@ void Logger::Barometer_BMP180(){
           // SAVE DATA //
           ///////////////
 
+          if (first_log_after_booting_up){
+            headerfile.print("Barometric pressure [hPa]");
+            headerfile.print(",");
+            headerfile.sync();
+          }
+          
           // SD write
           //datafile.print(T);
           //datafile.print(F(","));
@@ -2490,6 +2638,12 @@ void Logger::_sensor_function_template(int pin, float param1, float param2,
   ///////////////
   // SAVE DATA //
   ///////////////
+
+  if (first_log_after_booting_up){
+    headerfile.print("Some variable [units]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
 
   // SD write
   datafile.print(Some_variable);
@@ -2789,7 +2943,7 @@ void Logger::TippingBucketRainGage(){
     LEDwarn(40);
   }
   delay(10);
-  start_logging_to_otherfile("b_tips.txt");
+  start_logging_to_otherfile("bucket_tips.txt");
   now = RTC.now();
 
   // SD
@@ -2837,9 +2991,19 @@ void Logger::TippingBucketRainGage(){
 
 void Logger::start_logging_to_datafile(){
   // Open the file for writing
-  if (!datafile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {   
+  if (!datafile.open(datafilename, O_WRITE | O_CREAT | O_AT_END)) {   
     Serial.print(F("Opening "));
-    Serial.print(filename);
+    Serial.print(datafilename);
+    Serial.println(F(" for write failed"));
+  delay(10);
+  }
+}
+
+void Logger::start_logging_to_headerfile(){
+  // Open the file for writing
+  if (!headerfile.open("header.txt", O_WRITE | O_CREAT | O_AT_END)) {   
+    Serial.print(F("Opening "));
+    Serial.print("header.txt");
     Serial.println(F(" for write failed"));
   delay(10);
   }
@@ -2864,6 +3028,16 @@ void Logger::end_logging_to_otherfile(){
   Serial.println();
   // close the file: (This does the actual sync() step too - writes buffer)
   otherfile.close();
+  delay(10);
+}
+
+void Logger::end_logging_to_headerfile(){
+  // Ends line and closes otherfile
+  // Copied from endLine function
+  headerfile.println();
+  Serial.println();
+  // close the file: (This does the actual sync() step too - writes buffer)
+  headerfile.close();
   delay(10);
 }
 
