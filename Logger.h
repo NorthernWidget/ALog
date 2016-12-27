@@ -89,7 +89,7 @@ class Logger {
     Logger();
     
     // Initialization
-    void initialize(char* _logger_name, char* _sitecode, int _dayInterval, \
+    void initialize(char* _logger_name, char* _datafilename, int _dayInterval, \
          int _hourInterval, int _minInterval, int _secInterval, \
          bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false);
     void setupLogger();
@@ -221,6 +221,8 @@ class Logger {
     void start_logging_to_datafile();
     void start_logging_to_otherfile(char* filename);
     void end_logging_to_otherfile();
+    void start_logging_to_headerfile(){
+    void end_logging_to_headerfile(){
     void endLine();
 
 };
