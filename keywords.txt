@@ -1,0 +1,60 @@
+#######################################
+# Syntax Coloring Map Logger
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Logger	KEYWORD1	Logger
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+startAnalog	KEYWORD2
+endAnalog	KEYWORD2
+startLogging	KEYWORD2
+endLogging	KEYWORD2
+sleep		KEYWORD2
+initialize	KEYWORD2
+
+setupLogger	KEYWORD2
+get_use_sleep_mode	KEYWORD2
+
+readPin	KEYWORD2
+readPinOversample	KEYWORD2
+analogReadOversample	KEYWORD2
+thermistorB	KEYWORD2
+ultrasonicMB_analog_1cm	KEYWORD2
+maxbotixHRXL_WR_Serial	KEYWORD2
+maxbotixHRXL_WR_analog	KEYWORD2
+Decagon5TE	KEYWORD2
+DecagonGS1	KEYWORD2
+vdivR	KEYWORD2
+flex	KEYWORD2
+linearPotentiometer	KEYWORD2
+AtlasScientific	KEYWORD2
+HTM2500LF_humidity_temperature	KEYWORD2
+HM1500LF_humidity_with_external_temperature	KEYWORD2
+Inclinometer_SCA100T_D02_analog_Tcorr	KEYWORD2
+Anemometer_reed_switch	KEYWORD2
+Wind_Vane_Inspeed	KEYWORD2
+Pyranometer	KEYWORD2
+Barometer_BMP180	KEYWORD2
+_sensor_function_template	KEYWORD2
+
+HackHD	KEYWORD2
+Honeywell_HSC_analog	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+Log_Interval_Seconds	LITERAL1
+Log_Interval_Minutes	LITERAL1
+Log_Interval_Hours	LITERAL1
+Log_Interval_Days	LITERAL1
+external_interrupt	LITERAL1
+dataLoggerName	LITERAL1
+fileName	LITERAL1
