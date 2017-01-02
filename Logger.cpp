@@ -143,7 +143,7 @@ bool IS_LOGGING = false;
 // Filename and logger name
 // Filename is set up as 8.3 filename:
 //char filename[12];
-char* filename;
+char* datafilename;
 char* logger_name;
 
 // For interrupt from sensor
@@ -351,7 +351,7 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
   delay(10);
   
   Serial.print(F("Filename: "));
-  Serial.println(filename);
+  Serial.println(datafilename);
   
   Serial.println(F("Logger done initializing."));
   delay(10);
@@ -1166,7 +1166,7 @@ void Logger::endLogging(){
   datafile.sync();
   // Headerfile should be closed at this point, and not reopened
   if (first_log_after_booting_up){
-    headerfile.close()
+    headerfile.close();
     first_log_after_booting_up = false; // the job is done.
   }
   delay(30);
@@ -2602,8 +2602,8 @@ void Logger::Barometer_BMP180(){
 else Serial.println(F("BMP180 init fail"));
 }
 
-void Logger::_sensor_function_template(int pin, float param1, float param2, 
-                                       bool flag){
+void Logger::_sensor_function_template(int pin, int ADC_bits, float param1, 
+                                       float param2, bool flag){
   /**
    * @brief 
    * Function to help lay out a new sensor interface.
@@ -2613,6 +2613,12 @@ void Logger::_sensor_function_template(int pin, float param1, float param2,
    * Details about sensor go here
    * 
    * @param pin You often need to specify interface pins
+   * 
+   * @param ADC_bits You often need to specify how much the analog-to-digital 
+   *                 converter should be oversampled; this can range from
+   *                 10 (no oversampling) to 16 (maximum possible 
+   *                 oversampling before certainty in the oversampling method
+   *                 drops)
    * 
    * @param param1 A variable for the sensor or to interpret its value
    * 
@@ -2627,12 +2633,12 @@ void Logger::_sensor_function_template(int pin, float param1, float param2,
    * 
   */
   
-  float Vout_normalized_analog_example = analogReadOversample(xPin, \
-            ADC_resolution_nbits) / 1023.)
+  float Vout_normalized_analog_example = analogReadOversample(pin, \
+            ADC_bits) / 1023.;
   
-  float Some_variable = Vout_normalized_analog_example * param1 / param2
+  float Some_variable = Vout_normalized_analog_example * param1 / param2;
   if (flag){
-    Some_variable /= 2.
+    Some_variable /= 2.;
   }
   
   ///////////////
@@ -3009,13 +3015,13 @@ void Logger::start_logging_to_headerfile(){
   }
 }
 
-void Logger::start_logging_to_otherfile(char* filename){
+void Logger::start_logging_to_otherfile(char* _filename){
   // open the file for write at end like the Native SD library
-  if (!otherfile.open(filename, O_WRITE | O_CREAT | O_AT_END)) {
+  if (!otherfile.open(_filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
     Serial.print(F("Opening "));
-    Serial.print(filename);
+    Serial.print(_filename);
     Serial.println(F(" for write failed"));
     delay(10);
   }
@@ -3588,7 +3594,7 @@ void Logger::startup_sequence(){
     delay(1000); // Give Python time to print
     name();
     Serial.print(F("LOGGING TO FILE ["));
-    Serial.print(filename);
+    Serial.print(datafilename);
     Serial.println(F("]"));
     delay(1500);
     name();
