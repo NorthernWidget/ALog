@@ -402,9 +402,12 @@ void Logger::setupLogger(){
     pinMode(manualWakePin,INPUT);
     digitalWrite(manualWakePin,HIGH); // enable internal 20K pull-up
   }
-  //Start out with SD, Sensor pins set LOW
+  // Start out with SD, pin set LOW
   digitalWrite(SDpowerPin,LOW);
-  digitalWrite(SensorPowerPin,LOW);
+  // But have Sensor Power set HIGH, because if any I2C sensors are attached 
+  // and unpowered, they will drag down the signal from the RTC, and the 
+  // logger will not properly initialize
+  digitalWrite(SensorPowerPin,HIGH);
 
   ////////////
   // SERIAL //
