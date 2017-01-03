@@ -120,7 +120,7 @@ class Logger {
     // Print order: Distance [cm], standard deviation [cm]
     void maxbotixHRXL_WR_analog(int nping=10, int sonicPin=A0, int EX=99, \
          bool writeAll=true, \
-         uint8_t ADC_resolution_nbits=13);
+         uint8_t ADC_resolution_nbits=10);
     void Decagon5TE(int excitPin, int dataPin); // Poorly-tested
     void DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits=14);
     void vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits=10, \
