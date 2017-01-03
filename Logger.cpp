@@ -62,15 +62,19 @@ const int big_log=1;
 const int log_mega=2; // In development
 
 // Then define _model
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
+// Now taking advantage of the build.board property
+//#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
+#if defined ARDUINO_AVR_ALOG_BOTTLELOGGER
   const int _model = bottle_logger;
   const char _model_name[] = "bottle_logger";
+/*
 #elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__)
   const int _model = big_log;
   const char _model_name[] = "big_log";
 #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   const int _model = log_mega;
   const char _model_name[] = "log_mega";
+*/
 #endif
 
 // DECLARE PINS
@@ -97,6 +101,7 @@ const int log_mega=2; // In development
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
   const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
   const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
+/*
 #elif(_model == big_log)
   // SD card: CSpin and protected pins
   const int SCKpin = 7;
@@ -112,6 +117,7 @@ const int log_mega=2; // In development
   const int LEDpin = 23; // LED to tell user if logger is working properly
   const int wakePin = 10; // interrupt pin used for waking up via the alarm
   const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
+*/
 #endif
 
 /////////////////////////////////////////////////
