@@ -1597,7 +1597,7 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
   // RH in percent
   // Got to use the pow(base, int) function or do multiplication the long way...
   float RH_no_T_corr = (-1.91E-9 * Vh*Vh*Vh) + \
-                       (1.33E-5 * Vh*Vh) + (9.56E-3 * Vh);
++                      (1.33E-5 * Vh*Vh) + (9.56E-3 * Vh) - 2.16E1;
   float RH = RH_no_T_corr + 0.05 * (T - 23);
   
   ///////////////
@@ -2282,6 +2282,7 @@ void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
   // Wait in while loop while interrupt can increment counter.
   while (millis() - millis_start <= reading_duration_milliseconds){
   }
+  Serial.print(""); // Well, this is weird, but required to work.
   detachInterrupt(digitalPinToInterrupt(interrupt_pin_number));
   
   rotation_Hz = rotation_count / reading_duration_seconds;
