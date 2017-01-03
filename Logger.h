@@ -128,8 +128,8 @@ class Logger {
     // FLEX SENSOR READING DOES NOT STABLIIZE: CHANGES CONSISTENTLY WITH TIME.
     //void flex(int flexPin, float Rref, float calib1, float calib2);
     void linearPotentiometer(int linpotPin, float Rref, float slope, \
-         float intercept=0, uint8_t ADC_resolution_nbits=14, \
-         bool Rref_on_GND_side=true);
+         char* _distance_units, float intercept=0, \
+         uint8_t ADC_resolution_nbits=14, bool Rref_on_GND_side=true);
     void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, \
          uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
@@ -148,8 +148,8 @@ class Logger {
     void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
          float gain, float V_ref, uint8_t ADC_resolution_nbits=14);
     void Barometer_BMP180();
-    void _sensor_function_template(int pin, int ADC_bits, float param1, \
-         float param2, bool flag=false);
+    void _sensor_function_template(int pin, float param1, \
+         float param2, int ADC_bits=14, bool flag=false);
     
     // Sensors - triggered
     // Camera on/off function; decision made in end-user Arduino script

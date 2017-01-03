@@ -967,6 +967,8 @@ void Logger::displayTime(){
       // One row for date stamp; the next for real header info
       headerfile.print(now.unixtime());
       headerfile.println();
+      headerfile.print("UNIX time stamp");
+      headerfile.print(",");
     }
 
     now = RTC.now();
@@ -1166,7 +1168,7 @@ void Logger::endLogging(){
   datafile.sync();
   // Headerfile should be closed at this point, and not reopened
   if (first_log_after_booting_up){
-    headerfile.close();
+    end_logging_to_headerfile();
     first_log_after_booting_up = false; // the job is done.
   }
   delay(30);
@@ -2602,8 +2604,8 @@ void Logger::Barometer_BMP180(){
 else Serial.println(F("BMP180 init fail"));
 }
 
-void Logger::_sensor_function_template(int pin, int ADC_bits, float param1, 
-                                       float param2, bool flag){
+void Logger::_sensor_function_template(int pin, float param1, float param2, 
+                                       int ADC_bits, bool flag){
   /**
    * @brief 
    * Function to help lay out a new sensor interface.
@@ -2614,15 +2616,15 @@ void Logger::_sensor_function_template(int pin, int ADC_bits, float param1,
    * 
    * @param pin You often need to specify interface pins
    * 
+   * @param param1 A variable for the sensor or to interpret its value
+   * 
+   * @param param2 A variable for the sensor or to interpret its value
+   * 
    * @param ADC_bits You often need to specify how much the analog-to-digital 
    *                 converter should be oversampled; this can range from
    *                 10 (no oversampling) to 16 (maximum possible 
    *                 oversampling before certainty in the oversampling method
    *                 drops)
-   * 
-   * @param param1 A variable for the sensor or to interpret its value
-   * 
-   * @param param2 A variable for the sensor or to interpret its value
    * 
    * @param flag Something that helps to set an option
    * 
@@ -3181,6 +3183,17 @@ void Logger::Decagon5TE(int excitPin, int dataPin){
     // SAVE DATA //
     ///////////////
 
+    if (first_log_after_booting_up){
+      headerfile.print("Dielectric permittivity [-]");
+      headerfile.print(",");
+      headerfile.print("Electrical Conductivity [dS/m]");
+      headerfile.print(",");
+      headerfile.print("Temperature [degrees C]");
+      headerfile.print(",");
+      headerfile.sync();
+    }
+
+    // SD write
     datafile.print(Epsilon_a);
     datafile.print(F(","));
     datafile.print(EC);
@@ -3228,11 +3241,21 @@ void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
   voltage = Vref * _ADC / 1023.;
   
   // Standard Decagon equation -- linear, for up to 60% VWC
+  // Decagon sensor returns the same value of voltage regardless of its
+  // main power voltage (3 to 15 V allowed)
   volumetric_water_content = 0.494 * voltage - 0.554;
   
   ///////////////
   // SAVE DATA //
   ///////////////
+
+  if (first_log_after_booting_up){
+    headerfile.print("Voltage [V]");
+    headerfile.print(",");
+    headerfile.print("Volumentric water content [-]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
 
   // SD write
   datafile.print(voltage, 4);
@@ -3336,6 +3359,14 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
   // SAVE DATA //
   ///////////////
 
+  if (first_log_after_booting_up){
+    headerfile.print("Pressure [");
+    headerfile.print(_units[units]);
+    headerfile.print("]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
   // SD write
   datafile.print(P, 4);
   //datafile.print(F(" "));
@@ -3385,6 +3416,13 @@ void Logger::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, bool Rref_
   // SAVE DATA //
   ///////////////
   
+  if (first_log_after_booting_up){
+    headerfile.print("Resistance [Ohms]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
+  // SD write
   datafile.print(_R);
   datafile.print(F(","));
 
@@ -3403,6 +3441,7 @@ void Logger::flex(int flexPin, float Rref, float calib1, float calib2){
 */
 
 void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
+                                 char* _distance_units, \
                                  float intercept, \
                                  uint8_t ADC_resolution_nbits, \
                                  bool Rref_on_GND_side){
@@ -3424,6 +3463,10 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
    * 
    * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
+   * 
+   * @param _distance_units is the name of the units of distance that are used 
+   * in the linear calibration equation, and are therefore the units of this
+   * function's output.
    * 
    * @param Rref_on_GND-Side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
@@ -3451,6 +3494,15 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
   // SAVE DATA //
   ///////////////
   
+  if (first_log_after_booting_up){
+    headerfile.print("Distance [");
+    headerfile.print(_distance_units);
+    headerfile.print("]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
+  // SD write
   datafile.print(_dist);
   datafile.print(F(","));
 
