@@ -63,8 +63,8 @@ const int log_mega=2; // In development
 
 // Then define _model
 // Now taking advantage of the build.board property
-//#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
-#if defined ARDUINO_AVR_ALOG_BOTTLELOGGER
+// Keeping in MCU definitions for backwards compatibility... will eventually throw a deprecation error with this.
+#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
   const int _model = bottle_logger;
   const char _model_name[] = "bottle_logger";
 /*
