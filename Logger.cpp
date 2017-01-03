@@ -2608,6 +2608,9 @@ void Logger::Barometer_BMP180(){
     else Serial.println(F("Er start T"));
   }
 else Serial.println(F("BMP180 init fail"));
+
+// Note: this is currnetly not printing to header or results if it is not
+// working; it is like it is not even there in this case.
 }
 
 void Logger::_sensor_function_template(int pin, float param1, float param2, 
