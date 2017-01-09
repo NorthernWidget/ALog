@@ -3525,6 +3525,53 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
 
 }
 
+void save_Aref(float _V){
+  /**
+   * @brief
+   * Saves a float as the reference voltage for the ADC ("Vref") to the EEPROM
+   * 
+   * @details
+   * ADC == analog-digital comparator
+   * EEPROM = permanent memory (persists after shutdown)
+   * See: https://www.arduino.cc/en/Reference/EEPROMPut
+   * 
+   * This function is only called rarely, as this value is typically measured
+   * only once.
+   * 
+   * @param _V reference voltage, ideally measured under load [V]
+   * 
+   * Example:
+   * ```
+   * // Measuring 3.297V with a calibrated multimeter between 3V3 and GND
+   * // Then:
+   * logger.saveAref(3.297);
+   * ```
+   * 
+   */
+   EEPROM.put(4, _V);
+}
+
+float read_Aref(){
+  /**
+   * @brief
+   * Read the analog (ADC) sensor reference voltage from EEPROM, return float.
+   * 
+   * @details
+   * ADC == analog-digital comparator
+   * EEPROM = permanent memory (persists after shutdown)
+   * See: https://www.arduino.cc/en/Reference/EEPROMGet
+   * 
+   * Example:
+   * ```
+   * float Vref;
+   * Vref = logger.readAref();
+   * ```
+   * 
+   */
+  float _V;
+  EEPROM.get(4, _V);
+  return _V; 
+}
 
 // NEW STUFF: (MAINLY) INTERNAL FUNCTIONS
 

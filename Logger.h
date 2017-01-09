@@ -65,7 +65,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <avr/wdt.h>
 #include <stdlib.h> // For turning incoming ASCII character
                     // strings into int with atol
-
+#include <EEPROM.h> // Save serial number and reference voltage
+                    // Serial number cannot be written here
 
 // Sensor-centric libraries
 #include <SFE_BMP180.h>
