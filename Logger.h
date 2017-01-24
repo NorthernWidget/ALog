@@ -97,6 +97,7 @@ class Logger {
     
     // Code for sleeping, starting up from sleep, synching SD card
     void sleep();
+    void goToSleep_if_needed(); // Same as above, but checks if sleep is being used
     void startLogging();
     void endLogging();
     void startAnalog();

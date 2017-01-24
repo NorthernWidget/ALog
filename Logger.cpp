@@ -305,7 +305,6 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
     _use_sleep_mode = false;
     IS_LOGGING = true; // is always logging, in this case!
   }
-  
   // Assign the global and changable variables to input values
   LOG_ALL_SENSORS_ON_BUCKET_TIP = _LOG_ALL_SENSORS_ON_BUCKET_TIP;
 
@@ -1065,6 +1064,12 @@ void Logger::sleep(){
   wdt_disable();  //Disable the watchdog timer
 
   sleepNow();
+}
+
+void Logger::goToSleep_if_needed(){
+  if (_use_sleep_mode){
+    sleep();
+  }
 }
 
 void Logger::startLogging(){
