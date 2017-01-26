@@ -132,8 +132,6 @@ class Logger {
     void linearPotentiometer(int linpotPin, float Rref, float slope, \
          char* _distance_units, float intercept=0, \
          uint8_t ADC_resolution_nbits=14, bool Rref_on_GND_side=true);
-    void AtlasScientific(char* command, int softSerRX=6, int softSerTX=7, \
-         uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true);
     void HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
          float Rref_therm, uint8_t ADC_resolution_nbits=14);
     void HM1500LF_humidity_with_external_temperature(int humidPin, \
