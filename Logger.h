@@ -10,7 +10,7 @@ Goals:
 1. Manage logger utility functions, largely behind-the-scenes
 2. Simplify data logger operations to one-line calls
 
-Written by Andy Wickert, 2011-2016, and Chad Sandell, 2016<br>
+Written by Andy Wickert, 2011-2017, and Chad Sandell, 2017<br>
 Started 27 September 2011
 
 Designed to greatly simplify Arduino sketches 
@@ -24,7 +24,7 @@ Logger.h is part of Logger, an Arduino library written by Andrew D. Wickert
 and Chad T. Sandell.
 
 Copyright (C) 2011-2015, Andrew D. Wickert<br>
-Copyright (C) 2016, Andrew D. Wickert and Chad T. Sandell
+Copyright (C) 2016-2017, Andrew D. Wickert and Chad T. Sandell
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
