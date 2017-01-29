@@ -54,7 +54,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Arduino 1.0 libraries now default; no if/else
 #include <Arduino.h>
-#include <SoftwareSerial.h>
 
 // Standard libraries
 #include <SdFat.h>
@@ -67,13 +66,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     // strings into int with atol
 #include <EEPROM.h> // Save serial number and reference voltage
                     // Serial number cannot be written here
+#include <SoftwareSerial.h>
 
 // Sensor-centric libraries
 #include <SFE_BMP180.h>
 //#include <Adafruit_Sensor.h>
 //#include <Adafruit_BMP085_U.h>
 //#include <eRCaGuy_NewAnalogRead.h>
-
+#include <AtlasNW.h>
 
 // Outside of class definitions
 void wakeUpNow();
@@ -227,5 +227,6 @@ class Logger {
 
 };
 
+// End include guard
 #endif  
 
