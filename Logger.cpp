@@ -2434,6 +2434,37 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
   Serial.print(F(","));
 }
 
+void Logger::AtlasConductivity(){
+  // All hard-coded for starters
+  char condOut[100];
+  AtlasNW condProbe("conductivity", "SoftSerial", 7, 8, 9600);
+  delay(100);
+  condOut = condProbe.read();
+  delay(100);
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // Get rid of these derivative values, eventually.
+  if (first_log_after_booting_up){
+    headerfile.print("EC [uS]");
+    headerfile.print(",");
+    headerfile.print("TDS");
+    headerfile.print(",");
+    headerfile.print("S");
+    headerfile.print(",");
+    headerfile.print("SG");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
+  // SD write
+  datafile.print(condOut);
+  datafile.print(F(","));
+  
+}
+
 float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
                                    bool debug){
   /**
