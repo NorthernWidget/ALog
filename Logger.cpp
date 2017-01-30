@@ -2883,6 +2883,7 @@ void Logger::TippingBucketRainGage(){
     Serial.println(F("Error initializing SD card for writing"));
     LEDwarn(40);
   }
+  
   delay(10);
   start_logging_to_otherfile("bucket_tips.txt");
   now = RTC.now();
