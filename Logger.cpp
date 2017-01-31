@@ -169,6 +169,9 @@ bool first_log_after_booting_up = true;
 // Rotation count for anemometer
 unsigned int rotation_count = 0;
 
+// Generic output from an ASCII char array
+//char ASCII_out[100];
+
 // Flag for whether or not there is a sensor in the UART port.
 // If there is, disable the time-setting protocols; these will be triggered
 // by detection of the sensor.
@@ -2436,10 +2439,10 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
 
 void Logger::AtlasConductivity(){
   // All hard-coded for starters
-  char condOut[100];
+  //char condOut[100];
   AtlasNW condProbe("conductivity", "SoftSerial", 7, 8, 9600);
   delay(100);
-  condOut = condProbe.read();
+  condProbe.read();
   delay(100);
 
   ///////////////
@@ -2460,9 +2463,12 @@ void Logger::AtlasConductivity(){
   }
 
   // SD write
-  datafile.print(condOut);
+  datafile.print(condProbe.response);
   datafile.print(F(","));
   
+  // Echo to Serial
+  Serial.print(condProbe.response);
+  Serial.print(F(","));
 }
 
 float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
