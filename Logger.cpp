@@ -120,6 +120,9 @@ const int log_mega=2; // In development
 */
 #endif
 
+// Clock mode
+const bool h12 = false;
+
 /////////////////////////////////////////////////
 // GLOBAL VARIABLES DEFINED IN INITIALIZE STEP //
 /////////////////////////////////////////////////
@@ -442,7 +445,7 @@ void Logger::setupLogger(){
   Clock.checkIfAlarm(1); //Clear alarm flags
   Clock.checkIfAlarm(2); //Clear alarm flags
 
-  bool Century, h12 = false;
+  bool Century;
   bool PM;
   
   // First, what time is it now?
@@ -754,7 +757,8 @@ const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
 
     RTCon();
 
-    bool Century, h12, A12h =false;
+    bool Century
+    A12h = false;
     bool ADy = true;
     bool PM, Apm;
 
@@ -914,7 +918,6 @@ void Logger::checkAlarms(){
 void Logger::displayTime(){
   //Get current time:
   bool Century=false;
-  bool h12 = false;
   bool PM;
   Serial.print("UTC DATE/TIME: "); delay(5);
 	Serial.print(2000+Clock.getYear(), DEC);
@@ -3707,7 +3710,6 @@ void Logger::clockSet(){
   byte Second;
 
   bool Century=false;
-  bool h12;
   bool PM;
 
   DateTime nowPreSet = RTC.now();
