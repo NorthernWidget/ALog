@@ -435,20 +435,38 @@ void Logger::setupLogger(){
   // Includes check whether you are talking to Python terminal
   startup_sequence();
   
-  ///////////////////////////////////////////////////////////
-  // SET FIRST ALARM TO OBTAIN INSTANT READING ON START-UP //
-  ///////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////
+  // SET FIRST ALARM TO OCCUR ON THE NEXT INTEGER-DIVISIBLE //
+  //  NUMBER OF WHATEVER THE SMALLEST NEXT QUANTITY IS      //
+  ////////////////////////////////////////////////////////////
   Clock.checkIfAlarm(1); //Clear alarm flags
   Clock.checkIfAlarm(2); //Clear alarm flags
 
-  // ISSUE: THIS CAUSES READINGS THAT ARE NOT EXACTLY
-  // ON THE MINUTES
   bool Century, h12 = false;
   bool PM;
+  
+  // First, what time is it now?
   _days = Clock.getDoW();
   _hours = Clock.getHour(h12, PM);
   _minutes = Clock.getMinute();
-  _seconds = Clock.getSecond()+5;  //Set first alarm to activate in 5 seconds.
+  _seconds = Clock.getSecond()+5;  // Give logger some time before start
+  
+  // Second, what is the next time on which we fall on an integer of the 
+  // logging interval?
+  if dayInterval{
+  }
+  else if hourInterval{
+  }
+  else if min
+  
+  logger_name = _logger_name;
+  datafilename = _datafilename;
+  dayInterval = _dayInterval;
+  hourInterval = _hourInterval;
+  minInterval = _minInterval;
+  secInterval = _secInterval;
+
+  
   if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
   if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
   if(_hours > 23){_hours = _hours - 24; _days++;}
@@ -692,7 +710,7 @@ void Logger::setupLogger(){
     }
   }
 
-void Logger::alarm(int _days ,int _hours, int _minutes, int _seconds){
+void Logger::alarm(int _days, int _hours, int _minutes, int _seconds){
 
 /* Alarm bit info:
  * A1Dy true makes the alarm go on A1Day = Day of Week,
@@ -746,9 +764,13 @@ const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
 
     Clock.checkIfAlarm(1); //Clear alarm flags, do I need to do this here?
     Clock.checkIfAlarm(2); //Clear alarm flags
-
+    
+    // This is the primary alarm
     Clock.setA1Time(_days, _hours, _minutes, _seconds, AlarmBits, true, false, false);
     delay(2);
+
+    // This is a backup alarm that will wake the logger in case it misses the
+    // first alarm for some unknown reason
     int _days_backup = _days;
     int _hours_backup = _hours;
     int _minutes_backup = _minutes+2;
