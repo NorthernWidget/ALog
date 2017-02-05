@@ -73,7 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#include <Adafruit_Sensor.h>
 //#include <Adafruit_BMP085_U.h>
 //#include <eRCaGuy_NewAnalogRead.h>
-#include <AtlasNW.h>
+//#include <AtlasNW.h>
 
 // Outside of class definitions
 void wakeUpNow();
@@ -81,8 +81,8 @@ void wakeUpNow_tip();
 void _ISR_void();
 void _anemometer_count_increment();
 void _internalDateTime(uint16_t* date, uint16_t* time); // Callback: SD DT stamp
-// The rest of the library
 
+// The rest of the library
 class Logger {
 
   public:
@@ -205,7 +205,9 @@ class Logger {
     // Sensor utility codes
     float _vdivR(int pin, float Rref, uint8_t adc_bits=10, \
           bool Rref_on_GND_side=true, bool oversample_debug=false);
-    // I don't trust the software serial version
+    // I don't trust the software serial version -- should do some lab testing 
+    // to make sure that chances of clock speed / interrupt problems, 
+    // especially with so much time in sleep mode, are near-0.
     //int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
     int maxbotix_Serial_parse(int Ex);
     float standard_deviation_from_array(float values[], int nvalues, \
@@ -213,7 +215,7 @@ class Logger {
     float standard_deviation_from_array(int values[], int nvalues, float mean);
 
     // Special sensor codes
-    // Rain gage - will wake logger up and cause it to log to a different file
+    // Rain gauge - will wake logger up and cause it to log to a different file
     // The default interrupt is Pin 3, INT1 on ATmega328 (ALog BottleLogger).
     // This runs of bool _ext_int = true in loger.initialize()
     void TippingBucketRainGage();
