@@ -758,7 +758,6 @@ const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
     RTCon();
 
     bool Century
-    A12h = false;
     bool ADy = true;
     bool PM, Apm;
 
@@ -795,7 +794,9 @@ const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
 
 
 void Logger::displayAlarms(){
-  bool ADy, A12h, Apm;
+  bool ADy;
+  bool Apm;
+  bool A12h = false;
   byte ADay, AHour, AMinute, ASecond, AlarmBits;
   Serial.print(F("Alarm 1 (d/h/m/s): "));
 	Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
@@ -886,7 +887,8 @@ void Logger::checkAlarms(){
       // timer was needed to reset the logger
       start_logging_to_otherfile("Alarm_miss.txt");
 
-      bool ADy, A12h, Apm;
+      bool ADy;
+      bool Apm;
       byte ADay, AHour, AMinute, ASecond, AlarmBits;
       otherfile.print(now.unixtime());
       otherfile.print(",");
