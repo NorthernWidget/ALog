@@ -766,9 +766,6 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
   RTCon();
 
-  bool ADy = true;
-  bool Apm;
-
   byte AlarmBits = 0b00000000;
   Clock.turnOffAlarm(1); //Turn off alarms before setting.
   Clock.turnOffAlarm(2);
@@ -800,15 +797,19 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
 
 void Logger::displayAlarms(){
-  bool ADy;
-  bool Apm;
+  bool ADy; // Looks like this can be empty because it is defined within
+            // function... meaning that DS3231 library could use some updates.
+            // But will hold off on that until a full overhaul / upgrade / 
+            // migration to a fully RTClib-compatible system
+  bool Apm; // Empty, but must be declared for clock function
   bool A12h = false;
   byte ADay, AHour, AMinute, ASecond, AlarmBits;
   Serial.print(F("Alarm 1 (d/h/m/s): "));
 	Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
 	if (ADy) {
 		Serial.print(F("DoW "));
-	} else {
+	}
+	else {
 		Serial.print(F("Date "));
 	}
 	Serial.print(ADay, DEC);
@@ -828,9 +829,10 @@ void Logger::displayAlarms(){
 	}
 	if (Clock.checkAlarmEnabled(1)){
 		Serial.print(F("enabled"));
-  } else{
+  }
+  else{
     Serial.print(F("not enabled"));
-    }
+  }
 	
 	Serial.print('\n');
 	// Display Alarm 2 information
@@ -839,7 +841,8 @@ void Logger::displayAlarms(){
 	if (ADy){
 		Serial.print(F("DoW "));
 	} 
-    else{
+    else
+  {
     Serial.print(F("Date "));
   } 
 	Serial.print(ADay, DEC);
