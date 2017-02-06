@@ -446,18 +446,27 @@ void Logger::setupLogger(){
   Clock.checkIfAlarm(2); //Clear alarm flags
 
   bool Century;
-  bool PM;
+  bool PM; // Empty placeholder; always 24-hour
+  
+  uint32_t seconds_now;
+  uint32_t seconds_at_alarm;
   
   // First, what time is it now?
-  _days = Clock.getDoW();
-  _hours = Clock.getHour(h12, PM);
-  _minutes = Clock.getMinute();
-  _seconds = Clock.getSecond()+5;  // Give logger some time before start
+  now = RTC.now();
+  _days = now.dayOfTheWeek();
+  _hours = now.hour();
+  _minutes = now.minute();
+  _seconds = now.second();
   
   // Second, what is the next time on which we fall on an integer of the 
   // logging interval?
   if dayInterval{
+    seconds_now = _hours*3600 + _minutes*60 + seconds;
+    seconds_at_alarm = hourInterval*3600 + minInterval*60 + secInterval;
+    if (seconds_at_alarm > seconds_now){
+    }
   }
+  
   else if hourInterval{
   }
   else if min
@@ -921,24 +930,26 @@ void Logger::displayTime(){
   //Get current time:
   bool Century=false;
   bool PM;
-  Serial.print("UTC DATE/TIME: "); delay(5);
-	Serial.print(2000+Clock.getYear(), DEC);
-	Serial.print('.');
+  Serial.print("UTC DATE/TIME: ");
+  delay(5);
+  now = RTC.now()
+	Serial.print(2000+now.year(), DEC);
+	Serial.print(F('.'));
 	// then the month
-	Serial.print(Clock.getMonth(Century), DEC);
-	Serial.print('.');
+	Serial.print(now.month(), DEC);
+	Serial.print(F('.'));
 	// then the date
-	Serial.print(Clock.getDate(), DEC);
-	Serial.print(' ');
+	Serial.print(now.day(), DEC);
+	Serial.print(F(' '));
 	// and the day of the week
 	//Serial.print(Clock.getDoW(), DEC);
 	//Serial.print(' ');
 	// Finally the hour, minute, and second
-	Serial.print(Clock.getHour(h12, PM), DEC);
+	Serial.print(now.hour(), DEC);
 	Serial.print(':');
-	Serial.print(Clock.getMinute(), DEC);
+	Serial.print(now.minute(), DEC);
 	Serial.print(':');
-	Serial.print(Clock.getSecond(), DEC);
+	Serial.print(now.second(), DEC);
 	// Add AM/PM indicator
 	if (h12) {
 		if (PM) {
@@ -3734,17 +3745,18 @@ void Logger::clockSet(){
 	// problem, but this display is not mission-critical
 	for (int i=0; i<5; i++){
 	    delay(1000);
-	    Serial.print(Clock.getYear(), DEC);
+	    now = RTC.now();
+	    Serial.print(now.year(), DEC);
 	    Serial.print(F("-"));
-	    Serial.print(Clock.getMonth(Century), DEC);
+	    Serial.print(now.month(), DEC);
 	    Serial.print(F("-"));
-	    Serial.print(Clock.getDate(), DEC);
+	    Serial.print(now.day(), DEC);
 	    Serial.print(F(" "));
-	    Serial.print(Clock.getHour(h12, PM), DEC); //24-hr
+	    Serial.print(now.hour(), DEC); //24-hr (should be)
 	    Serial.print(F(":"));
-	    Serial.print(Clock.getMinute(), DEC);
+	    Serial.print(now.minute(), DEC);
 	    Serial.print(F(":"));
-	    Serial.println(Clock.getSecond(), DEC);
+	    Serial.println(now.second(), DEC);
 
 	}
   delay(1000);
