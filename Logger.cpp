@@ -134,7 +134,6 @@ int hourInterval;
 int minInterval;
 int secInterval;
 // Alarm counters
-int _days;
 int _hours;
 int _minutes;
 int _seconds;
@@ -448,43 +447,47 @@ void Logger::setupLogger(){
   bool Century;
   bool PM; // Empty placeholder; always 24-hour
   
-  uint32_t seconds_now;
-  uint32_t seconds_at_alarm;
+  //uint32_t seconds_now;
+  //uint32_t seconds_at_alarm;
+  uint32_t SECONDS_FROM_1970_TO_2000 = 946684800;
+  uint32_t unixtime_now;
+  uint32_t log_interval_seconds;
+  uint32_t unixtime_at_next_log;
   
   // First, what time is it now?
   now = RTC.now();
-  _days = now.dayOfTheWeek();
-  _hours = now.hour();
-  _minutes = now.minute();
-  _seconds = now.second();
   
   // Second, what is the next time on which we fall on an integer of the 
   // logging interval?
-  if dayInterval{
-    seconds_now = _hours*3600 + _minutes*60 + seconds;
-    seconds_at_alarm = hourInterval*3600 + minInterval*60 + secInterval;
-    if (seconds_at_alarm > seconds_now){
-    }
+  // Always act as if logging started at Midnight on Jan 1, 1970, to ensure
+  // that even terrible, irregular logging intervals produce times that
+  // line up with one anohter
+  // Note: no leap seconds!
+  unixtime_now = now.unixtime();
+  log_interval_seconds = hourInterval*3600 + minInterval*60 + secInterval;
+  unixtime_at_next_log = unixtime_now + log_interval_seconds - \
+                         (unixtime_now % log_interval_seconds);
+  // Ensure we have enough time to not pass the logging event accidentally
+  // 5 seconds is way more than needed, but better safe than sorry...
+  if (unixtime_at_next_log - unixtime_now < 5){
+    unixtime_at_next_log += log_interval_seconds;
   }
+  // Create a new object
+  DateTime t_nextLog = unixtime_at_next_log;
+  _hours = t_nextLog.hour();
+  _minutes = t_nextLog.minute();
+  _seconds = t_nextLog.second();
   
-  else if hourInterval{
-  }
-  else if min
-  
-  logger_name = _logger_name;
-  datafilename = _datafilename;
-  dayInterval = _dayInterval;
-  hourInterval = _hourInterval;
-  minInterval = _minInterval;
-  secInterval = _secInterval;
-
-  
+  /* 
+  // A nice piece of code, so I don't want to remove,
+  // but now running everything through DateTime object
   if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
   if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
   if(_hours > 23){_hours = _hours - 24; _days++;}
   if(_days > 7){_days = _days - 7;}
+  */
 
-  alarm( _days, _hours, _minutes, _seconds);  //Set first alarm.
+  alarm(_hours, _minutes, _seconds);  //Set first alarm.
 
   displayAlarms();  // Verify Alarms and display time
 
@@ -722,82 +725,80 @@ void Logger::setupLogger(){
     }
   }
 
-void Logger::alarm(int _days, int _hours, int _minutes, int _seconds){
+void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
-/* Alarm bit info:
- * A1Dy true makes the alarm go on A1Day = Day of Week,
- * A1Dy false makes the alarm go on A1Day = Date of month.
- *
- * byte AlarmBits sets the behavior of the alarms:
- *	Dy	A1M4	A1M3	A1M2	A1M1	Rate
- *	X	1		1		1		1		Once per second
- *	X	1		1		1		0		Alarm when seconds match
- *	X	1		1		0		0		Alarm when min, sec match
- *	X	1		0		0		0		Alarm when hour, min, sec match
- *	0	0		0		0		0		Alarm when date, h, m, s match
- *	1	0		0		0		0		Alarm when DoW, h, m, s match
- *
- *	Dy	A2M4	A2M3	A2M2	Rate
- *	X	1		1		1		Once per minute (at seconds = 00)
- *	X	1		1		0		Alarm when minutes match
- *	X	1		0		0		Alarm when hours and minutes match
- *	0	0		0		0		Alarm when date, hour, min match
- *	1	0		0		0		Alarm when DoW, hour, min match
- 
+  /* Alarm bit info:
+   * A1Dy true makes the alarm go on A1Day = Day of Week,
+   * A1Dy false makes the alarm go on A1Day = Date of month.
+   *
+   * byte AlarmBits sets the behavior of the alarms:
+   *	Dy	A1M4	A1M3	A1M2	A1M1	Rate
+   *	X	1		1		1		1		Once per second
+   *	X	1		1		1		0		Alarm when seconds match
+   *	X	1		1		0		0		Alarm when min, sec match
+   *	X	1		0		0		0		Alarm when hour, min, sec match
+   *	0	0		0		0		0		Alarm when date, h, m, s match
+   *	1	0		0		0		0		Alarm when DoW, h, m, s match
+   *
+   *	Dy	A2M4	A2M3	A2M2	Rate
+   *	X	1		1		1		Once per minute (at seconds = 00)
+   *	X	1		1		0		Alarm when minutes match
+   *	X	1		0		0		Alarm when hours and minutes match
+   *	0	0		0		0		Alarm when date, hour, min match
+   *	1	0		0		0		Alarm when DoW, hour, min match
+   
 
-const int ALRM1_MATCH_EVERY_SEC  0b1111  // once a second
-const int ALRM1_MATCH_SEC        0b1110  // when seconds match
-const int ALRM1_MATCH_MIN_SEC    0b1100  // when minutes and seconds match
-const int ALRM1_MATCH_HR_MIN_SEC 0b1000  // when hours, minutes, and seconds match
-const int ALRM1_MATCH_HR_MIN_SEC 0b0000  // when hours, minutes, and seconds match
-    byte ALRM1_SET = ALRM1_MATCH_HR_MIN_SEC;
+  const int ALRM1_MATCH_EVERY_SEC  0b1111  // once a second
+  const int ALRM1_MATCH_SEC        0b1110  // when seconds match
+  const int ALRM1_MATCH_MIN_SEC    0b1100  // when minutes and seconds match
+  const int ALRM1_MATCH_HR_MIN_SEC 0b1000  // when hours, minutes, and seconds match
+  const int ALRM1_MATCH_HR_MIN_SEC 0b0000  // when hours, minutes, and seconds match
+      byte ALRM1_SET = ALRM1_MATCH_HR_MIN_SEC;
 
-const int ALRM2_ONCE_PER_MIN     0b111   // once per minute (00 seconds of every minute)
-const int ALRM2_MATCH_MIN        0b110   // when minutes match
-const int ALRM2_MATCH_HR_MIN     0b100   // when hours and minutes match
-const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
-    byte ALRM2_SET = ALRM2_DISABLE;
+  const int ALRM2_ONCE_PER_MIN     0b111   // once per minute (00 seconds of every minute)
+  const int ALRM2_MATCH_MIN        0b110   // when minutes match
+  const int ALRM2_MATCH_HR_MIN     0b100   // when hours and minutes match
+  const int ALRM2_DATE_TIME        0b000   // when hours and minutes match
+      byte ALRM2_SET = ALRM2_DISABLE;
 
-      // Set AlarmBits, ALRM2 first, followed by ALRM1
-      AlarmBits = ALRM2_SET;
-      AlarmBits <<= 4;
-      AlarmBits |= ALRM1_SET;
-*/
+        // Set AlarmBits, ALRM2 first, followed by ALRM1
+        AlarmBits = ALRM2_SET;
+        AlarmBits <<= 4;
+        AlarmBits |= ALRM1_SET;
+  */
 
-    RTCon();
+  RTCon();
 
-    bool Century
-    bool ADy = true;
-    bool PM, Apm;
+  bool Century;
+  bool ADy = true;
+  bool PM, Apm;
 
-    byte AlarmBits = 0b00000000;
-    Clock.turnOffAlarm(1); //Turn off alarms before setting.
-    Clock.turnOffAlarm(2);
+  byte AlarmBits = 0b00000000;
+  Clock.turnOffAlarm(1); //Turn off alarms before setting.
+  Clock.turnOffAlarm(2);
 
-    Clock.checkIfAlarm(1); //Clear alarm flags, do I need to do this here?
-    Clock.checkIfAlarm(2); //Clear alarm flags
-    
-    // This is the primary alarm
-    Clock.setA1Time(_days, _hours, _minutes, _seconds, AlarmBits, true, false, false);
-    delay(2);
-
-    // This is a backup alarm that will wake the logger in case it misses the
-    // first alarm for some unknown reason
-    int _days_backup = _days;
-    int _hours_backup = _hours;
-    int _minutes_backup = _minutes+2;
+  Clock.checkIfAlarm(1); //Clear alarm flags, do I need to do this here?
+  Clock.checkIfAlarm(2); //Clear alarm flags
   
-    if(_minutes_backup > 59){_minutes_backup = _minutes_backup - 60; _hours_backup++;}
-    if(_hours_backup > 23){_hours_backup = _hours_backup - 24; _days_backup++;}
-    if(_days_backup > 7){_days_backup = _days_backup - 7;} 
-    Clock.setA2Time(_days_backup, _hours_backup, _minutes_backup, AlarmBits, true, false, false);  //setting as backup wake function
-    delay(2);
-    Clock.turnOnAlarm(1); //Turn on alarms.
-    delay(1);
-    Clock.turnOnAlarm(2);
-    delay(1);
+  // This is the primary alarm
+  Clock.setA1Time(0, _hours, _minutes, _seconds, AlarmBits, true, false, false);
+  delay(2);
 
-//displayAlarms(); delay(10);  //Uncomment to see alarms on serial monitor.
+  // This is a backup alarm that will wake the logger in case it misses the
+  // first alarm for some unknown reason
+  int _hours_backup = _hours;
+  int _minutes_backup = _minutes+2;
+
+  if(_minutes_backup > 59){_minutes_backup = _minutes_backup - 60; _hours_backup++;}
+  if(_hours_backup > 23){_hours_backup = _hours_backup - 24;}
+  Clock.setA2Time(0, _hours_backup, _minutes_backup, AlarmBits, true, false, false);  //setting as backup wake function
+  delay(2);
+  Clock.turnOnAlarm(1); //Turn on alarms.
+  delay(1);
+  Clock.turnOnAlarm(2);
+  delay(1);
+
+  //displayAlarms(); delay(10);  //Uncomment to see alarms on serial monitor.
 
 }
 
@@ -874,6 +875,10 @@ void Logger::displayAlarms(){
 }
 
 void Logger::checkAlarms(){
+  bool ADy;
+  bool Apm;
+  bool A12h = false;
+
 	Clock.checkIfAlarm(1);
 	
 	if (_use_sleep_mode){
@@ -932,7 +937,7 @@ void Logger::displayTime(){
   bool PM;
   Serial.print("UTC DATE/TIME: ");
   delay(5);
-  now = RTC.now()
+  now = RTC.now();
 	Serial.print(2000+now.year(), DEC);
 	Serial.print(F('.'));
 	// then the month
@@ -1240,16 +1245,14 @@ void Logger::endLogging(){
 
   if (_use_sleep_mode){
     //Calculate for next alarm
-    _days = _days+dayInterval;
     _hours = _hours+hourInterval;
     _minutes = _minutes+minInterval;
     _seconds = _seconds+secInterval;   
     if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
     if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
-    if(_hours > 23){_hours = _hours - 24; _days++;}
-    if(_days > 7){_days = _days - 7;} 
+    if(_hours > 23){_hours = _hours - 24;}
 
-    alarm(_days, _hours, _minutes, _seconds);  //Set new alarms.
+    alarm(_hours, _minutes, _seconds);  //Set new alarms.
 
     delay(2);
     RTCsleep();

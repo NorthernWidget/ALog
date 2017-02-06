@@ -167,8 +167,8 @@ class Logger {
     void sleepNow();
     void sleepNow_nap();
     // wakeUpNow defined outside of class; see above
-    void alarm(int dayInterval ,int hourInterval, int minInterval, \
-         int secInterval);
+    void alarm(uint8_t hourInterval, uint8_t minInterval, \
+         uint8_t secInterval);
     void displayAlarms(); //debug tool delete if desired.
     void checkAlarms();  //debug tool delete if desired. 
     void displayTime();   //debug tool delete if desired. 
