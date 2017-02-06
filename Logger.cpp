@@ -871,7 +871,7 @@ void Logger::displayAlarms(){
   //  Serial.println(Clock.getSecond());
 
   // Finally, print the current time to Serial
-  displayTime();
+  //displayTime();
 }
 
 void Logger::checkAlarms(){
@@ -932,39 +932,32 @@ void Logger::checkAlarms(){
 }
 
 void Logger::displayTime(){
-  //Get current time:
+  /*
+   Get current time.
+   Always 24-hour clock
+   */ 
   bool Century=false;
   bool PM;
   Serial.print("UTC DATE/TIME: ");
   delay(5);
   now = RTC.now();
 	Serial.print(2000+now.year(), DEC);
-	Serial.print(F('.'));
+	Serial.print(F("."));
 	// then the month
 	Serial.print(now.month(), DEC);
-	Serial.print(F('.'));
+	Serial.print(F("."));
 	// then the date
 	Serial.print(now.day(), DEC);
-	Serial.print(F(' '));
+	Serial.print(F(" "));
 	// and the day of the week
 	//Serial.print(Clock.getDoW(), DEC);
 	//Serial.print(' ');
 	// Finally the hour, minute, and second
 	Serial.print(now.hour(), DEC);
-	Serial.print(':');
+	Serial.print(":");
 	Serial.print(now.minute(), DEC);
-	Serial.print(':');
-	Serial.print(now.second(), DEC);
-	// Add AM/PM indicator
-	if (h12) {
-		if (PM) {
-			Serial.println(" PM ");
-		} else {
-			Serial.println(" AM ");
-		}
-	} else {
-		Serial.println(" 24h");
-	}
+	Serial.print(":");
+	Serial.println(now.second(), DEC);
 	// Enough time to print
   delay(2);
 }
