@@ -148,7 +148,6 @@ class Logger {
     void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
          float gain, float V_ref, uint8_t ADC_resolution_nbits=14);
     void Barometer_BMP180();
-    void AtlasConductivity();
     void _sensor_function_template(int pin, float param1, \
          float param2, int ADC_bits=14, bool flag=false);
     
