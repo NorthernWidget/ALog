@@ -444,9 +444,6 @@ void Logger::setupLogger(){
   Clock.checkIfAlarm(1); //Clear alarm flags
   Clock.checkIfAlarm(2); //Clear alarm flags
 
-  bool Century;
-  bool PM; // Empty placeholder; always 24-hour
-  
   //uint32_t seconds_now;
   //uint32_t seconds_at_alarm;
   uint32_t SECONDS_FROM_1970_TO_2000 = 946684800;
@@ -769,9 +766,8 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
   RTCon();
 
-  bool Century;
   bool ADy = true;
-  bool PM, Apm;
+  bool Apm;
 
   byte AlarmBits = 0b00000000;
   Clock.turnOffAlarm(1); //Turn off alarms before setting.
@@ -936,7 +932,6 @@ void Logger::displayTime(){
    Get current time.
    Always 24-hour clock
    */ 
-  bool Century=false;
   bool PM;
   Serial.print("UTC DATE/TIME: ");
   delay(5);
@@ -3717,9 +3712,6 @@ void Logger::clockSet(){
   byte Hour;
   byte Minute;
   byte Second;
-
-  bool Century=false;
-  bool PM;
 
   DateTime nowPreSet = RTC.now();
 
