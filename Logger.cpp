@@ -129,7 +129,6 @@ const bool h12 = false;
 
 // Logging interval - wake when minutes == this
 //int log_minutes; //**chad delete when new alarm works
-int dayInterval;
 int hourInterval;
 int minInterval;
 int secInterval;
@@ -234,7 +233,7 @@ DateTime now;
 Logger::Logger(){}
 
 void Logger::initialize(char* _logger_name, char* _datafilename, \
-                        int _dayInterval, int _hourInterval, \
+                        int _hourInterval, \
                         int _minInterval, int _secInterval, \
                         bool _ext_int, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP){
                         // bool _sensor_on_UART,
@@ -248,9 +247,6 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
    * @param _filename: Name of main data file saved to SD card; often helps to
    * relate it to the project or site; used to be limited to 8.3, but now
    * is not.
-   * 
-   * @param _dayInterval: How many days to wait before logging again; can range
-   * from 0-6.
    * 
    * @param _hourInterval: How many hours to wait before logging again; can range
    * from 0-24.
@@ -297,7 +293,6 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
   // Assign the global variables (not intended to change) to the input values
   logger_name = _logger_name;
   datafilename = _datafilename;
-  dayInterval = _dayInterval;
   hourInterval = _hourInterval;
   minInterval = _minInterval;
   secInterval = _secInterval;
@@ -306,7 +301,7 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
   // continuous logging!
   // (If all were set to 0, logger would try to log continuously anyway; this
   // just makes things easier by avoiding the sleep function
-  if ((dayInterval || hourInterval || minInterval || secInterval) == false){
+  if ((hourInterval || minInterval || secInterval) == false){
     _use_sleep_mode = false;
     IS_LOGGING = true; // is always logging, in this case!
   }
@@ -475,15 +470,6 @@ void Logger::setupLogger(){
   _minutes = t_nextLog.minute();
   _seconds = t_nextLog.second();
   
-  /* 
-  // A nice piece of code, so I don't want to remove,
-  // but now running everything through DateTime object
-  if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
-  if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
-  if(_hours > 23){_hours = _hours - 24; _days++;}
-  if(_days > 7){_days = _days - 7;}
-  */
-
   alarm(_hours, _minutes, _seconds);  //Set first alarm.
 
   displayAlarms();  // Verify Alarms and display time
@@ -662,12 +648,13 @@ void Logger::setupLogger(){
        *
        * In all but the IDLE sleep modes only LOW can be used.
        */
-
-      if (dayInterval && hourInterval && minInterval && secInterval == -1 && extInt == false){
+      
+      // START HERE!
+      if (hourInterval && minInterval && secInterval == -1 && extInt == false){
         Serial.println(F("All inputs to wake from sleep disabled! Reprogram, please!"));
       }
         //Serial.print(F("interrupt"));  delay(10);
-      if (dayInterval || hourInterval || minInterval || secInterval != -1){
+      if (hourInterval || minInterval || secInterval != -1){
         attachInterrupt(interruptNum, wakeUpNow, LOW); // wakeUpNow when wakePin goes LOW 
         //Serial.println(F(" attached")); delay(10);
       }
@@ -812,14 +799,12 @@ void Logger::displayAlarms(){
 	else {
 		Serial.print(F("Date "));
 	}
-	Serial.print(ADay, DEC);
-	Serial.print(' ');
 	Serial.print(AHour, DEC);
-	Serial.print(' ');
+	Serial.print(':');
 	Serial.print(AMinute, DEC);
-	Serial.print(' ');
+	Serial.print(':');
 	Serial.print(ASecond, DEC);
-	Serial.print(' ');
+	Serial.print(':');
 	if (A12h) {
 		if (Apm) {
 			Serial.print(F("pm"));
@@ -1104,6 +1089,14 @@ void Logger::sleep(){
 }
 
 void Logger::goToSleep_if_needed(){
+  /**
+   * @brief
+   * Places logger into sleep mode iff this is being used.
+   * 
+   * @details
+   * Function is accessible from Arduino sketch; is designed for cases in 
+   * which an external override may be required.
+   */
   if (_use_sleep_mode){
     sleep();
   }

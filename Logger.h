@@ -90,7 +90,7 @@ class Logger {
     Logger();
     
     // Initialization
-    void initialize(char* _logger_name, char* _datafilename, int _dayInterval, \
+    void initialize(char* _logger_name, char* _datafilename, \
          int _hourInterval, int _minInterval, int _secInterval, \
          bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false);
     void setupLogger();
