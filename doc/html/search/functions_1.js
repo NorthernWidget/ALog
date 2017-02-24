@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['decagon5te',['Decagon5TE',['../classLogger.html#a40ae372dee7f672a6d6f33ab441e4da1',1,'Logger']]],
-  ['decagongs1',['DecagonGS1',['../classLogger.html#a84da6a9ec3d4d56fdc32d950b71f1a26',1,'Logger']]]
+  ['analogreadoversample',['analogReadOversample',['../classLogger.html#ad8296890a14a0df83c2433a20f25b899',1,'Logger']]],
+  ['anemometer_5freed_5fswitch',['Anemometer_reed_switch',['../classLogger.html#a6c6a43a1b86f88c2a5e33d14c992e510',1,'Logger']]]
 ];

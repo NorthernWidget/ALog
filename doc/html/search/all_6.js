@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['linearpotentiometer',['linearPotentiometer',['../classLogger.html#a12dc18b7b16c91de5f7a3af7edb381a9',1,'Logger']]],
-  ['logger',['Logger',['../classLogger.html',1,'Logger'],['../classLogger.html#abc41bfb031d896170c7675fa96a6b30c',1,'Logger::Logger()']]],
-  ['logger_2ecpp',['Logger.cpp',['../Logger_8cpp.html',1,'']]],
-  ['logger_2eh',['Logger.h',['../Logger_8h.html',1,'']]],
-  ['logger',['Logger',['../md_README.html',1,'']]]
+  ['hackhd',['HackHD',['../classLogger.html#a923b296832bd4222da649ebc66427ac1',1,'Logger']]],
+  ['hm1500lf_5fhumidity_5fwith_5fexternal_5ftemperature',['HM1500LF_humidity_with_external_temperature',['../classLogger.html#a62b74ddb3cf9fdd7dae2394c1b245ed4',1,'Logger']]],
+  ['honeywell_5fhsc_5fanalog',['Honeywell_HSC_analog',['../classLogger.html#a9808967fdf91f10602aa883df35145b3',1,'Logger']]],
+  ['htm2500lf_5fhumidity_5ftemperature',['HTM2500LF_humidity_temperature',['../classLogger.html#a4ccff7a14a6bddc8bb28e22b3b36d3cc',1,'Logger']]]
 ];

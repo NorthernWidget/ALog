@@ -101,6 +101,7 @@ We have learned a bit from past field installations, so you can e-\/mail us at \
 \item V\+CC means \char`\"{}\+Voltage of the Common Connector\char`\"{}
 \item The 3.\+3V regulator is typically a precision voltage reference (part number L\+T1461\+D\+H\+S8-\/5\#\+P\+BF) that can source 10-\/50 mA of power, depending on V\+CC\+: 10 mA corresponds to 0.\+20V dropout between V\+CC and 3.\+3V; 50 mA corresponds to 1.\+5V dropout. Projects that need more power and/or use fully ratiometric measurements can request an A\+Log without this part; solder jumpers on the board will connect 3\+V3 pins to the unused side of our standard 3.\+3V low-\/dropout regulator.
 \item The 5V regulated output is supplied via a charge pump; when no current is drawn, its voltage will increase to 5.\+2V; after some current draw, is output will drop to a stable 5V. If there is a concern about low voltage draw from the charge pump, users should monitor its voltage with a voltage divider connected to one of the analog channels, and include a reading during the time that the sensor or other load on the charge pump is on and active.
+\item The interrupt pin (digital pin 3) can be used to detect events, such as an anemometer spinning or a rain gauge bucket tipping.
 \end{DoxyEnumerate}\hypertarget{index_About}{}\section{About}\label{index_About}
 Who is Northern Widget? What is the connection to the University of Minnesota?
 

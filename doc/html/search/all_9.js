@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['readpin',['readPin',['../classLogger.html#a343fcabefb37e06429865a2e6a6e708a',1,'Logger']]],
-  ['readpinoversample',['readPinOversample',['../classLogger.html#a4e67526c65fa865f276a515a200af4aa',1,'Logger']]]
+  ['maxbotixhrxl_5fwr_5fanalog',['maxbotixHRXL_WR_analog',['../classLogger.html#a3ce2869bbd48fdebbf44e155981c85b0',1,'Logger']]],
+  ['maxbotixhrxl_5fwr_5fserial',['maxbotixHRXL_WR_Serial',['../classLogger.html#a87ce56cb9c3dfc7abfd6308b2ee7dc10',1,'Logger']]]
 ];

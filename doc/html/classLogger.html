@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="ALog_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Logger (for ALog)
-   &#160;<span id="projectnumber">v0.2 for ALog 2.0</span>
+   &#160;<span id="projectnumber">v2.0.0</span>
    </div>
    <div id="projectbrief">Open-source Arduino-based field data logger</div>
   </td>
@@ -98,12 +98,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abc41bfb031d896170c7675fa96a6b30c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#abc41bfb031d896170c7675fa96a6b30c">Logger</a> ()</td></tr>
 <tr class="memdesc:abc41bfb031d896170c7675fa96a6b30c"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classLogger.html">Logger</a> library for the Arduino-based ALog data logger.  <a href="#abc41bfb031d896170c7675fa96a6b30c">More...</a><br /></td></tr>
 <tr class="separator:abc41bfb031d896170c7675fa96a6b30c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9495e2c8e63850f3c7cfcc31e9d73ffe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a9495e2c8e63850f3c7cfcc31e9d73ffe">initialize</a> (char *_logger_name, char *_sitecode, int _dayInterval, int _hourInterval, int _minInterval, int _secInterval, bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false)</td></tr>
-<tr class="separator:a9495e2c8e63850f3c7cfcc31e9d73ffe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a635c5dc0046646bec7023ef7133f0eb3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a635c5dc0046646bec7023ef7133f0eb3">initialize</a> (char *_logger_name, char *_datafilename, int _hourInterval, int _minInterval, int _secInterval, bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false)</td></tr>
+<tr class="separator:a635c5dc0046646bec7023ef7133f0eb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab5e0bd543758c65a17b77553a0e9f0c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#ab5e0bd543758c65a17b77553a0e9f0c9">setupLogger</a> ()</td></tr>
 <tr class="separator:ab5e0bd543758c65a17b77553a0e9f0c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad90ff8f29410f6b70cc6334391400a4e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#ad90ff8f29410f6b70cc6334391400a4e">sleep</a> ()</td></tr>
 <tr class="separator:ad90ff8f29410f6b70cc6334391400a4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad28cf6450ada04f0e1475998bede5b88"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#ad28cf6450ada04f0e1475998bede5b88">goToSleep_if_needed</a> ()</td></tr>
+<tr class="separator:ad28cf6450ada04f0e1475998bede5b88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a6c78dd1715b33ae4bbd6f66f116f77"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a4a6c78dd1715b33ae4bbd6f66f116f77">startLogging</a> ()</td></tr>
 <tr class="separator:a4a6c78dd1715b33ae4bbd6f66f116f77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa82814d61687debcf3b8dd6f46c9d549"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#aa82814d61687debcf3b8dd6f46c9d549">endLogging</a> ()</td></tr>
@@ -118,42 +120,44 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a343fcabefb37e06429865a2e6a6e708a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e67526c65fa865f276a515a200af4aa"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a4e67526c65fa865f276a515a200af4aa">readPinOversample</a> (int pin, int bits)</td></tr>
 <tr class="separator:a4e67526c65fa865f276a515a200af4aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a73193a90982ddcb31ad0b401ec0e71fa"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a73193a90982ddcb31ad0b401ec0e71fa">analogReadOversample</a> (int pin, int adc_bits=10, int nsamples=1, debug=false)</td></tr>
-<tr class="separator:a73193a90982ddcb31ad0b401ec0e71fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a343dbf1edb8745ea9672f579d3e8297e"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a343dbf1edb8745ea9672f579d3e8297e">thermistorB</a> (float R0, float B, float Rref, float T0degC, int thermPin, uint8_t ADC_resolution_nbits=14, bool Rref_on_GND_side=true;bool oversample_debug=false)</td></tr>
-<tr class="separator:a343dbf1edb8745ea9672f579d3e8297e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8296890a14a0df83c2433a20f25b899"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#ad8296890a14a0df83c2433a20f25b899">analogReadOversample</a> (int pin, uint8_t adc_bits=10, int nsamples=1, bool debug=false)</td></tr>
+<tr class="separator:ad8296890a14a0df83c2433a20f25b899"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55d923b98a6c503fccb25bfd4af32f3d"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a55d923b98a6c503fccb25bfd4af32f3d">thermistorB</a> (float R0, float B, float Rref, float T0degC, int thermPin, uint8_t ADC_resolution_nbits=14, bool Rref_on_GND_side=true, bool oversample_debug=false, bool record_results=true)</td></tr>
+<tr class="separator:a55d923b98a6c503fccb25bfd4af32f3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a362a1462166d63ddc613eaa1e86f9854"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a362a1462166d63ddc613eaa1e86f9854">ultrasonicMB_analog_1cm</a> (int nping, int EX, int sonicPin, bool writeAll)</td></tr>
 <tr class="separator:a362a1462166d63ddc613eaa1e86f9854"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87ce56cb9c3dfc7abfd6308b2ee7dc10"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a87ce56cb9c3dfc7abfd6308b2ee7dc10">maxbotixHRXL_WR_Serial</a> (int Ex, int nping, bool writeAll, int maxRange, bool RS232=false)</td></tr>
 <tr class="separator:a87ce56cb9c3dfc7abfd6308b2ee7dc10"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa05378a90963ceebf7dad0904a74f42f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#aa05378a90963ceebf7dad0904a74f42f">maxbotixHRXL_WR_analog</a> (int nping=10, int sonicPin=A0, int EX=99, bool writeAll=true, uint8_t ADC_resolution_nbits=13)</td></tr>
-<tr class="separator:aa05378a90963ceebf7dad0904a74f42f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ce2869bbd48fdebbf44e155981c85b0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a3ce2869bbd48fdebbf44e155981c85b0">maxbotixHRXL_WR_analog</a> (int nping=10, int sonicPin=A0, int EX=99, bool writeAll=true, uint8_t ADC_resolution_nbits=10)</td></tr>
+<tr class="separator:a3ce2869bbd48fdebbf44e155981c85b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40ae372dee7f672a6d6f33ab441e4da1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a40ae372dee7f672a6d6f33ab441e4da1">Decagon5TE</a> (int excitPin, int dataPin)</td></tr>
 <tr class="separator:a40ae372dee7f672a6d6f33ab441e4da1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84da6a9ec3d4d56fdc32d950b71f1a26"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a84da6a9ec3d4d56fdc32d950b71f1a26">DecagonGS1</a> (int pin, float Vref, uint8_t ADC_resolution_nbits=14)</td></tr>
 <tr class="separator:a84da6a9ec3d4d56fdc32d950b71f1a26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1ae31b2bdb77c86fb6851907258171b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#ab1ae31b2bdb77c86fb6851907258171b">vdivR</a> (int pin, float Rref, uint8_t ADC_resolution_nbits=10, bool Rref_on_GND_side=true)</td></tr>
 <tr class="separator:ab1ae31b2bdb77c86fb6851907258171b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12dc18b7b16c91de5f7a3af7edb381a9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a12dc18b7b16c91de5f7a3af7edb381a9">linearPotentiometer</a> (int linpotPin, float Rref, float slope, float intercept=0, uint8_t ADC_resolution_nbits=14)</td></tr>
-<tr class="separator:a12dc18b7b16c91de5f7a3af7edb381a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9fdcbb56e3e4910ac895ee150fe1b9ed"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a9fdcbb56e3e4910ac895ee150fe1b9ed">AtlasScientific</a> (char *command, int softSerRX=6, int softSerTX=7, uint32_t baudRate=38400, bool printReturn=true, bool saveReturn=true)</td></tr>
-<tr class="separator:a9fdcbb56e3e4910ac895ee150fe1b9ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a95670d06ec3b68300895cd7bf8c37999"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a95670d06ec3b68300895cd7bf8c37999">linearPotentiometer</a> (int linpotPin, float Rref, float slope, char *_distance_units, float intercept=0, uint8_t ADC_resolution_nbits=14, bool Rref_on_GND_side=true)</td></tr>
+<tr class="separator:a95670d06ec3b68300895cd7bf8c37999"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ccff7a14a6bddc8bb28e22b3b36d3cc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a4ccff7a14a6bddc8bb28e22b3b36d3cc">HTM2500LF_humidity_temperature</a> (int humidPin, int thermPin, float Rref_therm, uint8_t ADC_resolution_nbits=14)</td></tr>
 <tr class="separator:a4ccff7a14a6bddc8bb28e22b3b36d3cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0eda5a0be93a4d8505c7493d0f5e333"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#af0eda5a0be93a4d8505c7493d0f5e333">HM1500LF_humidity_with_external_temperature</a> (int humidPin, float Vref, float R0, float B, float Rref, float T0degC, int thermPin, uint8_t ADC_resolution_nbits=14)</td></tr>
-<tr class="separator:af0eda5a0be93a4d8505c7493d0f5e333"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91ffb193feceb75b2e19a3617d00455c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a91ffb193feceb75b2e19a3617d00455c">Inclinometer_SCA100T_D02_analog_Tcorr</a> (int xPin, int yPin, float Vref, float Vsupply, float R0, float B, float Rref, float T0degC, int thermPin, uint8_t ADC_resolution_nbits=14)</td></tr>
-<tr class="separator:a91ffb193feceb75b2e19a3617d00455c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62b74ddb3cf9fdd7dae2394c1b245ed4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a62b74ddb3cf9fdd7dae2394c1b245ed4">HM1500LF_humidity_with_external_temperature</a> (int humidPin, float R0_therm, float B_therm, float Rref_therm, float T0degC_therm, int thermPin_therm, uint8_t ADC_resolution_nbits=14)</td></tr>
+<tr class="separator:a62b74ddb3cf9fdd7dae2394c1b245ed4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80fdea5a339573980f9544ac64678411"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a80fdea5a339573980f9544ac64678411">Inclinometer_SCA100T_D02_analog_Tcorr</a> (int xPin, int yPin, float Vref, float Vsupply, float R0_therm, float B_therm, float Rref_therm, float T0degC_therm, int thermPin_therm, uint8_t ADC_resolution_nbits=14)</td></tr>
+<tr class="separator:a80fdea5a339573980f9544ac64678411"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6c6a43a1b86f88c2a5e33d14c992e510"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a6c6a43a1b86f88c2a5e33d14c992e510">Anemometer_reed_switch</a> (int interrupt_pin_number, unsigned long reading_duration_milliseconds, float meters_per_second_per_rotation)</td></tr>
 <tr class="separator:a6c6a43a1b86f88c2a5e33d14c992e510"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31c3cba5ff5722fb66bf540bfbe8b25d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a31c3cba5ff5722fb66bf540bfbe8b25d">Wind_Vane_Inspeed</a> (int vanePin)</td></tr>
 <tr class="separator:a31c3cba5ff5722fb66bf540bfbe8b25d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4190ce7ccfd7b148a6151102a3bf93d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#ae4190ce7ccfd7b148a6151102a3bf93d">Pyranometer</a> (int analogPin, float raw_mV_per_W_per_m2, float gain, float V_ref, uint8_t ADC_resolution_nbits=14)</td></tr>
 <tr class="separator:ae4190ce7ccfd7b148a6151102a3bf93d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40588117a274f0c6de926ef6ce1f0ba8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a40588117a274f0c6de926ef6ce1f0ba8">Barometer_BMP180</a> ()</td></tr>
+<tr class="separator:a40588117a274f0c6de926ef6ce1f0ba8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98f3cc370c87d1e1eaf3eb6a7e0f1623"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a98f3cc370c87d1e1eaf3eb6a7e0f1623">_sensor_function_template</a> (int pin, float param1, float param2, int ADC_bits=14, bool flag=false)</td></tr>
+<tr class="separator:a98f3cc370c87d1e1eaf3eb6a7e0f1623"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a923b296832bd4222da649ebc66427ac1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a923b296832bd4222da649ebc66427ac1">HackHD</a> (int control_pin, bool want_camera_on)</td></tr>
 <tr class="separator:a923b296832bd4222da649ebc66427ac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71ea885397f448ac03675b1e9a93ecfd"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a71ea885397f448ac03675b1e9a93ecfd">Honeywell_HSC_analog</a> (float Vsupply, float Pmin, float Pmax, int TransferFunction_number, int units, int pin, uint8_t ADC_resolution_nbits=14)</td></tr>
-<tr class="separator:a71ea885397f448ac03675b1e9a93ecfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9808967fdf91f10602aa883df35145b3"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLogger.html#a9808967fdf91f10602aa883df35145b3">Honeywell_HSC_analog</a> (int pin, float Vsupply, float Vref, float Pmin, float Pmax, int TransferFunction_number, int units, uint8_t ADC_resolution_nbits=14)</td></tr>
+<tr class="separator:a9808967fdf91f10602aa883df35145b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="abc41bfb031d896170c7675fa96a6b30c"></a>
@@ -182,7 +186,63 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a73193a90982ddcb31ad0b401ec0e71fa"></a>
+<a class="anchor" id="a98f3cc370c87d1e1eaf3eb6a7e0f1623"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Logger::_sensor_function_template </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>pin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>param1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>param2</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>ADC_bits</em> = <code>14</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>flag</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Function to help lay out a new sensor interface. This need not be "void": it may return a value as well.</p>
+<p>Details about sensor go here</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pin</td><td>You often need to specify interface pins</td></tr>
+    <tr><td class="paramname">param1</td><td>A variable for the sensor or to interpret its value</td></tr>
+    <tr><td class="paramname">param2</td><td>A variable for the sensor or to interpret its value</td></tr>
+    <tr><td class="paramname">ADC_bits</td><td>You often need to specify how much the analog-to-digital converter should be oversampled; this can range from 10 (no oversampling) to 16 (maximum possible oversampling before certainty in the oversampling method drops)</td></tr>
+    <tr><td class="paramname">flag</td><td>Something that helps to set an option</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Example (made up): </p><div class="fragment"><div class="line">logger.Example(A2, 1021.3, 15.2, True);</div></div><!-- fragment -->
+</div>
+</div>
+<a class="anchor" id="ad8296890a14a0df83c2433a20f25b899"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -195,7 +255,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
+          <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>adc_bits</em> = <code>10</code>, </td>
         </tr>
         <tr>
@@ -207,8 +267,8 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">debug&#160;</td>
-          <td class="paramname"> = <code>false</code>&#160;</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>debug</em> = <code>false</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -268,7 +328,7 @@ Public Member Functions</h2></td></tr>
 <p>Anemometer that flips a reed switch each time it spins.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">interrupt_pin_number</td><td>is the digital pin number corresponding to the appropriate interrupt; it uses the Arduino digitalPinToInterrupt(n_pin) function to properly attach the interrupt</td></tr>
+    <tr><td class="paramname">interrupt_pin_number</td><td>is the digital pin number corresponding to the appropriate interrupt; it uses the Arduino digitalPinToInterrupt(n_pin) function to properly attach the interrupt. On the ALog BottleLogger, this number will always be <b>3</b>.</td></tr>
     <tr><td class="paramname">reading_duration_milliseconds</td><td>How long will you count revolutions? Shorter durations save power, longer durations increase accuracy; very long durations will produce long-term averages. Typical values are a few seconds.</td></tr>
     <tr><td class="paramname">meters_per_second_per_rotation</td><td>Conversion factor between revolutions and wind speed. For the Inspeed Vortex wind sensor that we have used (<a href="http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp">http://www.inspeed.com/anemometers/Vortex_Wind_Sensor.asp</a>), this is: <b>2.5 mph/Hz = 1.1176 (m/s)/Hz</b></td></tr>
   </table>
@@ -278,68 +338,21 @@ Public Member Functions</h2></td></tr>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// 4-second reading with Inspeed Vortex wind sensor on digital pin 3</span></div><div class="line"><span class="comment">// (interrupt 1), returned in meters per second</span></div><div class="line">logger.Anemometer_reed_switch(3, 4000, 1.1176);</div></div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="a9fdcbb56e3e4910ac895ee150fe1b9ed"></a>
+<a class="anchor" id="a40588117a274f0c6de926ef6ce1f0ba8"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void Logger::AtlasScientific </td>
+          <td class="memname">void Logger::Barometer_BMP180 </td>
           <td>(</td>
-          <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>command</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>softSerRX</em> = <code>6</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>softSerTX</em> = <code>7</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>baudRate</em> = <code>38400</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>printReturn</em> = <code>true</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>saveReturn</em> = <code>true</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Atlas Scientific sensors: water properties and chemistry.</p>
-<p>Generalized serial interface for Atlas Scientific sensors. It uses SoftwareSerial AND THEREFORE IS LIKELY UNSTABLE AFTER A FEW DAYS IN THE FIELD. The watchdog timer SHOULD BE ABLE TO CATCH THIS, but this has not yet been tested.</p>
-<p>Code in comments is on the way to replacing this with hardware serial. It is also possible to replace this with I2C code, which will be more versitile: can connect many sensors to same I2C port, so long as they remain isolated.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">command</td><td>is the instruction code sent to the Atlas Scientific product. See the data sheet for your specific sensor.</td></tr>
-    <tr><td class="paramname">softSerRx</td><td>is the software serial receive port</td></tr>
-    <tr><td class="paramname">softSerTx</td><td>is the software serial transmit port</td></tr>
-    <tr><td class="paramname">baudRate</td><td>is set by the Atlas Scientific sensor's baud rate.</td></tr>
-    <tr><td class="paramname">printReturn</td><td>is true if you determines whether you care about (i.e. want to print) the Serial response, and false if you would just like to clear the buffer.</td></tr>
-    <tr><td class="paramname">saveReturn</td><td>is true if you want to save the response to the SD card.</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Example: </p><div class="fragment"><div class="line"><span class="comment">// read a pH probe using pins 7 and 8 as Rx and Tx, and save its results:</span></div><div class="line">logger.AtlasScientific(<span class="stringliteral">&quot;R&quot;</span>, 7, 8);</div></div><!-- fragment -->
+<p>Read absolute pressure in mbar.</p>
+<p>This function reads the absolute pressure in mbar (hPa). BMP180 sensor incorporates on board temperature correction. Uses I2C protocol.</p>
+<p>Example: </p><div class="fragment"><div class="line">logger.Barometer_BMP180();</div></div><!-- fragment -->
 </div>
 </div>
 <a class="anchor" id="a40ae372dee7f672a6d6f33ab441e4da1"></a>
@@ -476,6 +489,23 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ad28cf6450ada04f0e1475998bede5b88"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Logger::goToSleep_if_needed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Places logger into sleep mode iff this is being used.</p>
+<p>Function is accessible from Arduino sketch; is designed for cases in which an external override may be required.</p>
+
+</div>
+</div>
 <a class="anchor" id="a923b296832bd4222da649ebc66427ac1"></a>
 <div class="memitem">
 <div class="memproto">
@@ -523,7 +553,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="af0eda5a0be93a4d8505c7493d0f5e333"></a>
+<a class="anchor" id="a62b74ddb3cf9fdd7dae2394c1b245ed4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -537,37 +567,31 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>Vref</em>, </td>
+          <td class="paramname"><em>R0_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>R0</em>, </td>
+          <td class="paramname"><em>B_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>B</em>, </td>
+          <td class="paramname"><em>Rref_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>Rref</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>T0degC</em>, </td>
+          <td class="paramname"><em>T0degC_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>thermPin</em>, </td>
+          <td class="paramname"><em>thermPin_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -583,11 +607,11 @@ Public Member Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <p>HM1500LF Relative humidity sensor with external temperature correction</p>
-<p>This function measures the relative humidity of using a HTM1500 relative humidity sensor and an external thermistor. The relative humidity and temperature is measured using a 14 bit oversampling method. Results are displayed on the serial monitor and saved onto the SD card to four decimal places.</p>
+<p>This function measures the relative humidity of using a HTM1500 relative humidity sensor and an external thermistor. The relative humidity and temperature are measured using an oversampling method. Results are displayed on the serial monitor and saved onto the SD card to four decimal places. Temperature and relative humidity are recorded.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">humidPin</td><td>is the analog pin connected to the humidity output voltage of the module.</td></tr>
-    <tr><td class="paramname">R0_therm</td><td>is a thermistor calibration.</td></tr>
+    <tr><td class="paramname">R0_therm</td><td>is the resistance of the thermistor at the known temperature.</td></tr>
     <tr><td class="paramname">B_therm</td><td>is the B- or β- parameter of the thermistor.</td></tr>
     <tr><td class="paramname">Rref_therm</td><td>is the resistance of the corresponding reference resistor for that analog pin.</td></tr>
     <tr><td class="paramname">T0degC_therm</td><td>is a thermistor calibration.</td></tr>
@@ -596,18 +620,30 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Example: </p><div class="fragment"><div class="line">logger.HTM2500LF_humidity_temperature(1,?,10000,3950,10000,25,2);</div></div><!-- fragment -->
+<p>Example: </p><div class="fragment"><div class="line">logger.HM1500LF_humidity_with_external_temperature1,10000,3950,10000,25,1,12);</div></div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="a71ea885397f448ac03675b1e9a93ecfd"></a>
+<a class="anchor" id="a9808967fdf91f10602aa883df35145b3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">float Logger::Honeywell_HSC_analog </td>
           <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>pin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">float&#160;</td>
           <td class="paramname"><em>Vsupply</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>Vref</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -632,12 +668,6 @@ Public Member Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>units</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>pin</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -737,7 +767,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a91ffb193feceb75b2e19a3617d00455c"></a>
+<a class="anchor" id="a80fdea5a339573980f9544ac64678411"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -769,31 +799,31 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>R0</em>, </td>
+          <td class="paramname"><em>R0_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>B</em>, </td>
+          <td class="paramname"><em>B_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>Rref</em>, </td>
+          <td class="paramname"><em>Rref_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">float&#160;</td>
-          <td class="paramname"><em>T0degC</em>, </td>
+          <td class="paramname"><em>T0degC_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>thermPin</em>, </td>
+          <td class="paramname"><em>thermPin_therm</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -833,7 +863,7 @@ Public Member Functions</h2></td></tr>
 <p>Example: </p><div class="fragment"><div class="line">logger.Inclinometer_SCA100T_D02_analog_Tcorr(6, 2, 3.285, 5.191, \</div><div class="line">       10080.4120953, 3298.34232031, 10000, 25, 0);</div></div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="a9495e2c8e63850f3c7cfcc31e9d73ffe"></a>
+<a class="anchor" id="a635c5dc0046646bec7023ef7133f0eb3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -847,13 +877,7 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">char *&#160;</td>
-          <td class="paramname"><em>_sitecode</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>_dayInterval</em>, </td>
+          <td class="paramname"><em>_datafilename</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -897,7 +921,6 @@ Public Member Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">_logger_name</td><td>Name associated with this data logger; often helps to relate it to the project or site</td></tr>
     <tr><td class="paramname">_filename</td><td>Name of main data file saved to SD card; often helps to relate it to the project or site; used to be limited to 8.3, but now is not.</td></tr>
-    <tr><td class="paramname">_dayInterval</td><td>How many days to wait before logging again; can range from 0-6.</td></tr>
     <tr><td class="paramname">_hourInterval</td><td>How many hours to wait before logging again; can range from 0-24.</td></tr>
     <tr><td class="paramname">_minInterval</td><td>How many minutes to wait before logging again; can range from 0-59.</td></tr>
     <tr><td class="paramname">_secInterval</td><td>How many seconds to wait before logging again; can range from 0-59.</td></tr>
@@ -916,7 +939,7 @@ Public Member Functions</h2></td></tr>
 <p>Example: </p><div class="fragment"><div class="line">\\ Log every five minutes</div><div class="line">logger.initialize(<span class="stringliteral">&#39;TestLogger01&#39;</span>, <span class="stringliteral">&#39;lab_bench_test.alog&#39;</span>, 0, 0, 5, 0);</div></div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="a12dc18b7b16c91de5f7a3af7edb381a9"></a>
+<a class="anchor" id="a95670d06ec3b68300895cd7bf8c37999"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -941,6 +964,12 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">char *&#160;</td>
+          <td class="paramname"><em>_distance_units</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">float&#160;</td>
           <td class="paramname"><em>intercept</em> = <code>0</code>, </td>
         </tr>
@@ -948,7 +977,13 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>ADC_resolution_nbits</em> = <code>14</code>&#160;</td>
+          <td class="paramname"><em>ADC_resolution_nbits</em> = <code>14</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>Rref_on_GND_side</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -966,6 +1001,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">slope</td><td>Slope of the line (distance = (slope)R + R0)</td></tr>
     <tr><td class="paramname">intercept</td><td>(R0) of the line (distance = (slope)R + R0)</td></tr>
     <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</td></tr>
+    <tr><td class="paramname">_distance_units</td><td>is the name of the units of distance that are used in the linear calibration equation, and are therefore the units of this function's output.</td></tr>
     <tr><td class="paramname">Rref_on_GND-Side</td><td>indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a VCC-side reference resistor.</td></tr>
   </table>
   </dd>
@@ -974,7 +1010,7 @@ Public Member Functions</h2></td></tr>
 <p>Example: </p><div class="fragment"><div class="line"><span class="comment">// Using a 0-10k ohm radio tuner with units in mm and a perfect intercept;</span></div><div class="line"><span class="comment">// maintaining default 14-bit readings with standard-side (ALog header)</span></div><div class="line"><span class="comment">// reference resistor set-up</span></div><div class="line">logger.linearPotentiometer(A0, 5000, 0.0008);</div></div><!-- fragment -->
 </div>
 </div>
-<a class="anchor" id="aa05378a90963ceebf7dad0904a74f42f"></a>
+<a class="anchor" id="a3ce2869bbd48fdebbf44e155981c85b0"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1006,7 +1042,7 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>ADC_resolution_nbits</em> = <code>13</code>&#160;</td>
+          <td class="paramname"><em>ADC_resolution_nbits</em> = <code>10</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1027,7 +1063,7 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<p>Example: </p><div class="fragment"><div class="line">logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);</div></div><!-- fragment --><p> Note that sensor should be mounted away from supporting structure. These are the standard recommendations:</p><ul>
+<p>Example: </p><div class="fragment"><div class="line">logger.maxbotixHRXL_WR_analog(10,A2,99,0);</div></div><!-- fragment --><p> Note that sensor should be mounted away from supporting structure. These are the standard recommendations:</p><ul>
 <li>For a mast that is 5 meters high (or higher) the sensor should be mounted at least 100cm away from the mast.</li>
 <li>For a mast that is 2.5 meters high (or lower) the sensor should be at least 75cm away from the mast.</li>
 </ul>
@@ -1278,7 +1314,7 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a343dbf1edb8745ea9672f579d3e8297e"></a>
+<a class="anchor" id="a55d923b98a6c503fccb25bfd4af32f3d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1322,7 +1358,19 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>Rref_on_GND_side</em> = <code>true;&#160;bool&#160;oversample_debug=false</code>&#160;</td>
+          <td class="paramname"><em>Rref_on_GND_side</em> = <code>true</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>oversample_debug</em> = <code>false</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>record_results</em> = <code>true</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1346,6 +1394,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">ADC_resolution_nbits</td><td>(10-16 for the ALog BottleLogger) is the number of bits of ADC resolution used (oversampling for &gt;10 bits)</td></tr>
     <tr><td class="paramname">Rref_on_GND-Side</td><td>indicates the configuration of the voltage divider. True if using Alog provided Reference resistor terminals. If false, the reference resitor must be instead connected via the screw terminals. This is set true for external sensors that are built to require a VCC-side reference resistor.</td></tr>
     <tr><td class="paramname">oversample_debug</td><td>is true if you want a separate file, "Oversample.txt", to record every individual reading used in the oversampling.</td></tr>
+    <tr><td class="paramname">record_results</td><td>is true if you want to save results to the SD card and print to the serial monitor.</td></tr>
   </table>
   </dd>
 </dl>

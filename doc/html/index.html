@@ -25,7 +25,7 @@
   <td id="projectlogo"><img alt="Logo" src="ALog_logo_small.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Logger (for ALog)
-   &#160;<span id="projectnumber">v0.2 for ALog 2.0</span>
+   &#160;<span id="projectnumber">v2.0.0</span>
    </div>
    <div id="projectbrief">Open-source Arduino-based field data logger</div>
   </td>
@@ -188,6 +188,7 @@ ALog pinout and peripherals.</div></div>
 <li>VCC means "Voltage of the Common Connector"</li>
 <li>The 3.3V regulator is typically a precision voltage reference (part number LT1461DHS8-5#PBF) that can source 10-50 mA of power, depending on VCC: 10 mA corresponds to 0.20V dropout between VCC and 3.3V; 50 mA corresponds to 1.5V dropout. Projects that need more power and/or use fully ratiometric measurements can request an ALog without this part; solder jumpers on the board will connect 3V3 pins to the unused side of our standard 3.3V low-dropout regulator.</li>
 <li>The 5V regulated output is supplied via a charge pump; when no current is drawn, its voltage will increase to 5.2V; after some current draw, is output will drop to a stable 5V. If there is a concern about low voltage draw from the charge pump, users should monitor its voltage with a voltage divider connected to one of the analog channels, and include a reading during the time that the sensor or other load on the charge pump is on and active.</li>
+<li>The interrupt pin (digital pin 3) can be used to detect events, such as an anemometer spinning or a rain gauge bucket tipping.</li>
 </ol>
 <h1><a class="anchor" id="About"></a>
 About</h1>

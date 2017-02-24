@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['vdivr',['vdivR',['../classLogger.html#ab1ae31b2bdb77c86fb6851907258171b',1,'Logger']]]
+  ['thermistorb',['thermistorB',['../classLogger.html#a55d923b98a6c503fccb25bfd4af32f3d',1,'Logger']]]
 ];
