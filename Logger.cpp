@@ -64,7 +64,8 @@ const int log_mega=2; // In development
 // Then define _model
 // Now taking advantage of the build.board property
 // Keeping in MCU definitions for backwards compatibility... will eventually throw a deprecation error with this.
-#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
+// WILL HAVE TO UPDATE THIS -- UNIFORMLY THROUGHOUT CODE. START HERE!
+#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200) || defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V200) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
   const int _model = bottle_logger;
   const char _model_name[] = "bottle_logger";
 /*
@@ -95,9 +96,17 @@ const int log_mega=2; // In development
   const int SCLpin = A5;
   // Digital pins
   const int SensorPowerPin = 4; // Activates voltage regulator to give power to sensors
-  const int SDpowerPin = 8; // Turns on voltage source to SD card
-  const int ClockPowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
-  const int LEDpin = 9; // LED to tell user if logger is working properly
+  #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V200)
+    // 7 for both??? START HERE!
+    const int SDpowerPin = 7; // Turns on voltage source to SD card
+    const int ClockPowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+    const int LEDpin = 8; // LED to tell user if logger is working properly  
+  #else
+    // IS IT EVEN TRUE HERE THAT THERE ARE MULTIPLE PINS USED FOR SD AND CLOCK? START HERE!
+    const int SDpowerPin = 8; // Turns on voltage source to SD card
+    const int ClockPowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+    const int LEDpin = 9; // LED to tell user if logger is working properly  
+  #endif
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
   const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
   const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
