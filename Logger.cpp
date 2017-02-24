@@ -745,7 +745,6 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
   const int ALRM1_MATCH_SEC        0b1110  // when seconds match
   const int ALRM1_MATCH_MIN_SEC    0b1100  // when minutes and seconds match
   const int ALRM1_MATCH_HR_MIN_SEC 0b1000  // when hours, minutes, and seconds match
-  const int ALRM1_MATCH_HR_MIN_SEC 0b0000  // when hours, minutes, and seconds match
       byte ALRM1_SET = ALRM1_MATCH_HR_MIN_SEC;
 
   const int ALRM2_ONCE_PER_MIN     0b111   // once per minute (00 seconds of every minute)
@@ -762,7 +761,8 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
   RTCon();
 
-  byte AlarmBits = 0b00000000;
+  byte Alarm1Bits = 0b11111000;
+  byte Alarm2Bits = 0b11111100;
   Clock.turnOffAlarm(1); //Turn off alarms before setting.
   Clock.turnOffAlarm(2);
 
@@ -770,7 +770,7 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
   Clock.checkIfAlarm(2); //Clear alarm flags
   
   // This is the primary alarm
-  Clock.setA1Time(0, _hours, _minutes, _seconds, AlarmBits, true, false, false);
+  Clock.setA1Time(0, _hours, _minutes, _seconds, Alarm1Bits, true, false, false);
   delay(2);
 
   // This is a backup alarm that will wake the logger in case it misses the
@@ -780,7 +780,7 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
   if(_minutes_backup > 59){_minutes_backup = _minutes_backup - 60; _hours_backup++;}
   if(_hours_backup > 23){_hours_backup = _hours_backup - 24;}
-  Clock.setA2Time(0, _hours_backup, _minutes_backup, AlarmBits, true, false, false);  //setting as backup wake function
+  Clock.setA2Time(0, _hours_backup, _minutes_backup, Alarm2Bits, true, false, false);  //setting as backup wake function
   delay(2);
   Clock.turnOnAlarm(1); //Turn on alarms.
   delay(1);
@@ -802,12 +802,14 @@ void Logger::displayAlarms(){
   byte ADay, AHour, AMinute, ASecond, AlarmBits;
   Serial.print(F("Alarm 1 (d/h/m/s): "));
 	Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
+	/*
 	if (ADy) {
 		Serial.print(F("DoW "));
 	}
 	else {
 		Serial.print(F("Date "));
 	}
+	*/
 	Serial.print(AHour, DEC);
 	Serial.print(':');
 	Serial.print(AMinute, DEC);
@@ -832,15 +834,17 @@ void Logger::displayAlarms(){
 	// Display Alarm 2 information
 	Serial.print(F("Alarm 2 (d/h/m): "));
 	Clock.getA2Time(ADay, AHour, AMinute, AlarmBits, ADy, A12h, Apm);
+	/*
 	if (ADy){
 		Serial.print(F("DoW "));
 	} 
     else
   {
     Serial.print(F("Date "));
-  } 
+  }
 	Serial.print(ADay, DEC);
 	Serial.print(' ');
+  */
 	Serial.print(AHour, DEC);
 	Serial.print(' ');
 	Serial.print(AMinute, DEC);
@@ -875,6 +879,7 @@ void Logger::checkAlarms(){
 	Clock.checkIfAlarm(1);
 	
 	if (_use_sleep_mode){
+	  /*
 	  if (Clock.checkIfAlarm(2)) {
 		  Serial.println("Alarm missed! Resetting logger.");
       datafile.close();
@@ -921,6 +926,7 @@ void Logger::checkAlarms(){
       end_logging_to_otherfile();
       delay(20000); // Wait until WDT resets logger (<= 8 seconds)
 	  }
+	  */
   }
 }
 
