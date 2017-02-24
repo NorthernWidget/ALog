@@ -5,13 +5,18 @@
   This example code is in the public domain.
  */
  
-// Pin 13 has an LED connected on most Arduino boards.
-// But Pin 9 is used on the ALog BottleLogger
-// give it a name:
-int led = 9;
+// LED pin
+int led;
 
 // the setup routine runs once when you press reset:
 void setup() {                
+// Pin 13 has an LED connected on most Arduino boards.
+// But Pin 9 (or 8, v 2.0.0) is used on the ALog BottleLogger
+  #if defined ARDUINO_AVR_ALOG_BOTTLELOGGER_V200
+    led=8;
+  #else
+    led=9;
+  #endif
   // initialize the digital pin as an output.
   pinMode(led, OUTPUT);     
 }
