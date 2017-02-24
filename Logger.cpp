@@ -513,12 +513,17 @@ void Logger::setupLogger(){
   Serial.println(F("card initialized."));
   Serial.println();
   LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
-
+  
+  /*
+  // START HERE! DOESN'T WORK NOW -- WHY NOT? NOT BECAUSE OF NON-8.3-FILENAME
   start_logging_to_otherfile("StartTimes.txt");
+  Serial.println(now.unixtime());
   otherfile.print(now.unixtime());
   otherfile.print(",");
   end_logging_to_otherfile();
-
+  Serial.println(now.unixtime());
+  */
+  
   start_logging_to_datafile();
   start_logging_to_headerfile();
 
@@ -1140,7 +1145,7 @@ void Logger::startLogging(){
   // WDCE bit will allow updtaes to the prescalers and 
   // WDE for 4 clock cycles then it will be reset by 
   // hardware.
-  WDTCSR = WDTCSR | B00011000; 
+  WDTCSR = WDTCSR | B00011000;
 
   // Set the watchdog timeout prescaler value to 1024 K 
   // which will yeild a time-out interval of about 8.0 s.
@@ -1154,7 +1159,7 @@ void Logger::startLogging(){
   SDpowerOn();
   RTCon();
 
-  checkAlarms(); //Check and clear flag 
+  checkAlarms(); //Check and clear flag
 
   // First, check if there was a bucket tip from the rain gage, if present
   if (NEW_RAIN_BUCKET_TIP){
@@ -1169,14 +1174,18 @@ void Logger::startLogging(){
   }
   // Then check if a logging event is supposed to occur
   // that is not part of a new bucket tip
-  else if (IS_LOGGING){
+  // IS_LOGGING is
+  else if (IS_LOGGING == true){
     // Check if the logger has been awakend by someone pushing the button
     // If so, bypass everything else
+    //Serial.println("LOG1!");
     if (_model == bottle_logger && (digitalRead(manualWakePin) == LOW)){
       // Brief light flash to show that logging is happening
+      //Serial.println("LOG2!");
       digitalWrite(LEDpin, HIGH);
       delay(5); // to make sure tips aren't double-counted
       digitalWrite(LEDpin, LOW);
+      // And now note that it is logging
     }
   }
 
@@ -1242,20 +1251,36 @@ void Logger::endLogging(){
     TippingBucketRainGage();
   }
 
+  bool advance_alarm_flag = true;
+  
   if (_use_sleep_mode){
+    // Check if you have passed your logging time -- perhpas the LOG NOW 
+    // button was pressed, and not during / slightly before (and blocking)
+    // the time for the next logging
+    now = RTC.now();
     //Calculate for next alarm
-    _hours = _hours+hourInterval;
-    _minutes = _minutes+minInterval;
-    _seconds = _seconds+secInterval;   
-    if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
-    if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
-    if(_hours > 23){_hours = _hours - 24;}
+    uint32_t seconds_in_day_now = now.hour()*3600 + now.minute()*60 + now.second();
+    // 1 second padding in order to ensure that we jump to the next alarm
+    // sooner rather than later
+    uint32_t seconds_in_day_alarm = (_hours*3600 + _minutes*60 + _seconds - 1) % 86400;
+    if (seconds_in_day_now < seconds_in_day_alarm){
+      advance_alarm_flag = false;
+    }
+    
+    if (advance_alarm_flag){
+      // START HERE! MAKE THIS WORK FOR MIDNIGHT ROLLOVER
+      _hours = _hours+hourInterval;
+      _minutes = _minutes+minInterval;
+      _seconds = _seconds+secInterval;
+      if(_seconds > 59){_seconds = _seconds - 60; _minutes++;}
+      if(_minutes > 59){_minutes = _minutes - 60; _hours++;}
+      if(_hours > 23){_hours = _hours - 24;}
 
-    alarm(_hours, _minutes, _seconds);  //Set new alarms.
-
-    delay(2);
-    RTCsleep();
-    delay(2);
+      alarm(_hours, _minutes, _seconds);  //Set new alarms.
+    }
+      delay(2);
+      RTCsleep();
+      delay(2);
   }
   // After this step, since everything is in the loop() part of the Arduino
   // sketch, the sketch will cycle back back to sleep(...)
