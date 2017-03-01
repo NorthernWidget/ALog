@@ -73,7 +73,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#include <Adafruit_Sensor.h>
 //#include <Adafruit_BMP085_U.h>
 //#include <eRCaGuy_NewAnalogRead.h>
-#include <AtlasNW.h>
+//#include <AtlasNW.h>
 
 // Outside of class definitions
 void wakeUpNow();
@@ -148,7 +148,8 @@ class Logger {
     void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
          float gain, float V_ref, uint8_t ADC_resolution_nbits=14);
     void Barometer_BMP180();
-    void AtlasConductivity();
+    //void AtlasConductivity();
+    void AtlasConductivity(uint8_t softSerRX, uint8_t softSerTX, uint32_t baudRate=9600, float T=25.);
     void _sensor_function_template(int pin, float param1, \
          float param2, int ADC_bits=14, bool flag=false);
     

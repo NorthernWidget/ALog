@@ -2437,10 +2437,125 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
   Serial.print(F(","));
 }
 
+void Logger::AtlasConductivity(uint8_t softSerRX, uint8_t softSerTX, uint32_t baudRate, float T){
+  // All internal -- no outside library
+  char response_byte;
+  char response[100];
+  int i;
+  //int imax;
+  SoftwareSerial mySerial(softSerRX, softSerTX);
+  mySerial.begin(baudRate);
+  // Clear prior chit chat
+  mySerial.print('\r');
+  delay(50);
+  while (mySerial.available()){
+    response_byte = mySerial.read();
+  }
+  delay(50);
+  /*
+  // Set temperature
+  mySerial.print("T,");
+  mySerial.print(T,1);
+  mySerial.print('\r');
+  delay(500);
+  // Clear response
+  while (mySerial.available()){
+    response_byte = mySerial.read();
+  }
+  */
+  // Read conductivity
+  mySerial.print("R\r");
+  // Sensor response
+  //Serial.print("Sensor says: ");
+  delay(1000);
+  while (mySerial.available()){
+    response_byte = mySerial.read();
+    //Serial.println(response_byte);
+    delay(10);
+    //Serial.print(response_byte);
+    // Write only values
+    
+    if (response_byte == '*'){
+      break;
+    }
+    else{
+      response[i] = response_byte;
+      i++;
+    }
+    /*
+    if (response_byte != ' '){
+      response[i] = response_byte;
+      i++;
+    }
+    else{
+      break;
+    }
+    */
+  }
+  //Serial.println(i);
+  //Serial.println();
+  //Serial.println();
+  //Dump any characters after carriage return
+  while (mySerial.available()){
+    response_byte = mySerial.read();
+    //Serial.print(response_byte);
+  }
+  //Serial.println();
+  //Serial.println();
+
+  mySerial.end();
+  
+  // Shorten response to just what is needed
+  // i.e. clear extra chars at end of allocated 100 char array
+  //Serial.println();
+  //Serial.println(i);
+  //Serial.println();
+  /*
+  char response_short[i+6];
+  for (int _i=0; _i<(i); _i++){
+    response_short[_i] = response[_i];
+    Serial.println(response_short);
+  }
+  */
+  //Serial.println("END LOOP");
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  // Get rid of these derivative values, eventually.
+  if (first_log_after_booting_up){
+    headerfile.print("EC [uS]");
+    headerfile.print(",");
+    headerfile.print("TDS");
+    headerfile.print(",");
+    headerfile.print("S");
+    headerfile.print(",");
+    headerfile.print("SG");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
+  // SD write
+  for (int _i=0; _i<(i-1); _i++){
+    datafile.print(response[_i]);
+  }
+  datafile.print(F(","));
+  
+  // Echo to Serial
+  for (int _i=0; _i<(i-1); _i++){
+    Serial.print(response[_i]);
+  }
+  Serial.print(F(","));
+
+}
+
+/*
 void Logger::AtlasConductivity(){
+  
   // All hard-coded for starters
   //char condOut[100];
-  AtlasNW condProbe("conductivity", "SoftSerial", 7, 8, 9600);
+  AtlasNW condProbe("conductivity", "SoftSerial", 7, A0, 9600);
   delay(100);
   condProbe.read();
   delay(100);
@@ -2470,6 +2585,7 @@ void Logger::AtlasConductivity(){
   Serial.print(condProbe.response);
   Serial.print(F(","));
 }
+*/
 
 float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
                                    bool debug){
