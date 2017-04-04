@@ -12,7 +12,7 @@ char* fileName = "SC01.txt"; // Name of file for logged data: 8.3 format (e.g,
 //Setup logging interval here, may setup more than one variable. 
 //Minimum interval = 1 sec, maximum interval is 23 hours, 59 minutes, 59 seconds 
 //0 for all means that the logger will not sleep
-int Log_Interval_Seconds = 10; //Valid range is 0-59 seconds
+int Log_Interval_Seconds = 0; //Valid range is 0-59 seconds
 int Log_Interval_Minutes = 0; //Valid range is 0-59 minutes
 int Log_Interval_Hours = 0; //Valid range is 0-23 hours
 // external_interrupt is true for a tipping bucket rain gauge
@@ -39,7 +39,9 @@ logger.startLogging();  // Wake up and initialize
 // If you have no analog sensors, you should comment out the 
 // startAnalog() and endAnalog() commands
 
-logger.startAnalog();
+logger.startAnalog(); //turn on 3.3V power
+
+delay(5);  //Allow voltage to stabalize
 
 //Honeywell_HSC_analog(int pin, float Vsupply, vRef, float Pmin, float Pmax, int TransferFunction_number, int units)
 
@@ -58,9 +60,9 @@ logger.startAnalog();
 
 //Example: logger.Honeywell_HSC_analog(A1, 5, 3.3, 0, 30, 1, 6);
 
-logger.Honeywell_HSC_analog(int pin, float Vsupply, vRef, float Pmin, float Pmax, int TransferFunction_number, int units);
+logger.Honeywell_HSC_analog(1, 3.3, 3.3, 0, 30, 1, 6);
 
-logger.endAnalog();
+logger.endAnalog();  //turn off 3.3V power
 
 //
 // INSERT DIGITAL SENSOR READING COMMANDS HERE!
