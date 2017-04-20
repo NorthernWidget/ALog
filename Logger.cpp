@@ -766,8 +766,7 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
   RTCon();
 
-  byte Alarm1Bits = 0b11111000;
-  byte Alarm2Bits = 0b11111100;
+  byte AlarmBits = 0b01001000;
   Clock.turnOffAlarm(1); //Turn off alarms before setting.
   Clock.turnOffAlarm(2);
 
@@ -775,7 +774,7 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
   Clock.checkIfAlarm(2); //Clear alarm flags
   
   // This is the primary alarm
-  Clock.setA1Time(0, _hours, _minutes, _seconds, Alarm1Bits, true, false, false);
+  Clock.setA1Time(0, _hours, _minutes, _seconds, AlarmBits, true, false, false);
   delay(2);
 
   // This is a backup alarm that will wake the logger in case it misses the
@@ -785,7 +784,7 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
   if(_minutes_backup > 59){_minutes_backup = _minutes_backup - 60; _hours_backup++;}
   if(_hours_backup > 23){_hours_backup = _hours_backup - 24;}
-  Clock.setA2Time(0, _hours_backup, _minutes_backup, Alarm2Bits, true, false, false);  //setting as backup wake function
+  Clock.setA2Time(0, _hours_backup, _minutes_backup, AlarmBits, true, false, false);  //setting as backup wake function
   delay(2);
   Clock.turnOnAlarm(1); //Turn on alarms.
   delay(1);
@@ -883,8 +882,7 @@ void Logger::checkAlarms(){
 
 	Clock.checkIfAlarm(1);
 	
-	if (_use_sleep_mode){
-	  /*
+//	if (_use_sleep_mode){  //Removed by Chad 4/20/17
 	  if (Clock.checkIfAlarm(2)) {
 		  Serial.println("Alarm missed! Resetting logger.");
       datafile.close();
@@ -931,8 +929,7 @@ void Logger::checkAlarms(){
       end_logging_to_otherfile();
       delay(20000); // Wait until WDT resets logger (<= 8 seconds)
 	  }
-	  */
-  }
+//  }  //Removed by Chad 4/20/17
 }
 
 void Logger::displayTime(){
