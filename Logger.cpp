@@ -19,8 +19,9 @@ one-line calls.
 
 Logger.cpp is part of Logger, an Arduino library written by Andrew D. Wickert
 and Chad T. Sandell
-Copyright (C) 2011-2015, Andrew D. Wickert
+Copyright (C) 2011-2017, Andrew D. Wickert
 Copyright (C) 2016-2017, Andrew D. Wickert and Chad T. Sandell
+Copyright (C) 2016-2017, Regents of the University of Minnesota
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
