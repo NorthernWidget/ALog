@@ -46,7 +46,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // setup stuff in the constructor eventually (or maybe just lump "initialize" 
 // and "setup")
 
-
 /////////////////////////////////////////////////////
 // STATIC MEMBERS OF CLASS, SO ACCESSIBLE ANYWHERE //
 /////////////////////////////////////////////////////
@@ -292,8 +291,15 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
    * 
   */
   
-  MCUSR = MCUSR & B11110111;  // Clear the reset flag, the WDRF bit (bit 3) of MCUSR for watchdog timer.
-  wdt_disable();  //Disable Watch dog timer
+
+  // Enable the watchdog timer interupt.
+  WDTCSR = WDTCSR | B00011000;
+  WDTCSR = B00100001;
+  WDTCSR = WDTCSR | B01000000;
+  MCUSR = MCUSR & B11110111;
+
+//  MCUSR = MCUSR & B11110111;  // Clear the reset flag, the WDRF bit (bit 3) of MCUSR for watchdog timer.
+//  wdt_disable();  //Disable Watch dog timer
 
   ///////////////////
   // SLEEP COUNTER //
@@ -430,6 +436,7 @@ void Logger::setupLogger(){
   ///////////////////
 
   Wire.begin();
+  Wire.setTimeout(100);
 
   SDpowerOn();
   RTCon();
@@ -3658,6 +3665,7 @@ void Logger::startup_sequence(){
   // comment the above section that sets "connected_to_computer"...
   // that is, unless you can make the handshake work!
   if ( connected_to_computer ){
+    wdt_disable();
     delay(1000); // Give Python time to print
     name();
     Serial.print(F("LOGGING TO FILE ["));
