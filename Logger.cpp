@@ -43,6 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Logger.h>
 
+
 // Breaking things up at first, but will try to just put all of the initialize / 
 // setup stuff in the constructor eventually (or maybe just lump "initialize" 
 // and "setup")
@@ -291,16 +292,9 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
    * ```
    * 
   */
-  
 
-  // Enable the watchdog timer interupt.
-  WDTCSR = WDTCSR | B00011000;
-  WDTCSR = B00100001;
-  WDTCSR = WDTCSR | B01000000;
-  MCUSR = MCUSR & B11110111;
-
-//  MCUSR = MCUSR & B11110111;  // Clear the reset flag, the WDRF bit (bit 3) of MCUSR for watchdog timer.
-//  wdt_disable();  //Disable Watch dog timer
+  wdt_disable();
+  wdt_enable(WDTO_8S);    // Enable the watchdog timer interupt.
 
   ///////////////////
   // SLEEP COUNTER //
@@ -380,6 +374,8 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
 }
 
 void Logger::setupLogger(){
+
+  wdt_reset();
 
   /**
    * @brief 
@@ -544,6 +540,7 @@ void Logger::setupLogger(){
     SDpowerOff();
     RTCsleep();
   }
+  wdt_reset();
 }
 
 /////////////////////////////////////////////
@@ -1144,22 +1141,8 @@ void Logger::startLogging(){
    */
   // Wake up
 
-  // Set the WDCE bit (bit 4) and the WDE bit (bit 3) 
-  // of WDTCSR. The WDCE bit must be set in order to 
-  // change WDE or the watchdog prescalers. Setting the 
-  // WDCE bit will allow updtaes to the prescalers and 
-  // WDE for 4 clock cycles then it will be reset by 
-  // hardware.
-  WDTCSR = WDTCSR | B00011000;
-
-  // Set the watchdog timeout prescaler value to 1024 K 
-  // which will yeild a time-out interval of about 8.0 s.
-  WDTCSR = B00100001;
-
-  // Enable the watchdog timer interupt.
-  WDTCSR = WDTCSR | B01000000;
-  MCUSR = MCUSR & B11110111;
-  
+  wdt_disable();
+  wdt_enable(WDTO_8S);    // Enable the watchdog timer interupt.
   // Turn power on
   SDpowerOn();
   RTCon();
