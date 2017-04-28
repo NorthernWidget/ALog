@@ -1253,6 +1253,12 @@ void Logger::endLogging(){
   if (NEW_RAIN_BUCKET_TIP){
     TippingBucketRainGage();
   }
+  Serial.println("LOG!"); // This is better! The more we print, the harder it is
+                          // to break the system! (????!!!!)
+  //Serial.write(7); // Saved by another print statement. That's 3... there must
+                   // be a reason!
+                   // Without this, pressing the "LOG NOW" button would often
+                   // cause the system to freeze.
 
   bool advance_alarm_flag = true;
   
@@ -1265,6 +1271,7 @@ void Logger::endLogging(){
     uint32_t seconds_in_day_now = now.hour()*3600 + now.minute()*60 + now.second();
     // 1 second padding in order to ensure that we jump to the next alarm
     // sooner rather than later
+    // This is especially for the use of the LOG NOW button.
     uint32_t seconds_in_day_alarm = (_hours*3600 + _minutes*60 + _seconds - 1) % 86400;
     if (seconds_in_day_now < seconds_in_day_alarm){
       advance_alarm_flag = false;
@@ -3018,7 +3025,6 @@ void Logger::end_logging_to_headerfile(){
   // Ends line and closes otherfile
   // Copied from endLine function
   headerfile.println();
-  Serial.println();
   // close the file: (This does the actual sync() step too - writes buffer)
   headerfile.close();
   delay(10);
