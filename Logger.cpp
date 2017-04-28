@@ -413,9 +413,7 @@ void Logger::setupLogger(){
     pinMode(manualWakePin,INPUT);
     digitalWrite(manualWakePin,HIGH); // enable internal 20K pull-up
   }
-  // Start out with SD, pin set LOW
-  digitalWrite(SDpowerPin,LOW);
-  // But have Sensor Power set HIGH, because if any I2C sensors are attached 
+  // Have Sensor Power set HIGH, because if any I2C sensors are attached 
   // and unpowered, they will drag down the signal from the RTC, and the 
   // logger will not properly initialize
   digitalWrite(SensorPowerPin,HIGH);
@@ -777,7 +775,7 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
   Clock.checkIfAlarm(1); //Clear alarm flags, do I need to do this here?
   Clock.checkIfAlarm(2); //Clear alarm flags
-  
+    
   // This is the primary alarm
   Clock.setA1Time(0, _hours, _minutes, _seconds, AlarmBits, true, false, false);
   delay(2);
@@ -795,7 +793,18 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
   delay(1);
   Clock.turnOnAlarm(2);
   delay(1);
+  //Serial.print(' '); Using Serial to fix code from freezing; don't understand.
+  // Have looked through HW Serial, Print, Stream libraries; can't tell why yet
+  // (was a <15 minute look)
+  // Somehow, freezes when next needs to talk to clock if I don't do this!
+  Serial.write(2); // write ASCII STX; somehow Serial comes to the rescue again!
+                   // STX just as a character that doesn't take much space in
+                   // the Serial monitor
 
+  //bool ADy, Apm, A12h;
+  //byte ADay, AHour, AMinute, ASecond;
+  //Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
+  //Clock.getA2Time(ADay, AHour, AMinute, AlarmBits, ADy, A12h, Apm);
   //displayAlarms(); delay(10);  //Uncomment to see alarms on serial monitor.
 
 }
@@ -1067,7 +1076,7 @@ void Logger::RTCon(){
   pinMode(SDpowerPin,OUTPUT);
   digitalWrite(SDpowerPin,HIGH); //Chad -- one model's pull-ups attached to SDpowerPin
   digitalWrite(ClockPowerPin,HIGH);
-  delay(2);
+  delay(20);
 }
 
 void Logger::RTCsleep(){
@@ -1140,6 +1149,9 @@ void Logger::startLogging(){
    * it sends out an LED warning message of 20 rapid flashes.</b>
    */
   // Wake up
+  
+  delay(50);
+  //Serial.println("Rise and shine!");
 
   wdt_disable();
   wdt_enable(WDTO_8S);    // Enable the watchdog timer interupt.
@@ -1148,6 +1160,9 @@ void Logger::startLogging(){
   RTCon();
 
   checkAlarms(); //Check and clear flag
+  //displayAlarms();  // Verify Alarms and display time // Here for debugging
+                      // why the alarms weren't going off after 1st log.
+                      // Mysterious Serial.write (or .print) fixed it.
 
   // First, check if there was a bucket tip from the rain gage, if present
   if (NEW_RAIN_BUCKET_TIP){
@@ -1266,9 +1281,10 @@ void Logger::endLogging(){
 
       alarm(_hours, _minutes, _seconds);  //Set new alarms.
     }
-      delay(2);
-      RTCsleep();
-      delay(2);
+    //displayAlarms();  // Verify Alarms and display time
+    delay(2);
+    RTCsleep();
+    delay(2);
   }
   // After this step, since everything is in the loop() part of the Arduino
   // sketch, the sketch will cycle back back to sleep(...)
