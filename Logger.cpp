@@ -798,8 +798,10 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
   // (was a <15 minute look)
   // Somehow, freezes when next needs to talk to clock if I don't do this!
   Serial.write(2); // write ASCII STX; somehow Serial comes to the rescue again!
-                   // STX just as a character that doesn't take much space in
+  Serial.write(2); // STX just as a character that doesn't take much space in
                    // the Serial monitor
+  Serial.flush();
+  //delay(10);
 
   //bool ADy, Apm, A12h;
   //byte ADay, AHour, AMinute, ASecond;
