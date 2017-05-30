@@ -66,7 +66,7 @@ const int log_mega=2; // In development
 // Now taking advantage of the build.board property
 // Keeping in MCU definitions for backwards compatibility... will eventually throw a deprecation error with this.
 // WILL HAVE TO UPDATE THIS -- UNIFORMLY THROUGHOUT CODE. START HERE!
-#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200) || defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V200) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
+#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200) || defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
   const int _model = bottle_logger;
   const char _model_name[] = "bottle_logger";
 /*
@@ -97,7 +97,7 @@ const int log_mega=2; // In development
   const int SCLpin = A5;
   // Digital pins
   const int SensorPowerPin = 4; // Activates voltage regulator to give power to sensors
-  #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V200)
+  #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
     // 7 for both??? START HERE!
     const int SDpowerPin = 7; // Turns on voltage source to SD card
     const int ClockPowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
