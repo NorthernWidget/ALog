@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="README_8md" kind="file" language="Markdown">
+    <compoundname>README.md</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline><highlight class="normal">Logger</highlight></codeline>
+<codeline><highlight class="normal">======</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&quot;Logger&quot;<sp/>is<sp/>the<sp/>data<sp/>logger<sp/>library<sp/>for<sp/>the<sp/>Arduino-based<sp/>ALog<sp/>(http://northernwidget.com/alog/)<sp/>developed<sp/>by<sp/>Andy<sp/>Wickert<sp/>and<sp/>Chad<sp/>Sandell<sp/>at<sp/>Northern<sp/>Widget<sp/>LLC<sp/>and<sp/>the<sp/>University<sp/>of<sp/>Minnesota.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">While<sp/>it<sp/>is<sp/>developed<sp/>to<sp/>work<sp/>specifically<sp/>with<sp/>the<sp/>ALog,<sp/>it<sp/>will<sp/>also<sp/>work<sp/>with<sp/>a<sp/>standard<sp/>Arduino<sp/>that<sp/>is<sp/>outfitted<sp/>with<sp/>a<sp/>SD<sp/>card<sp/>and<sp/>a<sp/>DS3231<sp/>real-time<sp/>clock.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">&quot;Logger&quot;<sp/>is<sp/>optimized<sp/>to<sp/>handle<sp/>all<sp/>of<sp/>the<sp/>basic<sp/>file,<sp/>system,<sp/>and<sp/>power<sp/>management<sp/>behind-the-scenes,<sp/>and<sp/>to<sp/>reduce<sp/>power<sp/>consumption<sp/>to<sp/>minimal<sp/>levels<sp/>through<sp/>the<sp/>use<sp/>of<sp/>the<sp/>sleep<sp/>functions.<sp/>It<sp/>exposes<sp/>sensor<sp/>functions<sp/>as<sp/>single-line<sp/>calls,<sp/>and<sp/>includes<sp/>a<sp/>template<sp/>for<sp/>the<sp/>addition<sp/>of<sp/>new<sp/>sensors.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">For<sp/>questions<sp/>related<sp/>to<sp/>the<sp/>Logger<sp/>library,<sp/>please<sp/>send<sp/>a<sp/>message<sp/>to<sp/>us<sp/>at<sp/>info@northernwidget.com.</highlight></codeline>
+    </programlisting>
+    <location file="README.md"/>
+  </compounddef>
+</doxygen>

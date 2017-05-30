@@ -1,0 +1,370 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="Logger_8h" kind="file" language="C++">
+    <compoundname>Logger.h</compoundname>
+    <includes local="no">Arduino.h</includes>
+    <includes local="no">SdFat.h</includes>
+    <includes local="no">Wire.h</includes>
+    <includes local="no">DS3231.h</includes>
+    <includes local="no">math.h</includes>
+    <includes local="no">avr/sleep.h</includes>
+    <includes local="no">avr/wdt.h</includes>
+    <includes local="no">stdlib.h</includes>
+    <includes local="no">EEPROM.h</includes>
+    <includes local="no">SoftwareSerial.h</includes>
+    <includes local="no">SFE_BMP180.h</includes>
+    <includedby refid="Logger_8cpp" local="no">Logger.cpp</includedby>
+    <incdepgraph>
+      <node id="20">
+        <label>DS3231.h</label>
+      </node>
+      <node id="24">
+        <label>stdlib.h</label>
+      </node>
+      <node id="23">
+        <label>avr/wdt.h</label>
+      </node>
+      <node id="16">
+        <label>Logger.h</label>
+        <link refid="Logger_8h"/>
+        <childnode refid="17" relation="include">
+        </childnode>
+        <childnode refid="18" relation="include">
+        </childnode>
+        <childnode refid="19" relation="include">
+        </childnode>
+        <childnode refid="20" relation="include">
+        </childnode>
+        <childnode refid="21" relation="include">
+        </childnode>
+        <childnode refid="22" relation="include">
+        </childnode>
+        <childnode refid="23" relation="include">
+        </childnode>
+        <childnode refid="24" relation="include">
+        </childnode>
+        <childnode refid="25" relation="include">
+        </childnode>
+        <childnode refid="26" relation="include">
+        </childnode>
+        <childnode refid="27" relation="include">
+        </childnode>
+      </node>
+      <node id="19">
+        <label>Wire.h</label>
+      </node>
+      <node id="22">
+        <label>avr/sleep.h</label>
+      </node>
+      <node id="18">
+        <label>SdFat.h</label>
+      </node>
+      <node id="21">
+        <label>math.h</label>
+      </node>
+      <node id="17">
+        <label>Arduino.h</label>
+      </node>
+      <node id="27">
+        <label>SFE_BMP180.h</label>
+      </node>
+      <node id="26">
+        <label>SoftwareSerial.h</label>
+      </node>
+      <node id="25">
+        <label>EEPROM.h</label>
+      </node>
+    </incdepgraph>
+    <invincdepgraph>
+      <node id="29">
+        <label>Logger.cpp</label>
+        <link refid="Logger_8cpp"/>
+      </node>
+      <node id="28">
+        <label>Logger.h</label>
+        <link refid="Logger_8h"/>
+        <childnode refid="29" relation="include">
+        </childnode>
+      </node>
+    </invincdepgraph>
+    <innerclass refid="classLogger" prot="public">Logger</innerclass>
+      <sectiondef kind="func">
+      <memberdef kind="function" id="Logger_8h_1adee29828901ea1b4f99ce305fa3e17bd" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void wakeUpNow</definition>
+        <argsstring>()</argsstring>
+        <name>wakeUpNow</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Logger.h" line="80" column="1" bodyfile="Logger.cpp" bodystart="700" bodyend="711"/>
+      </memberdef>
+      <memberdef kind="function" id="Logger_8h_1a1a3b380e75d68eef4c3913816773e1b5" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void wakeUpNow_tip</definition>
+        <argsstring>()</argsstring>
+        <name>wakeUpNow_tip</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Logger.h" line="81" column="1" bodyfile="Logger.cpp" bodystart="713" bodyend="727"/>
+      </memberdef>
+      <memberdef kind="function" id="Logger_8h_1a9c215a00c214c880d04481d256d8d522" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void _ISR_void</definition>
+        <argsstring>()</argsstring>
+        <name>_ISR_void</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Logger.h" line="82" column="1" bodyfile="Logger.cpp" bodystart="2787" bodyend="2788"/>
+      </memberdef>
+      <memberdef kind="function" id="Logger_8h_1aa2e4ccb5b638347db4da535aac7ac209" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void _anemometer_count_increment</definition>
+        <argsstring>()</argsstring>
+        <name>_anemometer_count_increment</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Logger.h" line="83" column="1" bodyfile="Logger.cpp" bodystart="2790" bodyend="2795"/>
+      </memberdef>
+      <memberdef kind="function" id="Logger_8h_1a7551515cf6f018df3d8d942710936aef" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void _internalDateTime</definition>
+        <argsstring>(uint16_t *date, uint16_t *time)</argsstring>
+        <name>_internalDateTime</name>
+        <param>
+          <type>uint16_t *</type>
+          <declname>date</declname>
+        </param>
+        <param>
+          <type>uint16_t *</type>
+          <declname>time</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="Logger.h" line="84" column="1" bodyfile="Logger.cpp" bodystart="3864" bodyend="3870"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+<para><heading level="1"><ref refid="Logger_8h" kindref="compound">Logger.h</ref></heading>
+</para><para>Data logger library header<linebreak/>
+ Designed for the ALog<linebreak/>
+ Modules should work for any Arduino-based board with minimal modificiation.<linebreak/>
+ Goals:<orderedlist>
+<listitem><para>Manage logger utility functions, largely behind-the-scenes</para></listitem><listitem><para>Simplify data logger operations to one-line calls</para></listitem></orderedlist>
+</para><para>Written by Andy Wickert, 2011-2017, and Chad Sandell, 2017<linebreak/>
+ Started 27 September 2011</para><para>Designed to greatly simplify Arduino sketches for the ALog and reduce what the end user needs to do into relatively simple one-line calls.</para><para><heading level="2">LICENSE: GNU GPL v3</heading>
+</para><para><ref refid="Logger_8h" kindref="compound">Logger.h</ref> is part of <ref refid="classLogger" kindref="compound">Logger</ref>, an Arduino library written by Andrew D. Wickert and Chad T. Sandell.</para><para>Copyright (C) 2011-2017, Andrew D. Wickert Copyright (C) 2016-2017, Andrew D. Wickert and Chad T. Sandell Copyright (C) 2016-2017, Regents of the University of Minnesota</para><para>This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</para><para>This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</para><para>You should have received a copy of the GNU General Public License along with this program. If not, see <ulink url="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</ulink>. </para>    </detaileddescription>
+    <programlisting>
+<codeline lineno="1"></codeline>
+<codeline lineno="45"><highlight class="comment">//<sp/>DEFINE<sp/>SELF<sp/>/<sp/>INCLUDE<sp/>GUARD<sp/>//</highlight></codeline>
+<codeline lineno="48"><highlight class="comment"></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="49"><highlight class="normal"></highlight><highlight class="preprocessor">#ifndef<sp/>Logger_h</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="50"><highlight class="normal"></highlight><highlight class="preprocessor">#define<sp/>Logger_h</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="51"><highlight class="normal"></highlight></codeline>
+<codeline lineno="53"><highlight class="comment">//<sp/>INCLUDE<sp/>LIBRARIES<sp/>//</highlight></codeline>
+<codeline lineno="55"><highlight class="comment"></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="56"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Arduino<sp/>1.0<sp/>libraries<sp/>now<sp/>default;<sp/>no<sp/>if/else</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="57"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;Arduino.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="58"><highlight class="normal"></highlight></codeline>
+<codeline lineno="59"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Standard<sp/>libraries</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="60"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;SdFat.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;Wire.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="62"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;DS3231.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="63"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;math.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="64"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;avr/sleep.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="65"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;avr/wdt.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="66"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdlib.h&gt;</highlight><highlight class="normal"><sp/></highlight><highlight class="comment">//<sp/>For<sp/>turning<sp/>incoming<sp/>ASCII<sp/>character</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>strings<sp/>into<sp/>int<sp/>with<sp/>atol</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="68"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;EEPROM.h&gt;</highlight><highlight class="normal"><sp/></highlight><highlight class="comment">//<sp/>Save<sp/>serial<sp/>number<sp/>and<sp/>reference<sp/>voltage</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="69"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Serial<sp/>number<sp/>cannot<sp/>be<sp/>written<sp/>here</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="70"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;SoftwareSerial.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="71"><highlight class="normal"></highlight></codeline>
+<codeline lineno="72"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Sensor-centric<sp/>libraries</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="73"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;SFE_BMP180.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight><highlight class="comment">//#include<sp/>&lt;Adafruit_Sensor.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"></highlight><highlight class="comment">//#include<sp/>&lt;Adafruit_BMP085_U.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="76"><highlight class="normal"></highlight><highlight class="comment">//#include<sp/>&lt;eRCaGuy_NewAnalogRead.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="77"><highlight class="normal"></highlight><highlight class="comment">//#include<sp/>&lt;AtlasNW.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="78"><highlight class="normal"></highlight></codeline>
+<codeline lineno="79"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Outside<sp/>of<sp/>class<sp/>definitions</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="80"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>wakeUpNow();</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>wakeUpNow_tip();</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>_ISR_void();</highlight></codeline>
+<codeline lineno="83"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>_anemometer_count_increment();</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>_internalDateTime(uint16_t*<sp/>date,<sp/>uint16_t*<sp/>time);<sp/></highlight><highlight class="comment">//<sp/>Callback:<sp/>SD<sp/>DT<sp/>stamp</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="85"><highlight class="normal"></highlight></codeline>
+<codeline lineno="86"><highlight class="normal"></highlight><highlight class="comment">//<sp/>The<sp/>rest<sp/>of<sp/>the<sp/>library</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="87" refid="classLogger" refkind="compound"><highlight class="normal"></highlight><highlight class="keyword">class<sp/></highlight><highlight class="normal"><ref refid="classLogger" kindref="compound">Logger</ref><sp/>{</highlight></codeline>
+<codeline lineno="88"><highlight class="normal"></highlight></codeline>
+<codeline lineno="89"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">public</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Constructor</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="91"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="classLogger_1abc41bfb031d896170c7675fa96a6b30c" kindref="member">Logger</ref>();</highlight></codeline>
+<codeline lineno="92"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="93"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Initialization</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a635c5dc0046646bec7023ef7133f0eb3" kindref="member">initialize</ref>(</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*<sp/>_logger_name,<sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*<sp/>_datafilename,<sp/>\</highlight></codeline>
+<codeline lineno="95"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>_hourInterval,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>_minInterval,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>_secInterval,<sp/>\</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>_ext_int=</highlight><highlight class="keyword">false</highlight><highlight class="normal">,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>_LOG_ON_BUCKET_TIP=</highlight><highlight class="keyword">false</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1ab5e0bd543758c65a17b77553a0e9f0c9" kindref="member">setupLogger</ref>();</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="99"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Code<sp/>for<sp/>sleeping,<sp/>starting<sp/>up<sp/>from<sp/>sleep,<sp/>synching<sp/>SD<sp/>card</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1ad90ff8f29410f6b70cc6334391400a4e" kindref="member">sleep</ref>();</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1ad28cf6450ada04f0e1475998bede5b88" kindref="member">goToSleep_if_needed</ref>();<sp/></highlight><highlight class="comment">//<sp/>Same<sp/>as<sp/>above,<sp/>but<sp/>checks<sp/>if<sp/>sleep<sp/>is<sp/>being<sp/>used</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a4a6c78dd1715b33ae4bbd6f66f116f77" kindref="member">startLogging</ref>();</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1aa82814d61687debcf3b8dd6f46c9d549" kindref="member">endLogging</ref>();</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1af936c7f58e23316abb5614cbd31c7ced" kindref="member">startAnalog</ref>();</highlight></codeline>
+<codeline lineno="105"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1adca7be8a63592263c67f63766680d16f" kindref="member">endAnalog</ref>();</highlight></codeline>
+<codeline lineno="106"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="107"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Getters<sp/>and<sp/>setters</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="108"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/><ref refid="classLogger_1acc758b6fdaac8099c492929aa7f1691d" kindref="member">get_use_sleep_mode</ref>();</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="110"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Sensors<sp/>-<sp/>standard<sp/>procedure<sp/>(wake<sp/>up,<sp/>log,<sp/>sleep)</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="111"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a343fcabefb37e06429865a2e6a6e708a" kindref="member">readPin</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pin);</highlight></codeline>
+<codeline lineno="112"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a4e67526c65fa865f276a515a200af4aa" kindref="member">readPinOversample</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pin,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>bits);</highlight></codeline>
+<codeline lineno="113"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="classLogger_1ad8296890a14a0df83c2433a20f25b899" kindref="member">analogReadOversample</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pin,<sp/>uint8_t<sp/>adc_bits=10,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nsamples=1,<sp/>\</highlight></codeline>
+<codeline lineno="114"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>debug=</highlight><highlight class="keyword">false</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="115"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a55d923b98a6c503fccb25bfd4af32f3d" kindref="member">thermistorB</ref>(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>R0,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>B,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Rref,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>T0degC,<sp/>\</highlight></codeline>
+<codeline lineno="116"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>thermPin,<sp/>uint8_t<sp/>ADC_resolution_nbits=14,<sp/>\</highlight></codeline>
+<codeline lineno="117"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Rref_on_GND_side=</highlight><highlight class="keyword">true</highlight><highlight class="normal">,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>oversample_debug=</highlight><highlight class="keyword">false</highlight><highlight class="normal">,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>record_results=</highlight><highlight class="keyword">true</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="118"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Print<sp/>order:<sp/>Distance<sp/>[cm],<sp/>standard<sp/>deviation<sp/>[cm]</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="119"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a362a1462166d63ddc613eaa1e86f9854" kindref="member">ultrasonicMB_analog_1cm</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nping,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>EX,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>sonicPin,<sp/>\</highlight></codeline>
+<codeline lineno="120"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>writeAll);</highlight></codeline>
+<codeline lineno="121"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a87ce56cb9c3dfc7abfd6308b2ee7dc10" kindref="member">maxbotixHRXL_WR_Serial</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>Ex,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nping,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>writeAll,<sp/>\</highlight></codeline>
+<codeline lineno="122"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>maxRange,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>RS232=</highlight><highlight class="keyword">false</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="123"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Print<sp/>order:<sp/>Distance<sp/>[cm],<sp/>standard<sp/>deviation<sp/>[cm]</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="124"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a3ce2869bbd48fdebbf44e155981c85b0" kindref="member">maxbotixHRXL_WR_analog</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nping=10,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>sonicPin=A0,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>EX=99,<sp/>\</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>writeAll=</highlight><highlight class="keyword">true</highlight><highlight class="normal">,<sp/>\</highlight></codeline>
+<codeline lineno="126"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint8_t<sp/>ADC_resolution_nbits=10);</highlight></codeline>
+<codeline lineno="127"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a40ae372dee7f672a6d6f33ab441e4da1" kindref="member">Decagon5TE</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>excitPin,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>dataPin);<sp/></highlight><highlight class="comment">//<sp/>Poorly-tested</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="128"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a84da6a9ec3d4d56fdc32d950b71f1a26" kindref="member">DecagonGS1</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Vref,<sp/>uint8_t<sp/>ADC_resolution_nbits=14);</highlight></codeline>
+<codeline lineno="129"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1ab1ae31b2bdb77c86fb6851907258171b" kindref="member">vdivR</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Rref,<sp/>uint8_t<sp/>ADC_resolution_nbits=10,<sp/>\</highlight></codeline>
+<codeline lineno="130"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Rref_on_GND_side=</highlight><highlight class="keyword">true</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="131"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>FLEX<sp/>SENSOR<sp/>READING<sp/>DOES<sp/>NOT<sp/>STABLIIZE:<sp/>CHANGES<sp/>CONSISTENTLY<sp/>WITH<sp/>TIME.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="132"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//void<sp/>flex(int<sp/>flexPin,<sp/>float<sp/>Rref,<sp/>float<sp/>calib1,<sp/>float<sp/>calib2);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="133"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a95670d06ec3b68300895cd7bf8c37999" kindref="member">linearPotentiometer</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>linpotPin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Rref,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>slope,<sp/>\</highlight></codeline>
+<codeline lineno="134"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*<sp/>_distance_units,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>intercept=0,<sp/>\</highlight></codeline>
+<codeline lineno="135"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint8_t<sp/>ADC_resolution_nbits=14,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Rref_on_GND_side=</highlight><highlight class="keyword">true</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="136"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a4ccff7a14a6bddc8bb28e22b3b36d3cc" kindref="member">HTM2500LF_humidity_temperature</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>humidPin,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>thermPin,<sp/>\</highlight></codeline>
+<codeline lineno="137"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Rref_therm,<sp/>uint8_t<sp/>ADC_resolution_nbits=14);</highlight></codeline>
+<codeline lineno="138"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a62b74ddb3cf9fdd7dae2394c1b245ed4" kindref="member">HM1500LF_humidity_with_external_temperature</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>humidPin,<sp/>\</highlight></codeline>
+<codeline lineno="139"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>R0_therm,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>B_therm,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Rref_therm,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>T0degC_therm,<sp/>\</highlight></codeline>
+<codeline lineno="140"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>thermPin_therm,<sp/>uint8_t<sp/>ADC_resolution_nbits=14);</highlight></codeline>
+<codeline lineno="141"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a80fdea5a339573980f9544ac64678411" kindref="member">Inclinometer_SCA100T_D02_analog_Tcorr</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>xPin,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>yPin,<sp/>\</highlight></codeline>
+<codeline lineno="142"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Vref,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Vsupply,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>R0_therm,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>B_therm,<sp/>\</highlight></codeline>
+<codeline lineno="143"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Rref_therm,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>T0degC_therm,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>thermPin_therm,<sp/>\</highlight></codeline>
+<codeline lineno="144"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint8_t<sp/>ADC_resolution_nbits=14);</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a6c6a43a1b86f88c2a5e33d14c992e510" kindref="member">Anemometer_reed_switch</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>interrupt_pin_number,<sp/></highlight></codeline>
+<codeline lineno="146"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">unsigned</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">long</highlight><highlight class="normal"><sp/>reading_duration_milliseconds,<sp/>\</highlight></codeline>
+<codeline lineno="147"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>meters_per_second_per_rotation);</highlight></codeline>
+<codeline lineno="148"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a31c3cba5ff5722fb66bf540bfbe8b25d" kindref="member">Wind_Vane_Inspeed</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>vanePin);</highlight></codeline>
+<codeline lineno="149"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1ae4190ce7ccfd7b148a6151102a3bf93d" kindref="member">Pyranometer</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>analogPin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>raw_mV_per_W_per_m2,<sp/>\</highlight></codeline>
+<codeline lineno="150"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>gain,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>V_ref,<sp/>uint8_t<sp/>ADC_resolution_nbits=14);</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a40588117a274f0c6de926ef6ce1f0ba8" kindref="member">Barometer_BMP180</ref>();</highlight></codeline>
+<codeline lineno="152"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a98f3cc370c87d1e1eaf3eb6a7e0f1623" kindref="member">_sensor_function_template</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>param1,<sp/>\</highlight></codeline>
+<codeline lineno="153"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>param2,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ADC_bits=14,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>flag=</highlight><highlight class="keyword">false</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="154"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="155"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Sensors<sp/>-<sp/>triggered</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="156"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Camera<sp/>on/off<sp/>function;<sp/>decision<sp/>made<sp/>in<sp/>end-user<sp/>Arduino<sp/>script</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="157"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a923b296832bd4222da649ebc66427ac1" kindref="member">HackHD</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>control_pin,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>want_camera_on);</highlight></codeline>
+<codeline lineno="158"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/><ref refid="classLogger_1a9808967fdf91f10602aa883df35145b3" kindref="member">Honeywell_HSC_analog</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Vsupply,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Vref,<sp/>\</highlight></codeline>
+<codeline lineno="159"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Pmin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Pmax,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>TransferFunction_number,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>units,<sp/>\</highlight></codeline>
+<codeline lineno="160"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint8_t<sp/>ADC_resolution_nbits=14);</highlight></codeline>
+<codeline lineno="161"><highlight class="normal"></highlight></codeline>
+<codeline lineno="162"><highlight class="normal"><sp/><sp/></highlight><highlight class="keyword">private</highlight><highlight class="normal">:</highlight></codeline>
+<codeline lineno="163"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>pinUnavailable(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pin);</highlight></codeline>
+<codeline lineno="164"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*nameFile(</highlight><highlight class="keywordtype">char</highlight><highlight class="normal"><sp/>*<sp/>_sitecode);</highlight></codeline>
+<codeline lineno="165"><highlight class="normal"></highlight></codeline>
+<codeline lineno="166"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Sleep<sp/>and<sp/>alarms</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="167"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>sleepNow();</highlight></codeline>
+<codeline lineno="168"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>sleepNow_nap();</highlight></codeline>
+<codeline lineno="169"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>wakeUpNow<sp/>defined<sp/>outside<sp/>of<sp/>class;<sp/>see<sp/>above</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="170"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>alarm(uint8_t<sp/>hourInterval,<sp/>uint8_t<sp/>minInterval,<sp/>\</highlight></codeline>
+<codeline lineno="171"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>uint8_t<sp/>secInterval);</highlight></codeline>
+<codeline lineno="172"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>displayAlarms();<sp/></highlight><highlight class="comment">//debug<sp/>tool<sp/>delete<sp/>if<sp/>desired.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="173"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>checkAlarms();<sp/><sp/></highlight><highlight class="comment">//debug<sp/>tool<sp/>delete<sp/>if<sp/>desired.<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="174"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>displayTime();<sp/><sp/><sp/></highlight><highlight class="comment">//debug<sp/>tool<sp/>delete<sp/>if<sp/>desired.<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="175"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>LED<sp/>signals</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="176"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>LEDwarn(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nflash);</highlight></codeline>
+<codeline lineno="177"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>LEDgood();</highlight></codeline>
+<codeline lineno="178"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>LEDtimeWrong(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>ncycles);</highlight></codeline>
+<codeline lineno="179"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="180"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Time</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="181"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>unixDatestamp();</highlight></codeline>
+<codeline lineno="182"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="183"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Logger-computer<sp/>communications</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="184"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>name();</highlight></codeline>
+<codeline lineno="185"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>print_time();</highlight></codeline>
+<codeline lineno="186"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>set_time_main();</highlight></codeline>
+<codeline lineno="187"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>announce_start();</highlight></codeline>
+<codeline lineno="188"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>startup_sequence();</highlight></codeline>
+<codeline lineno="189"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>establishContact_Tx();</highlight></codeline>
+<codeline lineno="190"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>establishContact_Rx();</highlight></codeline>
+<codeline lineno="191"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="192"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Clock<sp/>power</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="193"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>RTCon();</highlight></codeline>
+<codeline lineno="194"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>RTCsleep();</highlight></codeline>
+<codeline lineno="195"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="196"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>SD<sp/>card<sp/>power</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="197"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SDpowerOn();</highlight></codeline>
+<codeline lineno="198"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>SDpowerOff();</highlight></codeline>
+<codeline lineno="199"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="200"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Clock<sp/>setting</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="201"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>clockSet();</highlight></codeline>
+<codeline lineno="202"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>GetDateStuff(byte&amp;<sp/>Year,<sp/>byte&amp;<sp/>Month,<sp/>byte&amp;<sp/>Day,<sp/>byte&amp;<sp/>DoW,<sp/></highlight></codeline>
+<codeline lineno="203"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>byte&amp;<sp/>Hour,<sp/>byte&amp;<sp/>Minute,<sp/>byte&amp;<sp/>Second);</highlight></codeline>
+<codeline lineno="204"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="205"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Sensor<sp/>utility<sp/>codes</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="206"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>_vdivR(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>pin,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>Rref,<sp/>uint8_t<sp/>adc_bits=10,<sp/>\</highlight></codeline>
+<codeline lineno="207"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>Rref_on_GND_side=</highlight><highlight class="keyword">true</highlight><highlight class="normal">,<sp/></highlight><highlight class="keywordtype">bool</highlight><highlight class="normal"><sp/>oversample_debug=</highlight><highlight class="keyword">false</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="208"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>I<sp/>don&apos;t<sp/>trust<sp/>the<sp/>software<sp/>serial<sp/>version<sp/>--<sp/>should<sp/>do<sp/>some<sp/>lab<sp/>testing<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="209"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>to<sp/>make<sp/>sure<sp/>that<sp/>chances<sp/>of<sp/>clock<sp/>speed<sp/>/<sp/>interrupt<sp/>problems,<sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="210"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>especially<sp/>with<sp/>so<sp/>much<sp/>time<sp/>in<sp/>sleep<sp/>mode,<sp/>are<sp/>near-0.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="211"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//int<sp/>maxbotix_soft_Serial_parse(int<sp/>Ex,<sp/>int<sp/>Rx,<sp/>bool<sp/>RS232=false);</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="212"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>maxbotix_Serial_parse(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>Ex);</highlight></codeline>
+<codeline lineno="213"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>standard_deviation_from_array(</highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>values[],<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nvalues,<sp/>\</highlight></codeline>
+<codeline lineno="214"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>mean);</highlight></codeline>
+<codeline lineno="215"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>standard_deviation_from_array(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>values[],<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>nvalues,<sp/></highlight><highlight class="keywordtype">float</highlight><highlight class="normal"><sp/>mean);</highlight></codeline>
+<codeline lineno="216"><highlight class="normal"></highlight></codeline>
+<codeline lineno="217"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Special<sp/>sensor<sp/>codes</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="218"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Rain<sp/>gauge<sp/>-<sp/>will<sp/>wake<sp/>logger<sp/>up<sp/>and<sp/>cause<sp/>it<sp/>to<sp/>log<sp/>to<sp/>a<sp/>different<sp/>file</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="219"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>The<sp/>default<sp/>interrupt<sp/>is<sp/>Pin<sp/>3,<sp/>INT1<sp/>on<sp/>ATmega328<sp/>(ALog<sp/>BottleLogger).</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="220"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>This<sp/>runs<sp/>of<sp/>bool<sp/>_ext_int<sp/>=<sp/>true<sp/>in<sp/>loger.initialize()</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="221"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>TippingBucketRainGage();</highlight></codeline>
+<codeline lineno="222"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline lineno="223"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>Logging</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="224"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>start_logging_to_datafile();</highlight></codeline>
+<codeline lineno="225"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>start_logging_to_otherfile(</highlight><highlight class="keywordtype">char</highlight><highlight class="normal">*<sp/>filename);</highlight></codeline>
+<codeline lineno="226"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>end_logging_to_otherfile();</highlight></codeline>
+<codeline lineno="227"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>start_logging_to_headerfile();</highlight></codeline>
+<codeline lineno="228"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>end_logging_to_headerfile();</highlight></codeline>
+<codeline lineno="229"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>endLine();</highlight></codeline>
+<codeline lineno="230"><highlight class="normal"></highlight></codeline>
+<codeline lineno="231"><highlight class="normal">};</highlight></codeline>
+<codeline lineno="232"><highlight class="normal"></highlight></codeline>
+<codeline lineno="233"><highlight class="normal"></highlight><highlight class="comment">//<sp/>End<sp/>include<sp/>guard</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="234"><highlight class="normal"></highlight><highlight class="preprocessor">#endif<sp/><sp/></highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="235"><highlight class="normal"></highlight></codeline>
+    </programlisting>
+    <location file="Logger.h"/>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,187 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
+  <compounddef id="api_8md" kind="file" language="Markdown">
+    <compoundname>api.md</compoundname>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline><highlight class="normal">#<sp/>Summary</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/>Members<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>Descriptions<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline><highlight class="normal">--------------------------------|---------------------------------------------</highlight></codeline>
+<codeline><highlight class="normal">`define<sp/>`[`cbi`](#Logger_8cpp_1ae70baf5399951da1e7ad45a0ed890832)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`define<sp/>`[`sbi`](#Logger_8cpp_1ac4a5536d9bf092116f88b94797ddc882)<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`wakeUpNow`](#Logger_8cpp_1adee29828901ea1b4f99ce305fa3e17bd)`()`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`wakeUpNow_tip`](#Logger_8cpp_1a1a3b380e75d68eef4c3913816773e1b5)`()`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`_ISR_void`](#Logger_8cpp_1a9c215a00c214c880d04481d256d8d522)`()`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`_anemometer_count_increment`](#Logger_8cpp_1aa2e4ccb5b638347db4da535aac7ac209)`()`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`save_Aref`](#Logger_8cpp_1a144189fccfe80979cc2fcafefdf2728a)`(float<sp/>_V)`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>float<sp/>`[`read_Aref`](#Logger_8cpp_1ae9bf4d0d2809a902be80dbf825844636)`()`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`_internalDateTime`](#Logger_8cpp_1a7551515cf6f018df3d8d942710936aef)`(uint16_t<sp/>*<sp/>date,uint16_t<sp/>*<sp/>time)`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`wakeUpNow`](#Logger_8h_1adee29828901ea1b4f99ce305fa3e17bd)`()`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`wakeUpNow_tip`](#Logger_8h_1a1a3b380e75d68eef4c3913816773e1b5)`()`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`_ISR_void`](#Logger_8h_1a9c215a00c214c880d04481d256d8d522)`()`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`_anemometer_count_increment`](#Logger_8h_1aa2e4ccb5b638347db4da535aac7ac209)`()`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`_internalDateTime`](#Logger_8h_1a7551515cf6f018df3d8d942710936aef)`(uint16_t<sp/>*<sp/>date,uint16_t<sp/>*<sp/>time)`<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`class<sp/>`[`Logger`](#classLogger)<sp/>|<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Members</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`define<sp/>`[`cbi`](#Logger_8cpp_1ae70baf5399951da1e7ad45a0ed890832)<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`define<sp/>`[`sbi`](#Logger_8cpp_1ac4a5536d9bf092116f88b94797ddc882)<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`wakeUpNow`](#Logger_8cpp_1adee29828901ea1b4f99ce305fa3e17bd)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`wakeUpNow_tip`](#Logger_8cpp_1a1a3b380e75d68eef4c3913816773e1b5)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`_ISR_void`](#Logger_8cpp_1a9c215a00c214c880d04481d256d8d522)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`_anemometer_count_increment`](#Logger_8cpp_1aa2e4ccb5b638347db4da535aac7ac209)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`save_Aref`](#Logger_8cpp_1a144189fccfe80979cc2fcafefdf2728a)`(float<sp/>_V)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>float<sp/>`[`read_Aref`](#Logger_8cpp_1ae9bf4d0d2809a902be80dbf825844636)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`_internalDateTime`](#Logger_8cpp_1a7551515cf6f018df3d8d942710936aef)`(uint16_t<sp/>*<sp/>date,uint16_t<sp/>*<sp/>time)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`wakeUpNow`](#Logger_8h_1adee29828901ea1b4f99ce305fa3e17bd)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`wakeUpNow_tip`](#Logger_8h_1a1a3b380e75d68eef4c3913816773e1b5)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`_ISR_void`](#Logger_8h_1a9c215a00c214c880d04481d256d8d522)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`_anemometer_count_increment`](#Logger_8h_1aa2e4ccb5b638347db4da535aac7ac209)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`_internalDateTime`](#Logger_8h_1a7551515cf6f018df3d8d942710936aef)`(uint16_t<sp/>*<sp/>date,uint16_t<sp/>*<sp/>time)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">#<sp/>class<sp/>`Logger`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Summary</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal"><sp/>Members<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>|<sp/>Descriptions<sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight></codeline>
+<codeline><highlight class="normal">--------------------------------|---------------------------------------------</highlight></codeline>
+<codeline><highlight class="normal">`public<sp/><sp/>`[`Logger`](#classLogger_1abc41bfb031d896170c7675fa96a6b30c)`()`<sp/>|<sp/>[Logger](#classLogger)<sp/>library<sp/>for<sp/>the<sp/>Arduino-based<sp/>ALog<sp/>data<sp/>logger.</highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`initialize`](#classLogger_1a635c5dc0046646bec7023ef7133f0eb3)`(char<sp/>*<sp/>_logger_name,char<sp/>*<sp/>_datafilename,int<sp/>_hourInterval,int<sp/>_minInterval,int<sp/>_secInterval,bool<sp/>_ext_int,bool<sp/>_LOG_ON_BUCKET_TIP)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`setupLogger`](#classLogger_1ab5e0bd543758c65a17b77553a0e9f0c9)`()`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`sleep`](#classLogger_1ad90ff8f29410f6b70cc6334391400a4e)`()`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`goToSleep_if_needed`](#classLogger_1ad28cf6450ada04f0e1475998bede5b88)`()`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`startLogging`](#classLogger_1a4a6c78dd1715b33ae4bbd6f66f116f77)`()`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`endLogging`](#classLogger_1aa82814d61687debcf3b8dd6f46c9d549)`()`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`startAnalog`](#classLogger_1af936c7f58e23316abb5614cbd31c7ced)`()`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`endAnalog`](#classLogger_1adca7be8a63592263c67f63766680d16f)`()`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>bool<sp/>`[`get_use_sleep_mode`](#classLogger_1acc758b6fdaac8099c492929aa7f1691d)`()`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>float<sp/>`[`readPin`](#classLogger_1a343fcabefb37e06429865a2e6a6e708a)`(int<sp/>pin)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>float<sp/>`[`readPinOversample`](#classLogger_1a4e67526c65fa865f276a515a200af4aa)`(int<sp/>pin,int<sp/>bits)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>float<sp/>`[`analogReadOversample`](#classLogger_1ad8296890a14a0df83c2433a20f25b899)`(int<sp/>pin,uint8_t<sp/>adc_bits,int<sp/>nsamples,bool<sp/>debug)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>float<sp/>`[`thermistorB`](#classLogger_1a55d923b98a6c503fccb25bfd4af32f3d)`(float<sp/>R0,float<sp/>B,float<sp/>Rref,float<sp/>T0degC,int<sp/>thermPin,uint8_t<sp/>ADC_resolution_nbits,bool<sp/>Rref_on_GND_side,bool<sp/>oversample_debug,bool<sp/>record_results)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`ultrasonicMB_analog_1cm`](#classLogger_1a362a1462166d63ddc613eaa1e86f9854)`(int<sp/>nping,int<sp/>EX,int<sp/>sonicPin,bool<sp/>writeAll)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>float<sp/>`[`maxbotixHRXL_WR_Serial`](#classLogger_1a87ce56cb9c3dfc7abfd6308b2ee7dc10)`(int<sp/>Ex,int<sp/>nping,bool<sp/>writeAll,int<sp/>maxRange,bool<sp/>RS232)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`maxbotixHRXL_WR_analog`](#classLogger_1a3ce2869bbd48fdebbf44e155981c85b0)`(int<sp/>nping,int<sp/>sonicPin,int<sp/>EX,bool<sp/>writeAll,uint8_t<sp/>ADC_resolution_nbits)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`Decagon5TE`](#classLogger_1a40ae372dee7f672a6d6f33ab441e4da1)`(int<sp/>excitPin,int<sp/>dataPin)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`DecagonGS1`](#classLogger_1a84da6a9ec3d4d56fdc32d950b71f1a26)`(int<sp/>pin,float<sp/>Vref,uint8_t<sp/>ADC_resolution_nbits)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`vdivR`](#classLogger_1ab1ae31b2bdb77c86fb6851907258171b)`(int<sp/>pin,float<sp/>Rref,uint8_t<sp/>ADC_resolution_nbits,bool<sp/>Rref_on_GND_side)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`linearPotentiometer`](#classLogger_1a95670d06ec3b68300895cd7bf8c37999)`(int<sp/>linpotPin,float<sp/>Rref,float<sp/>slope,char<sp/>*<sp/>_distance_units,float<sp/>intercept,uint8_t<sp/>ADC_resolution_nbits,bool<sp/>Rref_on_GND_side)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`HTM2500LF_humidity_temperature`](#classLogger_1a4ccff7a14a6bddc8bb28e22b3b36d3cc)`(int<sp/>humidPin,int<sp/>thermPin,float<sp/>Rref_therm,uint8_t<sp/>ADC_resolution_nbits)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`HM1500LF_humidity_with_external_temperature`](#classLogger_1a62b74ddb3cf9fdd7dae2394c1b245ed4)`(int<sp/>humidPin,float<sp/>R0_therm,float<sp/>B_therm,float<sp/>Rref_therm,float<sp/>T0degC_therm,int<sp/>thermPin_therm,uint8_t<sp/>ADC_resolution_nbits)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`Inclinometer_SCA100T_D02_analog_Tcorr`](#classLogger_1a80fdea5a339573980f9544ac64678411)`(int<sp/>xPin,int<sp/>yPin,float<sp/>Vref,float<sp/>Vsupply,float<sp/>R0_therm,float<sp/>B_therm,float<sp/>Rref_therm,float<sp/>T0degC_therm,int<sp/>thermPin_therm,uint8_t<sp/>ADC_resolution_nbits)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`Anemometer_reed_switch`](#classLogger_1a6c6a43a1b86f88c2a5e33d14c992e510)`(int<sp/>interrupt_pin_number,unsigned<sp/>long<sp/>reading_duration_milliseconds,float<sp/>meters_per_second_per_rotation)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`Wind_Vane_Inspeed`](#classLogger_1a31c3cba5ff5722fb66bf540bfbe8b25d)`(int<sp/>vanePin)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`Pyranometer`](#classLogger_1ae4190ce7ccfd7b148a6151102a3bf93d)`(int<sp/>analogPin,float<sp/>raw_mV_per_W_per_m2,float<sp/>gain,float<sp/>V_ref,uint8_t<sp/>ADC_resolution_nbits)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`Barometer_BMP180`](#classLogger_1a40588117a274f0c6de926ef6ce1f0ba8)`()`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`_sensor_function_template`](#classLogger_1a98f3cc370c87d1e1eaf3eb6a7e0f1623)`(int<sp/>pin,float<sp/>param1,float<sp/>param2,int<sp/>ADC_bits,bool<sp/>flag)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>void<sp/>`[`HackHD`](#classLogger_1a923b296832bd4222da649ebc66427ac1)`(int<sp/>control_pin,bool<sp/>want_camera_on)`<sp/>|<sp/></highlight></codeline>
+<codeline><highlight class="normal">`public<sp/>float<sp/>`[`Honeywell_HSC_analog`](#classLogger_1a9808967fdf91f10602aa883df35145b3)`(int<sp/>pin,float<sp/>Vsupply,float<sp/>Vref,float<sp/>Pmin,float<sp/>Pmax,int<sp/>TransferFunction_number,int<sp/>units,uint8_t<sp/>ADC_resolution_nbits)`<sp/>|<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">##<sp/>Members</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/><sp/>`[`Logger`](#classLogger_1abc41bfb031d896170c7675fa96a6b30c)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">[Logger](#classLogger)<sp/>library<sp/>for<sp/>the<sp/>Arduino-based<sp/>ALog<sp/>data<sp/>logger.</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">ALog<sp/>data<sp/>logger<sp/>library:<sp/>methods<sp/>to:</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*<sp/>Initialize<sp/>the<sp/>data<sp/>logger</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*<sp/>Sleep<sp/>and<sp/>wake</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*<sp/>Interact<sp/>with<sp/>the<sp/>real-time<sp/>clock<sp/>(RTC)</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*<sp/>Write<sp/>data<sp/>to<sp/>the<sp/>SD<sp/>card</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*<sp/>Manage<sp/>power</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">*<sp/>Interact<sp/>with<sp/>a<sp/>range<sp/>of<sp/>sensors</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">All<sp/>help<sp/>documentation<sp/>here<sp/>assumes<sp/>you<sp/>have<sp/>created<sp/>an<sp/>instance<sp/>of<sp/>the<sp/>&quot;Logger&quot;<sp/></highlight></codeline>
+<codeline><highlight class="normal">```cpp</highlight></codeline>
+<codeline><highlight class="normal">logger<sp/>Logger();</highlight></codeline>
+<codeline><highlight class="normal">```</highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`initialize`](#classLogger_1a635c5dc0046646bec7023ef7133f0eb3)`(char<sp/>*<sp/>_logger_name,char<sp/>*<sp/>_datafilename,int<sp/>_hourInterval,int<sp/>_minInterval,int<sp/>_secInterval,bool<sp/>_ext_int,bool<sp/>_LOG_ON_BUCKET_TIP)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`setupLogger`](#classLogger_1ab5e0bd543758c65a17b77553a0e9f0c9)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`sleep`](#classLogger_1ad90ff8f29410f6b70cc6334391400a4e)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`goToSleep_if_needed`](#classLogger_1ad28cf6450ada04f0e1475998bede5b88)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`startLogging`](#classLogger_1a4a6c78dd1715b33ae4bbd6f66f116f77)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`endLogging`](#classLogger_1aa82814d61687debcf3b8dd6f46c9d549)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`startAnalog`](#classLogger_1af936c7f58e23316abb5614cbd31c7ced)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`endAnalog`](#classLogger_1adca7be8a63592263c67f63766680d16f)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>bool<sp/>`[`get_use_sleep_mode`](#classLogger_1acc758b6fdaac8099c492929aa7f1691d)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>float<sp/>`[`readPin`](#classLogger_1a343fcabefb37e06429865a2e6a6e708a)`(int<sp/>pin)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>float<sp/>`[`readPinOversample`](#classLogger_1a4e67526c65fa865f276a515a200af4aa)`(int<sp/>pin,int<sp/>bits)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>float<sp/>`[`analogReadOversample`](#classLogger_1ad8296890a14a0df83c2433a20f25b899)`(int<sp/>pin,uint8_t<sp/>adc_bits,int<sp/>nsamples,bool<sp/>debug)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>float<sp/>`[`thermistorB`](#classLogger_1a55d923b98a6c503fccb25bfd4af32f3d)`(float<sp/>R0,float<sp/>B,float<sp/>Rref,float<sp/>T0degC,int<sp/>thermPin,uint8_t<sp/>ADC_resolution_nbits,bool<sp/>Rref_on_GND_side,bool<sp/>oversample_debug,bool<sp/>record_results)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`ultrasonicMB_analog_1cm`](#classLogger_1a362a1462166d63ddc613eaa1e86f9854)`(int<sp/>nping,int<sp/>EX,int<sp/>sonicPin,bool<sp/>writeAll)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>float<sp/>`[`maxbotixHRXL_WR_Serial`](#classLogger_1a87ce56cb9c3dfc7abfd6308b2ee7dc10)`(int<sp/>Ex,int<sp/>nping,bool<sp/>writeAll,int<sp/>maxRange,bool<sp/>RS232)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`maxbotixHRXL_WR_analog`](#classLogger_1a3ce2869bbd48fdebbf44e155981c85b0)`(int<sp/>nping,int<sp/>sonicPin,int<sp/>EX,bool<sp/>writeAll,uint8_t<sp/>ADC_resolution_nbits)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`Decagon5TE`](#classLogger_1a40ae372dee7f672a6d6f33ab441e4da1)`(int<sp/>excitPin,int<sp/>dataPin)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`DecagonGS1`](#classLogger_1a84da6a9ec3d4d56fdc32d950b71f1a26)`(int<sp/>pin,float<sp/>Vref,uint8_t<sp/>ADC_resolution_nbits)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`vdivR`](#classLogger_1ab1ae31b2bdb77c86fb6851907258171b)`(int<sp/>pin,float<sp/>Rref,uint8_t<sp/>ADC_resolution_nbits,bool<sp/>Rref_on_GND_side)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`linearPotentiometer`](#classLogger_1a95670d06ec3b68300895cd7bf8c37999)`(int<sp/>linpotPin,float<sp/>Rref,float<sp/>slope,char<sp/>*<sp/>_distance_units,float<sp/>intercept,uint8_t<sp/>ADC_resolution_nbits,bool<sp/>Rref_on_GND_side)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`HTM2500LF_humidity_temperature`](#classLogger_1a4ccff7a14a6bddc8bb28e22b3b36d3cc)`(int<sp/>humidPin,int<sp/>thermPin,float<sp/>Rref_therm,uint8_t<sp/>ADC_resolution_nbits)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`HM1500LF_humidity_with_external_temperature`](#classLogger_1a62b74ddb3cf9fdd7dae2394c1b245ed4)`(int<sp/>humidPin,float<sp/>R0_therm,float<sp/>B_therm,float<sp/>Rref_therm,float<sp/>T0degC_therm,int<sp/>thermPin_therm,uint8_t<sp/>ADC_resolution_nbits)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`Inclinometer_SCA100T_D02_analog_Tcorr`](#classLogger_1a80fdea5a339573980f9544ac64678411)`(int<sp/>xPin,int<sp/>yPin,float<sp/>Vref,float<sp/>Vsupply,float<sp/>R0_therm,float<sp/>B_therm,float<sp/>Rref_therm,float<sp/>T0degC_therm,int<sp/>thermPin_therm,uint8_t<sp/>ADC_resolution_nbits)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`Anemometer_reed_switch`](#classLogger_1a6c6a43a1b86f88c2a5e33d14c992e510)`(int<sp/>interrupt_pin_number,unsigned<sp/>long<sp/>reading_duration_milliseconds,float<sp/>meters_per_second_per_rotation)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`Wind_Vane_Inspeed`](#classLogger_1a31c3cba5ff5722fb66bf540bfbe8b25d)`(int<sp/>vanePin)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`Pyranometer`](#classLogger_1ae4190ce7ccfd7b148a6151102a3bf93d)`(int<sp/>analogPin,float<sp/>raw_mV_per_W_per_m2,float<sp/>gain,float<sp/>V_ref,uint8_t<sp/>ADC_resolution_nbits)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`Barometer_BMP180`](#classLogger_1a40588117a274f0c6de926ef6ce1f0ba8)`()`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`_sensor_function_template`](#classLogger_1a98f3cc370c87d1e1eaf3eb6a7e0f1623)`(int<sp/>pin,float<sp/>param1,float<sp/>param2,int<sp/>ADC_bits,bool<sp/>flag)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>void<sp/>`[`HackHD`](#classLogger_1a923b296832bd4222da649ebc66427ac1)`(int<sp/>control_pin,bool<sp/>want_camera_on)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">####<sp/>`public<sp/>float<sp/>`[`Honeywell_HSC_analog`](#classLogger_1a9808967fdf91f10602aa883df35145b3)`(int<sp/>pin,float<sp/>Vsupply,float<sp/>Vref,float<sp/>Pmin,float<sp/>Pmax,int<sp/>TransferFunction_number,int<sp/>units,uint8_t<sp/>ADC_resolution_nbits)`<sp/></highlight></codeline>
+<codeline></codeline>
+<codeline><highlight class="normal">Generated<sp/>by<sp/>[Moxygen](https://sourcey.com/moxygen)</highlight></codeline>
+    </programlisting>
+    <location file="api.md"/>
+  </compounddef>
+</doxygen>
