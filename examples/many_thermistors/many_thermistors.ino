@@ -20,55 +20,55 @@ bool external_interrupt = false; // e.g., rain gage
 void setup(){  //Serial baud rate is set to 38400
   logger.initialize(dataLoggerName, fileName,
     Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, 
-    external_interrupt);logger.setupLogger();
+    external_interrupt);
+  logger.setupLogger();
 }
 
 void loop(){
-// ***************************************** 
-logger.goToSleep_if_needed(); // Send logger to sleep
-logger.startLogging();  // Wake up and initialize
-// ****** DO NOT EDIT ABOVE THIS LINE ****** 
+  // ***************************************** 
+  logger.goToSleep_if_needed(); // Send logger to sleep
+  logger.startLogging();  // Wake up and initialize
+  // ****** DO NOT EDIT ABOVE THIS LINE ****** 
 
-//////////////////////////////////
-// READ SENSORS: EDIT THIS PART //
-//////////////////////////////////
+  //////////////////////////////////
+  // READ SENSORS: EDIT THIS PART //
+  //////////////////////////////////
 
-// Analog sensors: place all analog sensor commands between
-// startAnalog() and endAnalog().
-// If you have no analog sensors, you should comment out the 
-// startAnalog() and endAnalog() commands
+  // Analog sensors: place all analog sensor commands between
+  // startAnalog() and endAnalog().
+  // If you have no analog sensors, you should comment out the 
+  // startAnalog() and endAnalog() commands
 
-logger.startAnalog();
+  logger.startAnalog();
 
-// Arguments in order:
-// 1. Resistance R0 at temperature T0
-// 2. b-value
-// 3. Reference resistor resistance
-// 4. Temperature T0 at which thermistor resistance is R0
-// 5. Analog pin to which thermistor is attached.
-logger.thermistorB(10000, 3950, 10000, 25, 0); 
-logger.thermistorB(10000, 3950, 10000, 25, 1); 
-logger.thermistorB(10000, 3950, 10000, 25, 2); 
-logger.thermistorB(10000, 3950, 10000, 25, 3); 
-logger.thermistorB(10000, 3950, 10000, 25, 6); 
-logger.thermistorB(10000, 3950, 10000, 25, 7); 
+  // Arguments in order:
+  // 1. Resistance R0 at temperature T0
+  // 2. b-value
+  // 3. Reference resistor resistance
+  // 4. Temperature T0 at which thermistor resistance is R0
+  // 5. Analog pin to which thermistor is attached.
+  logger.thermistorB(10000, 3950, 10000, 25, 0); 
+  logger.thermistorB(10000, 3950, 10000, 25, 1); 
+  logger.thermistorB(10000, 3950, 10000, 25, 2); 
+  logger.thermistorB(10000, 3950, 10000, 25, 3); 
+  logger.thermistorB(10000, 3950, 10000, 25, 6); 
+  logger.thermistorB(10000, 3950, 10000, 25, 7); 
 
-logger.endAnalog();
+  logger.endAnalog();
 
-//
-// INSERT DIGITAL SENSOR READING COMMANDS HERE!
-//
+  //
+  // INSERT DIGITAL SENSOR READING COMMANDS HERE!
+  //
 
-// NOTE: THE BUFFER SIZE IS (CHECK ON THIS!!!!!!!!!!!!!!) 256 BYTES;
-// run "logger.bufferWrite" if you think you are approaching this limit.
-// Otherwise, the buffer will overflow and I'm not sure what will happen.
+  // NOTE: THE BUFFER SIZE IS (CHECK ON THIS!!!!!!!!!!!!!!) 256 BYTES;
+  // run "logger.bufferWrite" if you think you are approaching this limit.
+  // Otherwise, the buffer will overflow and I'm not sure what will happen.
 
 
-// ****** DO NOT EDIT BELOW THIS LINE ****** 
+  // ****** DO NOT EDIT BELOW THIS LINE ****** 
 
-// Wrap up files, turn off SD card, and go back to sleep
-logger.endLogging();
+  // Wrap up files, turn off SD card, and go back to sleep
+  logger.endLogging();
 
-// ***************************************** 
-
+  // ***************************************** 
 }
