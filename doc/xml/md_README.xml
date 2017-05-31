@@ -1,9 +1,0 @@
-<?xml version='1.0' encoding='UTF-8' standalone='no'?>
-<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.13">
-  <compounddef id="md_README" kind="page">
-    <compoundname>md_README</compoundname>
-    <title>Logger</title>
-    <detaileddescription>
-<para>&quot;Logger&quot; is the data logger library for the Arduino-based ALog (<ulink url="http://northernwidget.com/alog/">http://northernwidget.com/alog/</ulink>) developed by Andy Wickert and Chad Sandell at Northern Widget LLC and the University of Minnesota.</para><para>While it is developed to work specifically with the ALog, it will also work with a standard Arduino that is outfitted with a SD card and a DS3231 real-time clock.</para><para>&quot;Logger&quot; is optimized to handle all of the basic file, system, and power management behind-the-scenes, and to reduce power consumption to minimal levels through the use of the sleep functions. It exposes sensor functions as single-line calls, and includes a template for the addition of new sensors.</para><para>For questions related to the <ref refid="classLogger" kindref="compound">Logger</ref> library, please send a message to us at <ulink url="mailto:info@northernwidget.com">info@northernwidget.com</ulink>. </para>    </detaileddescription>
-  </compounddef>
-</doxygen>
