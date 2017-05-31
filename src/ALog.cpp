@@ -63,6 +63,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ASSIGN PINS //
 /////////////////
 
+// These can be variable; default values here are for the ALog shield
+// No pin is appropriate for the ALog shield for SDpowerPin and RTCpowerPin,
+// as these are controlled by the internal 3V3 regulator
+int8_t LEDpin = 9;
+int8_t SDpowerPin = -1;
+int8_t RTCpowerPin = -1;
+
 // True for all: UNO (ATMega168/328)
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
   // SD card: CSpin and protected pins
@@ -79,22 +86,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
   const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
   const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
-#endif
-#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
-  // 7 for both??? START HERE!
-  const int SDpowerPin = 7; // Turns on voltage source to SD card
-  const int ClockPowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
-  const int LEDpin = 8; // LED to tell user if logger is working properly  
-#elif defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200)
-  // IS IT EVEN TRUE HERE THAT THERE ARE MULTIPLE PINS USED FOR SD AND CLOCK? START HERE!
-  const int SDpowerPin = 8; // Turns on voltage source to SD card
-  const int ClockPowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
-  const int LEDpin = 9; // LED to tell user if logger is working properly  
-# else
-  // Using placeholder values
-  int8_t SDpowerPin = -1;
-  int8_t ClockPowerPin = -1;
-  int8_t LEDpin = -1;
+  #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
+    // 7 for both? Maybe this is better than redefining variables.
+    // GitHub issue is open on this; should guide future decisions
+    SDpowerPin = 7; // Turns on voltage source to SD card
+    RTCpowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+    LEDpin = 8; // LED to tell user if logger is working properly  
+  #elif defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200)
+    // IS IT EVEN TRUE HERE THAT THERE ARE MULTIPLE PINS USED FOR SD AND CLOCK? START HERE!
+    SDpowerPin = 8; // Turns on voltage source to SD card
+    RTCpowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+    LEDpin = 9; // LED to tell user if logger is working properly  
+  #endif
 #endif
 // True for all: MEGA (ATMega1280/2560)
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
@@ -381,9 +384,6 @@ void ALog::initialize(char* _logger_name, char* _datafilename, \
 }
 
 void ALog::setupLogger(){
-
-  wdt_reset();
-
   /**
    * @brief 
    * Readies the ALog to begin measurements
@@ -392,6 +392,9 @@ void ALog::setupLogger(){
    * Sets all pins, alarms, clock, SD card, etc: everything needed for the
    * ALog to run properly.
    */
+
+  wdt_reset();
+
   Serial.println(F("Beginning logger setup."));
 
   // We use a 3.3V regulator that we can switch on and off (to conserve power) 
@@ -413,7 +416,7 @@ void ALog::setupLogger(){
   pinMode(SensorPowerPin,OUTPUT);
   pinMode(LEDpin,OUTPUT);
   pinMode(SDpowerPin,OUTPUT);
-  pinMode(ClockPowerPin,OUTPUT);
+  pinMode(RTCpowerPin,OUTPUT);
   // Manual wake pin
   pinMode(manualWakePin,INPUT); // LOG NOW button
   digitalWrite(manualWakePin,HIGH); // enable internal 20K pull-up
@@ -437,8 +440,7 @@ void ALog::setupLogger(){
   Wire.begin();
   Wire.setTimeout(100);
 
-  SDpowerOn();
-  RTCon();
+  SDon_RTCon();
 
   /////////////////
   // CHECK CLOCK //
@@ -539,8 +541,7 @@ void ALog::setupLogger(){
   delay(20);
 
   if (_use_sleep_mode){
-    SDpowerOff();
-    RTCsleep();
+    SDoff_RTCsleep();
   }
   wdt_reset();
 }
@@ -562,6 +563,41 @@ bool ALog::get_use_sleep_mode(){
   return _use_sleep_mode;
 }
 
+void ALog::set_LEDpin(int8_t _pin){
+  /**
+   * @brief Set which pin to use for the main indicator LED.
+   * 
+   * @details
+   * Run this, if needed, before setupLogger()
+   */
+  LEDpin = _pin;
+}
+
+void ALog::set_SDpowerPin(int8_t _pin){
+  /**
+   * @brief Set which pin activates the 3V3 regulator to power the SD card.
+   * 
+   * @details
+   * * Set to -1 if not being used
+   * * Set to the same as RTCpowerPin if these are connected
+   *   (standard for the ALog BottleLogger)
+   * Run this, if needed, before setupLogger()
+   */
+   SDpowerPin = _pin;
+}
+void ALog::set_RTCpowerPin(int8_t _pin){
+  /**
+   * @brief Set which pin activates the 3V3 regulator to power the RTC 
+   *        (real-time clock).
+   * 
+   * @details
+   * * Set to -1 if not being used
+   * * Set to the same as SDpowerPin if these are connected
+   *   (standard for the ALog BottleLogger)
+   * Run this, if needed, before setupLogger()
+   */
+   RTCpowerPin = _pin;
+}
 
 /////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS: UTILITIES FOR LOGGER LIBRARY //
@@ -571,8 +607,8 @@ void ALog::pinUnavailable(uint8_t pin){
   int _errorFlag = 0;
 
   char* _pinNameList_crit[9] = {"CSpin", "SensorPowerPin", "SDpowerPin", \
-                                "ClockPowerPin", "LEDpin", "wakePin"};
-  int _pinList_crit[9] = {CSpin, SensorPowerPin, SDpowerPin, ClockPowerPin, \
+                                "RTCpowerPin", "LEDpin", "wakePin"};
+  int _pinList_crit[9] = {CSpin, SensorPowerPin, SDpowerPin, RTCpowerPin, \
                           LEDpin, wakePin};
 
   char* _pinNameList[9] = {"MISOpin", "MOSIpin", "SCKpin", "SDApin", \
@@ -774,7 +810,7 @@ void ALog::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
         AlarmBits |= ALRM1_SET;
   */
 
-  RTCon();
+  SDon_RTCon();
 
   byte AlarmBits = 0b01001000;
   Clock.turnOffAlarm(1); //Turn off alarms before setting.
@@ -1081,32 +1117,23 @@ float ALog::_vdivR(uint8_t pin, float Rref, uint8_t adc_bits, \
   return _R;
 }
 
-void ALog::RTCon(){
-  // Turn on power clock
-  pinMode(SDpowerPin,OUTPUT);
+void ALog::SDon_RTCon(){
+  // Turn on power to clock and SD card
   digitalWrite(SDpowerPin,HIGH); //Chad -- one model's pull-ups attached to SDpowerPin
-  digitalWrite(ClockPowerPin,HIGH);
+  digitalWrite(RTCpowerPin,HIGH);
   delay(20);
 }
 
-void ALog::RTCsleep(){
-  // Turn off power clock
-  // At this point, it runs on VCC (if logger is powered... which it is
+void ALog::SDoff_RTCsleep(){
+  // Turn off power to the clock (RTC) and SD card
+  // At this point, the RTC runs on VCC (if logger is powered... which it is
   // if this program is running) via the backup battery power supply.
   // This "tricks" it into turning off its I2C bus and saves power on the
   // board, but keeps its alarm functionality on.
   // (Idea to do this courtesy of Gerhard Oberforcher)
   digitalWrite(SDpowerPin,LOW); //Chad -- one model's pull-ups attached to SDpowerPin 
-  digitalWrite(ClockPowerPin,LOW);
+  digitalWrite(RTCpowerPin,LOW);
   delay(2);
-}
-
-void ALog::SDpowerOn(){
-  digitalWrite(SDpowerPin,HIGH);
-}
-
-void ALog::SDpowerOff(){
-  digitalWrite(SDpowerPin,LOW);
 }
 
 ////////////////////////////////////////////////////////////
@@ -1166,8 +1193,7 @@ void ALog::startLogging(){
   wdt_disable();
   wdt_enable(WDTO_8S);    // Enable the watchdog timer interupt.
   // Turn power on
-  SDpowerOn();
-  RTCon();
+  SDon_RTCon();
 
   checkAlarms(); //Check and clear flag
   //displayAlarms();  // Verify Alarms and display time // Here for debugging
@@ -1242,7 +1268,6 @@ void ALog::endLogging(){
    * an unforeseen circumstance in which it is not!
    */
   endLine();
-  //SDpowerOn();
   // Write all of the data to the file
   // The buffer is 256 bytes, I think -- so need to use this in-between
   // if there are too many data
@@ -1300,7 +1325,7 @@ void ALog::endLogging(){
     }
     //displayAlarms();  // Verify Alarms and display time
     delay(2);
-    RTCsleep();
+    SDoff_RTCsleep();
     delay(2);
   }
   // After this step, since everything is in the loop() part of the Arduino
@@ -1802,7 +1827,6 @@ void ALog::ultrasonicMB_analog_1cm(uint8_t nping, uint8_t Ex, uint8_t sonicPin,
       }
       Serial.print(range);
       Serial.print(F(","));
-      //SDpowerOn();
       datafile.print(range);
       datafile.print(F(","));
       //SDpowerOff();
@@ -1935,7 +1959,6 @@ void ALog::maxbotixHRXL_WR_analog(uint8_t nping, uint8_t sonicPin, uint8_t EX, \
       }
       Serial.print(range, 0);
       Serial.print(F(","));
-      //SDpowerOn();
       datafile.print(range, 0);
       datafile.print(F(","));
       //SDpowerOff();
@@ -2928,7 +2951,6 @@ void ALog::TippingBucketRainGage(){
 
   pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
   // might want to use a digitalread for better incorporation into normal logging cycle
-  //SDpowerOn();
 
   // Callback to set date and time in SD card file metadata
   // Following: https://forum.arduino.cc/index.php?topic=348562.0

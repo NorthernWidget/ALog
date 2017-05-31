@@ -106,6 +106,9 @@ class ALog {
     
     // Getters and setters
     bool get_use_sleep_mode();
+    void set_LEDpin(int8_t _pin);
+    void set_SDpowerPin(int8_t _pin);
+    void set_RTCpowerPin(int8_t _pin);
     
     // Sensors - standard procedure (wake up, log, sleep)
     float readPin(uint8_t pin);
@@ -189,13 +192,9 @@ class ALog {
     void establishContact_Tx();
     bool establishContact_Rx();
     
-    // Clock power
-    void RTCon();
-    void RTCsleep();
-    
-    // SD card power
-    void SDpowerOn();
-    void SDpowerOff();
+    // Clock and SD card power
+    void SDon_RTCon();
+    void SDoff_RTCsleep();
     
     // Clock setting
     void clockSet();
