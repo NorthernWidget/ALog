@@ -55,21 +55,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // MAYBE PUT UNDERSCORES BEFORE ALL OF THESE VARS, IF I THINK THERE IS RISK OF 
 // RE-DEFINING THEM IN SKETCH
 
-// DEFINE BOARD TYPE
-
-// First, give integer values to the different board types
-const int bottle_logger=0;
-const int big_log=1;
-const int log_mega=2; // In development
-
 // DECLARE PINS
-// Should do the full declaration here with some "if's" so I can do "const int"
+// Full declaration here with some "if's" so I can do "const [int/byte/...]"
+// Compiler optimizes all ints below, so no need to convert to byte
 
 /////////////////
 // ASSIGN PINS //
 /////////////////
 
-// True for all: UNO (ATMega328)
+// True for all: UNO (ATMega168/328)
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
   // SD card: CSpin and protected pins
   const int SCKpin = 13;
@@ -98,10 +92,11 @@ const int log_mega=2; // In development
   const int LEDpin = 9; // LED to tell user if logger is working properly  
 # else
   // Using placeholder values
-  const int SDpowerPin = -1;
-  const int ClockPowerPin = -1;
-  const int LEDpin = -1;
+  int8_t SDpowerPin = -1;
+  int8_t ClockPowerPin = -1;
+  int8_t LEDpin = -1;
 #endif
+// True for all: MEGA (ATMega1280/2560)
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   // SD card: CSpin and protected pins
   const int SCKpin = 52;
@@ -143,13 +138,13 @@ const bool h12 = false;
 
 // Logging interval - wake when minutes == this
 //int log_minutes; //**chad delete when new alarm works
-int hourInterval;
-int minInterval;
-int secInterval;
+uint8_t hourInterval;
+uint8_t minInterval;
+uint8_t secInterval;
 // Alarm counters
-int _hours;
-int _minutes;
-int _seconds;
+uint8_t _hours;
+uint8_t _minutes;
+uint8_t _seconds;
 
 // Use the sleep mode?
 bool _use_sleep_mode = true; // Defaults to true
@@ -182,7 +177,8 @@ bool LOG_ALL_SENSORS_ON_BUCKET_TIP; // Defaults to False, true if you should
 bool first_log_after_booting_up = true;
 
 // Rotation count for anemometer
-unsigned int rotation_count = 0;
+// Unlikely to go over 255...???
+uint8_t rotation_count = 0;
 
 // Generic output from an ASCII char array
 //char ASCII_out[100];
@@ -571,7 +567,7 @@ bool ALog::get_use_sleep_mode(){
 // PRIVATE FUNCTIONS: UTILITIES FOR LOGGER LIBRARY //
 /////////////////////////////////////////////////////
 
-void ALog::pinUnavailable(int pin){
+void ALog::pinUnavailable(uint8_t pin){
   int _errorFlag = 0;
 
   char* _pinNameList_crit[9] = {"CSpin", "SensorPowerPin", "SDpowerPin", \
@@ -793,8 +789,8 @@ void ALog::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
   // This is a backup alarm that will wake the logger in case it misses the
   // first alarm for some unknown reason
-  int _hours_backup = _hours;
-  int _minutes_backup = _minutes+2;
+  uint8_t _hours_backup = _hours;
+  uint8_t _minutes_backup = _minutes+2;
 
   if(_minutes_backup > 59){_minutes_backup = _minutes_backup - 60; _hours_backup++;}
   if(_hours_backup > 23){_hours_backup = _hours_backup - 24;}
@@ -830,7 +826,7 @@ void ALog::displayAlarms(){
             // migration to a fully RTClib-compatible system
   bool Apm; // Empty, but must be declared for clock function
   bool A12h = false;
-  byte ADay, AHour, AMinute, ASecond, AlarmBits;
+  uint8_t ADay, AHour, AMinute, ASecond, AlarmBits;
   Serial.print(F("Alarm 1 (d/h/m/s): "));
 	Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
 	/*
@@ -989,11 +985,12 @@ void ALog::displayTime(){
   delay(2);
 }
 
-void ALog::LEDwarn(int nflash)
+void ALog::LEDwarn(uint8_t nflash)
 {
   // Flash LED quickly to say that the SD card (and therefore the logger)
   // has not properly initialized upon restart
-  for(int i=0;i<=nflash;i++){
+  // No
+  for(uint8_t i=0;i<=nflash;i++){
     digitalWrite(LEDpin,HIGH);
     delay(40);
     digitalWrite(LEDpin,LOW);
@@ -1017,11 +1014,11 @@ void ALog::LEDgood()
   digitalWrite(LEDpin,LOW);
 }
 
-void ALog::LEDtimeWrong(int ncycles)
+void ALog::LEDtimeWrong(uint8_t ncycles)
 {
   // Syncopated pattern to show that the clock has probably reset to January
   // 1st, 2000
-  for(int i=0;i<=ncycles;i++)
+  for(uint8_t i=0;i<=ncycles;i++)
   {
     digitalWrite(LEDpin,HIGH);
     delay(250);
@@ -1061,7 +1058,7 @@ void ALog::endLine(){
   Serial.println();
 }
 
-float ALog::_vdivR(int pin, float Rref, uint8_t adc_bits, \
+float ALog::_vdivR(uint8_t pin, float Rref, uint8_t adc_bits, \
             bool Rref_on_GND_side, bool oversample_debug){
   // Same as public vidvR code, but returns value instead of 
   // saving it to a file
@@ -1334,7 +1331,7 @@ void ALog::endAnalog(){
 // Read analog pin
 //////////////////////////////
 
-float ALog::readPin(int pin){
+float ALog::readPin(uint8_t pin){
 
   /**
    * @brief Read the analog value of a pin.
@@ -1377,7 +1374,7 @@ float ALog::readPin(int pin){
 
 }
 
-float ALog::readPinOversample(int pin, int bits){
+float ALog::readPinOversample(uint8_t pin, uint8_t bits){
 
   /**
    * @brief 
@@ -1436,8 +1433,8 @@ float ALog::readPinOversample(int pin, int bits){
 //////////////////////////////
 
 float ALog::thermistorB(float R0, float B, float Rref, float T0degC, \
-            int thermPin, uint8_t ADC_resolution_nbits, bool Rref_on_GND_side, 
-            bool oversample_debug, bool record_results){
+            uint8_t thermPin, uint8_t ADC_resolution_nbits, \
+            bool Rref_on_GND_side, bool oversample_debug, bool record_results){
 
   /**
    * @brief 
@@ -1533,7 +1530,7 @@ float ALog::thermistorB(float R0, float B, float Rref, float T0degC, \
 // by TE Connectivity Measurement Specialties
 ///////////////////////////////////////////////
 
-void ALog::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
+void ALog::HTM2500LF_humidity_temperature(uint8_t humidPin, uint8_t thermPin, \
            float Rref_therm, uint8_t ADC_resolution_nbits){
 
   /**
@@ -1630,9 +1627,9 @@ void ALog::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
 // by TE Connectivity Measurement Specialties
 ///////////////////////////////////////////////
 
-void ALog::HM1500LF_humidity_with_external_temperature(int humidPin, \
+void ALog::HM1500LF_humidity_with_external_temperature(uint8_t humidPin, \
            float R0_therm, float B_therm, float Rref_therm, \
-           float T0degC_therm, int thermPin_therm, \
+           float T0degC_therm, uint8_t thermPin_therm, \
            uint8_t ADC_resolution_nbits){
 
   /**
@@ -1728,7 +1725,7 @@ void ALog::HM1500LF_humidity_with_external_temperature(int humidPin, \
 // 1 cm = 1 10-bit ADC interval
 //////////////////////////////////////////////////////////////
 
-void ALog::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, 
+void ALog::ultrasonicMB_analog_1cm(uint8_t nping, uint8_t Ex, uint8_t sonicPin, 
            bool writeAll){
 
   /**
@@ -1853,7 +1850,7 @@ void ALog::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin,
 
 }
 
-void ALog::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
+void ALog::maxbotixHRXL_WR_analog(uint8_t nping, uint8_t sonicPin, uint8_t EX, \
            bool writeAll, uint8_t ADC_resolution_nbits){
   /**
    * @brief Newer 1-mm precision MaxBotix rangefinders: analog readings
@@ -1984,7 +1981,7 @@ void ALog::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
 
 }
 
-float ALog::maxbotixHRXL_WR_Serial(int Ex, int npings, bool writeAll, \
+float ALog::maxbotixHRXL_WR_Serial(uint8_t Ex, uint8_t npings, bool writeAll, \
             int maxRange, bool RS232){
   /**
    * @brief
@@ -2133,7 +2130,7 @@ float ALog::standard_deviation_from_array(int values[], int nvalues,
   return sqrt(sumsquares/nvalues);
 }
 
-int ALog::maxbotix_Serial_parse(int Ex){
+int ALog::maxbotix_Serial_parse(uint8_t Ex){
   // NOTE: Currently assumes only one Serial port.
   // Excites the MaxBotix sensor and receives its ranging output
   char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
@@ -2201,9 +2198,9 @@ int ALog::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
 }
 */
 
-void ALog::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
+void ALog::Inclinometer_SCA100T_D02_analog_Tcorr(uint8_t xPin, uint8_t yPin, \
            float Vref, float Vsupply, float R0_therm, float B_therm, \
-           float Rref_therm, float T0degC_therm, int thermPin_therm, \
+           float Rref_therm, float T0degC_therm, uint8_t thermPin_therm, \
            uint8_t ADC_resolution_nbits){
   /**
    * @brief 
@@ -2322,7 +2319,7 @@ void ALog::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
 
 }
 
-void ALog::Anemometer_reed_switch(int interrupt_pin_number, \
+void ALog::Anemometer_reed_switch(uint8_t interrupt_pin_number, \
            unsigned long reading_duration_milliseconds, \
            float meters_per_second_per_rotation){
   /** 
@@ -2420,7 +2417,7 @@ void ALog::Anemometer_reed_switch(int interrupt_pin_number, \
   
 }
 
-void ALog::Wind_Vane_Inspeed(int vanePin){
+void ALog::Wind_Vane_Inspeed(uint8_t vanePin){
   /**
    * @brief
    * Wind vane: resistance changes with angle to wind.
@@ -2464,9 +2461,8 @@ void ALog::Wind_Vane_Inspeed(int vanePin){
   Serial.print(F(","));
 }
 
-void ALog::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
-           float gain, float V_ref, \
-           uint8_t ADC_resolution_nbits){
+void ALog::Pyranometer(uint8_t analogPin, float raw_mV_per_W_per_m2, \
+           float gain, float V_ref, uint8_t ADC_resolution_nbits){
   /**
    * @brief
    * Pyranometer wtih instrumentation amplifier
@@ -2527,8 +2523,8 @@ void ALog::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
   Serial.print(F(","));
 }
 
-float ALog::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
-            bool debug){
+float ALog::analogReadOversample(uint8_t pin, uint8_t adc_bits, \
+            uint8_t nsamples, bool debug){
   /**
    * @brief 
    * Higher analog resolution through oversampling
@@ -2715,8 +2711,8 @@ else Serial.println(F("BMP180 init fail"));
 // working; it is like it is not even there in this case.
 }
 
-void ALog::_sensor_function_template(int pin, float param1, float param2, 
-           int ADC_bits, bool flag){
+void ALog::_sensor_function_template(uint8_t pin, float param1, float param2, 
+           uint8_t ADC_bits, bool flag){
   /**
    * @brief 
    * Function to help lay out a new sensor interface.
@@ -3044,7 +3040,7 @@ void ALog::end_logging_to_headerfile(){
   delay(10);
 }
 
-void ALog::Decagon5TE(int excitPin, int dataPin){
+void ALog::Decagon5TE(uint8_t excitPin, uint8_t dataPin){
   /**
    * @brief 
    * Reads a Decagon Devices 5TE soil moisture probe.
@@ -3206,7 +3202,7 @@ void ALog::Decagon5TE(int excitPin, int dataPin){
   }
 }
 
-void ALog::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
+void ALog::DecagonGS1(uint8_t pin, float Vref, uint8_t ADC_resolution_nbits){
   /**
    * @brief Ruggedized Decagon Devices soil moisture sensor
    * 
@@ -3378,7 +3374,7 @@ float ALog::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
 
 }
 
-void ALog::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, \
+void ALog::vdivR(uint8_t pin, float Rref, uint8_t ADC_resolution_nbits, \
            bool Rref_on_GND_side){
   /**
    * @brief
@@ -3436,7 +3432,7 @@ void ALog::flex(int flexPin, float Rref, float calib1, float calib2){
 }
 */
 
-void ALog::linearPotentiometer(int linpotPin, float Rref, float slope, \
+void ALog::linearPotentiometer(uint8_t linpotPin, float Rref, float slope, \
            char* _distance_units, float intercept, \
            uint8_t ADC_resolution_nbits, bool Rref_on_GND_side){
   /**

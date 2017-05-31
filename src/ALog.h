@@ -108,49 +108,49 @@ class ALog {
     bool get_use_sleep_mode();
     
     // Sensors - standard procedure (wake up, log, sleep)
-    float readPin(int pin);
-    float readPinOversample(int pin, int bits);
-    float analogReadOversample(int pin, uint8_t adc_bits=10, int nsamples=1, \
-          bool debug=false);
+    float readPin(uint8_t pin);
+    float readPinOversample(uint8_t pin, uint8_t bits);
+    float analogReadOversample(uint8_t pin, uint8_t adc_bits=10, \
+          uint8_t nsamples=1, bool debug=false);
     float thermistorB(float R0, float B, float Rref, float T0degC, \
-          int thermPin, uint8_t ADC_resolution_nbits=14, \
-          bool Rref_on_GND_side=true, bool oversample_debug=false, bool record_results=true);
+          uint8_t thermPin, uint8_t ADC_resolution_nbits=14, \
+          bool Rref_on_GND_side=true, bool oversample_debug=false, \
+          bool record_results=true);
     // Print order: Distance [cm], standard deviation [cm]
-    void ultrasonicMB_analog_1cm(int nping, int EX, int sonicPin, \
+    void ultrasonicMB_analog_1cm(uint8_t nping, uint8_t EX, uint8_t sonicPin, \
          bool writeAll);
-    float maxbotixHRXL_WR_Serial(int Ex, int nping, bool writeAll, \
+    float maxbotixHRXL_WR_Serial(uint8_t Ex, uint8_t nping, bool writeAll, \
           int maxRange, bool RS232=false);
     // Print order: Distance [cm], standard deviation [cm]
-    void maxbotixHRXL_WR_analog(int nping=10, int sonicPin=A0, int EX=99, \
-         bool writeAll=true, \
-         uint8_t ADC_resolution_nbits=10);
-    void Decagon5TE(int excitPin, int dataPin); // Poorly-tested
-    void DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits=14);
-    void vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits=10, \
+    void maxbotixHRXL_WR_analog(uint8_t nping=10, uint8_t sonicPin=A0,
+         uint8_t EX=99, bool writeAll=true, uint8_t ADC_resolution_nbits=10);
+    void Decagon5TE(uint8_t excitPin, uint8_t dataPin); // Poorly-tested
+    void DecagonGS1(uint8_t pin, float Vref, uint8_t ADC_resolution_nbits=14);
+    void vdivR(uint8_t pin, float Rref, uint8_t ADC_resolution_nbits=10, \
          bool Rref_on_GND_side=true);
     // FLEX SENSOR READING DOES NOT STABLIIZE: CHANGES CONSISTENTLY WITH TIME.
     //void flex(int flexPin, float Rref, float calib1, float calib2);
-    void linearPotentiometer(int linpotPin, float Rref, float slope, \
+    void linearPotentiometer(uint8_t linpotPin, float Rref, float slope, \
          char* _distance_units, float intercept=0, \
          uint8_t ADC_resolution_nbits=14, bool Rref_on_GND_side=true);
-    void HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
+    void HTM2500LF_humidity_temperature(uint8_t humidPin, uint8_t thermPin, \
          float Rref_therm, uint8_t ADC_resolution_nbits=14);
-    void HM1500LF_humidity_with_external_temperature(int humidPin, \
+    void HM1500LF_humidity_with_external_temperature(uint8_t humidPin, \
          float R0_therm, float B_therm, float Rref_therm, float T0degC_therm, \
-         int thermPin_therm, uint8_t ADC_resolution_nbits=14);
-    void Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
+         uint8_t thermPin_therm, uint8_t ADC_resolution_nbits=14);
+    void Inclinometer_SCA100T_D02_analog_Tcorr(uint8_t xPin, uint8_t yPin, \
          float Vref, float Vsupply, float R0_therm, float B_therm, \
-         float Rref_therm, float T0degC_therm, int thermPin_therm, \
+         float Rref_therm, float T0degC_therm, uint8_t thermPin_therm, \
          uint8_t ADC_resolution_nbits=14);
-    void Anemometer_reed_switch(int interrupt_pin_number, 
+    void Anemometer_reed_switch(uint8_t interrupt_pin_number, 
          unsigned long reading_duration_milliseconds, \
          float meters_per_second_per_rotation);
-    void Wind_Vane_Inspeed(int vanePin);
-    void Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
+    void Wind_Vane_Inspeed(uint8_t vanePin);
+    void Pyranometer(uint8_t analogPin, float raw_mV_per_W_per_m2, \
          float gain, float V_ref, uint8_t ADC_resolution_nbits=14);
     void Barometer_BMP180();
-    void _sensor_function_template(int pin, float param1, \
-         float param2, int ADC_bits=14, bool flag=false);
+    void _sensor_function_template(uint8_t pin, float param1, \
+         float param2, uint8_t ADC_bits=14, bool flag=false);
     
     // Sensors - triggered
     // Camera on/off function; decision made in end-user Arduino script
@@ -160,7 +160,7 @@ class ALog {
           uint8_t ADC_resolution_nbits=14);
 
   private:
-    void pinUnavailable(int pin);
+    void pinUnavailable(uint8_t pin);
     char *nameFile(char * _sitecode);
 
     // Sleep and alarms
@@ -173,9 +173,9 @@ class ALog {
     void checkAlarms();  //debug tool delete if desired. 
     void displayTime();   //debug tool delete if desired. 
     // LED signals
-    void LEDwarn(int nflash);
+    void LEDwarn(uint8_t nflash);
     void LEDgood();
-    void LEDtimeWrong(int ncycles);
+    void LEDtimeWrong(uint8_t ncycles);
     
     // Time
     void unixDatestamp();
@@ -203,13 +203,13 @@ class ALog {
 		byte& Hour, byte& Minute, byte& Second);
     
     // Sensor utility codes
-    float _vdivR(int pin, float Rref, uint8_t adc_bits=10, \
+    float _vdivR(uint8_t pin, float Rref, uint8_t adc_bits=10, \
           bool Rref_on_GND_side=true, bool oversample_debug=false);
     // I don't trust the software serial version -- should do some lab testing 
     // to make sure that chances of clock speed / interrupt problems, 
     // especially with so much time in sleep mode, are near-0.
     //int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
-    int maxbotix_Serial_parse(int Ex);
+    int maxbotix_Serial_parse(uint8_t Ex);
     float standard_deviation_from_array(float values[], int nvalues, \
           float mean);
     float standard_deviation_from_array(int values[], int nvalues, float mean);
