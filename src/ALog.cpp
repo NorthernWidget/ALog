@@ -544,189 +544,189 @@ void ALog::setupLogger(){
 // GETTERS AND SETTERS: ADD MORE AS NEEDED //
 /////////////////////////////////////////////
 
-  bool ALog::get_use_sleep_mode(){
-    /**
-     * @brief Does the logger enter a low-power sleep mode? T/F.
-     * 
-     * @details
-     * * True if the logger is going to sleep between 
-     *   pases through the data-reading loop.
-     * * False if the logger is looping over its logging step (inside
-     *   void loop() in the *.ino code) continuously without sleeping
-     */
-    return _use_sleep_mode;
-  }
+bool ALog::get_use_sleep_mode(){
+  /**
+   * @brief Does the logger enter a low-power sleep mode? T/F.
+   * 
+   * @details
+   * * True if the logger is going to sleep between 
+   *   pases through the data-reading loop.
+   * * False if the logger is looping over its logging step (inside
+   *   void loop() in the *.ino code) continuously without sleeping
+   */
+  return _use_sleep_mode;
+}
 
 
 /////////////////////////////////////////////////////
 // PRIVATE FUNCTIONS: UTILITIES FOR LOGGER LIBRARY //
 /////////////////////////////////////////////////////
 
-  void ALog::pinUnavailable(int pin){
-    int _errorFlag = 0;
+void ALog::pinUnavailable(int pin){
+  int _errorFlag = 0;
 
-    char* _pinNameList_crit[9] = {"CSpin", "SensorPowerPin", "SDpowerPin", \
-                                  "ClockPowerPin", "LEDpin", "wakePin"};
-    int _pinList_crit[9] = {CSpin, SensorPowerPin, SDpowerPin, ClockPowerPin, \
-                            LEDpin, wakePin};
+  char* _pinNameList_crit[9] = {"CSpin", "SensorPowerPin", "SDpowerPin", \
+                                "ClockPowerPin", "LEDpin", "wakePin"};
+  int _pinList_crit[9] = {CSpin, SensorPowerPin, SDpowerPin, ClockPowerPin, \
+                          LEDpin, wakePin};
 
-    char* _pinNameList[9] = {"MISOpin", "MOSIpin", "SCKpin", "SDApin", \
-                             "SCLpin"};
-    int _pinList[9] = {MISOpin, MOSIpin, SCKpin, SDApin, SCLpin};
-    
-    for (int i=0; i<9; i++){
-      if (pin == _pinList[i]){
-        _errorFlag++;
-        Serial.print(F("Error: trying to alter the state of Pin "));
-        Serial.println(_pinList[i]);
-        Serial.print(F("This pin is assigned in a system-critical role as: "));
-        Serial.println(_pinNameList[i]);
-        // Note: numbers >13 in standard Arduino are analog pins
-      }
-    }
-    
-    bool SPI_or_I2C_flag = false;
-    for (int i=0; i<9; i++){
-      if (pin == _pinList_crit[i]){
-        SPI_or_I2C_flag = true;
-        break;
-      }
-    }
-    if (SPI_or_I2C_flag){
-      Serial.println(F("You are using the SPI or I2C bus; take care that this does not clash"));
-      Serial.println(F("with the SD card interface (SPI) or the clock interface (I2C)."));
-    }
-    
-    for (int i=0; i<9; i++){
-      if (pin == _pinList_crit[i]){
-        _errorFlag++;
-        Serial.print(F("Error: trying to alter the state of Pin "));
-        Serial.println(_pinList_crit[i]);
-        Serial.print(F("This pin is assigned in a system-critical role as: "));
-        Serial.println(_pinNameList_crit[i]);
-        // Note: numbers >13 in standard Arduino are analog pins
-      }
-    }
-    
-    if (_errorFlag){
-      Serial.println(F("Error encountered."));
-      Serial.println(F("Stalling program: cannot reassign critical pins to sensors, etc."));
-      LEDwarn(50); // 50 quick flashes of the LED
-      // Do nothing until reset
-      while(1){}
+  char* _pinNameList[9] = {"MISOpin", "MOSIpin", "SCKpin", "SDApin", \
+                           "SCLpin"};
+  int _pinList[9] = {MISOpin, MOSIpin, SCKpin, SDApin, SCLpin};
+  
+  for (int i=0; i<9; i++){
+    if (pin == _pinList[i]){
+      _errorFlag++;
+      Serial.print(F("Error: trying to alter the state of Pin "));
+      Serial.println(_pinList[i]);
+      Serial.print(F("This pin is assigned in a system-critical role as: "));
+      Serial.println(_pinNameList[i]);
+      // Note: numbers >13 in standard Arduino are analog pins
     }
   }
   
-  void ALog::sleepNow()         // here we put the arduino to sleep
-  {
-    IS_LOGGING = false;           // Definitely not logging anymore
-
-      /* Now is the time to set the sleep mode. In the Atmega8 datasheet
-       * http://www.atmel.com/dyn/resources/prod_documents/doc2486.pdf on page 35
-       * there is a list of sleep modes which explains which clocks and 
-       * wake up sources are available in which sleep mode.
-       *
-       * In the avr/sleep.h file, the call names of these sleep modes are to be found:
-       *
-       * The 5 different modes are:
-       *     SLEEP_MODE_IDLE         -the least power savings 
-       *     SLEEP_MODE_ADC
-       *     SLEEP_MODE_PWR_SAVE
-       *     SLEEP_MODE_STANDBY
-       *     SLEEP_MODE_PWR_DOWN     -the most power savings
-       *
-       * For now, we want as much power savings as possible, so we 
-       * choose the according 
-       * sleep mode: SLEEP_MODE_PWR_DOWN
-       * 
-       */  
-      set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
-
-  //    setPrescaler(6); // Clock prescaler of 64, slows down to conserve power
-      cbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter OFF
-
-      sleep_enable();          // enables the sleep bit in the mcucr register
-                               // so sleep is possible. just a safety pin 
-
-      /* Now it is time to enable an interrupt. We do it here so an 
-       * accidentally pushed interrupt button doesn't interrupt 
-       * our running program. if you want to be able to run 
-       * interrupt code besides the sleep function, place it in 
-       * setup() for example.
-       * 
-       * In the function call attachInterrupt(A, B, C)
-       * A   can be either 0 or 1 for interrupts on pin 2 or 3.   
-       * 
-       * B   Name of a function you want to execute at interrupt for A.
-       *
-       * C   Trigger mode of the interrupt pin. can be:
-       *             LOW        a low level triggers
-       *             CHANGE     a change in level triggers
-       *             RISING     a rising edge of a level triggers
-       *             FALLING    a falling edge of a level triggers
-       *
-       * In all but the IDLE sleep modes only LOW can be used.
-       */
-      
-      // START HERE!
-      if (hourInterval && minInterval && secInterval == -1 && extInt == false){
-        Serial.println(F("All inputs to wake from sleep disabled! Reprogram, please!"));
-      }
-        //Serial.print(F("interrupt"));  delay(10);
-      if (hourInterval || minInterval || secInterval != -1){
-        attachInterrupt(interruptNum, wakeUpNow, LOW); // wakeUpNow when wakePin goes LOW 
-        //Serial.println(F(" attached")); delay(10);
-      }
-
-      if (extInt){
-        attachInterrupt(1, wakeUpNow_tip, LOW);
-      }
-
-      sleep_mode();            // here the device is actually put to sleep!!
-                
-                              // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP.  
-
-      sleep_disable();         // first thing after waking from sleep:
-                               // disable sleep...
-
-      // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this to allow both measurements types!
-      // 06-11-2015: The above line commented to allow the rain gage to be read
-      // at the same time as other readings
-      // Maybe move this to specific post-wakeup code?
-      detachInterrupt(interruptNum);      // disables interrupt so the 
-                                          // wakeUpNow code will not be executed 
-                                          // during normal running time.
-  }
-
-  // Must be defined outside of Logger class
-  void wakeUpNow()        // here the interrupt is handled after wakeup
-  {
-    // execute code here after wake-up before returning to the loop() function
-    // timers and code using timers (serial.print and more...) will not work here.
-    // we don't really need to execute any special functions here, since we
-    // just want the thing to wake up
-    IS_LOGGING = true;                   // Currently logging
-                                         //    this will allow the logging 
-                                         //    to happen even if the logger is
-                                         //    already awake to deal with a 
-                                         //    rain gauge bucket tip
-   }
-
-  void wakeUpNow_tip()        // here the interrupt is handled after wakeup
-  {
-    // execute code here after wake-up before returning to the loop() function
-    // timers and code using timers (serial.print and more...) will not work here.
-    // we don't really need to execute any special functions here, since we
-    // just want the thing to wake up
-    //sleep_disable();         // first thing after waking from sleep:
-                               // disable sleep...
-    NEW_RAIN_BUCKET_TIP = true;
-    // If the logger is already logging, run
-    // !!!!!!!!!! WHAT WAS SUPPOSED TO GO INSIDE HERE?
-    if (IS_LOGGING){
-      
+  bool SPI_or_I2C_flag = false;
+  for (int i=0; i<9; i++){
+    if (pin == _pinList_crit[i]){
+      SPI_or_I2C_flag = true;
+      break;
     }
   }
+  if (SPI_or_I2C_flag){
+    Serial.println(F("You are using the SPI or I2C bus; take care that this does not clash"));
+    Serial.println(F("with the SD card interface (SPI) or the clock interface (I2C)."));
+  }
+  
+  for (int i=0; i<9; i++){
+    if (pin == _pinList_crit[i]){
+      _errorFlag++;
+      Serial.print(F("Error: trying to alter the state of Pin "));
+      Serial.println(_pinList_crit[i]);
+      Serial.print(F("This pin is assigned in a system-critical role as: "));
+      Serial.println(_pinNameList_crit[i]);
+      // Note: numbers >13 in standard Arduino are analog pins
+    }
+  }
+  
+  if (_errorFlag){
+    Serial.println(F("Error encountered."));
+    Serial.println(F("Stalling program: cannot reassign critical pins to sensors, etc."));
+    LEDwarn(50); // 50 quick flashes of the LED
+    // Do nothing until reset
+    while(1){}
+  }
+}
+
+void ALog::sleepNow()         // here we put the arduino to sleep
+{
+  IS_LOGGING = false;           // Definitely not logging anymore
+
+    /* Now is the time to set the sleep mode. In the Atmega8 datasheet
+     * http://www.atmel.com/dyn/resources/prod_documents/doc2486.pdf on page 35
+     * there is a list of sleep modes which explains which clocks and 
+     * wake up sources are available in which sleep mode.
+     *
+     * In the avr/sleep.h file, the call names of these sleep modes are to be found:
+     *
+     * The 5 different modes are:
+     *     SLEEP_MODE_IDLE         -the least power savings 
+     *     SLEEP_MODE_ADC
+     *     SLEEP_MODE_PWR_SAVE
+     *     SLEEP_MODE_STANDBY
+     *     SLEEP_MODE_PWR_DOWN     -the most power savings
+     *
+     * For now, we want as much power savings as possible, so we 
+     * choose the according 
+     * sleep mode: SLEEP_MODE_PWR_DOWN
+     * 
+     */  
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);   // sleep mode is set here
+
+//    setPrescaler(6); // Clock prescaler of 64, slows down to conserve power
+    cbi(ADCSRA,ADEN);                    // switch Analog to Digitalconverter OFF
+
+    sleep_enable();          // enables the sleep bit in the mcucr register
+                             // so sleep is possible. just a safety pin 
+
+    /* Now it is time to enable an interrupt. We do it here so an 
+     * accidentally pushed interrupt button doesn't interrupt 
+     * our running program. if you want to be able to run 
+     * interrupt code besides the sleep function, place it in 
+     * setup() for example.
+     * 
+     * In the function call attachInterrupt(A, B, C)
+     * A   can be either 0 or 1 for interrupts on pin 2 or 3.   
+     * 
+     * B   Name of a function you want to execute at interrupt for A.
+     *
+     * C   Trigger mode of the interrupt pin. can be:
+     *             LOW        a low level triggers
+     *             CHANGE     a change in level triggers
+     *             RISING     a rising edge of a level triggers
+     *             FALLING    a falling edge of a level triggers
+     *
+     * In all but the IDLE sleep modes only LOW can be used.
+     */
+    
+    // START HERE!
+    if (hourInterval && minInterval && secInterval == -1 && extInt == false){
+      Serial.println(F("All inputs to wake from sleep disabled! Reprogram, please!"));
+    }
+      //Serial.print(F("interrupt"));  delay(10);
+    if (hourInterval || minInterval || secInterval != -1){
+      attachInterrupt(interruptNum, wakeUpNow, LOW); // wakeUpNow when wakePin goes LOW 
+      //Serial.println(F(" attached")); delay(10);
+    }
+
+    if (extInt){
+      attachInterrupt(1, wakeUpNow_tip, LOW);
+    }
+
+    sleep_mode();            // here the device is actually put to sleep!!
+              
+                            // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP.  
+
+    sleep_disable();         // first thing after waking from sleep:
+                             // disable sleep...
+
+    // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this to allow both measurements types!
+    // 06-11-2015: The above line commented to allow the rain gage to be read
+    // at the same time as other readings
+    // Maybe move this to specific post-wakeup code?
+    detachInterrupt(interruptNum);      // disables interrupt so the 
+                                        // wakeUpNow code will not be executed 
+                                        // during normal running time.
+}
+
+// Must be defined outside of Logger class
+void wakeUpNow()        // here the interrupt is handled after wakeup
+{
+  // execute code here after wake-up before returning to the loop() function
+  // timers and code using timers (serial.print and more...) will not work here.
+  // we don't really need to execute any special functions here, since we
+  // just want the thing to wake up
+  IS_LOGGING = true;                   // Currently logging
+                                       //    this will allow the logging 
+                                       //    to happen even if the logger is
+                                       //    already awake to deal with a 
+                                       //    rain gauge bucket tip
+ }
+
+void wakeUpNow_tip()        // here the interrupt is handled after wakeup
+{
+  // execute code here after wake-up before returning to the loop() function
+  // timers and code using timers (serial.print and more...) will not work here.
+  // we don't really need to execute any special functions here, since we
+  // just want the thing to wake up
+  //sleep_disable();         // first thing after waking from sleep:
+                             // disable sleep...
+  NEW_RAIN_BUCKET_TIP = true;
+  // If the logger is already logging, run
+  // !!!!!!!!!! WHAT WAS SUPPOSED TO GO INSIDE HERE?
+  if (IS_LOGGING){
+    
+  }
+}
 
 void ALog::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
@@ -900,54 +900,54 @@ void ALog::checkAlarms(){
 
 	Clock.checkIfAlarm(1);
 	
-//	if (_use_sleep_mode){  //Removed by Chad 4/20/17
-	  if (Clock.checkIfAlarm(2)) {
-		  Serial.println("Alarm missed! Resetting logger.");
-      datafile.close();
-      LEDwarn(20);
-      delay(30);
+//if (_use_sleep_mode){  //Removed by Chad 4/20/17
+  if (Clock.checkIfAlarm(2)) {
+	  Serial.println("Alarm missed! Resetting logger.");
+    datafile.close();
+    LEDwarn(20);
+    delay(30);
 
-      // Callback to set date and time in SD card file metadata
-      // Following: https://forum.arduino.cc/index.php?topic=348562.0
-      // See: https://github.com/NorthernWidget/Logger/issues/6
-      SdFile::dateTimeCallback(_internalDateTime);
-      
-      if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
-        Serial.println(F("Error initializing SD card for writing"));
-        LEDwarn(40);
-      }
-      // Prepare to record times when the alarms were missed and the watchdog
-      // timer was needed to reset the logger
-      start_logging_to_otherfile("Alarm_miss.txt");
+    // Callback to set date and time in SD card file metadata
+    // Following: https://forum.arduino.cc/index.php?topic=348562.0
+    // See: https://github.com/NorthernWidget/Logger/issues/6
+    SdFile::dateTimeCallback(_internalDateTime);
+    
+    if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
+      Serial.println(F("Error initializing SD card for writing"));
+      LEDwarn(40);
+    }
+    // Prepare to record times when the alarms were missed and the watchdog
+    // timer was needed to reset the logger
+    start_logging_to_otherfile("Alarm_miss.txt");
 
-      bool ADy;
-      bool Apm;
-      byte ADay, AHour, AMinute, ASecond, AlarmBits;
-      otherfile.print(now.unixtime());
-      otherfile.print(",");
-      otherfile.print("Alarm: ");
-	    Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
-	    otherfile.print(ADay, DEC);
-	    otherfile.print(" DoW");
-	    otherfile.print(' ');
-	    otherfile.print(AHour, DEC);
-	    otherfile.print(' ');
-	    otherfile.print(AMinute, DEC);
-	    otherfile.print(' ');
-	    otherfile.print(ASecond, DEC);
-	    otherfile.print(' ');
-	    if (A12h) {
-		    if (Apm) {
-			    otherfile.print("PM");
-		    }
-		    else {
-			    otherfile.print("AM");
-		    }
+    bool ADy;
+    bool Apm;
+    byte ADay, AHour, AMinute, ASecond, AlarmBits;
+    otherfile.print(now.unixtime());
+    otherfile.print(",");
+    otherfile.print("Alarm: ");
+    Clock.getA1Time(ADay, AHour, AMinute, ASecond, AlarmBits, ADy, A12h, Apm);
+    otherfile.print(ADay, DEC);
+    otherfile.print(" DoW");
+    otherfile.print(' ');
+    otherfile.print(AHour, DEC);
+    otherfile.print(' ');
+    otherfile.print(AMinute, DEC);
+    otherfile.print(' ');
+    otherfile.print(ASecond, DEC);
+    otherfile.print(' ');
+    if (A12h) {
+	    if (Apm) {
+		    otherfile.print("PM");
 	    }
-      end_logging_to_otherfile();
-      delay(20000); // Wait until WDT resets logger (<= 8 seconds)
-	  }
-//  }  //Removed by Chad 4/20/17
+	    else {
+		    otherfile.print("AM");
+	    }
+    }
+    end_logging_to_otherfile();
+    delay(20000); // Wait until WDT resets logger (<= 8 seconds)
+  }
+//}  //Removed by Chad 4/20/17
 }
 
 void ALog::displayTime(){
@@ -980,77 +980,77 @@ void ALog::displayTime(){
   delay(2);
 }
 
-  void ALog::LEDwarn(int nflash)
-  {
-    // Flash LED quickly to say that the SD card (and therefore the logger)
-    // has not properly initialized upon restart
-    for(int i=0;i<=nflash;i++){
-      digitalWrite(LEDpin,HIGH);
-      delay(40);
-      digitalWrite(LEDpin,LOW);
-      delay(40);
-    }
-  }
-
-  void ALog::LEDgood()
-  {
-    // Peppy blinky pattern to show that the logger has successfully initialized
+void ALog::LEDwarn(int nflash)
+{
+  // Flash LED quickly to say that the SD card (and therefore the logger)
+  // has not properly initialized upon restart
+  for(int i=0;i<=nflash;i++){
     digitalWrite(LEDpin,HIGH);
-    delay(1000);
+    delay(40);
     digitalWrite(LEDpin,LOW);
-    delay(300);
+    delay(40);
+  }
+}
+
+void ALog::LEDgood()
+{
+  // Peppy blinky pattern to show that the logger has successfully initialized
+  digitalWrite(LEDpin,HIGH);
+  delay(1000);
+  digitalWrite(LEDpin,LOW);
+  delay(300);
+  digitalWrite(LEDpin,HIGH);
+  delay(100);
+  digitalWrite(LEDpin,LOW);
+  delay(100);
+  digitalWrite(LEDpin,HIGH);
+  delay(100);
+  digitalWrite(LEDpin,LOW);
+}
+
+void ALog::LEDtimeWrong(int ncycles)
+{
+  // Syncopated pattern to show that the clock has probably reset to January
+  // 1st, 2000
+  for(int i=0;i<=ncycles;i++)
+  {
+    digitalWrite(LEDpin,HIGH);
+    delay(250);
+    digitalWrite(LEDpin,LOW);
+    delay(100);
     digitalWrite(LEDpin,HIGH);
     delay(100);
     digitalWrite(LEDpin,LOW);
     delay(100);
-    digitalWrite(LEDpin,HIGH);
-    delay(100);
-    digitalWrite(LEDpin,LOW);
   }
+}
 
-  void ALog::LEDtimeWrong(int ncycles)
-  {
-    // Syncopated pattern to show that the clock has probably reset to January
-    // 1st, 2000
-    for(int i=0;i<=ncycles;i++)
-    {
-      digitalWrite(LEDpin,HIGH);
-      delay(250);
-      digitalWrite(LEDpin,LOW);
-      delay(100);
-      digitalWrite(LEDpin,HIGH);
-      delay(100);
-      digitalWrite(LEDpin,LOW);
-      delay(100);
-    }
-  }
+void ALog::unixDatestamp(){
 
-  void ALog::unixDatestamp(){
-
-    if (first_log_after_booting_up){
-      now = RTC.now();
-      // One row for date stamp; the next for real header info
-      headerfile.print(now.unixtime());
-      headerfile.println();
-      headerfile.print("UNIX time stamp");
-      headerfile.print(",");
-    }
-
+  if (first_log_after_booting_up){
     now = RTC.now();
-    datafile.print(now.unixtime());
-    datafile.print(F(","));
-
-    // Echo to serial
-    Serial.print(now.unixtime());
-    Serial.print(F(","));
+    // One row for date stamp; the next for real header info
+    headerfile.print(now.unixtime());
+    headerfile.println();
+    headerfile.print("UNIX time stamp");
+    headerfile.print(",");
   }
 
-  void ALog::endLine(){
-    // Ends the line in the file; do this at end of recording instance
-    // before going back to sleep
-    datafile.println();
-    Serial.println();
-  }
+  now = RTC.now();
+  datafile.print(now.unixtime());
+  datafile.print(F(","));
+
+  // Echo to serial
+  Serial.print(now.unixtime());
+  Serial.print(F(","));
+}
+
+void ALog::endLine(){
+  // Ends the line in the file; do this at end of recording instance
+  // before going back to sleep
+  datafile.println();
+  Serial.println();
+}
 
 float ALog::_vdivR(int pin, float Rref, uint8_t adc_bits, \
             bool Rref_on_GND_side, bool oversample_debug){
