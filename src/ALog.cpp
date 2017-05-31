@@ -55,29 +55,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // MAYBE PUT UNDERSCORES BEFORE ALL OF THESE VARS, IF I THINK THERE IS RISK OF 
 // RE-DEFINING THEM IN SKETCH
 
-// DEFINE BOARD BASED ON MCU TYPE
+// DEFINE BOARD TYPE
 
 // First, give integer values to the different board types
 const int bottle_logger=0;
 const int big_log=1;
 const int log_mega=2; // In development
-
-// Then define _model
-// Now taking advantage of the build.board property
-// Keeping in MCU definitions for backwards compatibility... will eventually throw a deprecation error with this.
-// WILL HAVE TO UPDATE THIS -- UNIFORMLY THROUGHOUT CODE. START HERE!
-#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200) || defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2) || defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
-  const int _model = bottle_logger;
-  const char _model_name[] = "bottle_logger";
-/*
-#elif defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__)
-  const int _model = big_log;
-  const char _model_name[] = "big_log";
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-  const int _model = log_mega;
-  const char _model_name[] = "log_mega";
-*/
-#endif
 
 // DECLARE PINS
 // Should do the full declaration here with some "if's" so I can do "const int"
@@ -86,7 +69,8 @@ const int log_mega=2; // In development
 // ASSIGN PINS //
 /////////////////
 
-#if(_model == bottle_logger)
+// True for all: UNO (ATMega328)
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
   // SD card: CSpin and protected pins
   const int SCKpin = 13;
   const int MISOpin = 12;
@@ -97,20 +81,41 @@ const int log_mega=2; // In development
   const int SCLpin = A5;
   // Digital pins
   const int SensorPowerPin = 4; // Activates voltage regulator to give power to sensors
-  #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
-    // 7 for both??? START HERE!
-    const int SDpowerPin = 7; // Turns on voltage source to SD card
-    const int ClockPowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
-    const int LEDpin = 8; // LED to tell user if logger is working properly  
-  #else
-    // IS IT EVEN TRUE HERE THAT THERE ARE MULTIPLE PINS USED FOR SD AND CLOCK? START HERE!
-    const int SDpowerPin = 8; // Turns on voltage source to SD card
-    const int ClockPowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
-    const int LEDpin = 9; // LED to tell user if logger is working properly  
-  #endif
+  // Sleep mode pins
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
   const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
   const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
+#endif
+#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
+  // 7 for both??? START HERE!
+  const int SDpowerPin = 7; // Turns on voltage source to SD card
+  const int ClockPowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+  const int LEDpin = 8; // LED to tell user if logger is working properly  
+#elif defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200)
+  // IS IT EVEN TRUE HERE THAT THERE ARE MULTIPLE PINS USED FOR SD AND CLOCK? START HERE!
+  const int SDpowerPin = 8; // Turns on voltage source to SD card
+  const int ClockPowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+  const int LEDpin = 9; // LED to tell user if logger is working properly  
+# else
+  // Using placeholder values
+  const int SDpowerPin = -1;
+  const int ClockPowerPin = -1;
+  const int LEDpin = -1;
+#endif
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+  // SD card: CSpin and protected pins
+  const int SCKpin = 52;
+  const int MISOpin = 50;
+  const int MOSIpin = 51;
+  const int CSpin = 53;
+  // Protected I2C pins
+  const int SDApin = 20;
+  const int SCLpin = 21;
+  // Sleep mode pins: same as for 328
+  const int wakePin = 2; // interrupt pin used for waking up via the alarm
+  const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
+#endif
+
 /*
 #elif(_model == big_log)
   // SD card: CSpin and protected pins
@@ -128,7 +133,6 @@ const int log_mega=2; // In development
   const int wakePin = 10; // interrupt pin used for waking up via the alarm
   const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
 */
-#endif
 
 // Clock mode
 const bool h12 = false;
@@ -338,16 +342,24 @@ void ALog::initialize(char* _logger_name, char* _datafilename, \
   // Logger models and setup //
   /////////////////////////////
 
-  if (_model == 0 || _model == 1 || _model == 2){
-    Serial.print(F("Logger model = "));
-    Serial.println(_model_name);
-  }
-  else{
-    Serial.println(F("Error: model name must be ""bottle"" or ""big""."));
-    Serial.println(F("Stopping execution."));
+  Serial.print("Logger model = ");
+  #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200)
+    Serial.println("ALog BottleLogger pre-v2.0.0");
+  #elif defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
+    Serial.println("ALog BottleLogger v2.X.Y");
+  #elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) \
+          || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
+    Serial.print("ATMega168/328 Arduino ");
+    Serial.println("e.g., Uno with or without ALog shield)");
+  #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+    Serial.println("ATMega1280/2560 Arduino Mega");
+  #else
+    Serial.println(F("Error: Arduino model not recognized by the ALog library."));
+    Serial.println(F("Please add support for it and/or contact the developers."));
+    Serial.println(F("info@northernwidget.com"));
     LEDwarn(100); // 100 quick flashes of the LED
     sleepNow(); // Do nothing until reset
-    }
+  #endif
   
   // From weather station code For power savings
   // http://jeelabs.net/projects/11/wiki/Weather_station_code
@@ -407,11 +419,8 @@ void ALog::setupLogger(){
   pinMode(SDpowerPin,OUTPUT);
   pinMode(ClockPowerPin,OUTPUT);
   // Manual wake pin
-  if (_model == bottle_logger){
-    Serial.println(F("Setting manualWakePin"));
-    pinMode(manualWakePin,INPUT);
-    digitalWrite(manualWakePin,HIGH); // enable internal 20K pull-up
-  }
+  pinMode(manualWakePin,INPUT); // LOG NOW button
+  digitalWrite(manualWakePin,HIGH); // enable internal 20K pull-up
   // Have Sensor Power set HIGH, because if any I2C sensors are attached 
   // and unpowered, they will drag down the signal from the RTC, and the 
   // logger will not properly initialize
@@ -1186,7 +1195,7 @@ void ALog::startLogging(){
     // Check if the logger has been awakend by someone pushing the button
     // If so, bypass everything else
     //Serial.println("LOG1!");
-    if (_model == bottle_logger && (digitalRead(manualWakePin) == LOW)){
+    if (digitalRead(manualWakePin) == LOW){
       // Brief light flash to show that logging is happening
       //Serial.println("LOG2!");
       digitalWrite(LEDpin, HIGH);
