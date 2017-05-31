@@ -6,7 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-Logger	KEYWORD1	Logger
+ALog	KEYWORD1	ALog
 
 #######################################
 # Methods and Functions (KEYWORD2)

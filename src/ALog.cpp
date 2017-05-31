@@ -1,5 +1,5 @@
 /**
-@file Logger.cpp
+@file ALog.cpp
 
 Data logger library
 Designed for the ALog
@@ -17,7 +17,7 @@ one-line calls.
 
 # LICENSE: GNU GPL v3
 
-Logger.cpp is part of Logger, an Arduino library written by Andrew D. Wickert
+ALog.cpp is part of ALog, an Arduino library written by Andrew D. Wickert
 and Chad T. Sandell
 Copyright (C) 2011-2017, Andrew D. Wickert
 Copyright (C) 2016-2017, Andrew D. Wickert and Chad T. Sandell
@@ -41,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // INCLUDE HEADER FILE AND ITS INCLUDED LIBRARIES //
 ////////////////////////////////////////////////////
 
-#include <Logger.h>
+#include <ALog.h>
 
 
 // Breaking things up at first, but will try to just put all of the initialize / 
@@ -210,15 +210,15 @@ SdFile headerfile; // Holds header data; re-printed on each reboot for a full
 
 DateTime now;
 
-///////////////////////////////////
-///////////////////////////////////
-//// LOGGER LIBRARY COMPONENTS ////
-///////////////////////////////////
-///////////////////////////////////
+/////////////////////////////////
+/////////////////////////////////
+//// ALOG LIBRARY COMPONENTS ////
+/////////////////////////////////
+/////////////////////////////////
 
 /**
  * @brief 
- * Logger library for the Arduino-based ALog data logger
+ * ALog library for the Arduino-based data loggers
  * 
  * @details
  * ALog data logger library: methods to:
@@ -230,9 +230,9 @@ DateTime now;
  * * Interact with a range of sensors
  *
  * All help documentation here assumes you have created an instance of the 
- * "Logger"
+ * "ALog" class.
  * ```
- * logger Logger();
+ * ALog alog;
  * ```
  *
 */
@@ -240,13 +240,12 @@ DateTime now;
 
 
 // Constructor
-Logger::Logger(){}
+ALog::ALog(){}
 
-void Logger::initialize(char* _logger_name, char* _datafilename, \
-                        int _hourInterval, \
-                        int _minInterval, int _secInterval, \
-                        bool _ext_int, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP){
-                        // bool _sensor_on_UART,
+void ALog::initialize(char* _logger_name, char* _datafilename, \
+           int _hourInterval, int _minInterval, int _secInterval, \
+           bool _ext_int, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP){
+           // bool _sensor_on_UART,
   /**
    * @brief 
    * Pass all variables needed to initialize logging.
@@ -281,14 +280,14 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
    * rain gauge bucket tip.
    * 
    * @details
-   * Data logger model does not need to be set:
+   * ALog Data logger model does not need to be set:
    * it is automatically determined from the MCU type and is used to
    * modify pinout-dependent functions.
    * 
    * Example:
    * ```
    * \\ Log every five minutes
-   * logger.initialize('TestLogger01', 'lab_bench_test.alog', 0, 0, 5, 0);
+   * alog.initialize('TestLogger01', 'lab_bench_test.alog', 0, 0, 5, 0);
    * ```
    * 
   */
@@ -373,7 +372,7 @@ void Logger::initialize(char* _logger_name, char* _datafilename, \
   
 }
 
-void Logger::setupLogger(){
+void ALog::setupLogger(){
 
   wdt_reset();
 
@@ -545,7 +544,7 @@ void Logger::setupLogger(){
 // GETTERS AND SETTERS: ADD MORE AS NEEDED //
 /////////////////////////////////////////////
 
-  bool Logger::get_use_sleep_mode(){
+  bool ALog::get_use_sleep_mode(){
     /**
      * @brief Does the logger enter a low-power sleep mode? T/F.
      * 
@@ -563,13 +562,16 @@ void Logger::setupLogger(){
 // PRIVATE FUNCTIONS: UTILITIES FOR LOGGER LIBRARY //
 /////////////////////////////////////////////////////
 
-  void Logger::pinUnavailable(int pin){
+  void ALog::pinUnavailable(int pin){
     int _errorFlag = 0;
 
-    char* _pinNameList_crit[9] = {"CSpin", "SensorPowerPin", "SDpowerPin", "ClockPowerPin", "LEDpin", "wakePin"};
-    int _pinList_crit[9] = {CSpin, SensorPowerPin, SDpowerPin, ClockPowerPin, LEDpin, wakePin};
+    char* _pinNameList_crit[9] = {"CSpin", "SensorPowerPin", "SDpowerPin", \
+                                  "ClockPowerPin", "LEDpin", "wakePin"};
+    int _pinList_crit[9] = {CSpin, SensorPowerPin, SDpowerPin, ClockPowerPin, \
+                            LEDpin, wakePin};
 
-    char* _pinNameList[9] = {"MISOpin", "MOSIpin", "SCKpin", "SDApin", "SCLpin"};
+    char* _pinNameList[9] = {"MISOpin", "MOSIpin", "SCKpin", "SDApin", \
+                             "SCLpin"};
     int _pinList[9] = {MISOpin, MOSIpin, SCKpin, SDApin, SCLpin};
     
     for (int i=0; i<9; i++){
@@ -615,7 +617,7 @@ void Logger::setupLogger(){
     }
   }
   
-  void Logger::sleepNow()         // here we put the arduino to sleep
+  void ALog::sleepNow()         // here we put the arduino to sleep
   {
     IS_LOGGING = false;           // Definitely not logging anymore
 
@@ -726,7 +728,7 @@ void Logger::setupLogger(){
     }
   }
 
-void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
+void ALog::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 
   /* Alarm bit info:
    * A1Dy true makes the alarm go on A1Day = Day of Week,
@@ -812,7 +814,7 @@ void Logger::alarm(uint8_t _hours, uint8_t _minutes, uint8_t _seconds){
 }
 
 
-void Logger::displayAlarms(){
+void ALog::displayAlarms(){
   bool ADy; // Looks like this can be empty because it is defined within
             // function... meaning that DS3231 library could use some updates.
             // But will hold off on that until a full overhaul / upgrade / 
@@ -891,7 +893,7 @@ void Logger::displayAlarms(){
   //displayTime();
 }
 
-void Logger::checkAlarms(){
+void ALog::checkAlarms(){
   bool ADy;
   bool Apm;
   bool A12h = false;
@@ -948,7 +950,7 @@ void Logger::checkAlarms(){
 //  }  //Removed by Chad 4/20/17
 }
 
-void Logger::displayTime(){
+void ALog::displayTime(){
   /*
    Get current time.
    Always 24-hour clock
@@ -978,7 +980,7 @@ void Logger::displayTime(){
   delay(2);
 }
 
-  void Logger::LEDwarn(int nflash)
+  void ALog::LEDwarn(int nflash)
   {
     // Flash LED quickly to say that the SD card (and therefore the logger)
     // has not properly initialized upon restart
@@ -990,7 +992,7 @@ void Logger::displayTime(){
     }
   }
 
-  void Logger::LEDgood()
+  void ALog::LEDgood()
   {
     // Peppy blinky pattern to show that the logger has successfully initialized
     digitalWrite(LEDpin,HIGH);
@@ -1006,7 +1008,7 @@ void Logger::displayTime(){
     digitalWrite(LEDpin,LOW);
   }
 
-  void Logger::LEDtimeWrong(int ncycles)
+  void ALog::LEDtimeWrong(int ncycles)
   {
     // Syncopated pattern to show that the clock has probably reset to January
     // 1st, 2000
@@ -1023,7 +1025,7 @@ void Logger::displayTime(){
     }
   }
 
-  void Logger::unixDatestamp(){
+  void ALog::unixDatestamp(){
 
     if (first_log_after_booting_up){
       now = RTC.now();
@@ -1043,15 +1045,15 @@ void Logger::displayTime(){
     Serial.print(F(","));
   }
 
-  void Logger::endLine(){
+  void ALog::endLine(){
     // Ends the line in the file; do this at end of recording instance
     // before going back to sleep
     datafile.println();
     Serial.println();
   }
 
-float Logger::_vdivR(int pin, float Rref, uint8_t adc_bits, \
-                     bool Rref_on_GND_side, bool oversample_debug){
+float ALog::_vdivR(int pin, float Rref, uint8_t adc_bits, \
+            bool Rref_on_GND_side, bool oversample_debug){
   // Same as public vidvR code, but returns value instead of 
   // saving it to a file
   float _ADC;
@@ -1073,7 +1075,7 @@ float Logger::_vdivR(int pin, float Rref, uint8_t adc_bits, \
   return _R;
 }
 
-void Logger::RTCon(){
+void ALog::RTCon(){
   // Turn on power clock
   pinMode(SDpowerPin,OUTPUT);
   digitalWrite(SDpowerPin,HIGH); //Chad -- one model's pull-ups attached to SDpowerPin
@@ -1081,7 +1083,7 @@ void Logger::RTCon(){
   delay(20);
 }
 
-void Logger::RTCsleep(){
+void ALog::RTCsleep(){
   // Turn off power clock
   // At this point, it runs on VCC (if logger is powered... which it is
   // if this program is running) via the backup battery power supply.
@@ -1093,11 +1095,11 @@ void Logger::RTCsleep(){
   delay(2);
 }
 
-void Logger::SDpowerOn(){
+void ALog::SDpowerOn(){
   digitalWrite(SDpowerPin,HIGH);
 }
 
-void Logger::SDpowerOff(){
+void ALog::SDpowerOff(){
   digitalWrite(SDpowerPin,LOW);
 }
 
@@ -1105,7 +1107,7 @@ void Logger::SDpowerOff(){
 // PUBLIC UTILITY FUNCTIONS TO IMPLEMENT LOGGER IN SKETCH //
 ////////////////////////////////////////////////////////////
 
-void Logger::sleep(){
+void ALog::sleep(){
   /**
    * @brief 
    * Puts the ALog data logger into a low-power sleep mode
@@ -1121,7 +1123,7 @@ void Logger::sleep(){
   sleepNow();
 }
 
-void Logger::goToSleep_if_needed(){
+void ALog::goToSleep_if_needed(){
   /**
    * @brief
    * Places logger into sleep mode iff this is being used.
@@ -1135,7 +1137,7 @@ void Logger::goToSleep_if_needed(){
   }
 }
 
-void Logger::startLogging(){
+void ALog::startLogging(){
   /**
    * @brief 
    * Wakes the logger and starts logging
@@ -1216,7 +1218,7 @@ void Logger::startLogging(){
   unixDatestamp();
 }
 
-void Logger::endLogging(){
+void ALog::endLogging(){
   /**
    * @brief 
    * Endslogging and returns to sleep
@@ -1299,7 +1301,7 @@ void Logger::endLogging(){
   // sketch, the sketch will cycle back back to sleep(...)
 }
 
-void Logger::startAnalog(){
+void ALog::startAnalog(){
   /**
    * @brief Turn on power to analog sensors
    */
@@ -1308,7 +1310,7 @@ void Logger::startAnalog(){
   delay(2);
 }
 
-void Logger::endAnalog(){
+void ALog::endAnalog(){
   /**
    * @brief Turn off power to analog sensors
    */
@@ -1323,7 +1325,7 @@ void Logger::endAnalog(){
 // Read analog pin
 //////////////////////////////
 
-float Logger::readPin(int pin){
+float ALog::readPin(int pin){
 
   /**
    * @brief Read the analog value of a pin.
@@ -1336,7 +1338,7 @@ float Logger::readPin(int pin){
    * 
    * Example:
    * ```
-   * logger.readPin(2);
+   * alog.readPin(2);
    * ```
    * 
    * 
@@ -1366,7 +1368,7 @@ float Logger::readPin(int pin){
 
 }
 
-float Logger::readPinOversample(int pin, int bits){
+float ALog::readPinOversample(int pin, int bits){
 
   /**
    * @brief 
@@ -1387,7 +1389,7 @@ float Logger::readPinOversample(int pin, int bits){
    * 
    * Example:
    * ```
-   * logger.readPinOversample(2, 12);
+   * alog.readPinOversample(2, 12);
    * ```
    * 
    * Output values will range from 0-1023, but be floating-point.
@@ -1424,10 +1426,9 @@ float Logger::readPinOversample(int pin, int bits){
 // Thermistor - with b-value
 //////////////////////////////
 
-float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
-                          int thermPin, uint8_t ADC_resolution_nbits, \
-                          bool Rref_on_GND_side, bool oversample_debug, \
-                          bool record_results){
+float ALog::thermistorB(float R0, float B, float Rref, float T0degC, \
+            int thermPin, uint8_t ADC_resolution_nbits, bool Rref_on_GND_side, 
+            bool oversample_debug, bool record_results){
 
   /**
    * @brief 
@@ -1475,9 +1476,9 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
    * Example:
    * ```
    * // Contherm from Digikey, 14-bit precision
-   * logger.thermistorB(10000, 3950, 30000, 25, 2, 14);
+   * alog.thermistorB(10000, 3950, 30000, 25, 2, 14);
    * // EPCOS, DigiKey # 495-2153-ND, 14-bit precision
-   * logger.thermistorB(10000, 3988, 13320, 25, 1, 14);
+   * alog.thermistorB(10000, 3988, 13320, 25, 1, 14);
    * ```
    * 
   */
@@ -1523,8 +1524,8 @@ float Logger::thermistorB(float R0, float B, float Rref, float T0degC, \
 // by TE Connectivity Measurement Specialties
 ///////////////////////////////////////////////
 
-void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
-                                float Rref_therm, uint8_t ADC_resolution_nbits){
+void ALog::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
+           float Rref_therm, uint8_t ADC_resolution_nbits){
 
   /**
    * @brief HTM2500LF Relative humidity and temperature sensor
@@ -1551,7 +1552,7 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
    * 
    * Example:
    * ```
-   * logger.HTM2500LF_humidity_temperature(1, 2, ?);
+   * alog.HTM2500LF_humidity_temperature(1, 2, ?);
    * ```
    *
    * This function is designed for ratiometric operation -- that is, the 
@@ -1620,10 +1621,10 @@ void Logger::HTM2500LF_humidity_temperature(int humidPin, int thermPin, \
 // by TE Connectivity Measurement Specialties
 ///////////////////////////////////////////////
 
-void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
-             float R0_therm, float B_therm, float Rref_therm, \
-             float T0degC_therm, int thermPin_therm, \
-             uint8_t ADC_resolution_nbits){
+void ALog::HM1500LF_humidity_with_external_temperature(int humidPin, \
+           float R0_therm, float B_therm, float Rref_therm, \
+           float T0degC_therm, int thermPin_therm, \
+           uint8_t ADC_resolution_nbits){
 
   /**
    * @brief HM1500LF Relative humidity sensor with external temperature
@@ -1656,7 +1657,7 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
    * 
    * Example:
    * ```
-   * logger.HM1500LF_humidity_with_external_temperature1,10000,3950,10000,25,1,12);
+   * alog.HM1500LF_humidity_with_external_temperature1,10000,3950,10000,25,1,12);
    * ```
    * 
   */
@@ -1718,7 +1719,8 @@ void Logger::HM1500LF_humidity_with_external_temperature(int humidPin, \
 // 1 cm = 1 10-bit ADC interval
 //////////////////////////////////////////////////////////////
 
-void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool writeAll){
+void ALog::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, 
+           bool writeAll){
 
   /**
    * @brief Old 1-cm resolution Maxbotix ultrasonic rangefinders: analog
@@ -1749,7 +1751,7 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool write
    * 
    * Example:
    * ```
-   * logger.ultrasonicMB_analog_1cm(10, 99, 2, 0);
+   * alog.ultrasonicMB_analog_1cm(10, 99, 2, 0);
    * ```
    * Note that sensor should be mounted away from supporting structure.
    * For a mast that is 5 meters high (or higher) the sensor should be 
@@ -1842,9 +1844,8 @@ void Logger::ultrasonicMB_analog_1cm(int nping, int Ex, int sonicPin, bool write
 
 }
 
-void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
-                                    bool writeAll, \
-                                    uint8_t ADC_resolution_nbits){
+void ALog::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
+           bool writeAll, uint8_t ADC_resolution_nbits){
   /**
    * @brief Newer 1-mm precision MaxBotix rangefinders: analog readings
    * 
@@ -1860,7 +1861,7 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
    * 
    * @param sonicPin is the analog input channel hooked up to the maxbotix sensor.
    * 
-   * @param EX is a digital output pin used for an excitation pulse.  *
+   * @param EX is a digital output pin used for an excitation pulse.
    * If maxbotix sensor is continuously powered, a reading will be taken when 
    * this pin is flashed high. Set to '99' if excitation pulse is not needed.
    * 
@@ -1872,7 +1873,7 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
    * 
    * Example:
    * ```
-   * logger.maxbotixHRXL_WR_analog(10,A2,99,0);
+   * alog.maxbotixHRXL_WR_analog(10,A2,99,0);
    * ```
    * Note that sensor should be mounted away from supporting structure. These 
    * are the standard recommendations:
@@ -1974,8 +1975,8 @@ void Logger::maxbotixHRXL_WR_analog(int nping, int sonicPin, int EX, \
 
 }
 
-float Logger::maxbotixHRXL_WR_Serial(int Ex, int npings, \
-                                     bool writeAll, int maxRange, bool RS232){
+float ALog::maxbotixHRXL_WR_Serial(int Ex, int npings, bool writeAll, \
+            int maxRange, bool RS232){
   /**
    * @brief
    * Uses the UART interface to record data from a MaxBotix sensor.
@@ -2009,7 +2010,7 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int npings, \
    * // Digital pin 7 controlling sensor excitation, averaging over 10 pings,
    * // not recording the results of each ping, and with a maximum range of 
    * // 5000 mm using standard TTL logic
-   * logger.maxbotixHRXL_WR_Serial(7, 10, false, 5000, false);
+   * alog.maxbotixHRXL_WR_Serial(7, 10, false, 5000, false);
    * 
    * ```
    */
@@ -2105,7 +2106,8 @@ float Logger::maxbotixHRXL_WR_Serial(int Ex, int npings, \
   return mean_range;
 }
 
-float Logger::standard_deviation_from_array(float values[], int nvalues, float mean){
+float ALog::standard_deviation_from_array(float values[], int nvalues, 
+            float mean){
   float sumsquares = 0;
   for (int i=0; i<nvalues; i++){
     sumsquares += square(values[i] - mean);
@@ -2113,7 +2115,8 @@ float Logger::standard_deviation_from_array(float values[], int nvalues, float m
   return sqrt(sumsquares/nvalues);
 }
 
-float Logger::standard_deviation_from_array(int values[], int nvalues, float mean){
+float ALog::standard_deviation_from_array(int values[], int nvalues, 
+            float mean){
   float sumsquares = 0;
   for (int i=0; i<nvalues; i++){
     sumsquares += square(values[i] - mean);
@@ -2121,7 +2124,7 @@ float Logger::standard_deviation_from_array(int values[], int nvalues, float mea
   return sqrt(sumsquares/nvalues);
 }
 
-int Logger::maxbotix_Serial_parse(int Ex){
+int ALog::maxbotix_Serial_parse(int Ex){
   // NOTE: Currently assumes only one Serial port.
   // Excites the MaxBotix sensor and receives its ranging output
   char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
@@ -2155,7 +2158,7 @@ int Logger::maxbotix_Serial_parse(int Ex){
 /*
 // CURRENTLY NOT USED -- ADW DOES NOT TRUST SOFTWARE SERIAL TO MAINTAIN
 // TIMING (AND NOT HANG)
-int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
+int ALog::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
   // Excites the MaxBotix sensor and receives its ranging output
   char range[7]; // R####<\r>, so R + 4 chars + carriage return + null
   SoftwareSerial mySerial(Rx, -1, RS232); // RX, TX, inverse logic - RS232 true, TTL false; defaults to TTL (false)
@@ -2189,10 +2192,10 @@ int Logger::maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232){
 }
 */
 
-void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
-             float Vref, float Vsupply, float R0_therm, float B_therm, \
-             float Rref_therm, float T0degC_therm, int thermPin_therm, \
-             uint8_t ADC_resolution_nbits){
+void ALog::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
+           float Vref, float Vsupply, float R0_therm, float B_therm, \
+           float Rref_therm, float T0degC_therm, int thermPin_therm, \
+           uint8_t ADC_resolution_nbits){
   /**
    * @brief 
    * Inclinometer, including temperature correction from an external sensor.
@@ -2235,8 +2238,8 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
    * 
    * Example:
    * ```
-   * logger.Inclinometer_SCA100T_D02_analog_Tcorr(6, 2, 3.285, 5.191, \
-   *        10080.4120953, 3298.34232031, 10000, 25, 0);
+   * alog.Inclinometer_SCA100T_D02_analog_Tcorr(6, 2, 3.285, 5.191, \
+   *      10080.4120953, 3298.34232031, 10000, 25, 0);
    * ```
    * 
   */
@@ -2310,9 +2313,9 @@ void Logger::Inclinometer_SCA100T_D02_analog_Tcorr(int xPin, int yPin, \
 
 }
 
-void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
-             unsigned long reading_duration_milliseconds, \
-             float meters_per_second_per_rotation){
+void ALog::Anemometer_reed_switch(int interrupt_pin_number, \
+           unsigned long reading_duration_milliseconds, \
+           float meters_per_second_per_rotation){
   /** 
    * @brief
    * Anemometer that flips a reed switch each time it spins.
@@ -2339,7 +2342,7 @@ void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
    * ```
    * // 4-second reading with Inspeed Vortex wind sensor on digital pin 3
    * // (interrupt 1), returned in meters per second
-   * logger.Anemometer_reed_switch(3, 4000, 1.1176);
+   * alog.Anemometer_reed_switch(3, 4000, 1.1176);
    * ```
    * 
    */
@@ -2408,7 +2411,7 @@ void Logger::Anemometer_reed_switch(int interrupt_pin_number, \
   
 }
 
-void Logger::Wind_Vane_Inspeed(int vanePin){
+void ALog::Wind_Vane_Inspeed(int vanePin){
   /**
    * @brief
    * Wind vane: resistance changes with angle to wind.
@@ -2431,7 +2434,7 @@ void Logger::Wind_Vane_Inspeed(int vanePin){
    * ```
    * // After setting up and zeroing the eVane to North, you wire it to 
    * // analog pin 7 on the ALog
-   * logger.Wind_Vane_Inspeed(A7);
+   * alog.Wind_Vane_Inspeed(A7);
    * ```
    * 
    */
@@ -2452,9 +2455,9 @@ void Logger::Wind_Vane_Inspeed(int vanePin){
   Serial.print(F(","));
 }
 
-void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
-                         float gain, float V_ref, \
-                         uint8_t ADC_resolution_nbits){
+void ALog::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
+           float gain, float V_ref, \
+           uint8_t ADC_resolution_nbits){
   /**
    * @brief
    * Pyranometer wtih instrumentation amplifier
@@ -2485,7 +2488,7 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
    * ```
    * // Using precision voltage reference and 16-bit resolution (highest
    * // defensible oversampling resolution)
-   * logger.Pyranometer(A0, 0.0136, 120, 3.300, 16);
+   * alog.Pyranometer(A0, 0.0136, 120, 3.300, 16);
    * ```
    */
    
@@ -2515,8 +2518,8 @@ void Logger::Pyranometer(int analogPin, float raw_mV_per_W_per_m2, \
   Serial.print(F(","));
 }
 
-float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
-                                   bool debug){
+float ALog::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
+            bool debug){
   /**
    * @brief 
    * Higher analog resolution through oversampling
@@ -2549,20 +2552,20 @@ float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
    * ```
    * // 12-bit measurement of Pin 2
    * // Leaves nsamples at its default value of 1 (single reading of sensor)
-   * logger.analogReadOversample(2, 12);
+   * alog.analogReadOversample(2, 12);
    * ```
    * 
    * Readings that require more bits of precision will take longer.
    * 
    * For analog measurements that do not require more than 10 bits of precision, 
-   * use logger.readpin(int pin) or the standard Arduino "AnalogRead" function.
+   * use alog.readpin(int pin) or the standard Arduino "AnalogRead" function.
    * 
    * Based on eRCaGuy_NewAnalogRead::takeSamples(uint8_t analogPin)
    * 
    * Example:
    * ```
    * // Take a single sample at 14-bit resolution and store it as "myReading"
-   * myReading = logger.analogReadOversample(A3, 14, 1);
+   * myReading = alog.analogReadOversample(A3, 14, 1);
    * ```
    * 
   */
@@ -2611,7 +2614,7 @@ float Logger::analogReadOversample(int pin, uint8_t adc_bits, int nsamples,
 }
 
 
-void Logger::Barometer_BMP180(){
+void ALog::Barometer_BMP180(){
 
   /**
    * @brief 
@@ -2623,7 +2626,7 @@ void Logger::Barometer_BMP180(){
    * 
    * Example:
    * ```
-   * logger.Barometer_BMP180();
+   * alog.Barometer_BMP180();
    * ```
    * 
   */
@@ -2703,8 +2706,8 @@ else Serial.println(F("BMP180 init fail"));
 // working; it is like it is not even there in this case.
 }
 
-void Logger::_sensor_function_template(int pin, float param1, float param2, 
-                                       int ADC_bits, bool flag){
+void ALog::_sensor_function_template(int pin, float param1, float param2, 
+           int ADC_bits, bool flag){
   /**
    * @brief 
    * Function to help lay out a new sensor interface.
@@ -2729,7 +2732,7 @@ void Logger::_sensor_function_template(int pin, float param1, float param2,
    * 
    * Example (made up):
    * ```
-   * logger.Example(A2, 1021.3, 15.2, True);
+   * alog.Example(A2, 1021.3, 15.2, True);
    * ```
    * 
   */
@@ -2763,7 +2766,7 @@ void Logger::_sensor_function_template(int pin, float param1, float param2,
 }
  
   
-void Logger::sleepNow_nap()         // here we put the arduino to sleep between interrupt readings
+void ALog::sleepNow_nap()         // here we put the arduino to sleep between interrupt readings
 {
     set_sleep_mode(SLEEP_MODE_STANDBY);   // sleep mode is set here
 
@@ -2794,7 +2797,7 @@ void _anemometer_count_increment(){
   attachInterrupt(1, _anemometer_count_increment, FALLING);
 }
 
-void Logger::HackHD(int control_pin, bool want_camera_on){
+void ALog::HackHD(int control_pin, bool want_camera_on){
   /**
    * @brief 
    * HackHD camera control function
@@ -2844,7 +2847,7 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
    * // ...
    * // 
    * if (distance < 1500){
-   *   logger.HackHD(8, true);
+   *   alog.HackHD(8, true);
    *   camera_on = true; // Maybe I can get a global variable from this library
    *                     // or have HackHD function return the camera state?
    *   now = RTC.now();
@@ -2855,7 +2858,7 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
    *   now = RTC.now();
    *   // If timed out, turn it off.
    *   if ((t_camera_timeout_start_unixtime - now.unixtime()) > timeout_secs){
-   *     logger.HackHD(8, false);
+   *     alog.HackHD(8, false);
    *     camera_on = false;
    *   }
    * }
@@ -2868,7 +2871,7 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
    * 
    */
 
-//void Logger::HackHD(int control_pin, int indicator_pin, bool want_camera_on){
+//void ALog::HackHD(int control_pin, int indicator_pin, bool want_camera_on){
   // Drop control_pin to GND to turn camera on or off
   Serial.print(F("C"));
   Serial.print(F("Camera is on"));
@@ -2905,7 +2908,7 @@ void Logger::HackHD(int control_pin, bool want_camera_on){
   // Otherwise, these conditions match and we are in good shape.  
 }
 
-void Logger::TippingBucketRainGage(){
+void ALog::TippingBucketRainGage(){
   /**
    * @brief 
    * Tipping-bucket rain gauge
@@ -2981,7 +2984,7 @@ void Logger::TippingBucketRainGage(){
   }
 }
 
-void Logger::start_logging_to_datafile(){
+void ALog::start_logging_to_datafile(){
   // Open the file for writing
   if (!datafile.open(datafilename, O_WRITE | O_CREAT | O_AT_END)) {   
     Serial.print(F("Opening "));
@@ -2991,7 +2994,7 @@ void Logger::start_logging_to_datafile(){
   }
 }
 
-void Logger::start_logging_to_headerfile(){
+void ALog::start_logging_to_headerfile(){
   // Open the file for writing
   if (!headerfile.open("header.txt", O_WRITE | O_CREAT | O_AT_END)) {   
     Serial.print(F("Opening "));
@@ -3001,7 +3004,7 @@ void Logger::start_logging_to_headerfile(){
   }
 }
 
-void Logger::start_logging_to_otherfile(char* _filename){
+void ALog::start_logging_to_otherfile(char* _filename){
   // open the file for write at end like the Native SD library
   if (!otherfile.open(_filename, O_WRITE | O_CREAT | O_AT_END)) {
     // Just use Serial.println: don't kill batteries by aborting code 
@@ -3013,7 +3016,7 @@ void Logger::start_logging_to_otherfile(char* _filename){
   }
 }
 
-void Logger::end_logging_to_otherfile(){
+void ALog::end_logging_to_otherfile(){
   // Ends line and closes otherfile
   // Copied from endLine function
   otherfile.println();
@@ -3023,7 +3026,7 @@ void Logger::end_logging_to_otherfile(){
   delay(10);
 }
 
-void Logger::end_logging_to_headerfile(){
+void ALog::end_logging_to_headerfile(){
   // Ends line and closes otherfile
   // Copied from endLine function
   headerfile.println();
@@ -3032,7 +3035,7 @@ void Logger::end_logging_to_headerfile(){
   delay(10);
 }
 
-void Logger::Decagon5TE(int excitPin, int dataPin){
+void ALog::Decagon5TE(int excitPin, int dataPin){
   /**
    * @brief 
    * Reads a Decagon Devices 5TE soil moisture probe.
@@ -3056,7 +3059,7 @@ void Logger::Decagon5TE(int excitPin, int dataPin){
    * 
    * Example:
    * ```
-   * logger.Decagon5TE(7, 8);
+   * alog.Decagon5TE(7, 8);
    * ```
    * 
    */
@@ -3194,7 +3197,7 @@ void Logger::Decagon5TE(int excitPin, int dataPin){
   }
 }
 
-void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
+void ALog::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
   /**
    * @brief Ruggedized Decagon Devices soil moisture sensor
    * 
@@ -3211,7 +3214,7 @@ void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
    * Example:
    * ```
    * // Using a non-precision Rref that is slightly off
-   * logger.DecagonGS1(A1, 3.27, 14);
+   * alog.DecagonGS1(A1, 3.27, 14);
    * ```
    * 
    */
@@ -3257,7 +3260,7 @@ void Logger::DecagonGS1(int pin, float Vref, uint8_t ADC_resolution_nbits){
 // Honeywell_HSC_analog
 //////////////////////////////
 
-float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
+float ALog::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
                                    float Pmin, float Pmax, \
                                    int TransferFunction_number, int units, \
                                    uint8_t ADC_resolution_nbits){
@@ -3309,7 +3312,7 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
    * 
    * Example:
    * ```
-   * logger.Honeywell_HSC_analog(A1, 5, 3.3, 0, 30, 1, 6);
+   * alog.Honeywell_HSC_analog(A1, 5, 3.3, 0, 30, 1, 6);
    * ```
    * 
    */
@@ -3366,7 +3369,8 @@ float Logger::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
 
 }
 
-void Logger::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, bool Rref_on_GND_side){
+void ALog::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, \
+           bool Rref_on_GND_side){
   /**
    * @brief
    * Resistance from a simple voltage divider
@@ -3389,7 +3393,7 @@ void Logger::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, bool Rref_
    * ```
    * // Use standard reference resistor headers: let last parameter be false 
    * // (default)
-   * logger.vdivR(A2, 10000, 12);
+   * alog.vdivR(A2, 10000, 12);
    * ```
    */
   
@@ -3417,17 +3421,15 @@ void Logger::vdivR(int pin, float Rref, uint8_t ADC_resolution_nbits, bool Rref_
 
 /*
 SENSOR DOES NOT STABILIZE (FLEXFORCE SENSOR)
-void Logger::flex(int flexPin, float Rref, float calib1, float calib2){
+void ALog::flex(int flexPin, float Rref, float calib1, float calib2){
   float _Rflex = _vdivR(flexPin, Rref);
   // FINISH WRITING CODE
 }
 */
 
-void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
-                                 char* _distance_units, \
-                                 float intercept, \
-                                 uint8_t ADC_resolution_nbits, \
-                                 bool Rref_on_GND_side){
+void ALog::linearPotentiometer(int linpotPin, float Rref, float slope, \
+           char* _distance_units, float intercept, \
+           uint8_t ADC_resolution_nbits, bool Rref_on_GND_side){
   /**
    * @brief
    * Linear potentiometer (radio tuner) to measure distance
@@ -3465,7 +3467,7 @@ void Logger::linearPotentiometer(int linpotPin, float Rref, float slope, \
    * // Using a 0-10k ohm radio tuner with units in mm and a perfect intercept;
    * // maintaining default 14-bit readings with standard-side (ALog header)
    * // reference resistor set-up
-   * logger.linearPotentiometer(A0, 5000, 0.0008);
+   * alog.linearPotentiometer(A0, 5000, 0.0008);
    * ```
    * 
    */
@@ -3514,7 +3516,7 @@ void save_Aref(float _V){
    * ```
    * // Measuring 3.297V with a calibrated multimeter between 3V3 and GND
    * // Then:
-   * logger.saveAref(3.297);
+   * alog.saveAref(3.297);
    * ```
    * 
    */
@@ -3534,7 +3536,7 @@ float read_Aref(){
    * Example:
    * ```
    * float Vref;
-   * Vref = logger.readAref();
+   * Vref = alog.readAref();
    * ```
    * 
    */
@@ -3545,7 +3547,7 @@ float read_Aref(){
 
 // NEW STUFF: (MAINLY) INTERNAL FUNCTIONS
 
-void Logger::name(){
+void ALog::name(){
   // Self-identify before talking
   Serial.print(F("<"));
   Serial.print(logger_name);
@@ -3553,7 +3555,7 @@ void Logger::name(){
 }
 
 
-void Logger::print_time(){
+void ALog::print_time(){
   boolean exit_flag = 1;
   // Wait for computer to tell logger to start sending its time
   char go;
@@ -3581,7 +3583,7 @@ void Logger::print_time(){
     // time over to the computer.
 }
 
-void Logger::set_time_main(){
+void ALog::set_time_main(){
   // Now set clock and returns 5 more times as part of that function
   // First thing coming in should be the time from the computer
   boolean exit_flag = 1;
@@ -3593,7 +3595,7 @@ void Logger::set_time_main(){
   }
 }
 
-void Logger::announce_start(){
+void ALog::announce_start(){
   Serial.println();
   name();
   Serial.println(F(" = this logger's name."));
@@ -3604,14 +3606,14 @@ void Logger::announce_start(){
 }
 
 // Handshake function
-void Logger::establishContact_Tx(){
+void ALog::establishContact_Tx(){
   while (Serial.available() <= 0) {
     Serial.print('A');   // send a capital A
     delay(300);
   }
 }
 
-bool Logger::establishContact_Rx(){
+bool ALog::establishContact_Rx(){
   char in;
   bool setclock = false;
   in = Serial.read();   // send a capital A
@@ -3622,7 +3624,7 @@ bool Logger::establishContact_Rx(){
   return setclock;
 }
 
-void Logger::startup_sequence(){
+void ALog::startup_sequence(){
   // Turn on power to all sensors: important for I2C sensors that may need
   // power to not pull on clock
   pinMode(SensorPowerPin, OUTPUT);
@@ -3752,7 +3754,7 @@ void Logger::startup_sequence(){
   digitalWrite(SensorPowerPin, LOW);
 }
 
-void Logger::clockSet(){
+void ALog::clockSet(){
 
   byte Year;
   byte Month;
@@ -3804,8 +3806,8 @@ void Logger::clockSet(){
 }
 
 
-void Logger::GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW, 
-		byte& Hour, byte& Minute, byte& Second) {
+void ALog::GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW, 
+		       byte& Hour, byte& Minute, byte& Second) {
 	// Call this if you notice something coming in on 
 	// the serial port. The stuff coming in should be in 
 	// the order YYMMDDwHHMMSS, with an 'x' at the end.

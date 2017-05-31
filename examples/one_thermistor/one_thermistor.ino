@@ -1,6 +1,6 @@
-#include "Logger.h"
+#include "ALog.h"
 
-Logger logger;
+ALog alog;
 
 ////////////////////////////
 // USER-ENTERED VARIABLES //
@@ -18,16 +18,16 @@ int Log_Interval_Hours = 0; //Valid range is 0-23 hours
 bool external_interrupt = false; // e.g., rain gage
 
 void setup(){  //Serial baud rate is set to 38400
-  logger.initialize(dataLoggerName, fileName,
+  alog.initialize(dataLoggerName, fileName,
     Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, 
     external_interrupt);
-  logger.setupLogger();
+  alog.setupLogger();
 }
 
 void loop(){
   // ***************************************** 
-  logger.goToSleep_if_needed(); // Send logger to sleep
-  logger.startLogging();  // Wake up and initialize
+  alog.goToSleep_if_needed(); // Send logger to sleep
+  alog.startLogging();  // Wake up and initialize
   // ****** DO NOT EDIT ABOVE THIS LINE ****** 
 
   //////////////////////////////////
@@ -39,27 +39,27 @@ void loop(){
   // If you have no analog sensors, you should comment out the 
   // startAnalog() and endAnalog() commands
 
-  logger.startAnalog();
+  alog.startAnalog();
 
   // CanTherm small bead
-  //logger.thermistorB(10000, 3950, 10000, 25, 0);
+  //alog.thermistorB(10000, 3950, 10000, 25, 0);
   // CanTherm expoxy bead: CWF1B103F3380
-  logger.thermistorB(10000, 3380, 10000, 25, 0);
+  alog.thermistorB(10000, 3380, 10000, 25, 0);
 
-  logger.endAnalog();
+  alog.endAnalog();
 
   //
   // INSERT DIGITAL SENSOR READING COMMANDS HERE!
   //
 
   // NOTE: THE BUFFER SIZE IS 512 BYTES;
-  // run "logger.bufferWrite" if you think you are approaching this limit.
+  // run "alog.bufferWrite" if you think you are approaching this limit.
   // Otherwise, the buffer will overflow and I'm not sure what will happen.
 
   // ****** DO NOT EDIT BELOW THIS LINE ****** 
 
   // Wrap up files, turn off SD card, and go back to sleep
-  logger.endLogging();
+  alog.endLogging();
 
   // ***************************************** 
 

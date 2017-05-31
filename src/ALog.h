@@ -1,7 +1,7 @@
 /**
 @file
 
-# Logger.h
+# ALog.h
 
 Data logger library header<br>
 Designed for the ALog<br>
@@ -46,8 +46,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // DEFINE SELF / INCLUDE GUARD //
 /////////////////////////////////
 
-#ifndef Logger_h
-#define Logger_h
+#ifndef ALog_h
+#define ALog_h
 
 ///////////////////////
 // INCLUDE LIBRARIES //
@@ -84,11 +84,11 @@ void _anemometer_count_increment();
 void _internalDateTime(uint16_t* date, uint16_t* time); // Callback: SD DT stamp
 
 // The rest of the library
-class Logger {
+class ALog {
 
   public:
     // Constructor
-    Logger();
+    ALog();
     
     // Initialization
     void initialize(char* _logger_name, char* _datafilename, \

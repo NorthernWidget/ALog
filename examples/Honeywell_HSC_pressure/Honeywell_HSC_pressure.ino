@@ -1,6 +1,6 @@
-#include "Logger.h"
+#include "ALog.h"
 
-Logger logger;
+ALog alog;
 
 ////////////////////////////
 // USER-ENTERED VARIABLES //
@@ -19,16 +19,16 @@ int Log_Interval_Hours = 0; //Valid range is 0-23 hours
 bool external_interrupt = false;
 
 void setup(){  //Serial baud rate is set to 38400
-  logger.initialize(dataLoggerName, fileName,
+  alog.initialize(dataLoggerName, fileName,
     Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, 
     external_interrupt);
-  logger.setupLogger();
+  alog.setupLogger();
 }
 
 void loop(){
   // ***************************************** 
-  logger.goToSleep_if_needed(); // Send logger to sleep
-  logger.startLogging();  // Wake up and initialize
+  alog.goToSleep_if_needed(); // Send logger to sleep
+  alog.startLogging();  // Wake up and initialize
   // ****** DO NOT EDIT ABOVE THIS LINE ****** 
 
   //////////////////////////////////
@@ -40,7 +40,7 @@ void loop(){
   // If you have no analog sensors, you should comment out the 
   // startAnalog() and endAnalog() commands
 
-  logger.startAnalog(); //turn on 3.3V power
+  alog.startAnalog(); //turn on 3.3V power
 
   delay(5);  //Allow voltage to stabalize
 
@@ -59,25 +59,25 @@ void loop(){
   //Units: 5 = inH2O
   //Units: 6 = PSI
 
-  //Example: logger.Honeywell_HSC_analog(A1, 5, 3.3, 0, 30, 1, 6);
+  //Example: alog.Honeywell_HSC_analog(A1, 5, 3.3, 0, 30, 1, 6);
 
-  logger.Honeywell_HSC_analog(1, 3.3, 3.3, 0, 30, 1, 6);
+  alog.Honeywell_HSC_analog(1, 3.3, 3.3, 0, 30, 1, 6);
 
-  logger.endAnalog();  //turn off 3.3V power
+  alog.endAnalog();  //turn off 3.3V power
 
   //
   // INSERT DIGITAL SENSOR READING COMMANDS HERE!
   //
 
   // NOTE: THE BUFFER SIZE IS (CHECK ON THIS!!!!!!!!!!!!!!) 256 BYTES;
-  // run "logger.bufferWrite" if you think you are approaching this limit.
+  // run "alog.bufferWrite" if you think you are approaching this limit.
   // Otherwise, the buffer will overflow and I'm not sure what will happen.
 
 
   // ****** DO NOT EDIT BELOW THIS LINE ****** 
 
   // Wrap up files, turn off SD card, and go back to sleep
-  logger.endLogging();
+  alog.endLogging();
 
   // ***************************************** 
 

@@ -1,6 +1,6 @@
-#include "Logger.h"
+#include "ALog.h"
 
-Logger logger;
+ALog alog;
 
 ////////////////////////////
 // USER-ENTERED VARIABLES //
@@ -22,23 +22,23 @@ void setup(){
   delay(50);
   pinMode(3, INPUT); // Include in library later
   digitalWrite(3, HIGH);
-  logger.initialize(dataLoggerName, fileName, Log_Interval_Days, \
+  alog.initialize(dataLoggerName, fileName, Log_Interval_Days, \
       Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds,
-      external_interrupt);logger.setupLogger();
+      external_interrupt);alog.setupLogger();
   pinMode(3, INPUT); // Include in library later
   digitalWrite(3, HIGH);
   delay(100);
   interrupts();
 
-logger.startAnalog();
+alog.startAnalog();
 }
 
 void loop(){
 // ***************************************** 
-if (logger.get_use_sleep_mode() == true){
-  logger.sleep(); // Send logger to sleep, and then wake up
+if (alog.get_use_sleep_mode() == true){
+  alog.sleep(); // Send logger to sleep, and then wake up
 }
-logger.startLogging(); // Power up all systems, check WDT, reset alarms  
+alog.startLogging(); // Power up all systems, check WDT, reset alarms  
                        // Open data file in write mode
 // ****** DO NOT EDIT ABOVE THIS LINE ****** 
 
@@ -51,29 +51,29 @@ logger.startLogging(); // Power up all systems, check WDT, reset alarms
 // If you have no analog sensors, you should comment out the 
 // startAnalog() and endAnalog() commands
 
-//logger.startAnalog();
+//alog.startAnalog();
 
 //I2C Barometer:
-logger.Barometer_BMP180();
+alog.Barometer_BMP180();
 
 //Thermistor (0):
-logger.thermistorB(10000, 3950, 10000, 25, A0); //Displayed with RH sensor function
+alog.thermistorB(10000, 3950, 10000, 25, A0); //Displayed with RH sensor function
 
 //Relative Humidity (1):
-//logger.HM1500LF_humidity_with_external_temperature(A1,10000,3950,10000,25,A0,12);
+//alog.HM1500LF_humidity_with_external_temperature(A1,10000,3950,10000,25,A0,12);
 
 //Ultrasonic rangefinder (2):
-//logger.ultrasonicMB_analog_1cm(5, 99, A1, 0);
-logger.maxbotixHRXL_WR_analog(5,A1,99,0);
+//alog.ultrasonicMB_analog_1cm(5, 99, A1, 0);
+alog.maxbotixHRXL_WR_analog(5,A1,99,0);
 
 //Wind Speed (3):
-//logger.Anemometer_reed_switch(3, 2000, 1.1176);
+//alog.Anemometer_reed_switch(3, 2000, 1.1176);
 
 //Wind Direction
-//logger.Wind_Vane_Inspeed(
+//alog.Wind_Vane_Inspeed(
 
 //Force sensor (2):
-logger.readPin(A2);
+alog.readPin(A2);
 
 //Water pressure (7):
 //***Honeywell_HSC_analog(int pin, float Vsupply, float vRef, float Pmin, float Pmax, int TransferFunction_number, int units)***
@@ -91,23 +91,23 @@ logger.readPin(A2);
 //Units: 5 = inH2O
 //Units: 6 = PSI
 
-logger.Honeywell_HSC_analog(A7,5.0,3.3,0.0,30.0,1,6);
+alog.Honeywell_HSC_analog(A7,5.0,3.3,0.0,30.0,1,6);
 
-//logger.endAnalog();
+//alog.endAnalog();
 
 //
 // INSERT DIGITAL SENSOR READING COMMANDS HERE!
 //
 
 // NOTE: THE BUFFER SIZE IS (CHECK ON THIS!!!!!!!!!!!!!!) 256 BYTES;
-// run "logger.bufferWrite" if you think you are approaching this limit.
+// run "alog.bufferWrite" if you think you are approaching this limit.
 // Otherwise, the buffer will overflow and I'm not sure what will happen.
 
 
 // ****** DO NOT EDIT BELOW THIS LINE ****** 
 
 // Wrap up files, turn off SD card, and go back to sleep
-logger.endLogging();
+alog.endLogging();
 
 // ***************************************** 
 
