@@ -101,8 +101,10 @@ class ALog {
     void goToSleep_if_needed(); // Same as above, but checks if sleep is being used
     void startLogging();
     void endLogging();
-    void startAnalog();
-    void endAnalog();
+    void startAnalog(); // DEPRECATED
+    void endAnalog(); // DEPRECATED
+    void sensorPowerOn();
+    void sensorPowerOff();
     
     // Getters and setters
     bool get_use_sleep_mode();

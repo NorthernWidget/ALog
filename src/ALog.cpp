@@ -1192,6 +1192,8 @@ void ALog::startLogging(){
 
   wdt_disable();
   wdt_enable(WDTO_8S);    // Enable the watchdog timer interupt.
+  // Enable ADC
+  sbi(ADCSRA,ADEN);        // switch Analog to Digitalconverter ON
   // Turn power on
   SDon_RTCon();
 
@@ -1323,7 +1325,7 @@ void ALog::endLogging(){
 
       alarm(_hours, _minutes, _seconds);  //Set new alarms.
     }
-    //displayAlarms();  // Verify Alarms and display time
+    //displayAlarms(); // Verify Alarms and display time
     delay(2);
     SDoff_RTCsleep();
     delay(2);
@@ -1332,21 +1334,48 @@ void ALog::endLogging(){
   // sketch, the sketch will cycle back back to sleep(...)
 }
 
-void ALog::startAnalog(){
+void ALog::sensorPowerOn(){
   /**
-   * @brief Turn on power to analog sensors
+   * @brief Turn ON power to 3V3 regulator that connects to screw terminals.
+   * @details
+   * This powers external devices.
    */
   digitalWrite(SensorPowerPin,HIGH);
-  sbi(ADCSRA,ADEN);        // switch Analog to Digitalconverter ON
   delay(2);
 }
 
-void ALog::endAnalog(){
+void ALog::sensorPowerOff(){
   /**
-   * @brief Turn off power to analog sensors
+   * @brief Turn OFF power to 3V3 regulator that connects to screw terminals.
+   * @details
+   * This cuts 3V3 power to external devices.
    */
   digitalWrite(SensorPowerPin,LOW);
   delay(2);
+}
+
+// DEPRECATED
+void ALog::startAnalog(){
+  /**
+   * @brief Turn on power to analog sensors
+   * @details
+   * Actually just turns on 3V3 regulator that could power anything.
+   * Keeping this around for backwards compatibility; look to
+   * sensorPowerOn() for the preferred version of this.
+   */
+  sensorPowerOn();
+}
+
+// DEPRECATED
+void ALog::endAnalog(){
+  /**
+   * @brief Turn off power to analog sensors
+   * @details
+   * Actually just turns off 3V3 regulator that could power anything.
+   * Keeping this around for backwards compatibility; look to
+   * sensorPowerOff() for the preferred version of this.
+   */
+  sensorPowerOff();
 }
 
 ////////////////////////////////
