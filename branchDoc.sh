@@ -30,4 +30,5 @@ read
 #git push origin master
 
 git clean -df
+git clean -df
 git checkout master
