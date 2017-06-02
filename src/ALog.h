@@ -93,7 +93,7 @@ class ALog {
     // Initialization
     void initialize(char* _logger_name, char* _datafilename, \
          int _hourInterval, int _minInterval, int _secInterval, \
-         bool _ext_int=false, bool _LOG_ON_BUCKET_TIP=false);
+         bool _ext_int=false, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP=false);
     void setupLogger();
     
     // Code for sleeping, starting up from sleep, synching SD card
@@ -114,7 +114,7 @@ class ALog {
     
     // Sensors - standard procedure (wake up, log, sleep)
     float readPin(uint8_t pin);
-    float readPinOversample(uint8_t pin, uint8_t bits);
+    float readPinOversample(uint8_t pin, uint8_t adc_bits);
     float analogReadOversample(uint8_t pin, uint8_t adc_bits=10, \
           uint8_t nsamples=1, bool debug=false);
     float thermistorB(float R0, float B, float Rref, float T0degC, \
@@ -124,7 +124,7 @@ class ALog {
     // Print order: Distance [cm], standard deviation [cm]
     void ultrasonicMB_analog_1cm(uint8_t nping, uint8_t EX, uint8_t sonicPin, \
          bool writeAll);
-    float maxbotixHRXL_WR_Serial(uint8_t Ex, uint8_t nping, bool writeAll, \
+    float maxbotixHRXL_WR_Serial(uint8_t Ex, uint8_t npings, bool writeAll, \
           int maxRange, bool RS232=false);
     // Print order: Distance [cm], standard deviation [cm]
     void maxbotixHRXL_WR_analog(uint8_t nping=10, uint8_t sonicPin=A0,

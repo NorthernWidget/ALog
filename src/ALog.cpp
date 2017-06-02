@@ -256,9 +256,10 @@ void ALog::initialize(char* _logger_name, char* _datafilename, \
    * @param _logger_name: Name associated with this data logger; often helps to
    * relate it to the project or site
    * 
-   * @param _filename: Name of main data file saved to SD card; often helps to
-   * relate it to the project or site; used to be limited to 8.3, but now
-   * is not.
+   * @param _datafilename: Name of main data file saved to SD card; often helps
+   * to relate it to the project or site; used to be limited to 8.3 file
+   * naming convention, but now strictly is not. (I still use 
+   * 8.3 names for safety's sake!)
    * 
    * @param _hourInterval: How many hours to wait before logging again; can range
    * from 0-24.
@@ -1521,7 +1522,7 @@ float ALog::thermistorB(float R0, float B, float Rref, float T0degC, \
    * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
-   * @param Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * @param Rref_on_GND_side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
    * the reference resitor must be instead connected via the screw terminals.
    * This is set true for external sensors that are built to require a
@@ -2272,11 +2273,7 @@ void ALog::Inclinometer_SCA100T_D02_analog_Tcorr(uint8_t xPin, uint8_t yPin, \
    * 3.3V on the ALog.
    * 
    * @param Vsupply is the input voltage that drives the sensor, and is typically
-   * ~5V.
-   * 
-   * 
-   * @param humidPin is the analog pin connected to the humidity output voltage 
-   * of the module.
+   * between 3.3 and 5V.
    * 
    * @param R0_therm is a thermistor calibration.
    * 
@@ -2877,7 +2874,7 @@ void ALog::HackHD(int control_pin, bool want_camera_on){
    * @param want_camera_on is true if you want to turn the camera on, false if 
    * you want to turn the camera off.
    * 
-   * @param CAMERA_IS_ON is a global varaible attached to this function that 
+   * \b CAMERA_IS_ON is a global varaible attached to this function that 
    * saves the state of the camera; it will be compared to "want_camera_on",
    * such that this function will do nothing if the camera is already on (or
    * off) and you want it on (or off).
@@ -3354,7 +3351,7 @@ float ALog::Honeywell_HSC_analog(int pin, float Vsupply, float Vref, \
    * * TransferFunction: 4 = 4% to 94% of Vsupply
    *   ("A" in second to last digit of part number)
    * 
-   * @param Units: Output units
+   * @param units: Output units
    * * Units: 0 = mbar
    * * Units: 1 = bar
    * * Units: 2 = Pa
@@ -3438,7 +3435,7 @@ void ALog::vdivR(uint8_t pin, float Rref, uint8_t ADC_resolution_nbits, \
    * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
    * number of bits of ADC resolution used (oversampling for >10 bits)
    * 
-   * @param Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * @param Rref_on_GND_side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
    * the reference resitor must be instead connected via the screw terminals.
    * This is set true for external sensors that are built to require a
@@ -3509,7 +3506,7 @@ void ALog::linearPotentiometer(uint8_t linpotPin, float Rref, float slope, \
    * in the linear calibration equation, and are therefore the units of this
    * function's output.
    * 
-   * @param Rref_on_GND-Side indicates the configuration of the voltage divider.  
+   * @param Rref_on_GND_side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
    * the reference resitor must be instead connected via the screw terminals.
    * This is set true for external sensors that are built to require a
