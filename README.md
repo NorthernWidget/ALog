@@ -73,7 +73,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     *   Metal "pins" to connect to and interact with other devices
     *   An oscillator, such as the ALog BottleLogger's 8 MHz crystal, sets the speed of the microcontroller's computation. This means that the ALog BottleLogger is an 8 MHz computer.
 *   A **pin** is one of the "legs" on the microcontroller chip. Electrical power or signlas flow through these.
-*   **C** and **C++** are programming languages.
+*   `C` and `C++` are **programming languages**.
     *   Programs written in these languages must be **compiled**. This means that they are turned into bytes (1s and 0s) by another piece of software before being made executable and (in our case) uploaded to a small board.
 *   **Arduino** is a software and hardware standard for microcontroller projects.
     *   They are best known for the Arduino Uno board (and its predecessors).
