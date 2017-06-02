@@ -240,12 +240,14 @@ Programming languages all have ways in which locial thoughts are placed into tex
 
 Each variable needs to be defined before it is used.
 
-<pre class="lang:default decode:true">bool isOn=False; // Boolean: True (1) or False (0)
+```cpp
+bool isOn=False; // Boolean: True (1) or False (0)
 int x=50; // Integer (this works for values between -32768 and 32767).
           // For broader applicability, look up uint32, int64, etc.
 float _my_float = 1000.293; // "Floating point" (decimal) number
 char letter='h' // This is a letter, but is represented in ASCII, so is
-                // also a 1-byte number</pre>
+                // also a 1-byte number
+```
 
 Each of these goes: **variable_type variable_name = variable_value ;** For more information on types, see the Sparkfun Electronics tutorial at https://learn.sparkfun.com/tutorials/data-types-in-arduino. For what you are doing right now, a general idea of what these definitions are and what they look like should work.
 
@@ -253,14 +255,17 @@ Each of these goes: **variable_type variable_name = variable_value ;** For more 
 
 Ignore lines that start with:
 
-<pre class="lang:default decode:true">// [compiler doensn't care what is here, but you can read it
-</pre>
+```cpp
+// [compiler doensn't care what is here, but you can read it]
+```
 
 And lines that are between
 
-<pre class="lang:default decode:true">/*
+```cpp
+/*
  whatevs
- */</pre>
+ */
+```
 
 These are for the benefit of the humans reading the code. Comment your code clearly and thoroughly!
 
@@ -268,12 +273,13 @@ These are for the benefit of the humans reading the code. Comment your code clea
 
 Lines must be terminated with semicolons.
 
-<pre class="lang:default decode:true">int a=5;
-</pre>
+```cpp
+int a=5;
+```
 
 #### Operations
 
-Basic arithmetic operators (<span class="lang:c++ decode:true crayon-inline">+, -, *, /</span>) work. Division of two integers results in "floor division, or rounding down the result. There are also logical operators (<span class="lang:c++ decode:true crayon-inline"><, >, ==</span>, etc.)
+Basic arithmetic operators (`+, -, *, /`) work. Division of two integers results in "floor division, or rounding down the result. There are also logical operators (`<, >, ==`, etc.)
 
 #### Loops and Statements
 
@@ -283,7 +289,7 @@ These are ways to control the flow of a code. I'm afraid that this introduction 
 
 ## Connecting the ALog and Computer
 
-Use a USB cable to connect the ALog to your computer. <PICTURE here> Then, using the Arduino IDE, select the name of the USB-serial port that is connected to the ALog. <PICTURE here> Now your ALog is ready for communications and programming. ---
+Use a USB cable to connect the ALog to your computer. **PICTURE here** Then, using the Arduino IDE, select the name of the USB-serial port that is connected to the ALog. **PICTURE here** Now your ALog is ready for communications and programming. ---
 
 ## Example Programs: Writing and Uploading
 
@@ -342,7 +348,7 @@ void loop() {
 
 #### Uploading code to the ALog data logger
 
-Once your code is written -- either as a copy/paste of this or as your own -- save your code. All Arduino sketches need to be within their own folder. After this, you can hit the "upload" button (right arrow) to load the code to the board. (The check mark to the left will test if your code compiles.) <Insert image>
+Once your code is written -- either as a copy/paste of this or as your own -- save your code. All Arduino sketches need to be within their own folder. After this, you can hit the "upload" button (right arrow) to load the code to the board. (The check mark to the left will test if your code compiles.) **Insert image**
 
 ### USB/Serial communications
 
@@ -369,7 +375,7 @@ void loop() {
 }
 ```
 
-Let's break this down a little bit:   **Change your baud rate to 38400 bps!**  
+Let's break this down a little bit:   **Change your baud rate to 38400 bps!**
 
 * * *
 
@@ -377,7 +383,7 @@ Let's break this down a little bit:   **Change your baud rate to 38400 bps!**
 
 #### Logger library
 
-https://htmlpreview.github.io/?https://raw.githubusercontent.com/NorthernWidget/Logger/master/doc/html/classLogger.html  
+https://htmlpreview.github.io/?https://raw.githubusercontent.com/NorthernWidget/Logger/master/doc/html/classLogger.html
 
 #### Thermistor example
 
