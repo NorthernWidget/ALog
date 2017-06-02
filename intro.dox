@@ -4,122 +4,543 @@
 
 The \b ALog data logger is an Arduino-based data logger that includes a full software library and documentation. The goal of this documentation is to ease the transition of researchers from closed-source proprietary technologies that are often well-documented, but can be expensive black boxes, to a fully open-source hardware and software toolchain that gives researchers all the power to control their data collection. For citizen-scientists who are interested in this tool: welcome, and it is greatly hoped that these instructions will suffice to get you started on the road to making measurements of our natural environment.
 
-\section software Software Installation
+\section instructions Instructions
 
-All of our software is available from our GitHub repository, https://github.com/NorthernWidget. To install the Arduino software and the core libraries, follow these steps:
+		<p>Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is for you. We&#8217;ll guide you through the steps to install a first simple program on your ALog data logger, and introduce you to a few concepts along the way.</p>
+<h1>Materials Needed</h1>
+<h2>For the basics:</h2>
+<ul>
+<li><strong>1x ALog data logger</strong></li>
+<li><strong>1x USB cable that fits the ALog&#8217;s USB port</strong>
+<ul>
+<li>USB A-B for version 2.1.0 and prior</li>
+<li>USB A-miniB (like an Android cell phone) for version 2.2.0 and greater</li>
+</ul>
+</li>
+<li><strong>A computer with a USB port</strong></li>
+</ul>
+<h2>For the data logging exercises</h2>
+<ul>
+<li><strong>1x thermistor</strong>
+<ul>
+<li>Our instructions are for the<strong> CanTherm CWF1B103F3380</strong> (available on <a href="https://www.digikey.com/product-detail/en/cantherm/CWF1B103F3380/317-1310-ND/1191085">Digi-Key</a> or from us). This thermistor is 1 meter long and coated in epoxy for all of your out-of-the-box measurement applications</li>
+</ul>
+</li>
+<li><strong>1x reference resistor</strong>
+<ul>
+<li>We typically use the <strong>Vishay Dale PTF5610K000BYEB </strong>for their high precision and temperature stability at a reasonable cost.</li>
+</ul>
+</li>
+</ul>
+<hr />
+<h1>A few definitions</h1>
+<ul>
+<li>A <strong>microcontroller</strong> is a teeny tiny computer that has its own:
+<ul>
+<li>Processor for performing computations</li>
+<li>Memory for storing programs and variables</li>
+<li>Metal &#8220;pins&#8221; to connect to and interact with other devices</li>
+<li>An oscillator, such as the ALog BottleLogger&#8217;s 8 MHz crystal, sets the speed of the microcontroller&#8217;s computation. This means that the ALog BottleLogger is an 8 MHz computer.</li>
+</ul>
+</li>
+<li>A <strong>pin</strong> is one of the &#8220;legs&#8221; on the microcontroller chip. Electrical power or signlas flow through these.</li>
+<li><strong>C</strong> and <strong>C++</strong> are programming languages.
+<ul>
+<li>Programs written in these languages must be <strong>compiled</strong>. This means that they are turned into bytes (1s and 0s) by another piece of software before being made executable and (in our case) uploaded to a small board.</li>
+</ul>
+</li>
+<li><strong>Arduino</strong> is a software and hardware standard for microcontroller projects.
+<ul>
+<li>They are best known for the Arduino Uno board (and its predecessors).</li>
+<li>Also important &#8212; and used by us &#8212; are their extensive software libraries to assist us in programming AVR microcontrollers.</li>
+<li><strong>AVR</strong> is the family of microcontrollers most commonly used by Arduino projects.</li>
+</ul>
+</li>
+<li>The <strong>ALog BottleLogger </strong>is a lightweight and inexpensive low-power open-source data logger that incorporates elements of the Arduino system, and can be programmed through the Arduino IDE.</li>
+</ul>
+<hr />
+<h1>Looking at your board:</h1>
+<p>Your ALog board should look something like this. It has a lot of components. We&#8217;ll start to look at them in more detail once you wire the board up.</p>
+<p><a href="http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220.png"><img class="aligncenter wp-image-484 size-large" src="http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220-1024x443.png" alt="" width="640" height="277" srcset="http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220-1024x443.png 1024w, http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220-300x130.png 300w, http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220-768x333.png 768w, http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220-400x173.png 400w, http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220.png 1293w" sizes="(max-width: 640px) 100vw, 640px" /></a></p>
+<p style="text-align: center;"><strong>ALog BottleLogger v2.2.0</strong></p>
+<h2>Dimensions: namesake</h2>
+<p>The dimensions of the ALog BottleLogger are perfect to slip it into a Nalgene water bottle: these are often easier to find than gasketed boxes, especially if you&#8217;re in the outdoors (or outdoors shops).</p>
+<h2>&#8220;Chunky&#8221; design for the field</h2>
+<p>Yes, we use the big, chunky, old-school SD cards, USB ports, and barrel jack connectors. And we love &#8217;em. Why? Have you ever tried to connect cables with mittens in Minnesota-frigid temperatures? Have you ever dropped a micro-SD card (or other object the size of your pinky nail) into a beautiful bed of colorful oak leaves, stand of prairie grasses, or a lake? You&#8217;d better hope that your missing item is as big and recognizable as possible. We call it designing for reality.</p>
+<h2>What does it have?</h2>
+<ul>
+<li>A teeny tiny computer running at 8MHz</li>
+<li>An SD card to save data</li>
+<li>A real-time clock and its backup battery to save the time</li>
+<li>A USB port to upload programs and talk to the computer</li>
+<li>A bunch of &#8220;screw terminals&#8221; to connect wires for sensors, etc.</li>
+<li>Six pairs of holes for &#8220;reference resistors&#8221; to act as standards for certain types of measurements (&#8220;analog&#8221;)</li>
+<li>A blinky light to tell you what&#8217;s going on</li>
+</ul>
+<h2>Pins</h2>
+<p>The Alog BottleLogger follows the Arduino Uno convention for pin numbering.</p>
+<h2>Those little numbers and letters by the screw terminals (pins)</h2>
+<p>Those black things on the sides with screw heads are the &#8220;screw terminals&#8221;. They clamp down on wires to connect peripherals to the ALog BottleLogger, securely.</p>
+<p>There are several different sets of letters by them. These are:</p>
+<h3>VCC</h3>
+<p>&#8220;Voltage of the common connector&#8221;: this is raw power from the batteries. Keep it above 3.6V and below 5.5V. Any higher and you fry things; any lower and the system starts shutting down.</p>
+<p>We usually use:</p>
+<ul>
+<li>USB (5V)</li>
+<li>3x AA or D batteries</li>
+</ul>
+<h3>5V</h3>
+<p>This is 5V power, supplied by a switchable charge pump. Note that it will be closer to 5.2V if very small voltages are required.</p>
+<p>It is most often used to power 5V devices.</p>
+<h3>3V3</h3>
+<p>This is 3.3V power, supplied by a switchable voltage regulator.</p>
+<p>It powers 3.3V devices and is used as a reference (and often a power source) for analog measurements.</p>
+<h3>GND</h3>
+<p>This is ground. Circuits that start at VCC end here. Don&#8217;t touch power directly to ground unless you want to destroy something. It is the same as 0V.</p>
+<h3>A0, A1, A2, A3, A6, A7</h3>
+<p>These are the analog pins. They measure input voltages in a range between 0 and 3.3 volts.</p>
+<p>What happened to 4 and 5? They are talking to the real-time clock, and are labeled SDA and SCL on the board.</p>
+<h3>D3-INT1, D7, D8 (digital pins)</h3>
+<p>These pins can read or write TRUE or FALSE values. For writing, TRUE means full power (VCC) is delivered. False means the pin goes to GND. Reading values with these pins tells you whether the observed voltage is closer to VCC or to GND.</p>
+<h3>D3-INT1 (interrupt)</h3>
+<p>This pin can be used as an interrupt, to observe an event. We often use it with anemometers (spin counters) and tipping-bucket rain gauges.</p>
+<h3>D7 and D8: (PWM)</h3>
+<p>Pulse-width modulation. Actually, this isn&#8217;t written on the board. It uses the analogWrite() function in Arduino and simulates a voltage between GND (0V) and VCC by turning itself on and off very quickly, repeatedly.</p>
+<h3>Rx and Tx</h3>
+<p>Receive and transmit: these are your serial pins. Be careful: they are also attached to the USB port (to talk to your computer), so they must be shared.</p>
+<p>For the electronics-savvy: they are connected to the computer via 1Kohm in-series resistors, so external sensors will override USB communications.</p>
+<h3>MOSI, MISO, SCK</h3>
+<p>These are the pins for the SPI communications protocol. This protocol is used to communicate with the SD card. You may also use it with some external sensors.</p>
+<p><code></code></p>
+<h3>SDA, SCL</h3>
+<p>These are the pins used for the I2C communications protocol. This works with the real-time clock, and can connect to external peripherals as well.</p>
+<p>For the tech-heads: we are updating the design to optimize this for 3.3V design, common among I2C devices.</p>
+<h2>Special pins</h2>
+<p>The ALog BottleLogger has several pins that are used for dedicated functions. These are:</p>
+<ul>
+<li><strong>Pin 2:</strong> Interrupt connected to clock: triggers logger to wake</li>
+<li><strong>Pin 4:</strong> Sensor power</li>
+<li><strong>Pin 7:</strong> Clock and SD card 3.3V power</li>
+<li><strong>Pin 8:</strong> LED on/off</li>
+</ul>
+<h2>Reference resistor headers</h2>
+<p>The pair of plastic vertical &#8220;headers&#8221; &#8212; things with holes in them for wires &#8212; are for reference resistors to read analog resistance-based sensors. A simple example is a thermistor, and we&#8217;ll cover that farther on down here.</p>
+<hr />
+<h1>Programming Arduino-based systems: Focus on the ALog</h1>
+<h2>Download and install the Arduino IDE</h2>
+<p>The Arduino IDE (Integrated Development Environment) is the current programming environment we use to write and upload programs to the ALog. (Other options exist, but this is the most beginner-friendly.)</p>
+<p>We haven&#8217;t yet tested the brand-new web editor, so we&#8217;ll be suggesting an old-fashioned download. And if you&#8217;re deploying these in the field, you&#8217;ll need the downloaded version!</p>
+<p>Go to <a href="https://www.arduino.cc/en/Main/Software">https://www.arduino.cc/en/Main/Software</a>.</p>
+<p>Get it, install it, go.</p>
+<h2>Set up the ALog boards definitions</h2>
+<p>The ALog boards are &#8220;third-party&#8221; Arduino boards, so you&#8217;ll have to set up support for these boards yourself.</p>
+<p>We&#8217;ve made a pretty thorough walkthrough that you can view here:</p>
+<p><a href="https://github.com/NorthernWidget/Arduino_Boards">https://github.com/NorthernWidget/Arduino_Boards</a></p>
+<h2>Download and install the custom ALog libraries</h2>
+<p>The ALog also relies on some custom software libraries. These are collections of computer code that help make everything from running basic data logging utilities to interfacing with specific sensors easier.</p>
+<p>We&#8217;re introducing you to these libraries up here, even though they won&#8217;t be needed until quite a bit further down.</p>
+<p>While we highly recommend them and they are very helpful for field work, you can also program the ALog without them! In fact, the earlier examples (below) do not include the custom libraries.</p>
+<h3>Download:</h3>
+<p><strong>Stable release: <a href="http://northernwidget.com/ALog_libraries/stable/ALog_libraries.zip">[ZIP]</a> <a href="http://northernwidget.com/ALog_libraries/stable/ALog_libraries.tar.gz">[TAR.GZ]</a> (recommended)</strong><br />
+Nightly build: <a href="http://northernwidget.com/ALog_libraries/nightly/ALog_libraries.zip">[ZIP]</a> <a href="http://northernwidget.com/ALog_libraries/nightly/ALog_libraries.tar.gz">[TAR.GZ]</a> (for only those who can tolerate things breaking once in a while)</p>
+<h3>Extract/Install:</h3>
+<p>Unzip the archive, and place the contents in the &#8220;Arduino&#8221; folder. This should be in your home directory or your Documents. Then restart the Arduino IDE (if it is open).</p>
+<h3>Easier ways in the future?</h3>
+<p>Yes, we&#8217;re going to integrate our libraries with the automated library manager in the Arduino IDE. Yippee! <strong>EXPECT MORE HERE IN THE FUTURE</strong></p>
+<h2>Learn some basics of programming in the Arduino language</h2>
+<p>If you&#8217;re not a programmer (yet!), you might be thinking, &#8220;yeah, right.&#8221;</p>
+<p>Yeah, right! You can program! We&#8217;ll walk you through it:</p>
+<ul>
+<li>First, we&#8217;ll point you to some nice resources</li>
+<li>Then, we&#8217;ll show you how to write a simple code to blink your LED.</li>
+<li>Finally, you&#8217;ll combine your LED blinking with serial communications with your computer.</li>
+</ul>
+<p><em>[For the technical folks: The Arduino programming language is variant of C/C++.]</em></p>
+<h2>Programming resources</h2>
+<h3>Tutorials from Adafruit</h3>
+<p>These are serious good. You can follow along with them!</p>
+<p><a href="https://learn.adafruit.com/series/learn-arduino">https://learn.adafruit.com/series/learn-arduino</a></p>
+<p>If you follow them, note that the ALog BottleLogger can take only 3.6 &#8212; 5.5 volts, and that the LED is controlled by Pin 8 (not 13).</p>
+<p>Here is their version of the &#8220;blink&#8221; example that we&#8217;ll do below.</p>
+<p>https://learn.adafruit.com/adafruit-arduino-lesson-1-blink?view=all</p>
+<p>Look at as many of these as you want! Yes, your ALog can:</p>
+<ul>
+<li>Sense sensors</li>
+<li>Motor motors</li>
+<li>Blink blinky things</li>
+<li>Textt text via the serial monitor</li>
+<li>Type text onto a display screen</li>
+<li>More more more!</li>
+</ul>
+<h3>The full reference guide</h3>
+<p>Yes, there <strong>is</strong> a manual!</p>
+<p>The full reference guide is here <a href="https://www.arduino.cc/en/Reference/HomePage">https://www.arduino.cc/en/Reference/HomePage</a>.</p>
+<h3>The internet</h3>
+<p>We&#8217;re not kidding. We type things into our favorite search engine when we can&#8217;t figure them out and/or are too tired to think. 90+% of the time, this gets us to the right answer. Sometimes it takes longer than others. Arduino forums and StackExchange are pretty great:</p>
+<p><a href="https://forum.arduino.cc/"><strong>Arduino forums</strong></a></p>
+<p><strong><a href="https://arduino.stackexchange.com/">Arduino stack exchange</a> </strong>[stack exchange is just about the most effective way of conveying the right answers for how to do things that I&#8217;ve (Andy has, that is!) ever seen on the internet]</p>
+<h2>Basic syntax of C programming</h2>
+<p>Programming languages all have ways in which locial thoughts are placed into text that is entered into a computer. Here is a non-exhaustive list of these. It is not intended to be complete, but to give you some essential tools to start reading the code that appears below.</p>
+<h3>Defining variables</h3>
+<p>Each variable needs to be defined before it is used.</p>
+<p></p><!-- Crayon Syntax Highlighter v_2.7.2_beta -->
 
-\subsection libraries ALog program and libraries
+		<div id="crayon-593141e2c5266963002221" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Copy"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+bool isOn=False; // Boolean: True (1) or False (0)
+int x=50; // Integer (this works for values between -32768 and 32767).
+          // For broader applicability, look up uint32, int64, etc.
+float _my_float = 1000.293; // "Floating point" (decimal) number
+char letter='h' // This is a letter, but is represented in ASCII, so is
+                // also a 1-byte number</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-593141e2c5266963002221-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c5266963002221-2">2</div><div class="crayon-num" data-line="crayon-593141e2c5266963002221-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c5266963002221-4">4</div><div class="crayon-num" data-line="crayon-593141e2c5266963002221-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c5266963002221-6">6</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><div class="crayon-line" id="crayon-593141e2c5266963002221-1"><span class="crayon-t">bool</span><span class="crayon-h"> </span><span class="crayon-v">isOn</span><span class="crayon-o">=</span><span class="crayon-t">False</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// Boolean: True (1) or False (0)</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c5266963002221-2"><span class="crayon-t">int</span><span class="crayon-h"> </span><span class="crayon-v">x</span><span class="crayon-o">=</span><span class="crayon-cn">50</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// Integer (this works for values between -32768 and 32767).</span></div><div class="crayon-line" id="crayon-593141e2c5266963002221-3"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-c">// For broader applicability, look up uint32, int64, etc.</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c5266963002221-4"><span class="crayon-t">float</span><span class="crayon-h"> </span><span class="crayon-v">_my_float</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">1000.293</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// "Floating point" (decimal) number</span></div><div class="crayon-line" id="crayon-593141e2c5266963002221-5"><span class="crayon-t">char</span><span class="crayon-h"> </span><span class="crayon-v">letter</span><span class="crayon-o">=</span><span class="crayon-s">'h'</span><span class="crayon-h"> </span><span class="crayon-c">// This is a letter, but is represented in ASCII, so is</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c5266963002221-6"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-c">// also a 1-byte number</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0014 seconds] -->
+<p></p>
+<p>Each of these goes:</p>
+<p><strong>variable_type       variable_name       =        variable_value        ;</strong></p>
+<p>For more information on types, see the Sparkfun Electronics tutorial at https://learn.sparkfun.com/tutorials/data-types-in-arduino. For what you are doing right now, a general idea of what these definitions are and what they look like should work.</p>
+<h3>Comments</h3>
+<p>Ignore lines that start with:</p>
+<p></p><!-- Crayon Syntax Highlighter v_2.7.2_beta -->
 
-1. Download Arduino’s latest IDE (version 1.6.9 at the time of writing): http://arduino.cc/en/Main/Software
-2. Navgate to your \b sketchbook folder in your home directory, and into the \b libraries folder that it contains. Clone or download the following git repositories there:
-2. 1. The main Logger library: https://github.com/NorthernWidget/Logger
-2. 2. The DS3231 clock library: https://github.com/NorthernWidget/DS3231.
-2. 3. SdFat library: https://github.com/greiman/SdFat
-3. In order to communicate with the ALog outside of the Arduino IDE (step 1) and set its clock, you will want to download ALogTalk from our GitHub repository, https://github.com/NorthernWidget/ALogTalk, along with Python if you are running Windows (Linux and Mac users have Python by default). See http://www.python.org/getit/.
+		<div id="crayon-593141e2c5277641452557" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Copy"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// [compiler doensn't care what is here, but you can read it</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-593141e2c5277641452557-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><div class="crayon-line" id="crayon-593141e2c5277641452557-1"><span class="crayon-c">// [compiler doensn't care what is here, but you can read it</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0002 seconds] -->
+<p></p>
+<p>And lines that are between</p>
+<p></p><!-- Crayon Syntax Highlighter v_2.7.2_beta -->
 
-Once all of these are installed, you are ready to program your ALog. Our Quick Start Guide is in the works, and will provide the next steps. Please e-mail info@northernwidget.com (for the full team) or Chad Sandell (sand0724@umn.edu) if you have questions
+		<div id="crayon-593141e2c527f733877688" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Copy"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+/*
+ whatevs
+ */</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-593141e2c527f733877688-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c527f733877688-2">2</div><div class="crayon-num" data-line="crayon-593141e2c527f733877688-3">3</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><div class="crayon-line" id="crayon-593141e2c527f733877688-1"><span class="crayon-c">/*</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c527f733877688-2"><span class="crayon-c"> whatevs</span></div><div class="crayon-line" id="crayon-593141e2c527f733877688-3"><span class="crayon-c"> */</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0002 seconds] -->
+<p></p>
+<p>These are for the benefit of the humans reading the code. Comment your code clearly and thoroughly!</p>
+<h3>Line endings</h3>
+<p>Lines must be terminated with semicolons.</p>
+<p></p><!-- Crayon Syntax Highlighter v_2.7.2_beta -->
 
-\subsection arduino_tutorial Arduino
+		<div id="crayon-593141e2c5287864598208" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Copy"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+int a=5;</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-593141e2c5287864598208-1">1</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><div class="crayon-line" id="crayon-593141e2c5287864598208-1"><span class="crayon-t">int</span><span class="crayon-h"> </span><span class="crayon-v">a</span><span class="crayon-o">=</span><span class="crayon-cn">5</span><span class="crayon-sy">;</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0003 seconds] -->
+<p></p>
+<h3>Operations</h3>
+<p>Basic arithmetic operators (
+			<span id="crayon-593141e2c528e085306791" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important;"><span class="crayon-pre crayon-code" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><span class="crayon-o">+</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-o">-</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-o">*</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-o">/</span></span></span>) work. Division of two integers results in &#8220;floor division, or rounding down the result.</p>
+<p>There are also logical operators (
+			<span id="crayon-593141e2c5295105553804" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important;"><span class="crayon-pre crayon-code" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><span class="crayon-o">&lt;</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-o">&gt;</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-o">==</span></span></span>, etc.)</p>
+<h3>Loops and Statements</h3>
+<p>These are ways to control the flow of a code. I&#8217;m afraid that this introduction to the ALog would be dilluted by the details of these. I point the interested reader to the main Arduino reference: <a href="https://www.arduino.cc/en/Reference/HomePage">https://www.arduino.cc/en/Reference/HomePage</a>.</p>
+<hr />
+<h1>Connecting the ALog and Computer</h1>
+<p>Use a USB cable to connect the ALog to your computer.</p>
+<p>&lt;PICTURE here&gt;</p>
+<p>Then, using the Arduino IDE, select the name of the USB-serial port that is connected to the ALog.</p>
+<p>&lt;PICTURE here&gt;</p>
+<p>Now your ALog is ready for communications and programming.</p>
+<hr />
+<h1>Example Programs: Writing and Uploading</h1>
+<p>Arduino programs, often called &#8220;sketches&#8221;, are how you tell the ALog data logger what to do. Here is some information to get you started.</p>
+<h2>A new program</h2>
+<p>If you open a new Arduino program, it will look like this:</p>
+<p></p><!-- Crayon Syntax Highlighter v_2.7.2_beta -->
 
-Limor Fried has an excellent tutorial for Arduino at http://www.ladyada.net/learn/arduino/. If you are unfamiliar with the platform (and/or embedded electronics), I strongly suggest that you purchase and Arduino Uno (http://arduino.cc/en/Main/arduinoBoardUno), which is their basic board upon which the ALog BottleLogger is based, and run through these tutorials to get used to C/C++ programming and Arduino.
+		<div id="crayon-593141e2c529d648593431" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title">Default Arduino code</span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Copy"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">C++</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+void setup() {
+  // put your setup code here, to run once:
 
-\section quickstart Quick-start guide
+}
 
-<i>This section, our quick-start guide is meant to get you up and running with your ALog BottleLogger as efficiently as possible.</i>
+void loop() {
+  // put your main code here, to run repeatedly:
 
-All right. You have your ALog data logger, and you’re ready to measure... something. Anything, really. But you need a hand getting out of the blocks. This section is here for you.
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-593141e2c529d648593431-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c529d648593431-2">2</div><div class="crayon-num" data-line="crayon-593141e2c529d648593431-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c529d648593431-4">4</div><div class="crayon-num" data-line="crayon-593141e2c529d648593431-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c529d648593431-6">6</div><div class="crayon-num" data-line="crayon-593141e2c529d648593431-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c529d648593431-8">8</div><div class="crayon-num" data-line="crayon-593141e2c529d648593431-9">9</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><div class="crayon-line" id="crayon-593141e2c529d648593431-1"><span class="crayon-t">void</span><span class="crayon-h"> </span><span class="crayon-e">setup</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c529d648593431-2"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// put your setup code here, to run once:</span></div><div class="crayon-line" id="crayon-593141e2c529d648593431-3">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c529d648593431-4"><span class="crayon-sy">}</span></div><div class="crayon-line" id="crayon-593141e2c529d648593431-5">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c529d648593431-6"><span class="crayon-t">void</span><span class="crayon-h"> </span><span class="crayon-e">loop</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-593141e2c529d648593431-7"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// put your main code here, to run repeatedly:</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c529d648593431-8">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c529d648593431-9"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0009 seconds] -->
+<p></p>
+<p>
+			<span id="crayon-593141e2c52a4136736136" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important;"><span class="crayon-pre crayon-code" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><span class="crayon-e">setup</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span></span></span> and  
+			<span id="crayon-593141e2c52ab217062009" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important;"><span class="crayon-pre crayon-code" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><span class="crayon-e">loop</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span></span></span>  are both <strong>functions</strong>. These are specific sets of code that are executed when their names are called in the code.</p>
+<p>These two functions are special in that:</p>
+<ol>
+<li>Every Arduino program much have them.</li>
+<li>They do not need to be called by code that you write: Arduino autmatically interprets and, indeed, requires that these be included.
+<ul>
+<li>Everything inside the curly braces after  
+			<span id="crayon-593141e2c52b2974190169" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important;"><span class="crayon-pre crayon-code" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><span class="crayon-e">setup</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span></span></span>  is run once, when the data logger starts running</li>
+<li>Everything inside the curly braces after  
+			<span id="crayon-593141e2c52b9930480542" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important;"><span class="crayon-pre crayon-code" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><span class="crayon-e">loop</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span></span></span>  is run continuously, after 
+			<span id="crayon-593141e2c52c0412281921" class="crayon-syntax crayon-syntax-inline  crayon-theme-classic crayon-theme-classic-inline crayon-font-monaco" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important;"><span class="crayon-pre crayon-code" style="font-size: 12px !important; line-height: 15px !important;font-size: 12px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><span class="crayon-e">setup</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span></span></span>.</li>
+</ul>
+</li>
+</ol>
+<p>Before these functions, you can place all of your variable definitions.</p>
+<h2>Blink</h2>
+<p>Let&#8217;s make a blinky light turn on and off! On the ALog, <strong>pin 8</strong> is attached to a red indicator LED. Here is some code to create a synocpated blinky light.</p>
+<p></p><!-- Crayon Syntax Highlighter v_2.7.2_beta -->
 
-\subsection software_install Installing requisite software
+		<div id="crayon-593141e2c52cc333931690" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title">Default Arduino code</span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Copy"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">C++</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// Syncopated LED blink
 
-Go to \ref libraries, above, and follow the installation directions.
+void setup() {
+ // put your setup code here, to run once:
+ pinMode(8, OUTPUT); // "Output" means that the maximum current possible will be available at Pin 8
+                     // to drive the LED
+}
 
-\subsection program_upload Upload the program "alog_no_sensors"
+void loop() {
+ // put your main code here, to run repeatedly:
+ digitalWrite(8, HIGH); // Turn power to light ON
+ delay(750); // Wait for 750 milliseconds
+ digitalWrite(8, LOW); // Turn power to light OFF
+ delay(250);
+ digitalWrite(8, HIGH);
+ delay(250);
+ digitalWrite(8, LOW);
+ delay(250);
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52cc333931690-2">2</div><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52cc333931690-4">4</div><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52cc333931690-6">6</div><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52cc333931690-8">8</div><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52cc333931690-10">10</div><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-11">11</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52cc333931690-12">12</div><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-13">13</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52cc333931690-14">14</div><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-15">15</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52cc333931690-16">16</div><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-17">17</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52cc333931690-18">18</div><div class="crayon-num" data-line="crayon-593141e2c52cc333931690-19">19</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><div class="crayon-line" id="crayon-593141e2c52cc333931690-1"><span class="crayon-c">// Syncopated LED blink</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52cc333931690-2">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52cc333931690-3"><span class="crayon-t">void</span><span class="crayon-h"> </span><span class="crayon-e">setup</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52cc333931690-4"><span class="crayon-h"> </span><span class="crayon-c">// put your setup code here, to run once:</span></div><div class="crayon-line" id="crayon-593141e2c52cc333931690-5"><span class="crayon-h"> </span><span class="crayon-e">pinMode</span><span class="crayon-sy">(</span><span class="crayon-cn">8</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">OUTPUT</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// "Output" means that the maximum current possible will be available at Pin 8</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52cc333931690-6"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span class="crayon-c">// to drive the LED</span></div><div class="crayon-line" id="crayon-593141e2c52cc333931690-7"><span class="crayon-sy">}</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52cc333931690-8">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52cc333931690-9"><span class="crayon-t">void</span><span class="crayon-h"> </span><span class="crayon-e">loop</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52cc333931690-10"><span class="crayon-h"> </span><span class="crayon-c">// put your main code here, to run repeatedly:</span></div><div class="crayon-line" id="crayon-593141e2c52cc333931690-11"><span class="crayon-h"> </span><span class="crayon-e">digitalWrite</span><span class="crayon-sy">(</span><span class="crayon-cn">8</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">HIGH</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// Turn power to light ON</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52cc333931690-12"><span class="crayon-h"> </span><span class="crayon-e">delay</span><span class="crayon-sy">(</span><span class="crayon-cn">750</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// Wait for 750 milliseconds</span></div><div class="crayon-line" id="crayon-593141e2c52cc333931690-13"><span class="crayon-h"> </span><span class="crayon-e">digitalWrite</span><span class="crayon-sy">(</span><span class="crayon-cn">8</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">LOW</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// Turn power to light OFF</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52cc333931690-14"><span class="crayon-h"> </span><span class="crayon-e">delay</span><span class="crayon-sy">(</span><span class="crayon-cn">250</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-593141e2c52cc333931690-15"><span class="crayon-h"> </span><span class="crayon-e">digitalWrite</span><span class="crayon-sy">(</span><span class="crayon-cn">8</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">HIGH</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52cc333931690-16"><span class="crayon-h"> </span><span class="crayon-e">delay</span><span class="crayon-sy">(</span><span class="crayon-cn">250</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-593141e2c52cc333931690-17"><span class="crayon-h"> </span><span class="crayon-e">digitalWrite</span><span class="crayon-sy">(</span><span class="crayon-cn">8</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">LOW</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52cc333931690-18"><span class="crayon-h"> </span><span class="crayon-e">delay</span><span class="crayon-sy">(</span><span class="crayon-cn">250</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-593141e2c52cc333931690-19"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0034 seconds] -->
+<p></p>
+<h3>Uploading code to the ALog data logger</h3>
+<p>Once your code is written &#8212; either as a copy/paste of this or as your own &#8212; save your code. All Arduino sketches need to be within their own folder.</p>
+<p>After this, you can hit the &#8220;upload&#8221; button (right arrow) to load the code to the board. (The check mark to the left will test if your code compiles.)</p>
+<p>&lt;Insert image&gt;</p>
+<h2>USB/Serial communications</h2>
+<p>A second important piece of your work with the Arduino is to communicate with it. We&#8217;ll start with one-way communications, with the ALog talking to your computer. We will still flash the LED, and will add in information on how to define a variable outside of these two functions. I break this down in the comments.</p>
+<p></p><!-- Crayon Syntax Highlighter v_2.7.2_beta -->
 
-Now, upload some code to your data logger. We’ll start with an example that does nothing but log the time. Follow these steps:
+		<div id="crayon-593141e2c52d4081236265" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Copy"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">C++</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+// Global variables
+// These variables are availalble 
+int LEDpin = 8;
 
-1. Start the Arduino application on your computer.
-2. Go to File→Examples→Logger→alog_no_sensors. Click to open it.
-\image html Open_alog_no_sensors.png "Open alog_no_sensors: this is our blank template upon which you can write your logger code. For now, we will just upload this file alone." width=8cm
-\image latex Open_alog_no_sensors.png "Open alog_no_sensors: this is our blank template upon which you can write your logger code. For now, we will just upload this file alone." width=.8\linewidth
-3. Select "Arduino Pro" under "boards". Sparkfun’s Arduino Pro 3.3V has the same microcontroller chip and clock speed as the ALog BottleLogger, so its settings are compatible.
-\image html BoardsSelect_ArduinoPro.png "Sparkfun's Arduino pro can have the same settings as the ALog." width=8cm
-\image latex BoardsSelect_ArduinoPro.png "Sparkfun's Arduino pro can have the same settings as the ALog." width=.8\linewidth
-4. Select the processor for the ALog: 8 MHz Arduino Pro 328.
-\image html ProcessorSelect_3V3_8MHz.png "The Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega328 has the proper settings for the ALog BottleLogger. Your version of Arduino won’t have the 'ALog BottleLogger' custom setting at the top; it is part of our work to eventually have a more streamlined ALog programming interface." width=8cm
-\image latex ProcessorSelect_3V3_8MHz.png "The Arduino Pro or Pro Mini (3.3V, 8 MHz) w/ ATmega328 has the proper settings for the ALog BottleLogger. Your version of Arduino won’t have the 'ALog BottleLogger' custom setting at the top; it is part of our work to eventually have a more streamlined ALog programming interface." width=.8\linewidth
-5. Plug in your ALog BottleLogger using a USB A to B cable.
-6. The BottleLogger should blink a couple of times on the LED’s that are right by the USB port. This means that it sees that it has been plugged in. Sometimes, we ship the BottleLoggers with a "blink" program installed. This will cause the large red LED in the center to blink when the ALog is plugged in... so your board might do this too. It’s one of our ways of testing that the board is programmable before shipping it to you.
-7. Click on the "tools" menu, like the above figure. The "Serial Port" item in that menu should no longer be grayed out. Select your serial port.
-8. Click "upload" from within the window holding "alog_no_sensors", and send the code to the ALog. It will compile for a little while first, and then be sent over as a bitstream while the two small LED’s by the USB port on the ALog blink furiously: these are telling you that data is being sent to the logger (RX) or transmitted from the logger to the computer (TX).
-9. Once this is done, click the "Serial Monitor" button to see what your data logger says. It will probably say something about setting the clock while the ALog flashes a syncopated rhythm on its main LED. This means that it is time for your next step...
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(38400);
+  pinMode(LEDpin, OUTPUT);
+}
 
-\subsection clock_setting Interfacing with the ALog and setting its clock
+void loop() {
+  // put your main code here, to run repeatedly:
+  Serial.println("Hi, computer.");
+  delay(1000);
+  digitalWrite(LEDpin, HIGH);
+  delay(500);
+  digitalWrite(LEDpin, LOW);
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-593141e2c52d4081236265-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52d4081236265-2">2</div><div class="crayon-num" data-line="crayon-593141e2c52d4081236265-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52d4081236265-4">4</div><div class="crayon-num" data-line="crayon-593141e2c52d4081236265-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52d4081236265-6">6</div><div class="crayon-num" data-line="crayon-593141e2c52d4081236265-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52d4081236265-8">8</div><div class="crayon-num" data-line="crayon-593141e2c52d4081236265-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52d4081236265-10">10</div><div class="crayon-num" data-line="crayon-593141e2c52d4081236265-11">11</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52d4081236265-12">12</div><div class="crayon-num" data-line="crayon-593141e2c52d4081236265-13">13</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52d4081236265-14">14</div><div class="crayon-num" data-line="crayon-593141e2c52d4081236265-15">15</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52d4081236265-16">16</div><div class="crayon-num" data-line="crayon-593141e2c52d4081236265-17">17</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52d4081236265-18">18</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><div class="crayon-line" id="crayon-593141e2c52d4081236265-1"><span class="crayon-c">// Global variables</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52d4081236265-2"><span class="crayon-c">// These variables are availalble </span></div><div class="crayon-line" id="crayon-593141e2c52d4081236265-3"><span class="crayon-t">int</span><span class="crayon-h"> </span><span class="crayon-v">LEDpin</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">8</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52d4081236265-4">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52d4081236265-5"><span class="crayon-t">void</span><span class="crayon-h"> </span><span class="crayon-e">setup</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52d4081236265-6"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// put your setup code here, to run once:</span></div><div class="crayon-line" id="crayon-593141e2c52d4081236265-7"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">Serial</span><span class="crayon-sy">.</span><span class="crayon-e">begin</span><span class="crayon-sy">(</span><span class="crayon-cn">38400</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52d4081236265-8"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-e">pinMode</span><span class="crayon-sy">(</span><span class="crayon-v">LEDpin</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">OUTPUT</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-593141e2c52d4081236265-9"><span class="crayon-sy">}</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52d4081236265-10">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52d4081236265-11"><span class="crayon-t">void</span><span class="crayon-h"> </span><span class="crayon-e">loop</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-h"> </span><span class="crayon-sy">{</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52d4081236265-12"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// put your main code here, to run repeatedly:</span></div><div class="crayon-line" id="crayon-593141e2c52d4081236265-13"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">Serial</span><span class="crayon-sy">.</span><span class="crayon-e">println</span><span class="crayon-sy">(</span><span class="crayon-s">"Hi, computer."</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52d4081236265-14"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-e">delay</span><span class="crayon-sy">(</span><span class="crayon-cn">1000</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-593141e2c52d4081236265-15"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-e">digitalWrite</span><span class="crayon-sy">(</span><span class="crayon-v">LEDpin</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">HIGH</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52d4081236265-16"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-e">delay</span><span class="crayon-sy">(</span><span class="crayon-cn">500</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-593141e2c52d4081236265-17"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-e">digitalWrite</span><span class="crayon-sy">(</span><span class="crayon-v">LEDpin</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">LOW</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52d4081236265-18"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0030 seconds] -->
+<p></p>
+<p>Let&#8217;s break this down a little bit:</p>
+<p>&nbsp;</p>
+<p><strong>Change your baud rate to 38400 bps!</strong></p>
+<p>&nbsp;</p>
+<hr />
+<h1>Using the ALog library</h1>
+<p>&nbsp;</p>
+<h3>Logger library</h3>
+<p>https://htmlpreview.github.io/?https://raw.githubusercontent.com/NorthernWidget/Logger/master/doc/html/classLogger.html</p>
+<p>&nbsp;</p>
+<h3>Thermistor example</h3>
+<p>For now, we&#8217;ll go through this as a group, but text will go here eventually!</p>
+<p></p><!-- Crayon Syntax Highlighter v_2.7.2_beta -->
 
-To set the clock of the ALog, plug it into your computer and run the "ALogTalk.py" program. This requires a Python interpreter (standard on all Linux and Mac computers) and can be done from the terminal by navigating to the ALogTalk directory and doing one of two things.
+		<div id="crayon-593141e2c52dc078587911" class="crayon-syntax crayon-theme-classic crayon-font-monaco crayon-os-pc print-yes notranslate" data-settings=" minimize scroll-mouseover" style=" margin-top: 12px; margin-bottom: 12px; font-size: 12px !important; line-height: 15px !important;">
+		
+			<div class="crayon-toolbar" data-settings=" mouseover overlay hide delay" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><span class="crayon-title"></span>
+			<div class="crayon-tools" style="font-size: 12px !important;height: 18px !important; line-height: 18px !important;"><div class="crayon-button crayon-nums-button" title="Toggle Line Numbers"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-plain-button" title="Toggle Plain Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-wrap-button" title="Toggle Line Wrap"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-expand-button" title="Expand Code"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-copy-button" title="Copy"><div class="crayon-button-icon"></div></div><div class="crayon-button crayon-popup-button" title="Open Code In New Window"><div class="crayon-button-icon"></div></div><span class="crayon-language">C++</span></div></div>
+			<div class="crayon-info" style="min-height: 16.8px !important; line-height: 16.8px !important;"></div>
+			<div class="crayon-plain-wrap"><textarea wrap="soft" class="crayon-plain print-no" data-settings="dblclick" readonly style="-moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4; font-size: 12px !important; line-height: 15px !important;">
+#include "Logger.h"
 
-First, if you have a standard
+Logger logger;
 
-FINISH THIS AFTER WORKING THROUGH CLOCK SETTING PROGRAMS! SEE IF YOU CAN GET THE HANDSHAKE TO WORK!
+////////////////////////////
+// USER-ENTERED VARIABLES //
+////////////////////////////
+char* dataLoggerName = "Thermistor Logger";
+char* fileName = "TempLog.txt"; // Name of file for logged data: 8.3 format (e.g, 
+                             // ABCDEFGH.TXT); &lt;= 8 chars before ".txt" is OK
 
->>> python ALogTalk.py
+//Setup logging interval here, may setup more than one variable. 
+//Minimum interval = 1 sec, maximum interval is 23 hours, 59 minutes, 59 seconds
+//0 for all means that the logger will not sleep
+int Log_Interval_Seconds = 10; //Valid range is 0-59 seconds
+int Log_Interval_Minutes = 0; //Valid range is 0-59 minutes
+int Log_Interval_Hours = 0; //Valid range is 0-23 hours
+bool external_interrupt = false; // e.g., rain gage
 
-Instructions will appear on the screen; if the logger does not respond, you can push its "reset" button.
+void setup(){  //Serial baud rate is set to 38400
+  logger.initialize(dataLoggerName, fileName,
+    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds,
+    external_interrupt);logger.setupLogger();
+}
 
+void loop(){
+// ***************************************** 
+logger.goToSleep_if_needed(); // Send logger to sleep
+logger.startLogging();  // Wake up and initialize
+// ****** DO NOT EDIT ABOVE THIS LINE ****** 
 
+//////////////////////////////////
+// READ SENSORS: EDIT THIS PART //
+//////////////////////////////////
 
+// Analog sensors: place all analog sensor commands between
+// startAnalog() and endAnalog().
+// If you have no analog sensors, you should comment out the 
+// startAnalog() and endAnalog() commands
 
+logger.startAnalog();
 
+// CanTherm small bead
+//logger.thermistorB(10000, 3950, 10000, 25, 0);
+// CanTherm expoxy bead: CWF1B103F3380
+logger.thermistorB(10000, 3380, 10000, 25, 0);
 
->>> python ALogTalk.py
+logger.endAnalog();
 
-Instructions will appear on the screen; if the logger does not respond, you can push its "reset" button.
+//
+// INSERT DIGITAL SENSOR READING COMMANDS HERE!
+//
 
-\subsection programming_your_own Creating and uploading a custom data logging routine
+// NOTE: THE BUFFER SIZE IS 512 BYTES;
+// run "logger.bufferWrite" if you think you are approaching this limit.
+// Otherwise, the buffer will overflow and I'm not sure what will happen.
 
-The Github repository has examples of data logging routines, which you can modify for your own purposes. See the "examples" folder. You can also look at "Logger.h" to see what variables you need to pass to each sensor’s function.
+// ****** DO NOT EDIT BELOW THIS LINE ****** 
 
-These examples include comments for where you should place your commands to communicate with various sensors, both analog and digital.
+// Wrap up files, turn off SD card, and go back to sleep
+logger.endLogging();
 
-If you are unfamiliar with C or Arduino programming, the Arduino reference guide can help: http://arduino.cc/en/Reference/HomePage.
+// ***************************************** 
 
-\b IMPORTANT: many examples of ALog code are included in this package; please use them as possible starting points for your code.
-
-\subsection attaching_sensors Attaching sensors
-
-Use the screw terminals (labeled) to connect sensors to the logger. These screw terminals are labeled with pin numbers that correspond to the pin numbers used in the program.
-
-\subsection self_made_sensor_code Writing your own sensor code
-
-\subsection field_deployment Field deployment
-
-We have learned a bit from past field installations, so you can e-mail us at info@northernwidget.com to tell us that you want some of these examples on the website. In the meantime, it’s basically an exercise in keeping the logger away from the elements and animals that like to chew wires.
-
-\section pinout ALog pinout and peripherals
-
-\image html LoggerPinout.png "ALog pinout and peripherals." width=10cm
-\image latex LoggerPinout.png "ALog pinout and peripherals." width=\linewidth
-
-\b Notes
-1. All pin numbers correspond to those of the Arduino Uno
-2. All SPI pins (11, 12, 13) are also used for SD card communication) 
-3. VCC means "Voltage of the Common Connector"
-4. The 3.3V regulator is typically a precision voltage reference 
-    (part number LT1461DHS8-5#PBF) that can source 10-50 mA of 
-    power, depending on VCC: 10 mA corresponds to 0.20V dropout 
-    between VCC and 3.3V; 50 mA corresponds to 1.5V dropout. 
-    Projects that need more power and/or use fully ratiometric 
-    measurements can request an ALog without this part; solder 
-    jumpers on the board will connect 3V3 pins to the unused side 
-    of our standard 3.3V low-dropout regulator.
-5. The 5V regulated output is supplied via a charge pump; when no current is drawn, its voltage will increase to 5.2V; after some current draw, is output will drop to a stable 5V. If there is a concern about low voltage draw from the charge pump, users should monitor its voltage with a voltage divider connected to one of the analog channels, and include a reading during the time that the sensor or other load on the charge pump is on and active.
-6. The interrupt pin (digital pin 3) can be used to detect events, such as an anemometer spinning or a rain gauge bucket tipping.
-
-\section About
-
-Who is Northern Widget? What is the connection to the University of Minnesota?
-
-<b>Northern Widget</b> is a company that 
-
-
+}</textarea></div>
+			<div class="crayon-main" style="">
+				<table class="crayon-table">
+					<tr class="crayon-row">
+				<td class="crayon-nums " data-settings="show">
+					<div class="crayon-nums-content" style="font-size: 12px !important; line-height: 15px !important;"><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-1">1</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-2">2</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-3">3</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-4">4</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-5">5</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-6">6</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-7">7</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-8">8</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-9">9</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-10">10</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-11">11</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-12">12</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-13">13</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-14">14</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-15">15</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-16">16</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-17">17</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-18">18</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-19">19</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-20">20</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-21">21</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-22">22</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-23">23</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-24">24</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-25">25</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-26">26</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-27">27</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-28">28</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-29">29</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-30">30</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-31">31</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-32">32</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-33">33</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-34">34</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-35">35</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-36">36</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-37">37</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-38">38</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-39">39</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-40">40</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-41">41</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-42">42</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-43">43</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-44">44</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-45">45</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-46">46</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-47">47</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-48">48</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-49">49</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-50">50</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-51">51</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-52">52</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-53">53</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-54">54</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-55">55</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-56">56</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-57">57</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-58">58</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-59">59</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-60">60</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-61">61</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-62">62</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-63">63</div><div class="crayon-num crayon-striped-num" data-line="crayon-593141e2c52dc078587911-64">64</div><div class="crayon-num" data-line="crayon-593141e2c52dc078587911-65">65</div></div>
+				</td>
+						<td class="crayon-code"><div class="crayon-pre" style="font-size: 12px !important; line-height: 15px !important; -moz-tab-size:4; -o-tab-size:4; -webkit-tab-size:4; tab-size:4;"><div class="crayon-line" id="crayon-593141e2c52dc078587911-1"><span class="crayon-p">#include "Logger.h"</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-2">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52dc078587911-3"><span class="crayon-e">Logger </span><span class="crayon-v">logger</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-4">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52dc078587911-5"><span class="crayon-c">////////////////////////////</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-6"><span class="crayon-c">// USER-ENTERED VARIABLES //</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-7"><span class="crayon-c">////////////////////////////</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-8"><span class="crayon-t">char</span><span class="crayon-o">*</span><span class="crayon-h"> </span><span class="crayon-v">dataLoggerName</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-s">"Thermistor Logger"</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-9"><span class="crayon-t">char</span><span class="crayon-o">*</span><span class="crayon-h"> </span><span class="crayon-v">fileName</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-s">"TempLog.txt"</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// Name of file for logged data: 8.3 format (e.g, </span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-10"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span class="crayon-c">// ABCDEFGH.TXT); &lt;= 8 chars before ".txt" is OK</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-11">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-12"><span class="crayon-c">//Setup logging interval here, may setup more than one variable. </span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-13"><span class="crayon-c">//Minimum interval = 1 sec, maximum interval is 23 hours, 59 minutes, 59 seconds</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-14"><span class="crayon-c">//0 for all means that the logger will not sleep</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-15"><span class="crayon-t">int</span><span class="crayon-h"> </span><span class="crayon-v">Log_Interval_Seconds</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">10</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">//Valid range is 0-59 seconds</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-16"><span class="crayon-t">int</span><span class="crayon-h"> </span><span class="crayon-v">Log_Interval_Minutes</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">0</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">//Valid range is 0-59 minutes</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-17"><span class="crayon-t">int</span><span class="crayon-h"> </span><span class="crayon-v">Log_Interval_Hours</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-cn">0</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">//Valid range is 0-23 hours</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-18"><span class="crayon-t">bool</span><span class="crayon-h"> </span><span class="crayon-v">external_interrupt</span><span class="crayon-h"> </span><span class="crayon-o">=</span><span class="crayon-h"> </span><span class="crayon-t">false</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// e.g., rain gage</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-19">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-20"><span class="crayon-t">void</span><span class="crayon-h"> </span><span class="crayon-e">setup</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">{</span><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">//Serial baud rate is set to 38400</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-21"><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-v">logger</span><span class="crayon-sy">.</span><span class="crayon-e">initialize</span><span class="crayon-sy">(</span><span class="crayon-v">dataLoggerName</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">fileName</span><span class="crayon-sy">,</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-22"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">Log_Interval_Hours</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">Log_Interval_Minutes</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-v">Log_Interval_Seconds</span><span class="crayon-sy">,</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-23"><span class="crayon-h">&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="crayon-v">external_interrupt</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-v">logger</span><span class="crayon-sy">.</span><span class="crayon-e">setupLogger</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-24"><span class="crayon-sy">}</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-25">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-26"><span class="crayon-t">void</span><span class="crayon-h"> </span><span class="crayon-e">loop</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">{</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-27"><span class="crayon-c">// ***************************************** </span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-28"><span class="crayon-v">logger</span><span class="crayon-sy">.</span><span class="crayon-e">goToSleep_if_needed</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h"> </span><span class="crayon-c">// Send logger to sleep</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-29"><span class="crayon-v">logger</span><span class="crayon-sy">.</span><span class="crayon-e">startLogging</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span><span class="crayon-h">&nbsp;&nbsp;</span><span class="crayon-c">// Wake up and initialize</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-30"><span class="crayon-c">// ****** DO NOT EDIT ABOVE THIS LINE ****** </span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-31">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-32"><span class="crayon-c">//////////////////////////////////</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-33"><span class="crayon-c">// READ SENSORS: EDIT THIS PART //</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-34"><span class="crayon-c">//////////////////////////////////</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-35">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-36"><span class="crayon-c">// Analog sensors: place all analog sensor commands between</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-37"><span class="crayon-c">// startAnalog() and endAnalog().</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-38"><span class="crayon-c">// If you have no analog sensors, you should comment out the </span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-39"><span class="crayon-c">// startAnalog() and endAnalog() commands</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-40">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52dc078587911-41"><span class="crayon-v">logger</span><span class="crayon-sy">.</span><span class="crayon-e">startAnalog</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-42">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52dc078587911-43"><span class="crayon-c">// CanTherm small bead</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-44"><span class="crayon-c">//logger.thermistorB(10000, 3950, 10000, 25, 0);</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-45"><span class="crayon-c">// CanTherm expoxy bead: CWF1B103F3380</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-46"><span class="crayon-v">logger</span><span class="crayon-sy">.</span><span class="crayon-e">thermistorB</span><span class="crayon-sy">(</span><span class="crayon-cn">10000</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-cn">3380</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-cn">10000</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-cn">25</span><span class="crayon-sy">,</span><span class="crayon-h"> </span><span class="crayon-cn">0</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-47">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-48"><span class="crayon-v">logger</span><span class="crayon-sy">.</span><span class="crayon-e">endAnalog</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-49">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-50"><span class="crayon-c">//</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-51"><span class="crayon-c">// INSERT DIGITAL SENSOR READING COMMANDS HERE!</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-52"><span class="crayon-c">//</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-53">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-54"><span class="crayon-c">// NOTE: THE BUFFER SIZE IS 512 BYTES;</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-55"><span class="crayon-c">// run "logger.bufferWrite" if you think you are approaching this limit.</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-56"><span class="crayon-c">// Otherwise, the buffer will overflow and I'm not sure what will happen.</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-57">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-58"><span class="crayon-c">// ****** DO NOT EDIT BELOW THIS LINE ****** </span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-59">&nbsp;</div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-60"><span class="crayon-c">// Wrap up files, turn off SD card, and go back to sleep</span></div><div class="crayon-line" id="crayon-593141e2c52dc078587911-61"><span class="crayon-v">logger</span><span class="crayon-sy">.</span><span class="crayon-e">endLogging</span><span class="crayon-sy">(</span><span class="crayon-sy">)</span><span class="crayon-sy">;</span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-62">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52dc078587911-63"><span class="crayon-c">// ***************************************** </span></div><div class="crayon-line crayon-striped-line" id="crayon-593141e2c52dc078587911-64">&nbsp;</div><div class="crayon-line" id="crayon-593141e2c52dc078587911-65"><span class="crayon-sy">}</span></div></div></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+<!-- [Format Time: 0.0071 seconds] -->
+<p></p>
+<p>&nbsp;</p>
+<h1>Connecting sensors</h1>
+<p><a href="http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout.png"><img class="aligncenter wp-image-486" src="http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout-791x1024.png" alt="" width="1000" height="1294" srcset="http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout-791x1024.png 791w, http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout-232x300.png 232w, http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout-768x994.png 768w, http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout-400x518.png 400w, http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout.png 1275w" sizes="(max-width: 1000px) 100vw, 1000px" /></a></p>
+<p><a href="http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout_smallfile.pdf">[PDF of User&#8217;s Layout guide]</a></p>
 
  */
