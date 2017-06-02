@@ -10,10 +10,9 @@ If you use the ALog library (and/or data logger) in a publication, please cite:
 
 **Wickert, A. D. (2014), [The ALog: Inexpensive, Open-Source, Automated Data Collection in the Field](http://onlinelibrary.wiley.com/wol1/doi/10.1890/0012-9623-95.2.68/full), *Bull. Ecol. Soc. Am.*, *95*(2), 68–78, doi:10.1890/0012-9623-95.2.68.**
 
-
+---
 
 # Quick-start guide
----
 
 ## Using the ALog library
 
@@ -41,16 +40,15 @@ The ALog has been developed by Andy Wickert and Chad Sandell at Northern Widget 
 
 For questions related to the Logger library, please send a message to us at info@northernwidget.com.
 
-
+---
 
 # Guide for first-time users: from the basics onward
----
 
 Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is for you. We'll guide you through the steps to install a first simple program on your ALog data logger, and introduce you to a few concepts along the way.
 
-# Materials Needed
+## Materials Needed
 
-## For the basics:
+### For the basics:
 
 *   **1x ALog data logger**
 *   **1x USB cable that fits the ALog's USB port**
@@ -58,7 +56,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     *   USB A-miniB (like an Android cell phone) for version 2.2.0 and greater
 *   **A computer with a USB port**
 
-## For the data logging exercises
+### For the data logging exercises
 
 *   **1x thermistor**
     *   Our instructions are for the **CanTherm CWF1B103F3380** (available on [Digi-Key](https://www.digikey.com/product-detail/en/cantherm/CWF1B103F3380/317-1310-ND/1191085) or from us). This thermistor is 1 meter long and coated in epoxy for all of your out-of-the-box measurement applications
@@ -67,7 +65,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
 
 ---
 
-# A few definitions
+## A few definitions
 
 *   A **microcontroller** is a teeny tiny computer that has its own:
     *   Processor for performing computations
@@ -85,21 +83,21 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
 
 ---
 
-# Looking at your board:
+## Looking at your board:
 
 Your ALog board should look something like this. It has a lot of components. We'll start to look at them in more detail once you wire the board up. [![](http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220-1024x443.png)](http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220.png)
 
 **ALog BottleLogger v2.2.0**
 
-## Dimensions: namesake
+### Dimensions: namesake
 
 The dimensions of the ALog BottleLogger are perfect to slip it into a Nalgene water bottle: these are often easier to find than gasketed boxes, especially if you're in the outdoors (or outdoors shops).
 
-## "Chunky" design for the field
+### "Chunky" design for the field
 
 Yes, we use the big, chunky, old-school SD cards, USB ports, and barrel jack connectors. And we love 'em. Why? Have you ever tried to connect cables with mittens in Minnesota-frigid temperatures? Have you ever dropped a micro-SD card (or other object the size of your pinky nail) into a beautiful bed of colorful oak leaves, stand of prairie grasses, or a lake? You'd better hope that your missing item is as big and recognizable as possible. We call it designing for reality.
 
-## What does it have?
+### What does it have?
 
 *   A teeny tiny computer running at 8MHz
 *   An SD card to save data
@@ -109,62 +107,62 @@ Yes, we use the big, chunky, old-school SD cards, USB ports, and barrel jack con
 *   Six pairs of holes for "reference resistors" to act as standards for certain types of measurements ("analog")
 *   A blinky light to tell you what's going on
 
-## Pins
+### Pins
 
 The Alog BottleLogger follows the Arduino Uno convention for pin numbering.
 
-## Those little numbers and letters by the screw terminals (pins)
+### Those little numbers and letters by the screw terminals (pins)
 
 Those black things on the sides with screw heads are the "screw terminals". They clamp down on wires to connect peripherals to the ALog BottleLogger, securely. There are several different sets of letters by them. These are:
 
-### VCC
+#### VCC
 
 "Voltage of the common connector": this is raw power from the batteries. Keep it above 3.6V and below 5.5V. Any higher and you fry things; any lower and the system starts shutting down. We usually use:
 
 *   USB (5V)
 *   3x AA or D batteries
 
-### 5V
+#### 5V
 
 This is 5V power, supplied by a switchable charge pump. Note that it will be closer to 5.2V if very small voltages are required. It is most often used to power 5V devices.
 
-### 3V3
+#### 3V3
 
 This is 3.3V power, supplied by a switchable voltage regulator. It powers 3.3V devices and is used as a reference (and often a power source) for analog measurements.
 
-### GND
+#### GND
 
 This is ground. Circuits that start at VCC end here. Don't touch power directly to ground unless you want to destroy something. It is the same as 0V.
 
-### A0, A1, A2, A3, A6, A7
+#### A0, A1, A2, A3, A6, A7
 
 These are the analog pins. They measure input voltages in a range between 0 and 3.3 volts. What happened to 4 and 5? They are talking to the real-time clock, and are labeled SDA and SCL on the board.
 
-### D3-INT1, D7, D8 (digital pins)
+#### D3-INT1, D7, D8 (digital pins)
 
 These pins can read or write TRUE or FALSE values. For writing, TRUE means full power (VCC) is delivered. False means the pin goes to GND. Reading values with these pins tells you whether the observed voltage is closer to VCC or to GND.
 
-### D3-INT1 (interrupt)
+#### D3-INT1 (interrupt)
 
 This pin can be used as an interrupt, to observe an event. We often use it with anemometers (spin counters) and tipping-bucket rain gauges.
 
-### D7 and D8: (PWM)
+#### D7 and D8: (PWM)
 
 Pulse-width modulation. Actually, this isn't written on the board. It uses the analogWrite() function in Arduino and simulates a voltage between GND (0V) and VCC by turning itself on and off very quickly, repeatedly.
 
-### Rx and Tx
+#### Rx and Tx
 
 Receive and transmit: these are your serial pins. Be careful: they are also attached to the USB port (to talk to your computer), so they must be shared. For the electronics-savvy: they are connected to the computer via 1Kohm in-series resistors, so external sensors will override USB communications.
 
-### MOSI, MISO, SCK
+#### MOSI, MISO, SCK
 
 These are the pins for the SPI communications protocol. This protocol is used to communicate with the SD card. You may also use it with some external sensors.
 
-### SDA, SCL
+#### SDA, SCL
 
 These are the pins used for the I2C communications protocol. This works with the real-time clock, and can connect to external peripherals as well. For the tech-heads: we are updating the design to optimize this for 3.3V design, common among I2C devices.
 
-## Special pins
+### Special pins
 
 The ALog BottleLogger has several pins that are used for dedicated functions. These are:
 
@@ -173,37 +171,37 @@ The ALog BottleLogger has several pins that are used for dedicated functions. Th
 *   **Pin 7:** Clock and SD card 3.3V power
 *   **Pin 8:** LED on/off
 
-## Reference resistor headers
+### Reference resistor headers
 
 The pair of plastic vertical "headers" -- things with holes in them for wires -- are for reference resistors to read analog resistance-based sensors. A simple example is a thermistor, and we'll cover that farther on down here. ---
 
-# Programming Arduino-based systems: Focus on the ALog
+## Programming Arduino-based systems: Focus on the ALog
 
-## Download and install the Arduino IDE
+### Download and install the Arduino IDE
 
 The Arduino IDE (Integrated Development Environment) is the current programming environment we use to write and upload programs to the ALog. (Other options exist, but this is the most beginner-friendly.) We haven't yet tested the brand-new web editor, so we'll be suggesting an old-fashioned download. And if you're deploying these in the field, you'll need the downloaded version! Go to [https://www.arduino.cc/en/Main/Software](https://www.arduino.cc/en/Main/Software). Get it, install it, go.
 
-## Set up the ALog boards definitions
+### Set up the ALog boards definitions
 
 The ALog boards are "third-party" Arduino boards, so you'll have to set up support for these boards yourself. We've made a pretty thorough walkthrough that you can view here: [https://github.com/NorthernWidget/Arduino_Boards](https://github.com/NorthernWidget/Arduino_Boards)
 
-## Download and install the custom ALog libraries
+### Download and install the custom ALog libraries
 
 The ALog also relies on some custom software libraries. These are collections of computer code that help make everything from running basic data logging utilities to interfacing with specific sensors easier. We're introducing you to these libraries up here, even though they won't be needed until quite a bit further down. While we highly recommend them and they are very helpful for field work, you can also program the ALog without them! In fact, the earlier examples (below) do not include the custom libraries.
 
-### Download:
+#### Download:
 
 **Stable release: [[ZIP]](http://northernwidget.com/ALog_libraries/stable/ALog_libraries.zip) [[TAR.GZ]](http://northernwidget.com/ALog_libraries/stable/ALog_libraries.tar.gz) (recommended)** Nightly build: [[ZIP]](http://northernwidget.com/ALog_libraries/nightly/ALog_libraries.zip) [[TAR.GZ]](http://northernwidget.com/ALog_libraries/nightly/ALog_libraries.tar.gz) (for only those who can tolerate things breaking once in a while)
 
-### Extract/Install:
+#### Extract/Install:
 
 Unzip the archive, and place the contents in the "Arduino" folder. This should be in your home directory or your Documents. Then restart the Arduino IDE (if it is open).
 
-### Easier ways in the future?
+#### Easier ways in the future?
 
 Yes, we're going to integrate our libraries with the automated library manager in the Arduino IDE. Yippee! **EXPECT MORE HERE IN THE FUTURE**
 
-## Learn some basics of programming in the Arduino language
+### Learn some basics of programming in the Arduino language
 
 If you're not a programmer (yet!), you might be thinking, "yeah, right." Yeah, right! You can program! We'll walk you through it:
 
@@ -213,9 +211,9 @@ If you're not a programmer (yet!), you might be thinking, "yeah, right." Yeah, r
 
 _[For the technical folks: The Arduino programming language is variant of C/C++.]_
 
-## Programming resources
+### Programming resources
 
-### Tutorials from Adafruit
+#### Tutorials from Adafruit
 
 These are serious good. You can follow along with them! [https://learn.adafruit.com/series/learn-arduino](https://learn.adafruit.com/series/learn-arduino) If you follow them, note that the ALog BottleLogger can take only 3.6 -- 5.5 volts, and that the LED is controlled by Pin 8 (not 13). Here is their version of the "blink" example that we'll do below. https://learn.adafruit.com/adafruit-arduino-lesson-1-blink?view=all Look at as many of these as you want! Yes, your ALog can:
 
@@ -226,19 +224,19 @@ These are serious good. You can follow along with them! [https://learn.adafruit.
 *   Type text onto a display screen
 *   More more more!
 
-### The full reference guide
+#### The full reference guide
 
 Yes, there **is** a manual! The full reference guide is here [https://www.arduino.cc/en/Reference/HomePage](https://www.arduino.cc/en/Reference/HomePage).
 
-### The internet
+#### The internet
 
 We're not kidding. We type things into our favorite search engine when we can't figure them out and/or are too tired to think. 90+% of the time, this gets us to the right answer. Sometimes it takes longer than others. Arduino forums and StackExchange are pretty great: [**Arduino forums**](https://forum.arduino.cc/) **[Arduino stack exchange](https://arduino.stackexchange.com/)** [stack exchange is just about the most effective way of conveying the right answers for how to do things that I've (Andy has, that is!) ever seen on the internet]
 
-## Basic syntax of C programming
+### Basic syntax of C programming
 
 Programming languages all have ways in which locial thoughts are placed into text that is entered into a computer. Here is a non-exhaustive list of these. It is not intended to be complete, but to give you some essential tools to start reading the code that appears below.
 
-### Defining variables
+#### Defining variables
 
 Each variable needs to be defined before it is used.
 
@@ -251,7 +249,7 @@ char letter='h' // This is a letter, but is represented in ASCII, so is
 
 Each of these goes: **variable_type variable_name = variable_value ;** For more information on types, see the Sparkfun Electronics tutorial at https://learn.sparkfun.com/tutorials/data-types-in-arduino. For what you are doing right now, a general idea of what these definitions are and what they look like should work.
 
-### Comments
+#### Comments
 
 Ignore lines that start with:
 
@@ -266,32 +264,32 @@ And lines that are between
 
 These are for the benefit of the humans reading the code. Comment your code clearly and thoroughly!
 
-### Line endings
+#### Line endings
 
 Lines must be terminated with semicolons.
 
 <pre class="lang:default decode:true">int a=5;
 </pre>
 
-### Operations
+#### Operations
 
 Basic arithmetic operators (<span class="lang:c++ decode:true crayon-inline">+, -, *, /</span>) work. Division of two integers results in "floor division, or rounding down the result. There are also logical operators (<span class="lang:c++ decode:true crayon-inline"><, >, ==</span>, etc.)
 
-### Loops and Statements
+#### Loops and Statements
 
 These are ways to control the flow of a code. I'm afraid that this introduction to the ALog would be dilluted by the details of these. I point the interested reader to the main Arduino reference: [https://www.arduino.cc/en/Reference/HomePage](https://www.arduino.cc/en/Reference/HomePage).
 
 * * *
 
-# Connecting the ALog and Computer
+## Connecting the ALog and Computer
 
 Use a USB cable to connect the ALog to your computer. <PICTURE here> Then, using the Arduino IDE, select the name of the USB-serial port that is connected to the ALog. <PICTURE here> Now your ALog is ready for communications and programming. ---
 
-# Example Programs: Writing and Uploading
+## Example Programs: Writing and Uploading
 
 Arduino programs, often called "sketches", are how you tell the ALog data logger what to do. Here is some information to get you started.
 
-## A new program
+### A new program
 
 If you open a new Arduino program, it will look like this:
 
@@ -340,11 +338,11 @@ void loop() {
 }
 </pre>
 
-### Uploading code to the ALog data logger
+#### Uploading code to the ALog data logger
 
 Once your code is written -- either as a copy/paste of this or as your own -- save your code. All Arduino sketches need to be within their own folder. After this, you can hit the "upload" button (right arrow) to load the code to the board. (The check mark to the left will test if your code compiles.) <Insert image>
 
-## USB/Serial communications
+### USB/Serial communications
 
 A second important piece of your work with the Arduino is to communicate with it. We'll start with one-way communications, with the ALog talking to your computer. We will still flash the LED, and will add in information on how to define a variable outside of these two functions. I break this down in the comments.
 
@@ -371,13 +369,13 @@ Let's break this down a little bit:   **Change your baud rate to 38400 bps!**
 
 * * *
 
-# Using the ALog library
+## Using the ALog library
 
-### Logger library
+#### Logger library
 
 https://htmlpreview.github.io/?https://raw.githubusercontent.com/NorthernWidget/Logger/master/doc/html/classLogger.html  
 
-### Thermistor example
+#### Thermistor example
 
 For now, we'll go through this as a group, but text will go here eventually!
 
@@ -448,6 +446,6 @@ logger.endLogging();
 }
 </pre>
 
-# Connecting sensors
+## Connecting sensors
 
 [![](http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout-791x1024.png)](http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout.png) [[PDF of User's Layout guide]](http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout_smallfile.pdf)
