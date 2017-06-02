@@ -87,7 +87,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
 
 Your ALog board should look something like this. It has a lot of components. We'll start to look at them in more detail once you wire the board up.
 
-![ALog BottleLogger v.2.2.0 top side photo](http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220-1024x443.png)
+![ALog BottleLogger v.2.2.0 top side photo](http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220.png)
 
 **ALog BottleLogger v2.2.0**
 
