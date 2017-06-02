@@ -99,6 +99,12 @@ The dimensions of the ALog BottleLogger are perfect to slip it into a Nalgene wa
 
 Yes, we use the big, chunky, old-school SD cards, USB ports, and barrel jack connectors. And we love 'em. Why? Have you ever tried to connect cables with mittens in Minnesota-frigid temperatures? Have you ever dropped a micro-SD card (or other object the size of your pinky nail) into a beautiful bed of colorful oak leaves, stand of prairie grasses, or a lake? You'd better hope that your missing item is as big and recognizable as possible. We call it designing for reality.
 
+(An update... while we love the old-schoool cool of the big USB A-B cable, we
+couldn't help but notice that tons of us were traveling with A-micro-B cables
+thanks to Android phones, but had to make a special effort to remember to bring 
+our A-B cables to the field. So we've made a recent (2017) update to the USB 
+port in our design.)
+
 ### What does it have?
 
 *   A teeny tiny computer running at 8MHz
