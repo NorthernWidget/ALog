@@ -1,8 +1,0 @@
-/*! \mainpage ALog Guide
-
-\section intro_sec Introduction
-
-The \b ALog data logger is an Arduino-based data logger that includes a full software library and documentation. The goal of this documentation is to ease the transition of researchers from closed-source proprietary technologies that are often well-documented, but can be expensive black boxes, to a fully open-source hardware and software toolchain that gives researchers all the power to control their data collection. For citizen-scientists who are interested in this tool: welcome, and it is greatly hoped that these instructions will suffice to get you started on the road to making measurements of our natural environment.
-
-\section instructions Instructions
-
