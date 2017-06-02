@@ -293,7 +293,8 @@ Arduino programs, often called "sketches", are how you tell the ALog data logger
 
 If you open a new Arduino program, it will look like this:
 
-<pre class="lang:c++ decode:true" title="Default Arduino code">void setup() {
+```cpp
+void setup() {
   // put your setup code here, to run once:
 
 }
@@ -302,14 +303,14 @@ void loop() {
   // put your main code here, to run repeatedly:
 
 }
-</pre>
+```
 
-<span class="lang:c++ decode:true crayon-inline">setup()</span> and <span class="lang:c++ decode:true crayon-inline">loop()</span> are both **functions**. These are specific sets of code that are executed when their names are called in the code. These two functions are special in that:
+`setup()` and `loop()` are both **functions**. These are specific sets of code that are executed when their names are called in the code. These two functions are special in that:
 
 1.  Every Arduino program much have them.
 2.  They do not need to be called by code that you write: Arduino autmatically interprets and, indeed, requires that these be included.
-    *   Everything inside the curly braces after <span class="lang:c++ decode:true crayon-inline">setup()</span> is run once, when the data logger starts running
-    *   Everything inside the curly braces after <span class="lang:c++ decode:true crayon-inline">loop()</span> is run continuously, after <span class="lang:c++ decode:true crayon-inline">setup()</span>.
+    *   Everything inside the curly braces after `setup()` is run once, when the data logger starts running
+    *   Everything inside the curly braces after `loop()` is run continuously, after `setup()`.
 
 Before these functions, you can place all of your variable definitions.
 
@@ -317,7 +318,8 @@ Before these functions, you can place all of your variable definitions.
 
 Let's make a blinky light turn on and off! On the ALog, **pin 8** is attached to a red indicator LED. Here is some code to create a synocpated blinky light.
 
-<pre class="lang:c++ decode:true" title="Default Arduino code">// Syncopated LED blink
+```cpp
+// Syncopated LED blink
 
 void setup() {
  // put your setup code here, to run once:
@@ -336,7 +338,7 @@ void loop() {
  digitalWrite(8, LOW);
  delay(250);
 }
-</pre>
+```
 
 #### Uploading code to the ALog data logger
 
@@ -346,7 +348,8 @@ Once your code is written -- either as a copy/paste of this or as your own -- sa
 
 A second important piece of your work with the Arduino is to communicate with it. We'll start with one-way communications, with the ALog talking to your computer. We will still flash the LED, and will add in information on how to define a variable outside of these two functions. I break this down in the comments.
 
-<pre class="lang:c++ decode:true">// Global variables
+```cpp
+// Global variables
 // These variables are availalble 
 int LEDpin = 8;
 
@@ -363,7 +366,8 @@ void loop() {
   digitalWrite(LEDpin, HIGH);
   delay(500);
   digitalWrite(LEDpin, LOW);
-}</pre>
+}
+```
 
 Let's break this down a little bit:   **Change your baud rate to 38400 bps!**  
 
@@ -379,7 +383,8 @@ https://htmlpreview.github.io/?https://raw.githubusercontent.com/NorthernWidget/
 
 For now, we'll go through this as a group, but text will go here eventually!
 
-<pre class="lang:c++ decode:true">#include "Logger.h"
+```cpp
+#include "Logger.h"
 
 Logger logger;
 
@@ -444,7 +449,7 @@ logger.endLogging();
 // ***************************************** 
 
 }
-</pre>
+```
 
 ## Connecting sensors
 
