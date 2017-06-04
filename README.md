@@ -16,22 +16,193 @@ If you use the ALog library (and/or data logger) in a publication, please cite:
 
 ## Using the ALog library
 
-### With an ALog data logger
+### Structure of an Arduino sketch with the ALog library
 
-```
-Example code here
+The following code is an Ardiuno "sketch" that includes the Alog library. It works whether you are using an:
+
+*   ALog data logger
+*   Arduino Uno (with ALog shield or equivalent clock and SD card)
+*   Arduino Mega (with ALog shield or equivalent clock and SD card)
+
+*Support for ARM-series Arduino boards is currently under development.*
+
+```cpp
+#include "ALog.h"
+
+ALog alog;
+
+////////////////////////////
+// USER-ENTERED VARIABLES //
+////////////////////////////
+char* dataLoggerName = "T01"; // Name of logger; displayed in Serial communications
+char* fileName = "T01.txt"; // Name of file for logged data: 8.3 format (e.g, 
+                            // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
+
+//Setup logging interval here, may set up more than one variable. 
+//Minimum interval = 1 sec, maximum interval is 23 hours, 59 minutes, 59 seconds
+//0 for all means that the logger will not sleep
+int Log_Interval_Seconds = 10; //Valid range is 0-59 seconds
+int Log_Interval_Minutes = 0; //Valid range is 0-59 minutes
+int Log_Interval_Hours = 0; //Valid range is 0-23 hours
+// external_interrupt is true for a tipping bucket rain gauge
+bool external_interrupt = false;
+
+void setup(){  //Serial baud rate is set to 38400
+  alog.initialize(dataLoggerName, fileName,
+    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, 
+    external_interrupt);
+    
+  // If you are using a standard Arduino board (i.e. not a full ALog data logger)
+  // and are not using the Arduino shield, you will have to set the proper pins for
+  // the indicator LED (defualts to 9) and the SD card and RTC power (default to -1
+  // to be inactive in the case of constant power supply; set these to the same
+  // value if there is just one switch for both of these).
+  // Replace "_pin" with your desired pin number, and uncomment the relevant line(s).
+  // set_LEDpin(_pin);
+  // set_SDpowerPin(_pin);
+  // set_RTCpowerPin(_pin);
+  
+  alog.setupLogger();
+}
+
+void loop(){
+  // *****************************************************
+
+  alog.goToSleep_if_needed(); // Send logger to sleep
+  alog.startLogging(); // Power up all systems, check WDT, reset alarms,
+                       // and open data file(s) in write mode
+
+  // ************ DO NOT EDIT ABOVE THIS LINE ************
+
+  ///////////////////////////////////////////////////////
+  // READ SENSORS; GATHER/PROCESS DATA: EDIT THIS PART //
+  ///////////////////////////////////////////////////////
+
+  alog.sensorPowerOn();
+  
+  // Turn on external power (3.3V and 5V in the case of the ALog BottleLogger)
+  // for sensors and any other devices.
+  // Place commands for all sensors that require this between
+  // SensorPowerOn() and SensorPowerOff().
+  // If you have no sensors that require power, you should comment out the 
+  // SensorPowerOn() and SensorPowerOff() commands.
+
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+  // INSERT COMMANDS TO READ SENSORS THAT REQUIRE ALOG-SUPPLIED POWER HERE! //
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+  
+  alog.sensorPowerOff();
+
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+  // INSERT COMMANDS TO READ SENSORS THAT DO NOT REQUIRE ALOG-SUPPLIED POWER HERE! //
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+
+
+  // NOTE: THE BUFFER SIZE IS 512 BYTES;
+  // run "alog.bufferWrite()" between your commands in this section
+  // if you think you are approaching this limit.
+  // Otherwise, the buffer will overflow and I'm not sure what will happen!
+  // alog.bufferWrite()
+
+  // ************ DO NOT EDIT BELOW THIS LINE ************ 
+
+  // Wrap up files, turn off SD card, and go back to sleep
+  alog.endLogging();
+
+  // ***************************************************** 
+}
 ```
 
-### With an ALog shield or another system
+### Sensor commands
 
+Sensor commands are defined in detail in the extended help, available below (PDF version) and at http://northernwidget.github.io/ALog/classALog.html.
+
+In short, they look like:
+
+```cpp
+  alog.sensorName(parameter1, parameter2, parameter3)
 ```
-Example code here
+where these parameters can be the pin numbers to which the sensors are attached, sensor-specific electrical characteristics (e.g., resistance), calibration values, and quantities that affect how the sensor behaves during its operation.
+
+One example, for a thermistor (a temperature-sensitive resistor), is:
+```cpp
+  logger.thermistorB(10000, 3380, 10000, 25, 0);
 ```
+Where the parameters are, in order:
+
+*   **R0**: Known resistance at given known temperature (here 10,000 ohms)
+*   **B**: The parameter governing the curvature of the resistance-to-temperature calibration curve (here 3380 K) 
+*   **Rref**: The resistance of the known resistor (here also 10,000 Ω, to optimize measurement sensitivity at 10 kΩ)
+*   **T0degC**: The temperature [in Celsius] at which the known resistance equals **R0** (here 25°C)
+*   **thermPin**: The analog pin number to be read
+
+This thermistor example is reiterated and expanded upon in the "Guide for first-time users: from the basics onward", below.
 
 ## Adding support for new sensors
 
-```
-Example code here
+Printed below is the template function designed to guide users about how to add support for additional sensors. You may also look at ALog.cpp and ALog.h for our current examples, and feel free to contact us (info@northernwidget.com) if you have questions about how to properly incorporate new sensors.
+
+If you do add your sensor to our library or make an improvement, **we would really appreciate it if you woudl contact us about including the changes you've made**. We have designed the ALog library as a resource for the community, and the more of us who make it better, the bigger and better open-source field instrumentation grows!
+
+```cpp
+void ALog::_sensor_function_template(uint8_t pin, float param1, float param2, 
+           uint8_t ADC_bits, bool flag){
+  /**
+   * @brief 
+   * Function to help lay out a new sensor interface.
+   * This need not be "void": it may return a value as well.
+   * 
+   * @details
+   * Details about sensor go here
+   * 
+   * @param pin You often need to specify interface pins
+   * 
+   * @param param1 A variable for the sensor or to interpret its value
+   * 
+   * @param param2 A variable for the sensor or to interpret its value
+   * 
+   * @param ADC_bits You often need to specify how much the analog-to-digital 
+   *                 converter should be oversampled; this can range from
+   *                 10 (no oversampling) to 16 (maximum possible 
+   *                 oversampling before certainty in the oversampling method
+   *                 drops)
+   * 
+   * @param flag Something that helps to set an option
+   * 
+   * Example (made up):
+   * ```
+   * alog.Example(A2, 1021.3, 15.2, True);
+   * ```
+   * 
+  */
+  
+  float Vout_normalized_analog_example = analogReadOversample(pin, \
+            ADC_bits) / 1023.;
+  
+  float Some_variable = Vout_normalized_analog_example * param1 / param2;
+  if (flag){
+    Some_variable /= 2.;
+  }
+  
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  if (first_log_after_booting_up){
+    headerfile.print("Some variable [units]");
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
+  // SD write
+  datafile.print(Some_variable);
+  datafile.print(F(","));
+  
+  // Echo to serial
+  Serial.print(Some_variable);
+  Serial.print(F(","));
+
+}
 ```
 
 ## Main Developers and Contact
@@ -53,7 +224,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
 *   **1x ALog data logger**
 *   **1x USB cable that fits the ALog's USB port**
     *   USB A-B for version 2.1.0 and prior
-    *   USB A-miniB (like an Android cell phone) for version 2.2.0 and greater
+    *   USB A-miniB (like an Android cell phone) for version 2.2.0 and later
 *   **A computer with a USB port**
 
 ### For the data logging exercises
@@ -62,8 +233,6 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     *   Our instructions are for the **CanTherm CWF1B103F3380** (available on [Digi-Key](https://www.digikey.com/product-detail/en/cantherm/CWF1B103F3380/317-1310-ND/1191085) or from us). This thermistor is 1 meter long and coated in epoxy for all of your out-of-the-box measurement applications
 *   **1x reference resistor**
     *   We typically use the **Vishay Dale PTF5610K000BYEB** for their high precision and temperature stability at a reasonable cost.
-
----
 
 ## A few definitions
 
@@ -79,9 +248,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     *   They are best known for the Arduino Uno board (and its predecessors).
     *   Also important -- and used by us -- are their extensive software libraries to assist us in programming AVR microcontrollers.
     *   **AVR** is the family of microcontrollers most commonly used by Arduino projects.
-*   The **ALog BottleLogger** is a lightweight and inexpensive low-power open-source data logger that incorporates elements of the Arduino system, and can be programmed through the Arduino IDE.
-
----
+*   The **ALog BottleLogger** is a lightweight and inexpensive low-power open-source data logger that incorporates elements of the Arduino system, and can be programmed through the Arduino IDE. RETURN HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ## Looking at your board:
 
@@ -182,7 +349,7 @@ The ALog BottleLogger has several pins that are used for dedicated functions. Th
 
 ### Reference resistor headers
 
-The pair of plastic vertical "headers" -- things with holes in them for wires -- are for reference resistors to read analog resistance-based sensors. A simple example is a thermistor, and we'll cover that farther on down here. ---
+The pair of plastic vertical "headers" -- things with holes in them for wires -- are for reference resistors to read analog resistance-based sensors. A simple example is a thermistor, and we'll cover that farther on down here. RETURN HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ## Programming Arduino-based systems: Focus on the ALog
 
@@ -298,7 +465,7 @@ These are ways to control the flow of a code. I'm afraid that this introduction 
 
 ## Connecting the ALog and Computer
 
-Use a USB cable to connect the ALog to your computer. **PICTURE here** Then, using the Arduino IDE, select the name of the USB-serial port that is connected to the ALog. **PICTURE here** Now your ALog is ready for communications and programming. ---
+Use a USB cable to connect the ALog to your computer. **PICTURE here** Then, using the Arduino IDE, select the name of the USB-serial port that is connected to the ALog. **PICTURE here** Now your ALog is ready for communications and programming. RETURN HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ## Example Programs: Writing and Uploading
 
@@ -399,70 +566,90 @@ https://htmlpreview.github.io/?https://raw.githubusercontent.com/NorthernWidget/
 For now, we'll go through this as a group, but text will go here eventually!
 
 ```cpp
-#include "Logger.h"
+#include "ALog.h"
 
-Logger logger;
+ALog alog;
 
 ////////////////////////////
 // USER-ENTERED VARIABLES //
 ////////////////////////////
-char* dataLoggerName = "Thermistor Logger";
-char* fileName = "TempLog.txt"; // Name of file for logged data: 8.3 format (e.g, 
-                             // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
+char* dataLoggerName = "Thermistor Logger"; // Name of logger; displayed in Serial communications
+char* fileName = "TempLog1.txt"; // Name of file for logged data: 8.3 format (e.g, 
+                            // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
 
-//Setup logging interval here, may setup more than one variable. 
+//Setup logging interval here, may set up more than one variable. 
 //Minimum interval = 1 sec, maximum interval is 23 hours, 59 minutes, 59 seconds
 //0 for all means that the logger will not sleep
 int Log_Interval_Seconds = 10; //Valid range is 0-59 seconds
 int Log_Interval_Minutes = 0; //Valid range is 0-59 minutes
 int Log_Interval_Hours = 0; //Valid range is 0-23 hours
-bool external_interrupt = false; // e.g., rain gage
+// external_interrupt is true for a tipping bucket rain gauge
+bool external_interrupt = false;
 
 void setup(){  //Serial baud rate is set to 38400
-  logger.initialize(dataLoggerName, fileName,
-    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds,
-    external_interrupt);logger.setupLogger();
+  alog.initialize(dataLoggerName, fileName,
+    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, 
+    external_interrupt);
+    
+  // If you are using a standard Arduino board (i.e. not a full ALog data logger)
+  // and are not using the Arduino shield, you will have to set the proper pins for
+  // the indicator LED (defualts to 9) and the SD card and RTC power (default to -1
+  // to be inactive in the case of constant power supply; set these to the same
+  // value if there is just one switch for both of these).
+  // Replace "_pin" with your desired pin number, and uncomment the relevant line(s).
+  // set_LEDpin(_pin);
+  // set_SDpowerPin(_pin);
+  // set_RTCpowerPin(_pin);
+  
+  alog.setupLogger();
 }
 
 void loop(){
-// ***************************************** 
-logger.goToSleep_if_needed(); // Send logger to sleep
-logger.startLogging();  // Wake up and initialize
-// ****** DO NOT EDIT ABOVE THIS LINE ****** 
+  // *****************************************************
 
-//////////////////////////////////
-// READ SENSORS: EDIT THIS PART //
-//////////////////////////////////
+  alog.goToSleep_if_needed(); // Send logger to sleep
+  alog.startLogging(); // Power up all systems, check WDT, reset alarms,
+                       // and open data file(s) in write mode
 
-// Analog sensors: place all analog sensor commands between
-// startAnalog() and endAnalog().
-// If you have no analog sensors, you should comment out the 
-// startAnalog() and endAnalog() commands
+  // ************ DO NOT EDIT ABOVE THIS LINE ************
 
-logger.startAnalog();
+  ///////////////////////////////////////////////////////
+  // READ SENSORS; GATHER/PROCESS DATA: EDIT THIS PART //
+  ///////////////////////////////////////////////////////
 
-// CanTherm small bead
-//logger.thermistorB(10000, 3950, 10000, 25, 0);
-// CanTherm expoxy bead: CWF1B103F3380
-logger.thermistorB(10000, 3380, 10000, 25, 0);
+  alog.sensorPowerOn();
+  
+  // Turn on external power (3.3V and 5V in the case of the ALog BottleLogger)
+  // for sensors and any other devices.
+  // Place commands for all sensors that require this between
+  // SensorPowerOn() and SensorPowerOff().
+  // If you have no sensors that require power, you should comment out the 
+  // SensorPowerOn() and SensorPowerOff() commands.
 
-logger.endAnalog();
+  // CanTherm small bead
+  //logger.thermistorB(10000, 3950, 10000, 25, 0);
+  // CanTherm expoxy bead: CWF1B103F3380
+  logger.thermistorB(10000, 3380, 10000, 25, 0);
+  
+  alog.sensorPowerOff();
 
-//
-// INSERT DIGITAL SENSOR READING COMMANDS HERE!
-//
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
+  // INSERT COMMANDS TO READ SENSORS THAT DO NOT REQUIRE ALOG-SUPPLIED POWER HERE! //
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
 
-// NOTE: THE BUFFER SIZE IS 512 BYTES;
-// run "logger.bufferWrite" if you think you are approaching this limit.
-// Otherwise, the buffer will overflow and I'm not sure what will happen.
 
-// ****** DO NOT EDIT BELOW THIS LINE ****** 
+  // NOTE: THE BUFFER SIZE IS 512 BYTES;
+  // run "alog.bufferWrite()" between your commands in this section
+  // if you think you are approaching this limit.
+  // Otherwise, the buffer will overflow and I'm not sure what will happen!
+  // alog.bufferWrite()
 
-// Wrap up files, turn off SD card, and go back to sleep
-logger.endLogging();
+  // ************ DO NOT EDIT BELOW THIS LINE ************ 
 
-// ***************************************** 
+  // Wrap up files, turn off SD card, and go back to sleep
+  alog.endLogging();
 
+  // ***************************************************** 
 }
 ```
 

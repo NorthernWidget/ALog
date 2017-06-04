@@ -1508,19 +1508,19 @@ float ALog::thermistorB(float R0, float B, float Rref, float T0degC, \
    * card to four decimal places.
    * 
    * @param R0 is the resistance of the thermistor at the known temperature
-   * @param T0degC
+   * @param T0degC. [Ω]
    * 
-   * @param B is the β parameter of the thermistor
+   * @param B is the β parameter of the thermistor. [K]
    * 
    * @param Rref is the resistance of the corresponding reference resistor for \
-   * the analog pin set by \b ThermPin (below).
+   * the analog pin set by \b ThermPin (below). [Ω]
    * 
-   * @param T0degC is the temperature at which \b R0 was calibrated.
+   * @param T0degC is the temperature at which \b R0 was calibrated. [°C]
    * 
-   * @param thermPin is the analog pin number to be read.
+   * @param thermPin is the analog pin number to be read. [-]
    * 
    * @param ADC_resolution_nbits (10-16 for the ALog BottleLogger) is the 
-   * number of bits of ADC resolution used (oversampling for >10 bits)
+   * number of bits of ADC resolution used (oversampling for >10 bits) [bits]
    * 
    * @param Rref_on_GND_side indicates the configuration of the voltage divider.  
    * True if using Alog provided Reference resistor terminals. If false, 
