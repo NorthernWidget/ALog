@@ -586,6 +586,7 @@ void ALog::set_SDpowerPin(int8_t _pin){
    */
    SDpowerPin = _pin;
 }
+
 void ALog::set_RTCpowerPin(int8_t _pin){
   /**
    * @brief Set which pin activates the 3V3 regulator to power the RTC 
@@ -598,6 +599,48 @@ void ALog::set_RTCpowerPin(int8_t _pin){
    * Run this, if needed, before setupLogger()
    */
    RTCpowerPin = _pin;
+}
+
+/////////////////////////////////////////////////////////////////
+// EEPROM: SERIAL NUMBERS, MEASURED VOLTAGE REGULATOR VOLTAGES //
+/////////////////////////////////////////////////////////////////
+
+uint16_t ALog::get_serial_number(){
+  /**
+   * @brief Retrieve the ALog's serial number from EEPROM .
+   * 
+   * @details
+   * It is stored in bytes 0 and 1 of the EEPROM.
+   */
+   uint16_t serialNumber;
+   EEPROM.get(0, serialNumber);
+   return serialNumber;
+}
+
+float ALog::get_3V3_measured_voltage(){
+  /**
+   * @brief Retrieve the ALog's 3.3V regulator's actual measured voltage
+   * under load, stored in the EEPROM.
+   * 
+   * @details
+   * It is stored in bytes 2, 3, 4, and 5 of the EEPROM.
+   */
+   uint16_t voltage;
+   EEPROM.get(2, voltage);
+   return voltage;
+}
+
+float ALog::get_5V_measured_voltage(){
+  /**
+   * @brief Retrieve the ALog's 5V charge pump's actual measured voltage
+   * under load, stored in the EEPROM.
+   * 
+   * @details
+   * It is stored in bytes 6, 7, 8, and 9 of the EEPROM.
+   */
+   uint16_t voltage;
+   EEPROM.get(6, voltage);
+   return voltage;
 }
 
 /////////////////////////////////////////////////////
@@ -1272,8 +1315,8 @@ void ALog::endLogging(){
    */
   endLine();
   // Write all of the data to the file
-  // The buffer is 256 bytes, I think -- so need to use this in-between
-  // if there are too many data
+  // The buffer is 512 bytes -- so need to use this in-between
+  // if there are too many bytes of data
   datafile.sync();
   // Headerfile should be closed at this point, and not reopened
   if (first_log_after_booting_up){

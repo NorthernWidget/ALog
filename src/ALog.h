@@ -67,7 +67,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     // strings into int with atol
 #include <EEPROM.h> // Save serial number and reference voltage
                     // Serial number cannot be written here
+                    // (This is for the program to configure each logger)
 #include <SoftwareSerial.h>
+#include <EEPROM.h>
 
 // Sensor-centric libraries
 #include <SFE_BMP180.h>
@@ -111,6 +113,10 @@ class ALog {
     void set_LEDpin(int8_t _pin);
     void set_SDpowerPin(int8_t _pin);
     void set_RTCpowerPin(int8_t _pin);
+    // Important subset: EEPROM: Serial number and calibrations
+    uint16_t get_serial_number();
+    float get_3V3_measured_voltage();
+    float get_5V_measured_voltage();
     
     // Sensors - standard procedure (wake up, log, sleep)
     float readPin(uint8_t pin);
