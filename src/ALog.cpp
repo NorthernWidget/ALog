@@ -946,7 +946,7 @@ void ALog::checkAlarms(){
   if (Clock.checkIfAlarm(2)) {
 	  Serial.println("Alarm missed! Resetting logger.");
     datafile.close();
-    LEDwarn(20);
+    LEDwarn(5);
     delay(30);
 
     // Callback to set date and time in SD card file metadata
@@ -955,8 +955,8 @@ void ALog::checkAlarms(){
     SdFile::dateTimeCallback(_internalDateTime);
     
     if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
-      Serial.println(F("Error initializing SD card for writing"));
-      LEDwarn(40);
+      Serial.println(F("Card failed, or not present"));
+      LEDwarn(20); // 20 quick flashes of the LED
     }
     // Prepare to record times when the alarms were missed and the watchdog
     // timer was needed to reset the logger
@@ -1242,11 +1242,11 @@ void ALog::startLogging(){
   if (!sd.begin(CSpin, SPI_HALF_SPEED)) {
     // Just use Serial.println: don't kill batteries by aborting code 
     // on error
-    Serial.println(F("Error initializing SD card for writing"));
+    Serial.println(F("Card failed, or not present"));
     // WARN THE END USER -- new feature after conversations with Amanda and 
     // Crystal about SD cards not being seated correctly, and/or just not 
     // knowing if they are.
-    LEDwarn(40);
+    LEDwarn(20); // 20 quick flashes of the LED
   }
   delay(10);
   // Datestamp the start of the line
