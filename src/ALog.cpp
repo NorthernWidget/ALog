@@ -66,7 +66,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // These can be variable; default values here are for the ALog shield
 // No pin is appropriate for the ALog shield for SDpowerPin and RTCpowerPin,
 // as these are controlled by the internal 3V3 regulator
-int8_t LEDpin = 9;
+int8_t LEDpin = 8;
 int8_t SDpowerPin = -1;
 int8_t RTCpowerPin = -1;
 
@@ -1534,12 +1534,16 @@ float ALog::thermistorB(float R0, float B, float Rref, float T0degC, \
    * @param record_results is true if you want to save results to the SD card and
    * print to the serial monitor.
 
-   * Example:
+   * Examples:
    * ```
-   * // Contherm from Digikey, 14-bit precision
+   * // Cantherm from Digikey
+   * // 10 kOhm @ 25degC, 3950 K b-value, 30 kOhm reference resistor, on 
+   * // analog Pin 1, 14-bit precision
    * alog.thermistorB(10000, 3950, 30000, 25, 2, 14);
-   * // EPCOS, DigiKey # 495-2153-ND, 14-bit precision
-   * alog.thermistorB(10000, 3988, 13320, 25, 1, 14);
+   * // EPCOS, DigiKey # 495-2153-ND
+   * // 10 kOhm @ 25degC, 3988 K b-value, 13.32 kOhm reference resistor, on 
+   * // analog Pin 1, 12-bit precision
+   * alog.thermistorB(10000, 3988, 13320, 25, 1, 12);
    * ```
    * 
   */
