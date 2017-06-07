@@ -523,16 +523,6 @@ void ALog::setupLogger(){
   Serial.println();
   LEDgood(); // LED flashes peppy happy pattern, indicating that all is well
   
-  /*
-  // START HERE! DOESN'T WORK NOW -- WHY NOT? NOT BECAUSE OF NON-8.3-FILENAME
-  start_logging_to_otherfile("StartTimes.txt");
-  Serial.println(now.unixtime());
-  otherfile.print(now.unixtime());
-  otherfile.print(",");
-  end_logging_to_otherfile();
-  Serial.println(now.unixtime());
-  */
-  
   start_logging_to_datafile();
   start_logging_to_headerfile();
 
