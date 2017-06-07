@@ -2,6 +2,8 @@
 
 ALog alog;
 
+// Note: Serial baud rate is set to 38400 bps
+
 ////////////////////////////
 // USER-ENTERED VARIABLES //
 ////////////////////////////
@@ -17,7 +19,7 @@ int Log_Interval_Minutes = 0; //Valid range is 0-59 minutes
 int Log_Interval_Hours = 0; //Valid range is 0-23 hours
 bool external_interrupt = false; // e.g., rain gage
 
-void setup(){  //Serial baud rate is set to 38400
+void setup(){
   alog.initialize(dataLoggerName, fileName,
     Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, 
     external_interrupt);
