@@ -2558,7 +2558,7 @@ void ALog::Wind_Vane_Inspeed(uint8_t vanePin){
 }
 
 void ALog::Pyranometer(uint8_t analogPin, float raw_mV_per_W_per_m2, \
-           float gain, float V_ref, uint8_t ADC_resolution_nbits){
+           float gain, float Vref, uint8_t ADC_resolution_nbits){
   /**
    * @brief
    * Pyranometer wtih instrumentation amplifier
@@ -2578,7 +2578,7 @@ void ALog::Pyranometer(uint8_t analogPin, float raw_mV_per_W_per_m2, \
    * 
    * @param gain is the amplification factor
    * 
-   * @param V_ref is the reference voltage of the ADC; on the ALog, this is
+   * @param Vref is the reference voltage of the ADC; on the ALog, this is
    * a precision 3.3V regulator (unless a special unit without this regulator
    * is ordered; the regulator uses significant power)
    * 
@@ -2596,8 +2596,8 @@ void ALog::Pyranometer(uint8_t analogPin, float raw_mV_per_W_per_m2, \
   // V
   // Vref V --> mV
   float Vin = (analogReadOversample(analogPin, ADC_resolution_nbits) / 1023.) \
-               * V_ref * 1000.;
-  //float Vin = V_ref * 1000. * analogRead(analogPin) / 1023.; // No oversampling
+               * Vref * 1000.;
+  //float Vin = Vref * 1000. * analogRead(analogPin) / 1023.; // No oversampling
   float Radiation_W_m2 = Vin / (raw_mV_per_W_per_m2 * gain);
   
   ///////////////
@@ -3738,8 +3738,9 @@ void ALog::startup_sequence(){
   unsigned long unixtime_at_start;
   
   // First, throw away any garbage on the incoming Serial line
-  while(Serial.available() > 0)
+  while(Serial.available() > 0){
     Serial.read();
+  }
     
   // Then check if connected to computer with ALogTalk running to set the clock
   // Do so by first pinging the computer, and then waiting for a handshake.
