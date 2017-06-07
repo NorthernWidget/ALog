@@ -84,7 +84,6 @@ int8_t RTCpowerPin = -1;
   const int SensorPowerPin = 4; // Activates voltage regulator to give power to sensors
   // Sleep mode pins
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
-  const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
   const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
   #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
     // 7 for both? Maybe this is better than redefining variables.
@@ -111,7 +110,6 @@ int8_t RTCpowerPin = -1;
   const int SCLpin = 21;
   // Sleep mode pins: same as for 328
   const int wakePin = 2; // interrupt pin used for waking up via the alarm
-  const int interruptNum = wakePin-2; // =0 for pin 2, 1 for pin 3
 #endif
 
 /*
@@ -129,7 +127,6 @@ int8_t RTCpowerPin = -1;
   const int SDpowerPin = 22; // Turns on voltage source to SD card
   const int LEDpin = 23; // LED to tell user if logger is working properly
   const int wakePin = 10; // interrupt pin used for waking up via the alarm
-  const int interruptNum = 0; // =0 for pin 2, 1 for pin 3
 */
 
 // Clock mode
@@ -166,7 +163,7 @@ char* datafilename;
 char* logger_name;
 
 // For interrupt from sensor
-bool extInt;
+bool extInt; // This will default to Pin 3 (INT(errupt) 1 on ALog BottleLogger)
 bool NEW_RAIN_BUCKET_TIP = false; // flag
 bool LOG_ALL_SENSORS_ON_BUCKET_TIP; // Defaults to False, true if you should 
                                     // all sensors every time an event (e.g., 
@@ -749,12 +746,12 @@ void ALog::sleepNow()         // here we put the arduino to sleep
     }
       //Serial.print(F("interrupt"));  delay(10);
     if (hourInterval || minInterval || secInterval != -1){
-      attachInterrupt(interruptNum, wakeUpNow, LOW); // wakeUpNow when wakePin goes LOW 
+      attachInterrupt(digitalPinToInterrupt(wakePin), wakeUpNow, LOW); // wakeUpNow when wakePin goes LOW 
       //Serial.println(F(" attached")); delay(10);
     }
 
     if (extInt){
-      attachInterrupt(1, wakeUpNow_tip, LOW);
+      attachInterrupt(digitalPinToInterrupt(3), wakeUpNow_tip, LOW);
     }
 
     sleep_mode();            // here the device is actually put to sleep!!
@@ -768,7 +765,7 @@ void ALog::sleepNow()         // here we put the arduino to sleep
     // 06-11-2015: The above line commented to allow the rain gage to be read
     // at the same time as other readings
     // Maybe move this to specific post-wakeup code?
-    detachInterrupt(interruptNum);      // disables interrupt so the 
+    detachInterrupt(digitalPinToInterrupt(wakePin)); // disables interrupt so the 
                                         // wakeUpNow code will not be executed 
                                         // during normal running time.
 }
@@ -2885,7 +2882,7 @@ void _anemometer_count_increment(){
   rotation_count ++;
   detachInterrupt(1);
   delay(20); // debounce
-  attachInterrupt(1, _anemometer_count_increment, FALLING);
+  attachInterrupt(digitalPinToInterrupt(3), _anemometer_count_increment, FALLING);
 }
 
 void ALog::HackHD(int control_pin, bool want_camera_on){
@@ -3060,7 +3057,7 @@ void ALog::TippingBucketRainGage(){
   
   //delay(2000);
   
-  attachInterrupt(1, wakeUpNow_tip, LOW);
+  attachInterrupt(digitalPinToInterrupt(3), wakeUpNow_tip, LOW);
 
   // Then based on whether we are already logging or if we are supposed to 
   // start logging here, we can continue with the logging process, or just 
