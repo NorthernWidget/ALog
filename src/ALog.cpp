@@ -20,7 +20,7 @@ one-line calls.
 ALog.cpp is part of ALog, an Arduino library written by Andrew D. Wickert
 and Chad T. Sandell
 Copyright (C) 2011-2017, Andrew D. Wickert
-Copyright (C) 2016-2017, Andrew D. Wickert and Chad T. Sandell
+Copyright (C) 2016-2017, Chad T. Sandell
 Copyright (C) 2016-2017, Regents of the University of Minnesota
 
 This program is free software: you can redistribute it and/or modify
@@ -63,12 +63,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ASSIGN PINS //
 /////////////////
 
-// These can be variable; default values here are for the ALog shield
-// No pin is appropriate for the ALog shield for SDpowerPin and RTCpowerPin,
-// as these are controlled by the internal 3V3 regulator
-int8_t LEDpin = 8;
-int8_t SDpowerPin = -1;
-int8_t RTCpowerPin = -1;
 
 // True for all: UNO (ATMega168/328)
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
@@ -88,14 +82,21 @@ int8_t RTCpowerPin = -1;
   #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
     // 7 for both? Maybe this is better than redefining variables.
     // GitHub issue is open on this; should guide future decisions
-    SDpowerPin = 7; // Turns on voltage source to SD card
-    RTCpowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
-    LEDpin = 8; // LED to tell user if logger is working properly  
+    int SDpowerPin = 7; // Turns on voltage source to SD card
+    int RTCpowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+    int LEDpin = 8; // LED to tell user if logger is working properly  
   #elif defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200)
     // IS IT EVEN TRUE HERE THAT THERE ARE MULTIPLE PINS USED FOR SD AND CLOCK? START HERE!
-    SDpowerPin = 8; // Turns on voltage source to SD card
-    RTCpowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
-    LEDpin = 9; // LED to tell user if logger is working properly  
+    int SDpowerPin = 8; // Turns on voltage source to SD card
+    int RTCpowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+    int LEDpin = 9; // LED to tell user if logger is working properly
+  #else
+    // These can be variable; default values here are for the ALog shield
+    // No pin is appropriate for the ALog shield for SDpowerPin and RTCpowerPin,
+    // as these are controlled by the internal 3V3 regulator
+    int8_t LEDpin = 8;
+    int8_t SDpowerPin = -1;
+    int8_t RTCpowerPin = -1;
   #endif
 #endif
 // True for all: MEGA (ATMega1280/2560)
