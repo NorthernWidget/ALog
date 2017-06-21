@@ -1,9 +1,9 @@
 #! /bin/sh
 
-# cd to root
-cd ..
 # Build documentation
-sh doc/buildDoxygenLocally.sh
+sh buildDoxygenLocally.sh
+# cd to root for git commands
+cd ..
 # Upload documentation to branch
 sh doc/branchDoc.sh
 

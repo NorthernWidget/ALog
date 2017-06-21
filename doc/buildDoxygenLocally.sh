@@ -6,7 +6,7 @@ perl -CSDA -plE 's/\s/ /g' README_doxygen.md # replace Unicode whitespace with A
 sed -i -e 's/\ {.c/{.c/g' README_doxygen.md # rm space before {.cpp} for syntax highlighting
 
 # Create doxygen files: HTML and PDF
-doxygen doxygen_Logger.cfg
+doxygen ../doxygen_Logger.cfg
 cd latex
 ./Make.sh
 
