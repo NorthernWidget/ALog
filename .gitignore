@@ -1,7 +1,13 @@
-# Linux temp files #
-###################
+# Linux temp files 
+####################
 *~
 
+# Other temp files
+####################
+*.swp
+*.gch
+
 # Documentation -- just put it in gh-pages branch
+###################################################
 doc
 doctmp
