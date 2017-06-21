@@ -10,6 +10,8 @@ If you use the ALog library (and/or data logger) in a publication, please cite:
 
 **Wickert, A. D. (2014), [The ALog: Inexpensive, Open-Source, Automated Data Collection in the Field](http://onlinelibrary.wiley.com/wol1/doi/10.1890/0012-9623-95.2.68/full), *Bull. Ecol. Soc. Am.*, *95*(2), 68–78, doi:10.1890/0012-9623-95.2.68.**
 
+In addition to the README.md at [https://github.com/NorthernWidget/ALog](https://github.com/NorthernWidget/ALog), documentation is available as a combination of the information here and an index of logger functions in both [[HTML]](http://northernwidget.github.io/ALog) and [[PDF]](http://northernwidget.github.io/ALog/refman.pdf) format.
+
 * * *
 
 # Quick-start guide
@@ -308,7 +310,7 @@ PICTURE OF MY TOOL ROLL HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Your ALog board should look something like this. It has a lot of components. We'll start to look at them in more detail once you wire the board up.
 
 ![ALog BottleLogger v2.2.0 top side photo](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ALogBottleLogger220.png "ALog BottleLogger v2.2.0 top side photo")
-@image latex doc/figures/ALogBottleLogger220.png width=\linewidth
+@image latex "../figures/ALogBottleLogger220.png" "ALog BottleLogger"
 
 ***ALog BottleLogger v2.2.0 top side photo***
 
@@ -478,7 +480,7 @@ Go to **File** > **Preferences** (or **Arduino** > **Preferences** on Mac).
 <!--- [Adding a board manager list](https://cdn.sparkfun.com/assets/learn_tutorials/4/5/4/arduino-board-add.png) (link to Sparkfun's tutorial) -->
 
 ![Open the Arduino IDE preferences](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/File_Preferences.png "Open the Arduino IDE preferences.")
-@image latex doc/figures/Arduino_Boards/File_Preferences.png
+@image latex Arduino_Boards/File_Preferences.png "Arduino IDE preferences"
 
 ***Open the Arduino IDE preferences***
 
@@ -488,33 +490,34 @@ Open 'Additional Boards Manager URLs', and paste the following in either the box
 	https://raw.githubusercontent.com/NorthernWidget/Arduino_Boards/master/package_NorthernWidget_index.json
 
 ![Paste the URL here](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/PreferencesWindow.png)
-@image latex doc/figures/Arduino_Boards/PreferencesWindow.png
+@image latex Arduino_Boards/PreferencesWindow.png "URL here"
 
 ***Paste the URL here.***
 
 ![Unless you already have done that for third-party boards... in that case, open this frame and paste the URL here.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/BoardURLs_list.png "Unless you already have done that for third-party boards... in that case, open this frame and paste the URL here.")
-@image latex doc/figures/Arduino_Boards/BoardURLs_list.png
+@image latex Arduino_Boards/BoardURLs_list.png "Or here"
 
 ***Unless you already have done that for third-party boards... in that case, open this frame and paste the URL here.***
 
 Now, go to **Tools** > **Board** > **Boards Manager...**.
 
 ![Open the boards manager here.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/Tools_Boards_BoardManager.png "Open the boards manager here.")
-@image latex doc/figures/Arduino_Boards/Tools_Boards_BoardManager.png
+
+@image latex Arduino_Boards/Tools_Boards_BoardManager.png "Boards"
 
 ***Open the boards manager here.***
 
 Click it, and the following window will appear:
 
 ![Boards Manager.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/BoardsManager.png "Boards Manager.")
-@image latex doc/figures/Arduino_Boards/BoardsManager.png
+@image latex Arduino_Boards/BoardsManager.png "Boards manager"
 
 ***Boards Manager.***
 
 if you type in "Northern Widget" (or usually just "Northern" as well), you should see an option to install board files for Northern Widget Arduino compatible boards.
 
 ![Northern Widget boards.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/BoardsManager_Northern.png "Northern Widget boards.")
-@image latex doc/figures/Arduino_Boards/BoardsManager_Northern.png
+@image latex Arduino_Boards/BoardsManager_Northern.png "Boards"
 
 ***Northern Widget boards.***
 
@@ -523,7 +526,7 @@ if you type in "Northern Widget" (or usually just "Northern" as well), you shoul
 Click "Install" to add the NorthernWidget boards to your list. At the time of writing, we support only AVR boards, but this may change soon.
 
 ![ALog (AVR) support installed.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/BoardsManager_Northern_Done.png "ALog (AVR) support installed.")
-@image latex doc/figures/Arduino_Boards/BoardsManager_Northern_Done.png
+@image latex Arduino_Boards/BoardsManager_Northern_Done.png "Done."
 
 ***ALog (AVR) support installed.***
 
@@ -532,7 +535,7 @@ Now, when you select the Boards list, you will see a collection of new boards fo
 You will then want to change your chosen board to the board that you have. At the time of writing, this is probably the "ALog BottleLogger v2"; the "legacy" option is used for v2.0.0-beta and prior, and there are fewer of these boards in circulation.
 
 ![Select the proper board.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/Tools_Boards_NorthernWidget_ALog_BottleLogger_v2.png "Now, when you go to Tools > Board, you should see the Northern Widget ALog boards. Select the proper board.")
-@image latex doc/figures/Arduino_Boards/Tools_Boards_NorthernWidget_ALog_BottleLogger_v2.png
+@image latex Arduino_Boards/Tv2.png "Select board"
 
 ***Select the proper board.***
 
@@ -795,7 +798,10 @@ void loop() {
 
 ## Using the ALog library
 
-[http://northernwidget.github.io/ALog/classALog.html](http://northernwidget.github.io/ALog/classALog.html)
+The full reference to the ALog library is located at
+[http://northernwidget.github.io/ALog/classALog.html](http://northernwidget.github.io/ALog/classALog.html).
+
+The following sections walk you through the functionality.
 
 ### ALog library components
 
@@ -895,8 +901,10 @@ You can use these functions with sensors by passing the results from a call to `
 
 #### Sensor functions (mostly "public" functions, exposed to the user)
 
+The full index of the sensor functions, along with ways to use them, is here:
 [http://northernwidget.github.io/ALog/classALog.html](http://northernwidget.github.io/ALog/classALog.html)
 
+See the thermistor example (below) and the information in the "Basic Reference" (above) for a more in-depth description of how to create and use sensor functions.
 
 ### Thermistor example
 
@@ -1131,7 +1139,7 @@ This is it, where the magic happens!
 * Standard temperature to which factory standard resistance corresponds [ohms]
 * Analog pin number (this could equally be A1 or 14 for the ALog BottleLogger)
 
-Do you want to know more about these parameters? Look up the function-specific help, which is below in the PDF version or available from [http://northernwidget.github.io/ALog/classALog.html](http://northernwidget.github.io/ALog/classALog.html).
+Do you want to know more about these parameters? Look up the function-specific help, which is below if you are looking at the PDF version of the help (downloadable from [http://northernwidget.github.io/ALog/refman.pdf](http://northernwidget.github.io/ALog/refman.pdf)) and available online at [http://northernwidget.github.io/ALog/classALog.html](http://northernwidget.github.io/ALog/classALog.html).
 
 ```cpp
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
@@ -1194,7 +1202,7 @@ Don't have Python? You probably will have figured it out when that failed Here a
 ## Connecting sensors (and more) to the ALog
 
 ![User's layout and connection guide](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ALogUsersLayout.png "User's layout and connection guide")
-@image latex doc/figures/ALogUsersLayout.pdf "Layout and connection guide" width=6.5in
+@image latex ALogUsersLayout.pdf "Layout and connection guide" width=6.5in
 
 ***User's layout and connection guide***
 
