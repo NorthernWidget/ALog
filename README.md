@@ -551,11 +551,30 @@ The ALog also relies on some custom software libraries. These are collections of
 
 The Arduino IDE has a library manager! Here we will walk you through how to use it to obtain and install the requisite libraries. This uses the graphical interface, but can take longer than, "Option 2", below.
 
-WALKTHROUGH WITH IMAGES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+At the moment, you will also have to download the stable release (below) and copy the SFE_BMP180 library into your "Arduino/libraries" folder; we're working to streamline this.
+
+First, open the libraries manager.
+
+![Open the libraries manager.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/libraries_sketch-include-manage.png "Open the libraries manager.")
+@image latex ArduinoScreenshots/libraries_sketch-include-manage.png "libraries"
+
+Then, look up each of the three core libraries:
+
+DE3231 (real-time clock):
+![DS3231 library.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/libraryDS3231.png "DS3231 library.")
+@image latex ArduinoScreenshots/libraryDS3231.png "DS3231 library"
+
+SdFat (SD card):
+![SdFat library.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/librarySdFat.png "SdFat library.")
+@image latex ArduinoScreenshots/librarySdFat.png "SdFat library"
+
+ALog (all data logging!):
+![ALog library.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/libraryALog.png "ALog library.")
+@image latex ArduinoScreenshots/libraryALog.png "ALog library"
+
+Once this is done, go to the instructions for Option 2 (immediately below) to get the SFE_BMP180 library.
 
 #### Option 2: direct installation from a prepared file archive
-
-***Stable and unstable options***
 
 ##### Download:
 
@@ -565,7 +584,7 @@ Nightly build: [[ZIP]](http://northernwidget.com/ALog_libraries/nightly/ALog_lib
 
 ##### Extract/Install:
 
-Unzip the archive, and place the contents in the "Arduino" folder. This should be in your home directory or your Documents. Then restart the Arduino IDE (if it is open).
+Unzip the archive, and place the contents in the "Arduino/libraries" folder. This should be in your home directory or your Documents. Then restart the Arduino IDE (if it is open).
 
 ### Learn some basics of programming in the Arduino language
 
