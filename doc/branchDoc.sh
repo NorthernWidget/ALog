@@ -3,7 +3,7 @@
 git checkout master
 
 git push origin --delete gh-pages
-read
+#read
 git branch -D gh-pages
 
 doxygen doxygen_Logger.cfg
@@ -23,7 +23,7 @@ git reset # maybe not needed?
 git add -f doc/html
 git commit -m "Documentation update (doxygen): gh-pages"
 git subtree push --prefix doc/html origin gh-pages
-read
+#read
 
 #git add -f doc/figures
 #git commit -m "source figures"
