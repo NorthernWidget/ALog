@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # Build documentation
-./buildDoxygenLocally.sh
+sh buildDoxygenLocally.sh
 # Upload documentation to branch
-./branchDoc.sh
+sh branchDoc.sh
 
