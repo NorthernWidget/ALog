@@ -20,7 +20,7 @@ one-line calls.
 ALog.cpp is part of ALog, an Arduino library written by Andrew D. Wickert
 and Chad T. Sandell
 Copyright (C) 2011-2017, Andrew D. Wickert
-Copyright (C) 2016-2017, Andrew D. Wickert and Chad T. Sandell
+Copyright (C) 2016-2017, Chad T. Sandell
 Copyright (C) 2016-2017, Regents of the University of Minnesota
 
 This program is free software: you can redistribute it and/or modify
@@ -63,53 +63,54 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ASSIGN PINS //
 /////////////////
 
-// These can be variable; default values here are for the ALog shield
-// No pin is appropriate for the ALog shield for SDpowerPin and RTCpowerPin,
-// as these are controlled by the internal 3V3 regulator
-int8_t LEDpin = 8;
-int8_t SDpowerPin = -1;
-int8_t RTCpowerPin = -1;
 
 // True for all: UNO (ATMega168/328)
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
   // SD card: CSpin and protected pins
-  const int SCKpin = 13;
-  const int MISOpin = 12;
-  const int MOSIpin = 11;
-  const int CSpin = 10;
+  const int8_t SCKpin = 13;
+  const int8_t MISOpin = 12;
+  const int8_t MOSIpin = 11;
+  const int8_t CSpin = 10;
   // Protected I2C pins
-  const int SDApin = A4;
-  const int SCLpin = A5;
+  const int8_t SDApin = A4;
+  const int8_t SCLpin = A5;
   // Digital pins
-  const int SensorPowerPin = 4; // Activates voltage regulator to give power to sensors
+  const int8_t SensorPowerPin = 4; // Activates voltage regulator to give power to sensors
   // Sleep mode pins
-  const int wakePin = 2; // interrupt pin used for waking up via the alarm
-  const int manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
+  const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
+  const int8_t manualWakePin = 5; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
   #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
     // 7 for both? Maybe this is better than redefining variables.
     // GitHub issue is open on this; should guide future decisions
-    SDpowerPin = 7; // Turns on voltage source to SD card
-    RTCpowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
-    LEDpin = 8; // LED to tell user if logger is working properly  
+    int8_t SDpowerPin = 7; // Turns on voltage source to SD card
+    int8_t RTCpowerPin = 7; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+    int8_t LEDpin = 8; // LED to tell user if logger is working properly  
   #elif defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200)
     // IS IT EVEN TRUE HERE THAT THERE ARE MULTIPLE PINS USED FOR SD AND CLOCK? START HERE!
-    SDpowerPin = 8; // Turns on voltage source to SD card
-    RTCpowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
-    LEDpin = 9; // LED to tell user if logger is working properly  
+    int8_t SDpowerPin = 8; // Turns on voltage source to SD card
+    int8_t RTCpowerPin = 6; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+    int8_t LEDpin = 9; // LED to tell user if logger is working properly
+  #else
+    // These can be variable; default values here are for the ALog shield
+    // No pin is appropriate for the ALog shield for SDpowerPin and RTCpowerPin,
+    // as these are controlled by the internal 3V3 regulator
+    int8_t LEDpin = 8;
+    int8_t SDpowerPin = -1;
+    int8_t RTCpowerPin = -1;
   #endif
 #endif
 // True for all: MEGA (ATMega1280/2560)
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
   // SD card: CSpin and protected pins
-  const int SCKpin = 52;
-  const int MISOpin = 50;
-  const int MOSIpin = 51;
-  const int CSpin = 53;
+  const int8_t SCKpin = 52;
+  const int8_t MISOpin = 50;
+  const int8_t MOSIpin = 51;
+  const int8_t CSpin = 53;
   // Protected I2C pins
-  const int SDApin = 20;
-  const int SCLpin = 21;
+  const int8_t SDApin = 20;
+  const int8_t SCLpin = 21;
   // Sleep mode pins: same as for 328
-  const int wakePin = 2; // interrupt pin used for waking up via the alarm
+  const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
 #endif
 
 /*
