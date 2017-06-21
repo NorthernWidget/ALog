@@ -21,7 +21,7 @@ If you use the ALog library (and/or data logger) in a publication, please cite:
     1. The ALog library; you can find this more easily by typing "Northern Widget" into the search box
     2. The DS3231 library (for the real-time clock); this can also be found by typing "Northern Widget"
     3. The SdFat library (for the SD card); simply typing "sdfat" into the search box will do.
-    4. The BMP180 library from SparkFun electronics NOT INCLUDED YET FOR DOWNLOAD -- PERHAPS INCORPORATE INSIDE OUR SYSTEM TO NOT REQUIRE ANOTHER DOWNLOAD!!!!!????!!!??!!!!!!!!!!!!!!!!!
+    4. The BMP180 library from SparkFun electronics (**key difference:** This must be downloaded and installed separately via a copy/paste into your Arduino/libraries folder; we are looking into options to avoid this necessity)
 3. Add support for the ALog boards. (Skip this step if you're using a non-ALog Arduino.) Detailed instructions, available from [https://github.com/NorthernWidget/Arduino_Boards](https://github.com/NorthernWidget/Arduino_Boards), are also included below in the Complete Guide.
     1. Go to File --> Preferences (Arduino --> Preferences on Mac) and paste this URL into the "Additional Boards Manager URLs" entry zone, in the lower right: https://raw.githubusercontent.com/NorthernWidget/Arduino_Boards/master/package_NorthernWidget_index.json
     2. Go to Tools --> Boards --> Boards Manager; type in "Northern Widget" and install these boards definitions.
@@ -32,12 +32,6 @@ If you use the ALog library (and/or data logger) in a publication, please cite:
 8. Look at the logger. You should see the blue and yellow lights flashing to show that it is communicating with the computer.
 9. Open the serial monitor (top right button) and set the baud rate to 38400 bps.
 10. See if the logger works; if it does, you are ready to start adding commands to read sensors. (If it doesn't, please check your progress through these steps, look through the rest of this guide, and if you really can't figure it out, email us at [info@northernwidget.com](mailto:info@northernwidget.com).
-
-
-INCLUDE SOMEWHERE BELOW IN APPROPRIATE SECTION IN LONG-FORM GUIDE!!!!!!!!!!!!!!!!!!!!!
-pictures of installation of libraries
-pictures of opening code, etc
-Just go through everything!
 
 * * *
 
@@ -68,10 +62,10 @@ ALog alog;
 // USER-ENTERED VARIABLES //
 ////////////////////////////
 char* dataLoggerName = "T01"; // Name of logger; displayed in Serial communications
-char* fileName = "T01.txt"; // Name of file for logged data: 8.3 format (e.g, 
+char* fileName = "T01.txt"; // Name of file for logged data: 8.3 format (e.g,
                             // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
 
-//Setup logging interval here, may set up more than one variable. 
+//Setup logging interval here, may set up more than one variable.
 //Minimum interval = 1 sec, maximum interval is 23 hours, 59 minutes, 59 seconds
 //0 for all means that the logger will not sleep
 int Log_Interval_Seconds = 10; //Valid range is 0-59 seconds
@@ -82,9 +76,9 @@ bool external_interrupt = false;
 
 void setup(){
   alog.initialize(dataLoggerName, fileName,
-    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, 
+    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds,
     external_interrupt);
-    
+
   // If you are using a standard Arduino board (i.e. not a full ALog data logger)
   // and are not using the Arduino shield, you will have to set the proper pins for
   // the indicator LED (defualts to 9) and the SD card and RTC power (default to -1
@@ -94,7 +88,7 @@ void setup(){
   // set_LEDpin(_pin);
   // set_SDpowerPin(_pin);
   // set_RTCpowerPin(_pin);
-  
+
   alog.setupLogger();
 }
 
@@ -112,18 +106,18 @@ void loop(){
   ///////////////////////////////////////////////////////
 
   alog.sensorPowerOn();
-  
+
   // Turn on external power (3.3V and 5V in the case of the ALog BottleLogger)
   // for sensors and any other devices.
   // Place commands for all sensors that require this between
   // SensorPowerOn() and SensorPowerOff().
-  // If you have no sensors that require power, you should comment out the 
+  // If you have no sensors that require power, you should comment out the
   // SensorPowerOn() and SensorPowerOff() commands.
 
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
   // INSERT COMMANDS TO READ SENSORS THAT REQUIRE ALOG-SUPPLIED POWER HERE! //
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
-  
+
   alog.sensorPowerOff();
 
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
@@ -137,12 +131,12 @@ void loop(){
   // Otherwise, the buffer will overflow and I'm not sure what will happen!
   // alog.bufferWrite()
 
-  // ************ DO NOT EDIT BELOW THIS LINE ************ 
+  // ************ DO NOT EDIT BELOW THIS LINE ************
 
   // Wrap up files, turn off SD card, and go back to sleep
   alog.endLogging();
 
-  // ***************************************************** 
+  // *****************************************************
 }
 ```
 
@@ -164,7 +158,7 @@ One example, for a thermistor (a temperature-sensitive resistor), is:
 Where the parameters are, in order:
 
 *   **R0**: Known resistance at given known temperature (here 10,000 ohms)
-*   **B**: The parameter governing the curvature of the resistance-to-temperature calibration curve (here 3380 K) 
+*   **B**: The parameter governing the curvature of the resistance-to-temperature calibration curve (here 3380 K)
 *   **Rref**: The resistance of the known resistor (here also 10,000 Ω, to optimize measurement sensitivity at 10 kΩ)
 *   **T0degC**: The temperature [in Celsius] at which the known resistance equals **R0** (here 25°C)
 *   **thermPin**: The analog pin number to be read
@@ -178,45 +172,45 @@ Printed below is the template function designed to guide users about how to add 
 If you do add your sensor to our library or make an improvement, **we would really appreciate it if you woudl contact us about including the changes you've made**. We have designed the ALog library as a resource for the community, and the more of us who make it better, the bigger and better open-source field instrumentation grows!
 
 ```cpp
-void ALog::_sensor_function_template(uint8_t pin, float param1, float param2, 
+void ALog::_sensor_function_template(uint8_t pin, float param1, float param2,
            uint8_t ADC_bits, bool flag){
   /**
-   * @brief 
+   * @brief
    * Function to help lay out a new sensor interface.
    * This need not be "void": it may return a value as well.
-   * 
+   *
    * @details
    * Details about sensor go here
-   * 
+   *
    * @param pin You often need to specify interface pins
-   * 
+   *
    * @param param1 A variable for the sensor or to interpret its value
-   * 
+   *
    * @param param2 A variable for the sensor or to interpret its value
-   * 
-   * @param ADC_bits You often need to specify how much the analog-to-digital 
+   *
+   * @param ADC_bits You often need to specify how much the analog-to-digital
    *                 converter should be oversampled; this can range from
-   *                 10 (no oversampling) to 16 (maximum possible 
+   *                 10 (no oversampling) to 16 (maximum possible
    *                 oversampling before certainty in the oversampling method
    *                 drops)
-   * 
+   *
    * @param flag Something that helps to set an option
-   * 
+   *
    * Example (made up):
    * ```
    * alog.Example(A2, 1021.3, 15.2, True);
    * ```
-   * 
+   *
   */
-  
+
   float Vout_normalized_analog_example = analogReadOversample(pin, \
             ADC_bits) / 1023.;
-  
+
   float Some_variable = Vout_normalized_analog_example * param1 / param2;
   if (flag){
     Some_variable /= 2.;
   }
-  
+
   ///////////////
   // SAVE DATA //
   ///////////////
@@ -230,7 +224,7 @@ void ALog::_sensor_function_template(uint8_t pin, float param1, float param2,
   // SD write
   datafile.print(Some_variable);
   datafile.print(F(","));
-  
+
   // Echo to serial
   Serial.print(Some_variable);
   Serial.print(F(","));
@@ -313,10 +307,10 @@ PICTURE OF MY TOOL ROLL HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 Your ALog board should look something like this. It has a lot of components. We'll start to look at them in more detail once you wire the board up.
 
-![ALog BottleLogger v.2.2.0 top side photo](http://northernwidget.com/wp-content/uploads/2017/05/ALogBottleLogger220.png)
-@image latex doc/figures/ALogBottleLogger220.png
+![ALog BottleLogger v2.2.0 top side photo](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ALogBottleLogger220.png "ALog BottleLogger v2.2.0 top side photo")
+@image latex doc/figures/ALogBottleLogger220.png width=\linewidth
 
-**ALog BottleLogger v2.2.0**
+***ALog BottleLogger v2.2.0 top side photo***
 
 ### Dimensions: namesake
 
@@ -328,8 +322,8 @@ Yes, we use the big, chunky, old-school SD cards, USB ports, and barrel jack con
 
 (An update... while we love the old-schoool cool of the big USB A-B cable, we
 couldn't help but notice that tons of us were traveling with A-micro-B cables
-thanks to Android phones, but had to make a special effort to remember to bring 
-our A-B cables to the field. So we've made a recent (2017) update to the USB 
+thanks to Android phones, but had to make a special effort to remember to bring
+our A-B cables to the field. So we've made a recent (2017) update to the USB
 port in our design.)
 
 ### What does it have?
@@ -427,7 +421,7 @@ These are the pins used for the I2C communications protocol. This works with the
 The ALog BottleLogger has several pins that are used for dedicated functions. These are:
 
 *   **Pin 2:** Interrupt connected to clock: triggers logger to wake
-*   **Pin 4:** External (sensor) power 3.3V and 5V regulator on/off switch 
+*   **Pin 4:** External (sensor) power 3.3V and 5V regulator on/off switch
 *   **Pin 5:** The "LOG" (also referred to as "LOG NOW") button uses this pin to tell the logger to wake up and take a reading immediately.
 *   **Pin 7:** Clock and SD card power on/off switch
 *   **Pin 8:** Message-flashing LED on/off
@@ -483,39 +477,64 @@ Go to **File** > **Preferences** (or **Arduino** > **Preferences** on Mac).
 
 <!--- [Adding a board manager list](https://cdn.sparkfun.com/assets/learn_tutorials/4/5/4/arduino-board-add.png) (link to Sparkfun's tutorial) -->
 
-![Open the Arduino IDE preferences](https://github.com/NorthernWidget/Arduino_Boards/raw/master/README_images/File_Preferences.png "Open the Arduino IDE preferences.")
+![Open the Arduino IDE preferences](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/File_Preferences.png "Open the Arduino IDE preferences.")
+@image latex doc/figures/Arduino_Boards/File_Preferences.png
 
-Open 'Additional Boards Manager URLs', and paste the following in either the box for **Additional Boards Manager URLs**, or, if this is populated, the window that pops up when you hit the button to the right of the **Additional Boards Manager URLs** text entry area:  
+***Open the Arduino IDE preferences***
+
+
+Open 'Additional Boards Manager URLs', and paste the following in either the box for **Additional Boards Manager URLs**, or, if this is populated, the window that pops up when you hit the button to the right of the **Additional Boards Manager URLs** text entry area:
 
 	https://raw.githubusercontent.com/NorthernWidget/Arduino_Boards/master/package_NorthernWidget_index.json
 
-![Paste the URL here](https://github.com/NorthernWidget/Arduino_Boards/raw/master/README_images/PreferencesWindow.png "Paste the URL here.")
+![Paste the URL here](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/PreferencesWindow.png)
+@image latex doc/figures/Arduino_Boards/PreferencesWindow.png
 
-![Unless you already have done that for third-party boards... in that case, open this frame and paste the URL here.](https://github.com/NorthernWidget/Arduino_Boards/raw/master/README_images/BoardURLs_list.png "Unless you already have done that for third-party boards... in that case, open this frame and paste the URL here.")
+***Paste the URL here.***
+
+![Unless you already have done that for third-party boards... in that case, open this frame and paste the URL here.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/BoardURLs_list.png "Unless you already have done that for third-party boards... in that case, open this frame and paste the URL here.")
+@image latex doc/figures/Arduino_Boards/BoardURLs_list.png
+
+***Unless you already have done that for third-party boards... in that case, open this frame and paste the URL here.***
 
 Now, go to **Tools** > **Board** > **Boards Manager...**.
 
-![Open the boards manager here.](https://github.com/NorthernWidget/Arduino_Boards/raw/master/README_images/Tools_Boards_BoardManager.png "Open the boards manager here.")
+![Open the boards manager here.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/Tools_Boards_BoardManager.png "Open the boards manager here.")
+@image latex doc/figures/Arduino_Boards/Tools_Boards_BoardManager.png
+
+***Open the boards manager here.***
 
 Click it, and the following window will appear:
 
-![Boards Manager.](https://github.com/NorthernWidget/Arduino_Boards/raw/master/README_images/BoardsManager.png "Boards Manager.")
+![Boards Manager.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/BoardsManager.png "Boards Manager.")
+@image latex doc/figures/Arduino_Boards/BoardsManager.png
+
+***Boards Manager.***
 
 if you type in "Northern Widget" (or usually just "Northern" as well), you should see an option to install board files for Northern Widget Arduino compatible boards.
 
-![Northern Widget boards.](https://github.com/NorthernWidget/Arduino_Boards/raw/master/README_images/BoardsManager_Northern.png "Northern Widget boards.")
+![Northern Widget boards.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/BoardsManager_Northern.png "Northern Widget boards.")
+@image latex doc/figures/Arduino_Boards/BoardsManager_Northern.png
 
-**If Northern Widget options do not appear**, restart your Arduino IDE and try again.
+***Northern Widget boards.***
+
+***If Northern Widget options do not appear.*** restart your Arduino IDE and try again.
 
 Click "Install" to add the NorthernWidget boards to your list. At the time of writing, we support only AVR boards, but this may change soon.
 
-![ALog (AVR) support installed.](https://github.com/NorthernWidget/Arduino_Boards/raw/master/README_images/BoardsManager_Northern_Done.png "ALog (AVR) support installed.")
+![ALog (AVR) support installed.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/BoardsManager_Northern_Done.png "ALog (AVR) support installed.")
+@image latex doc/figures/Arduino_Boards/BoardsManager_Northern_Done.png
+
+***ALog (AVR) support installed.***
 
 Now, when you select the Boards list, you will see a collection of new boards for Northern Widget.
 
 You will then want to change your chosen board to the board that you have. At the time of writing, this is probably the "ALog BottleLogger v2"; the "legacy" option is used for v2.0.0-beta and prior, and there are fewer of these boards in circulation.
 
-![Select the proper board.](https://github.com/NorthernWidget/Arduino_Boards/raw/master/README_images/Tools_Boards_NorthernWidget_ALog_BottleLogger_v2.png "Now, when you go to Tools > Board, you should see the Northern Widget ALog boards. Select the proper board.")
+![Select the proper board.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Arduino_Boards/Tools_Boards_NorthernWidget_ALog_BottleLogger_v2.png "Now, when you go to Tools > Board, you should see the Northern Widget ALog boards. Select the proper board.")
+@image latex doc/figures/Arduino_Boards/Tools_Boards_NorthernWidget_ALog_BottleLogger_v2.png
+
+***Select the proper board.***
 
 **That's it! You're done, and ready to rock and roll... er, collect data, with your ALog data logger.**
 
@@ -537,7 +556,7 @@ WALKTHROUGH WITH IMAGES !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 ##### Download:
 
-**Stable release: [[ZIP]](http://northernwidget.com/ALog_libraries/stable/ALog_libraries.zip) [[TAR.GZ]](http://northernwidget.com/ALog_libraries/stable/ALog_libraries.tar.gz) (recommended)** 
+**Stable release: [[ZIP]](http://northernwidget.com/ALog_libraries/stable/ALog_libraries.zip) [[TAR.GZ]](http://northernwidget.com/ALog_libraries/stable/ALog_libraries.tar.gz) (recommended)**
 
 Nightly build: [[ZIP]](http://northernwidget.com/ALog_libraries/nightly/ALog_libraries.zip) [[TAR.GZ]](http://northernwidget.com/ALog_libraries/nightly/ALog_libraries.tar.gz) (for only those who can tolerate things breaking once in a while)
 
@@ -894,10 +913,10 @@ ALog alog;
 // USER-ENTERED VARIABLES //
 ////////////////////////////
 char* dataLoggerName = "Thermistor Logger"; // Name of logger; displayed in Serial communications
-char* fileName = "TempLog1.txt"; // Name of file for logged data: 8.3 format (e.g, 
+char* fileName = "TempLog1.txt"; // Name of file for logged data: 8.3 format (e.g,
                             // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
 
-//Setup logging interval here, may set up more than one variable. 
+//Setup logging interval here, may set up more than one variable.
 //Minimum interval = 1 sec, maximum interval is 23 hours, 59 minutes, 59 seconds
 //0 for all means that the logger will not sleep
 int Log_Interval_Seconds = 10; //Valid range is 0-59 seconds
@@ -908,19 +927,27 @@ bool external_interrupt = false;
 
 void setup(){
   alog.initialize(dataLoggerName, fileName,
-    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, 
+    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds,
     external_interrupt);
-    
-  // If you are using a standard Arduino board (i.e. not a full ALog data logger)
-  // and are not using the Arduino shield, you will have to set the proper pins for
-  // the indicator LED (defualts to 9) and the SD card and RTC power (default to -1
-  // to be inactive in the case of constant power supply; set these to the same
-  // value if there is just one switch for both of these).
-  // Replace "_pin" with your desired pin number, and uncomment the relevant line(s).
+
+  // If you are using a standard Arduino board (i.e. not a full ALog data
+  // logger) and are not using the Arduino shield, you will have to set the
+  // proper pins for the indicator LED (defualts to 9) and the SD card, RTC
+  // power, and sensor or other external device power (default to -1).
+  // The "-1" default ensures that no pins are affected by commands to switch
+  // power to the SD card, RTC power, or sensor power. This is because the
+  // typical use case, a standard Arduino Uno, uses the Arduino's built-in
+  // 3V3 regulator to power to run the RTC and SD card (as we do with the ALog
+  // shield).
+  // These can also be set to the same value if they are needed but the same
+  // voltage regulator serves multiple purposes.
+  // Replace "_pin" with your desired pin number, and uncomment the relevant
+  // following line(s).
   // set_LEDpin(_pin);
   // set_SDpowerPin(_pin);
   // set_RTCpowerPin(_pin);
-  
+  // set_SensorPowerPin(_pin);
+
   alog.setupLogger();
 }
 
@@ -938,19 +965,19 @@ void loop(){
   ///////////////////////////////////////////////////////
 
   alog.sensorPowerOn();
-  
+
   // Turn on external power (3.3V and 5V in the case of the ALog BottleLogger)
   // for sensors and any other devices.
   // Place commands for all sensors that require this between
   // SensorPowerOn() and SensorPowerOff().
-  // If you have no sensors that require power, you should comment out the 
+  // If you have no sensors that require power, you should comment out the
   // SensorPowerOn() and SensorPowerOff() commands.
 
   // CanTherm small bead
   //logger.thermistorB(10000, 3950, 10000, 25, 0);
   // CanTherm expoxy bead: CWF1B103F3380
   logger.thermistorB(10000, 3380, 10000, 25, 0);
-  
+
   alog.sensorPowerOff();
 
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
@@ -964,12 +991,12 @@ void loop(){
   // Otherwise, the buffer will overflow and I'm not sure what will happen!
   // alog.bufferWrite()
 
-  // ************ DO NOT EDIT BELOW THIS LINE ************ 
+  // ************ DO NOT EDIT BELOW THIS LINE ************
 
   // Wrap up files, turn off SD card, and go back to sleep
   alog.endLogging();
 
-  // ***************************************************** 
+  // *****************************************************
 }
 ```
 
@@ -999,10 +1026,10 @@ Self-explanatory!
 // USER-ENTERED VARIABLES //
 ////////////////////////////
 char* dataLoggerName = "Thermistor Logger"; // Name of logger; displayed in Serial communications
-char* fileName = "TempLog1.txt"; // Name of file for logged data: 8.3 format (e.g, 
+char* fileName = "TempLog1.txt"; // Name of file for logged data: 8.3 format (e.g,
                             // ABCDEFGH.TXT); <= 8 chars before ".txt" is OK
 
-//Setup logging interval here, may set up more than one variable. 
+//Setup logging interval here, may set up more than one variable.
 //Minimum interval = 1 sec, maximum interval is 23 hours, 59 minutes, 59 seconds
 //0 for all means that the logger will not sleep
 int Log_Interval_Seconds = 10; //Valid range is 0-59 seconds
@@ -1023,7 +1050,7 @@ bool external_interrupt = false;
 ```cpp
 void setup(){
   alog.initialize(dataLoggerName, fileName,
-    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds, 
+    Log_Interval_Hours, Log_Interval_Minutes, Log_Interval_Seconds,
     external_interrupt);
 ```
 
@@ -1045,7 +1072,7 @@ This is the start of the `setup()` step, which is run once when the logger turns
 
 As is written in the comments, set these values for the indicator LED, SDpowerPin, and RTCpowerPin. The latter two are typically unset on non-ALog Arduino boards, and are equal to each other (but already set within the ALog library) for ALog boards.
 
-```cpp  
+```cpp
   alog.setupLogger();
 }
 ```
@@ -1076,19 +1103,19 @@ Here, the comments are self-explanatory, mostly; a couple extra explanations:
   ///////////////////////////////////////////////////////
 
   alog.sensorPowerOn();
-  
+
   // Turn on external power (3.3V and 5V in the case of the ALog BottleLogger)
   // for sensors and any other devices.
   // Place commands for all sensors that require this between
   // SensorPowerOn() and SensorPowerOff().
-  // If you have no sensors that require power, you should comment out the 
+  // If you have no sensors that require power, you should comment out the
   // SensorPowerOn() and SensorPowerOff() commands.
 
   // CanTherm small bead
   //logger.thermistorB(10000, 3950, 10000, 25, 0);
   // CanTherm expoxy bead: CWF1B103F3380
   logger.thermistorB(10000, 3380, 10000, 25, 0);
-  
+
   alog.sensorPowerOff();
 ```
 
@@ -1125,12 +1152,12 @@ We don't have any of these here, but examples would be sensors with their own po
 As it says: if you think you're in danger of overflowing the buffer, run this command! You'll need 512 characters in your line for this to happen though, and I've never appraoched this in my work. But hey, someone might!
 
 ```cpp
-  // ************ DO NOT EDIT BELOW THIS LINE ************ 
+  // ************ DO NOT EDIT BELOW THIS LINE ************
 
   // Wrap up files, turn off SD card, and go back to sleep
   alog.endLogging();
 
-  // ***************************************************** 
+  // *****************************************************
 }
 ```
 
@@ -1166,11 +1193,13 @@ Don't have Python? You probably will have figured it out when that failed Here a
 
 ## Connecting sensors (and more) to the ALog
 
-![](http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout.png)
+![User's layout and connection guide](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ALogUsersLayout.png "User's layout and connection guide")
+@image latex doc/figures/ALogUsersLayout.pdf "Layout and connection guide" width=6.5in
 
-@image latex doc/figures/ALogUsersLayout.pdf width=6.5in
+***User's layout and connection guide***
 
-[[PDF of User's Layout guide]](http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout_smallfile.pdf)
+[[PDF of User's Layout guide]](https://github.com/NorthernWidget/ALog/raw/master/doc/ALogUsersLayout_smallfile.pdf)
+[(backup link)](http://northernwidget.com/wp-content/uploads/2017/05/ALogUsersLayout_smallfile.pdf)
 
 ### Pin definitions
 
@@ -1243,6 +1272,6 @@ PHOTOS AND WRITING HERE!
 
 !!!!!!!!!!!!!!!!!
 
-### 
+###
 
 !!!!!!!!!!!!!!!!!!!!
