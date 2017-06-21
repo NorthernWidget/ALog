@@ -572,6 +572,8 @@ ALog (all data logging!):
 ![ALog library.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/libraryALog.png "ALog library.")
 @image latex ArduinoScreenshots/libraryALog.png "ALog library"
 
+!!!!!!!!!!!!!!!!!!!!!!! UPDATE AND TAKE THIS SCREENSHOT! THEN ADD ALL FIGURES!
+
 Once this is done, go to the instructions for Option 2 (immediately below) to get the SFE_BMP180 library.
 
 #### Option 2: direct installation from a prepared file archive
@@ -710,7 +712,10 @@ Before these functions, you can place all of your variable definitions.
 
 ### Uploading code to the ALog data logger
 
-Once your code is written -- either as a copy/paste of this or as your own -- save your code. All Arduino sketches need to be within their own folder. After this, you can hit the "upload" button (right arrow) to load the code to the board. (The check mark to the left will test if your code compiles.) **Insert images** !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Once your code is written -- either as a copy/paste of this or as your own -- save your code. All Arduino sketches need to be within their own folder. After this, you can hit the "upload" button (right arrow) to load the code to the board. (The check mark to the left will test if your code compiles.)
+
+![Upload sketch (program) to board.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/Uploading.png "Uploading sketch (program) to board.")
+@image latex ArduinoScreenshots/Uploading.png "Uploading to board"
 
 ### Blink
 
@@ -745,7 +750,16 @@ Look at the comments in the code for information on what each of the commands do
 A second important piece of your work with the Arduino is to communicate with it. We'll start with one-way communications, with the ALog talking to your computer. We will still flash the LED, and will add in information on how to define a variable outside of these two functions. The comments give you some general idea of what each section does; I will break down the importance of each section below.
 
 *Before running this code, open the serial monitor and* ***change your baud rate to 38400 bps!***
-**Insert images to open serial monitor and change baud rate** !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+![Open the serial monitor.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/Uploading.png "Open the serial monitor.")
+@image latex ArduinoScreenshots/OpenSerialMonitor.png "Serial monitor"
+
+(Note the error message: this is because I have no board plugged in. If you get this and **do** have a board plugged in, go to **Tools** > **Port** > **[new port that you pick]**)
+
+![Change the baud rate.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/Uploading.png "Change the baud rate.")
+@image latex ArduinoScreenshots/BaudRate.png "Baud rate"
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ADD THIS IMAGE ONCE I CAN PLUG IN A BOARD!
+
 
 ```cpp
 // Global variables
