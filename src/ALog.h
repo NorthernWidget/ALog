@@ -13,9 +13,9 @@ Goals:
 Written by Andy Wickert, 2011-2017, and Chad Sandell, 2017<br>
 Started 27 September 2011
 
-Designed to greatly simplify Arduino sketches 
-for the ALog and reduce what the end 
-user needs to do into relatively simple 
+Designed to greatly simplify Arduino sketches
+for the ALog and reduce what the end
+user needs to do into relatively simple
 one-line calls.
 
 ## LICENSE: GNU GPL v3
@@ -91,13 +91,13 @@ class ALog {
   public:
     // Constructor
     ALog();
-    
+
     // Initialization
     void initialize(char* _logger_name, char* _datafilename, \
          int _hourInterval, int _minInterval, int _secInterval, \
          bool _ext_int=false, bool _LOG_ALL_SENSORS_ON_BUCKET_TIP=false);
     void setupLogger();
-    
+
     // Code for sleeping, starting up from sleep, synching SD card
     void sleep();
     void goToSleep_if_needed(); // Same as above, but checks if sleep is being used
@@ -107,17 +107,18 @@ class ALog {
     void endAnalog(); // DEPRECATED
     void sensorPowerOn();
     void sensorPowerOff();
-    
+
     // Getters and setters
     bool get_use_sleep_mode();
     void set_LEDpin(int8_t _pin);
     void set_SDpowerPin(int8_t _pin);
     void set_RTCpowerPin(int8_t _pin);
+    void set_SensorPowerPin(int8_t _pin);
     // Important subset: EEPROM: Serial number and calibrations
     uint16_t get_serial_number();
     float get_3V3_measured_voltage();
     float get_5V_measured_voltage();
-    
+
     // Sensors - standard procedure (wake up, log, sleep)
     float readPin(uint8_t pin);
     float readPinOversample(uint8_t pin, uint8_t adc_bits);
@@ -153,7 +154,7 @@ class ALog {
          float Vref, float Vsupply, float R0_therm, float B_therm, \
          float Rref_therm, float T0degC_therm, uint8_t thermPin_therm, \
          uint8_t ADC_resolution_nbits=14);
-    void Anemometer_reed_switch(uint8_t interrupt_pin_number, 
+    void Anemometer_reed_switch(uint8_t interrupt_pin_number,
          unsigned long reading_duration_milliseconds, \
          float meters_per_second_per_rotation);
     void Wind_Vane_Inspeed(uint8_t vanePin);
@@ -162,7 +163,7 @@ class ALog {
     void Barometer_BMP180();
     void _sensor_function_template(uint8_t pin, float param1, \
          float param2, uint8_t ADC_bits=14, bool flag=false);
-    
+
     // Sensors - triggered
     // Camera on/off function; decision made in end-user Arduino script
     void HackHD(int control_pin, bool want_camera_on);
@@ -181,16 +182,16 @@ class ALog {
     void alarm(uint8_t hourInterval, uint8_t minInterval, \
          uint8_t secInterval);
     void displayAlarms(); //debug tool delete if desired.
-    void checkAlarms();  //debug tool delete if desired. 
-    void displayTime();   //debug tool delete if desired. 
+    void checkAlarms();  //debug tool delete if desired.
+    void displayTime();   //debug tool delete if desired.
     // LED signals
     void LEDwarn(uint8_t nflash);
     void LEDgood();
     void LEDtimeWrong(uint8_t ncycles);
-    
+
     // Time
     void unixDatestamp();
-    
+
     // Logger-computer communications
     void name();
     void print_time();
@@ -199,21 +200,21 @@ class ALog {
     void startup_sequence();
     void establishContact_Tx();
     bool establishContact_Rx();
-    
+
     // Clock and SD card power
     void SDon_RTCon();
     void SDoff_RTCsleep();
-    
+
     // Clock setting
     void clockSet();
-    void GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW, 
+    void GetDateStuff(byte& Year, byte& Month, byte& Day, byte& DoW,
 		byte& Hour, byte& Minute, byte& Second);
-    
+
     // Sensor utility codes
     float _vdivR(uint8_t pin, float Rref, uint8_t adc_bits=10, \
           bool Rref_on_GND_side=true, bool oversample_debug=false);
-    // I don't trust the software serial version -- should do some lab testing 
-    // to make sure that chances of clock speed / interrupt problems, 
+    // I don't trust the software serial version -- should do some lab testing
+    // to make sure that chances of clock speed / interrupt problems,
     // especially with so much time in sleep mode, are near-0.
     //int maxbotix_soft_Serial_parse(int Ex, int Rx, bool RS232=false);
     int maxbotix_Serial_parse(uint8_t Ex);
@@ -226,7 +227,7 @@ class ALog {
     // The default interrupt is Pin 3, INT1 on ATmega328 (ALog BottleLogger).
     // This runs of bool _ext_int = true in loger.initialize()
     void TippingBucketRainGage();
-    
+
     // Logging
     void start_logging_to_datafile();
     void start_logging_to_otherfile(char* filename);
@@ -238,5 +239,4 @@ class ALog {
 };
 
 // End include guard
-#endif  
-
+#endif
