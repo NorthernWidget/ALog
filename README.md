@@ -279,7 +279,9 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     * Wire stripper
     * Spare wire
     * Multimeter
-    * Adjustable wrench
+    * Adjustable wrench (mine in the photo is larger than is needed)
+    * Socket wrench (can be optional if you know that you won't need it)
+    * Hex wrenches (allen wrenches / church keys) (I have English and Metric sets, but don't always bring both)
     * Portable soldering iron: battery-powered (you get maybe 15-20 minutes on a 4x AA model) or butane
     * Lead-free solder
     * Electrical tape
@@ -287,7 +289,8 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     * Permanent markers (I like multiple sizes of Sharpies)
     * Cable ties
 
-PICTURE OF MY TOOL ROLL HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+![Andy's tool roll.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ToolRoll.jpg "Andy's tool roll.")
+@image latex ToolRoll.jpg "Andy's tool roll"
 
 ## A few definitions
 
@@ -1284,18 +1287,23 @@ This table does not include pin capabilities that are technically possible but n
 
 ### How to attach wires to screw terminals
 
-Tools needed:
+Tools/materials needed:
 
 *   Screwdriver, slotted. We recommend a 0.4 x 2 mm blade. Good options are [this one](https://www.digikey.com/product-detail/en/wiha/26020/431-1176-ND/510465) and its [ESD-safe version](https://www.digikey.com/product-detail/en/wiha/27220/431-1202-ND/512198).
-*   Sensor !!!!!!!!!!!!!!!!!!!!!!!!!
+*   ALog data logger or equivalent
+*   A sensor!
 
 Also helpful:
 
 *   Common sense
 *   Caution
 
-PHOTOS AND WRITING HERE!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+To be safe, disconnect power from the logger before attaching or detaching any wires. For full disclosure, though, we do this with power attached all the time -- this just opens the possibility of something going wrong, and requires steady hands.
+
+Using the screwdriver, open the screw terminal (lefty loosey), stick the end of the wire into it, and then close the screw terminal until you feel significant resistance (righty tighty!). The goal is that the wire can't come out under reasonable force.
+
+![Attaching a wire (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/AttachWireScrew.png "Attaching a wire (photo R. Schulz)")
+@image latex AttachWireScrew.png "Attaching wire"
 
 ### Rererence resistors (what are they good for?)
 
