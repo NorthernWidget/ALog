@@ -1376,7 +1376,7 @@ The key is a little bit of circuit algebra for something called the "Voltage div
 For the ALog, the sensor typically lies between 3V3 (a power source, Vin on the above diagram) and an analog pin (Vout on the above diagram). Applying Ohm's law gives you the following equation that one can use to solve for the value of R1 if you know R2.
 
 ![Voltage divider](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/VdivEquation.png "Voltage divider")
-@image latex VdivEquation.png width=2.5in
+@image latex VdivEquation.png width=1.8in
 
 And this is where the reference resistor comes in: this is the R2, connected between Vout and GND.
 
@@ -1384,7 +1384,7 @@ It is possible, and necessary with a few sensors, to flip the structure around; 
 
 And that's it: **the reference resistor is a standard** required to measure another unknown resistance, and it is implemented in a circuit that converts the unknown resistance into a voltage.
 
-*For more information, see [ Wikipedia: Voltage divider](https://en.wikipedia.org/wiki/Voltage_divider)*
+*For more information, see [ Wikipedia: Voltage divider](https://en.wikipedia.org/wiki/Voltage_divider#Resistive_divider)*
 
 ### The ISP (or ICSP) header and the bootloader
 
