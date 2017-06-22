@@ -15,5 +15,5 @@ mv Arduino_Boards/Tools_Boards_NorthernWidget_ALog_BottleLogger_v2.png Arduino_B
 
 # Move PDF into HTML folder so it appears in branch but doesn't have
 # tracked history (would be too much overhead)
-cp refman.pdf ../html/refman.pdf
+cp refman.pdf ../html/ALogReferenceManual.pdf
 

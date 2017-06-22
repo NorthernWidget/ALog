@@ -10,13 +10,13 @@ If you use the ALog library (and/or data logger) in a publication, please cite:
 
 **Wickert, A. D. (2014), [The ALog: Inexpensive, Open-Source, Automated Data Collection in the Field](http://onlinelibrary.wiley.com/wol1/doi/10.1890/0012-9623-95.2.68/full), *Bull. Ecol. Soc. Am.*, *95*(2), 68–78, doi:10.1890/0012-9623-95.2.68.**
 
-In addition to the README.md at [https://github.com/NorthernWidget/ALog](https://github.com/NorthernWidget/ALog), documentation is available as a combination of the information here and an index of logger functions in both [[HTML]](http://northernwidget.github.io/ALog) and [[PDF]](http://northernwidget.github.io/ALog/refman.pdf) format.
+In addition to the README.md at [https://github.com/NorthernWidget/ALog](https://github.com/NorthernWidget/ALog), documentation is available as a combination of the information here and an index of logger functions in both [[HTML]](http://northernwidget.github.io/ALog) and [[PDF]](http://northernwidget.github.io/ALog/ALogReferenceManual.pdf) format.
 
 * * *
 
 # Quick-start guide
 
-***No-frills, no-pictures, as quick as possible. All the same material is covered in more detail in the*** **"Complete guide: from the basics onward,"** *** below; look there if you get stuck***
+***No-frills, no-pictures, as quick as possible. All the same material is covered in more detail in the*** **"Complete guide: from the basics onward,"** ***below; look there if you get stuck***
 
 1. Download and install the Arduino IDE from [https://www.arduino.cc/en/Main/Software](https://www.arduino.cc/en/Main/Software)
 2. Install all required software libraries: start the IDE, go to "Sketch --> Include Library --> Manage Libraries...", and search for and install the following:
@@ -550,6 +550,8 @@ The ALog also relies on some custom software libraries. These are collections of
 
 #### Option 1: downloading and installing through the Arduino IDE
 
+***Currently not recommended, at least until all components can be downloaded this way***
+
 ***Stable versions, but outdated during times of rapid development***
 
 The Arduino IDE has a library manager! Here we will walk you through how to use it to obtain and install the requisite libraries. This uses the graphical interface, but can take longer than, "Option 2", below.
@@ -579,6 +581,8 @@ Once this is done, go to the instructions for Option 2 (immediately below) to ge
 
 #### Option 2: direct installation from a prepared file archive
 
+***Not automated in the IDE but much simpler!***
+
 ##### Download:
 
 **Stable release: [[ZIP]](http://northernwidget.com/ALog_libraries/stable/ALog_libraries.zip) [[TAR.GZ]](http://northernwidget.com/ALog_libraries/stable/ALog_libraries.tar.gz) (recommended)**
@@ -587,7 +591,7 @@ Nightly build: [[ZIP]](http://northernwidget.com/ALog_libraries/nightly/ALog_lib
 
 ##### Extract/Install:
 
-Unzip the archive, and place the contents in the "Arduino/libraries" folder. This should be in your home directory or your Documents. Then restart the Arduino IDE (if it is open).
+Unzip the archive, and place the contents in your "**Arduino/libraries**" folder. This should be in your home directory or your Documents. Then restart the Arduino IDE (if it is open).
 
 ### Learn some basics of programming in the Arduino language
 
@@ -677,10 +681,16 @@ These are ways to control the flow of a code. I'm afraid that this introduction 
 
 ## Connecting the ALog and Computer
 
-Use a USB cable to connect the ALog to your computer. **PICTURE here** Then, using the Arduino IDE, select the name of the USB-serial port that is connected to the ALog. **PICTURE here** Now your ALog is ready for communications and programming. RETURN HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Use a USB cable to connect the ALog to your computer. (Photo from ALog v2.0.0; v2.2.0+ use microUSB, like Android cell phones.)
+![Insert USB cable (photo R. Schulz).](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/InsertUSB.png "Insert USB cable (photo R. Schulz).")
+@image latex InsertUSB.png "USB connection"
 
-POWER CONNECTOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!?
-SECTION FOR THAT IS NOW BELOW!!!
+Then, using the Arduino IDE, select the name of the USB-serial port that is connected to the ALog.
+
+![USB-Serial port select.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/SerialPort.png "USB-Serial port select.")
+@image latex ArduinoScreenshots/InsertUSB.png "Serial Port"
+
+Now your ALog is ready for communications and programming.
 
 ## Example Programs: Writing and Uploading
 
@@ -757,10 +767,8 @@ A second important piece of your work with the Arduino is to communicate with it
 
 (Note that if I would have clicked, an error message would have popped up below saying that it cannot find a device at the given port: this is because I have no board plugged in. If you get this message and **do** have a board plugged in, go to **Tools** > **Port** > **[new port that you pick]**)
 
-![Change the baud rate.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/Uploading.png "Change the baud rate.")
-@image latex ArduinoScreenshots/BaudRate.png "Baud rate"
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ADD THIS IMAGE ONCE I CAN PLUG IN A BOARD!
-
+![Change the baud rate.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/SetBaud.png "Change the baud rate.")
+@image latex ArduinoScreenshots/ArduinoScreenshots/SetBaud.png "Baud rate"
 
 ```cpp
 // Global variables
@@ -1173,7 +1181,7 @@ This is it, where the magic happens!
 * Standard temperature to which factory standard resistance corresponds [ohms]
 * Analog pin number (this could equally be A1 or 14 for the ALog BottleLogger)
 
-Do you want to know more about these parameters? Look up the function-specific help, which is below if you are looking at the PDF version of the help (downloadable from [http://northernwidget.github.io/ALog/refman.pdf](http://northernwidget.github.io/ALog/refman.pdf)) and available online at [http://northernwidget.github.io/ALog/classALog.html](http://northernwidget.github.io/ALog/classALog.html).
+Do you want to know more about these parameters? Look up the function-specific help, which is below if you are looking at the PDF version of the help (downloadable from [http://northernwidget.github.io/ALog/ALogReferenceManual.pdf](http://northernwidget.github.io/ALog/ALogReferenceManual.pdf)) and available online at [http://northernwidget.github.io/ALog/classALog.html](http://northernwidget.github.io/ALog/classALog.html).
 
 ```cpp
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
@@ -1209,19 +1217,25 @@ And as always, if anything here is unclear, please contact us and we'll try our 
 
 ## Setting the real-time clock
 
+### Graphical interface
+
+Coming soon!
+
+### Command-line
+
 The ALog's clock is a key component -- without it, all the data are sitting in an unreferenced time frame. This is why we have chosen the DS3231 real-time clock, which has the highest accuracy and stability of any commonly-available real-time clock that does not incorporate an absolute time referenge (e.g., with GPS). GPS would be great for some circumstances, and we're developing a logger with it, but this would not be the extreme low-power device that the ALog BottleLogger is.
 
 Enough with the background -- how do you set the clock?
 
 You will need the **ALog library** and the **DS3231 library**, both of which you should already have at this point, as well as the **ALogTalk** repository of Python scripts at [github.com/NorthernWidget/ALogTalk](github.com/NorthernWidget/ALogTalk). In order to run the Python scripts, you need either **Python 2** (including **pyserial**) or for us to have made an executable version for your platform.
 
-### Integrated into the ALog code
+#### Integrated into the ALog code
 
 When you upload the ALog code to your ALog data logger or Arduino board, it includes code to set the clock via serial communications. Plug in your data logger, run **ALogClockSet.py** (which is in the **ALogTalk** repository), and it should work -- if it doesn't, hit the reset button.
 
 How do you run **ALogClockSet.py**?
 
-**All operating systems:** Open a terminal, navigate to the directory that holds **ALogClockSet.py**, and type:
+**All operating systems:** Open a terminal, navigate to the directory that holds **ALogClockSet.py** (the directory should be called **ALogTalk**, and type:
 ```
 python ALogClockSet.py
 ```
@@ -1231,7 +1245,14 @@ Don't have Python? You probably will have figured it out when that failed Here a
 1. Install Python 2.X; I recommmend getting the **anaconda** distribution
 2. Download an executable verison of **ALogClockSet.py**; email us if you can't find this (it's not always up-to-date due to the overhead required for making executables)
 
+#### After uploading a separate sketch
 
+Open the "ALog_DS3231_set_echo" example (**File (Arduino on Mac)** > **Examples** > **DS3231** > **ALog_DS3231_set_echo**) and upload it to the board.
+
+Open a terminal, navigate to the **ALogTalk** directory, and type:
+```
+python SimpleClockSet.py
+```
 
 ## Connecting sensors (and more) to the ALog
 
@@ -1311,14 +1332,36 @@ Using the screwdriver, open the screw terminal (lefty loosey), stick the end of 
 
 ## Field deployment
 
+### SD card
+
+Insert the SD card carefuly, and make sure that it is seated! The logger will reset constantly if it is not and it is v2.2.0+. Otherwise, it is imporatant to hit the "RESET" button and make sure that the LOOOOONG-short-short flash pattern occurs. This means that the logger is ready to go. Otherwise, no data will be recorded!
+
+![Inserting SD card (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/AttachWireScrew.png "Inserting SD card (photo R. Schulz)")
+@image latex InsertSD.png "Inserting SD card"
+
 ### Power
 
-!!!!!!!!!!!!!!
+#### Barrel jack
+
+In the field, the main way to power the ALog data logger is by plugging in a barrel jack connected to a battery pack. We typically use barrel jacks with screw terminals to attach to generic battery packs (D or AA) that have wire leads; we sometimes use barrel jacks that are already part of the cable.
+
+![Attaching a wire (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/AttachWireScrew.png "Attaching a wire (photo R. Schulz)")
+@image latex AttachWireScrew.png "Attaching wire"
+
+#### JST connector
+
+Next to the barrel jack is a solder pad for a JST connector. This may be populated (i.e., you may solder a JST connector to the board here) if needed to attach power supplies.
+
+#### Power sources
+
+We typically use 3xD or 3xAA primary cell batteries, as they are light, inexpensive, reliable, and available around the world.
+
+Solar charging system development is ongoing, and once complete, will allow long-term power supply and a higher rate of logger power consumption.
 
 ### Housing and waterproofing
 
 !!!!!!!!!!!!!!!!!
 
-###
+### Deployment
 
 !!!!!!!!!!!!!!!!!!!!
