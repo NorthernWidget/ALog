@@ -315,7 +315,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     * Cable ties
 
 ![Andy's tool roll.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ToolRoll.jpg "Andy's tool roll.")
-@image latex ToolRoll.jpg "Andy's tool roll"
+@image latex ToolRoll.png "Andy's tool roll"
 
 ## A few definitions
 
@@ -1383,6 +1383,8 @@ And this is where the reference resistor comes in: this is the R2, connected bet
 It is possible, and necessary with a few sensors, to flip the structure around; in this case, a reference resistor is not attached to the header on the board, but is instead attached to the screw terminals for a power source and the appropriate analog port. Such a reversed order may require a flag to be set in the code.
 
 And that's it: **the reference resistor is a standard** required to measure another unknown resistance, and it is implemented in a circuit that converts the unknown resistance into a voltage.
+
+*For more information, see [ Wikipedia: Voltage divider](https://en.wikipedia.org/wiki/Voltage_divider)*
 
 ### The ISP (or ICSP) header and the bootloader
 
