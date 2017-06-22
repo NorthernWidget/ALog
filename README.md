@@ -572,8 +572,6 @@ ALog (all data logging!):
 ![ALog library.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/libraryALog.png "ALog library.")
 @image latex ArduinoScreenshots/libraryALog.png "ALog library"
 
-!!!!!!!!!!!!!!!!!!!!!!! UPDATE AND TAKE THIS SCREENSHOT! THEN ADD ALL FIGURES!
-
 Once this is done, go to the instructions for Option 2 (immediately below) to get the SFE_BMP180 library.
 
 #### Option 2: direct installation from a prepared file archive
@@ -754,7 +752,7 @@ A second important piece of your work with the Arduino is to communicate with it
 ![Open the serial monitor.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/Uploading.png "Open the serial monitor.")
 @image latex ArduinoScreenshots/OpenSerialMonitor.png "Serial monitor"
 
-(Note the error message: this is because I have no board plugged in. If you get this and **do** have a board plugged in, go to **Tools** > **Port** > **[new port that you pick]**)
+(Note that if I would have clicked, an error message would have popped up below saying that it cannot find a device at the given port: this is because I have no board plugged in. If you get this message and **do** have a board plugged in, go to **Tools** > **Port** > **[new port that you pick]**)
 
 ![Change the baud rate.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/Uploading.png "Change the baud rate.")
 @image latex ArduinoScreenshots/BaudRate.png "Baud rate"
