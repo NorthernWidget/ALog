@@ -314,7 +314,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     * Permanent markers (I like multiple sizes of Sharpies)
     * Cable ties
 
-![Andy's tool roll.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ToolRoll.jpg "Andy's tool roll.")
+![Andy's tool roll.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ToolRoll.png "Andy's tool roll.")
 @image latex ToolRoll.png "Andy's tool roll"
 
 ## A few definitions
@@ -337,10 +337,10 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
 
 Your ALog board should look something like this. It has a lot of components. We'll start to look at them in more detail once you wire the board up.
 
-![ALog BottleLogger v2.2.0 top side photo](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ALogBottleLogger220.png "ALog BottleLogger v2.2.0 top side photo")
-@image latex "../figures/ALogBottleLogger220.png" "ALog BottleLogger"
+![ALog BottleLogger v2.2.0 top photo](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ALogBottleLogger220.png "ALog BottleLogger v2.2.0 top photo")
+@image latex ALogBottleLogger220.png "ALog BottleLogger"
 
-***ALog BottleLogger v2.2.0 top side photo***
+***ALog BottleLogger v2.2.0 top photo***
 
 ### Dimensions: namesake
 
@@ -724,7 +724,7 @@ Use a USB cable to connect the ALog to your computer. (Photo from ALog v2.0.0; v
 Then, using the Arduino IDE, select the name of the USB-serial port that is connected to the ALog.
 
 ![USB-Serial port select.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/SerialPort.png "USB-Serial port select.")
-@image latex ArduinoScreenshots/InsertUSB.png "Serial Port"
+@image latex ArduinoScreenshots/SerialPort.png "Serial Port"
 
 Now your ALog is ready for communications and programming.
 
@@ -804,7 +804,7 @@ A second important piece of your work with the Arduino is to communicate with it
 (Note that if I would have clicked, an error message would have popped up below saying that it cannot find a device at the given port: this is because I have no board plugged in. If you get this message and **do** have a board plugged in, go to **Tools** > **Port** > **[new port that you pick]**)
 
 ![Change the baud rate.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/SetBaud.png "Change the baud rate.")
-@image latex ArduinoScreenshots/ArduinoScreenshots/SetBaud.png "Baud rate"
+@image latex ArduinoScreenshots/SetBaud.png "Baud"
 
 ```cpp
 // Global variables
@@ -1293,7 +1293,7 @@ python SimpleClockSet.py
 ## Connecting sensors (and more) to the ALog
 
 ![User's layout and connection guide](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ALogUsersLayout.png "User's layout and connection guide")
-@image latex ALogUsersLayout.pdf "Layout and connection guide" width=6.5in
+@image latex ALogUsersLayout.pdf "Guide" width=6.5in
 
 ***User's layout and connection guide***
 
@@ -1371,12 +1371,12 @@ The analog channels on the ALog (or any electronic device) read voltage. But a l
 The key is a little bit of circuit algebra for something called the "Voltage divider":
 
 ![Voltage divider](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Resistive_divider2.png "Voltage divider")
-@image latex Resistive_divider2.png "Voltage divider"
+@image latex Resistive_divider2.png "Voltage divider" width=2in
 
 For the ALog, the sensor typically lies between 3V3 (a power source, Vin on the above diagram) and an analog pin (Vout on the above diagram). Applying Ohm's law gives you the following equation that one can use to solve for the value of R1 if you know R2.
 
 ![Voltage divider](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/VdivEquation.png "Voltage divider")
-@image latex VdivEquation.png
+@image latex VdivEquation.png width=2.5in
 
 And this is where the reference resistor comes in: this is the R2, connected between Vout and GND.
 
