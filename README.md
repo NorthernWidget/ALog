@@ -28,12 +28,16 @@ In addition to the README.md at [https://github.com/NorthernWidget/ALog](https:/
     1. Go to File --> Preferences (Arduino --> Preferences on Mac) and paste this URL into the "Additional Boards Manager URLs" entry zone, in the lower right: https://raw.githubusercontent.com/NorthernWidget/Arduino_Boards/master/package_NorthernWidget_index.json
     2. Go to Tools --> Boards --> Boards Manager; type in "Northern Widget" and install these boards definitions.
 4. Choose the board that you will be using. Go to tools --> board, and then (most likely) --> ALog BottleLogger v2.
-5. Using a USB cable, plug your ALog data logger (or compatible Arduino device) into the computer
-6. Go to File (Arduino on Mac) --> Examples --> ALog --> BasicStart. Click on it to load the file.
-7. Upload the code to the logger: click on the "upload" button (right arrow) or press CTRL+u (command+u on Mac)
-8. Look at the logger. You should see the blue and yellow lights flashing to show that it is communicating with the computer.
-9. Open the serial monitor (top right button) and set the baud rate to 38400 bps.
-10. See if the logger works; if it does, you are ready to start adding commands to read sensors. (If it doesn't, please check your progress through these steps, look through the rest of this guide, and if you really can't figure it out, email us at [info@northernwidget.com](mailto:info@northernwidget.com).
+5. Slide an SD card into the recepticle on the ALog BottleLogger.
+6. Using a USB cable, plug your ALog data logger (or compatible Arduino device) into the computer
+7. Go to File (Arduino on Mac) --> Examples --> ALog --> BasicStart. Click on it to load the file.
+8. Upload the code to the logger: click on the "upload" button (right arrow) or press CTRL+u (command+u on Mac)
+9. Look at the logger. You should see the blue and yellow lights flashing to show that it is communicating with the computer.
+10. Open the serial monitor (top right button) and set the baud rate to 38400 bps.
+11. See if the logger works; if it does, you are ready to start adding commands to read sensors.
+    1.  If it doesn't, please check your progress through these steps, look through the rest of this guide, and if you really can't figure it out, email us at [info@northernwidget.com](mailto:info@northernwidget.com).
+    2. Use the "RESET" button if at any point you need to restart the program
+    3. Use the "LOG" (or "LOG NOW") button to instantly take a reading, even if the logger would not otherwise be recording anything at that time
 
 * * *
 
@@ -233,6 +237,27 @@ void ALog::_sensor_function_template(uint8_t pin, float param1, float param2,
 
 }
 ```
+
+## LED
+
+***(This is identical to "LED messages", below in the full guide)***
+
+These messages are flashed on the large red LED. Those in bold are those that you may see most commonly.
+
+* Syncopated: **daaaa-da-daaaa-da-daaaa-da**: Clock has reset to the year 2000! Please set the clock.
+* **LONG-short-short**: All is good! Starting to log.
+* 5 quick flashes: Missed first alarm; caught by backup alarm. Rebooting logger.
+* **20 quick flashes**: SD card failed, or (more likely) is not present. This also happens if it is not seated properly; reseat the card and try again.
+* 50 quick flashes: you have tried to reassign a pin critical to the ALog to another function; this will most likely break the system. Check your code and re-upload.
+* 100 quick flashes: your Arduino model is not recognized by the ALog library!
+
+## Buttons
+
+***(This is identical to "Buttons: RESET and LOG", below in the full guide)***
+
+There are two buttons on the ALog:
+* **RESET** starts the program over from the start. It's similar to "reboot" on your computer.
+* **LOG** takes a reading at the exact instant it is pressed and causes the red indicator LED to strobe once.
 
 ## Main Developers and Contact
 
@@ -466,6 +491,13 @@ I2C is a 2-wire communications protocol. It is used to communicate with the real
 
 The pair of plastic vertical "headers" -- things with holes in them for wires -- are for reference resistors to read analog resistance-based sensors. A simple example is a thermistor, and we'll cover that farther on down here. For now, just consider these resistors to be standards against which many analog sensors will be compared to measure their resistance values.
 
+### Buttons: RESET and LOG
+
+There are two buttons on the ALog:
+* **RESET** starts the program over from the start. It's similar to "reboot" on your computer.
+* **LOG** takes a reading at the exact instant it is pressed and causes the red indicator LED to strobe once.
+
+
 ## Programming Arduino-based systems: Focus on the ALog
 
 ### Download and install the Arduino IDE
@@ -566,14 +598,17 @@ First, open the libraries manager.
 Then, look up each of the three core libraries:
 
 DE3231 (real-time clock):
+
 ![DS3231 library.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/libraryDS3231.png "DS3231 library.")
 @image latex ArduinoScreenshots/libraryDS3231.png "DS3231 library"
 
 SdFat (SD card):
+
 ![SdFat library.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/librarySdFat.png "SdFat library.")
 @image latex ArduinoScreenshots/librarySdFat.png "SdFat library"
 
 ALog (all data logging!):
+
 ![ALog library.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/libraryALog.png "ALog library.")
 @image latex ArduinoScreenshots/libraryALog.png "ALog library"
 
@@ -682,6 +717,7 @@ These are ways to control the flow of a code. I'm afraid that this introduction 
 ## Connecting the ALog and Computer
 
 Use a USB cable to connect the ALog to your computer. (Photo from ALog v2.0.0; v2.2.0+ use microUSB, like Android cell phones.)
+
 ![Insert USB cable (photo R. Schulz).](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/InsertUSB.png "Insert USB cable (photo R. Schulz).")
 @image latex InsertUSB.png "USB connection"
 
@@ -1328,7 +1364,41 @@ Using the screwdriver, open the screw terminal (lefty loosey), stick the end of 
 
 ### Rererence resistors (what are they good for?)
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+Two parallel rows of headers are designed to hold through-hole resistors that span one row to the other. Each of these is numbered to correspond to a particular analog port. Why are these here?
+
+The analog channels on the ALog (or any electronic device) read voltage. But a lot of sensors return resistance. So how do we change that resistance into a voltage?
+
+The key is a little bit of circuit algebra for something called the "Voltage divider":
+
+![Voltage divider](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/Resistive_divider2.png "Voltage divider")
+@image latex Resistive_divider2.png "Voltage divider"
+
+For the ALog, the sensor typically lies between 3V3 (a power source, Vin on the above diagram) and an analog pin (Vout on the above diagram). Applying Ohm's law gives you the following equation that one can use to solve for the value of R1 if you know R2.
+
+![Voltage divider](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/VdivEquation.png "Voltage divider")
+@image latex VdivEquation.png
+
+And this is where the reference resistor comes in: this is the R2, connected between Vout and GND.
+
+It is possible, and necessary with a few sensors, to flip the structure around; in this case, a reference resistor is not attached to the header on the board, but is instead attached to the screw terminals for a power source and the appropriate analog port. Such a reversed order may require a flag to be set in the code.
+
+And that's it: **the reference resistor is a standard** required to measure another unknown resistance, and it is implemented in a circuit that converts the unknown resistance into a voltage.
+
+### The ISP (or ICSP) header and the bootloader
+
+This is the last section in the connection guide because it is the one that -- hopefully -- you will never have to use!
+
+Place your ALog BottleLogger in front of you with the SD card to the right. Look at the upper left corner. Do you see those six holes? Those are the ones that we are talking about. They allow the user to burn programs directly onto the logger. **This is called the "In-System Programmer" or "ISP" header.**
+
+*(If you are using a standard Arduino, there should be an ISP header as well; if you are using an ARM-based chip, there is a bigger header with smaller pin spacings.)*
+
+When your ALog (or Arduino) arrives, it has a bootloader on it -- a small program that allows you to upload code via the USB connection. Useful! But if somehow something happens to the bootloader, you will have to burn a new one. You will need an in-system programmer: AVR ISP, another Arduino, the Adafruit USBtinyISP, etc... there are many possibilities! If you have an ARM-based chip, you will need an ATmel AVR Dragon or other more advanced programming chip.
+
+Then, remove the SD card. The ISP on any standard Arduino uses the SPI interface. The SD card, which also uses the SPI interface, may interfere with bootloader burning.
+
+After this, go to the **Tools** menu. Make sure that you have selected the proper board (**Tools** > **Board**) and programmer (**Tools** > **Programmer: "[NAME OF YOUR CURRENTLY-SELECTED PROGRAMMER]"**). Then plug the ISP of your choice into the ISP header: simply holding a 6-pin header at an angle in the holes so the metal makes contact is enough for the ALog BottleLogger, but you may solder it if you choose. Once you have a good connection, go to **Tools** > **Burn Bootloader** and wait for the programmer to tell you that it has successfully complteted the task.
+
+If it doesn't work, the most common reason is because you have inserted the ISP backwards. Flip the ISP header around and try again.
 
 ## Field deployment
 
@@ -1336,7 +1406,7 @@ Using the screwdriver, open the screw terminal (lefty loosey), stick the end of 
 
 Insert the SD card carefuly, and make sure that it is seated! The logger will reset constantly if it is not and it is v2.2.0+. Otherwise, it is imporatant to hit the "RESET" button and make sure that the LOOOOONG-short-short flash pattern occurs. This means that the logger is ready to go. Otherwise, no data will be recorded!
 
-![Inserting SD card (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/AttachWireScrew.png "Inserting SD card (photo R. Schulz)")
+![Inserting SD card (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/InsertSD.png "Inserting SD card (photo R. Schulz)")
 @image latex InsertSD.png "Inserting SD card"
 
 ### Power
@@ -1345,8 +1415,8 @@ Insert the SD card carefuly, and make sure that it is seated! The logger will re
 
 In the field, the main way to power the ALog data logger is by plugging in a barrel jack connected to a battery pack. We typically use barrel jacks with screw terminals to attach to generic battery packs (D or AA) that have wire leads; we sometimes use barrel jacks that are already part of the cable.
 
-![Attaching a wire (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/AttachWireScrew.png "Attaching a wire (photo R. Schulz)")
-@image latex AttachWireScrew.png "Attaching wire"
+![Plugging in the barrel jack (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/BarrelJack.png "Plugging in the barrel jack (photo R. Schulz)")
+@image latex BarrelJack.png "Barrel jack power"
 
 #### JST connector
 
@@ -1360,8 +1430,8 @@ Solar charging system development is ongoing, and once complete, will allow long
 
 ### Housing and waterproofing
 
-!!!!!!!!!!!!!!!!!
+>>>
 
 ### Deployment
 
-!!!!!!!!!!!!!!!!!!!!
+>>>
