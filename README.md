@@ -1432,7 +1432,10 @@ Solar charging system development is ongoing, and once complete, will allow long
 
 ### Housing and waterproofing
 
->>>
+![Housing, loggger, AA battery box, and cable gland (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/HousingSmall.png "Housing, loggger, AA battery box, and cable gland (photo R. Schulz)")
+@image latex HousingSmall.png "Housing"
+
+>>>>
 
 ### Deployment
 
