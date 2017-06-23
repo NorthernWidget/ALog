@@ -28,7 +28,7 @@ In addition to the README.md at [https://github.com/NorthernWidget/ALog](https:/
     1. Go to File --> Preferences (Arduino --> Preferences on Mac) and paste this URL into the "Additional Boards Manager URLs" entry zone, in the lower right: https://raw.githubusercontent.com/NorthernWidget/Arduino_Boards/master/package_NorthernWidget_index.json
     2. Go to Tools --> Boards --> Boards Manager; type in "Northern Widget" and install these boards definitions.
 4. Choose the board that you will be using. Go to tools --> board, and then (most likely) --> ALog BottleLogger v2.
-5. Slide an SD card into the recepticle on the ALog BottleLogger.
+5. Slide an SD card into the receptacle on the ALog BottleLogger.
 6. Using a USB cable, plug your ALog data logger (or compatible Arduino device) into the computer
 7. Go to File (Arduino on Mac) --> Examples --> ALog --> BasicStart. Click on it to load the file.
 8. Upload the code to the logger: click on the "upload" button (right arrow) or press CTRL+u (command+u on Mac)
@@ -87,7 +87,7 @@ void setup(){
 
   // If you are using a standard Arduino board (i.e. not a full ALog data logger)
   // and are not using the Arduino shield, you will have to set the proper pins for
-  // the indicator LED (defualts to 9) and the SD card and RTC power (default to -1
+  // the indicator LED (defaults to 9) and the SD card and RTC power (default to -1
   // to be inactive in the case of constant power supply; set these to the same
   // value if there is just one switch for both of these).
   // Replace "_pin" with your desired pin number, and uncomment the relevant line(s).
@@ -175,7 +175,7 @@ This thermistor example is reiterated and expanded upon in the "Guide for first-
 
 Printed below is the template function designed to guide users about how to add support for additional sensors. You may also look at ALog.cpp and ALog.h for our current examples, and feel free to contact us ([info@northernwidget.com](mailto:info@northernwidget.com)) if you have questions about how to properly incorporate new sensors.
 
-If you do add your sensor to our library or make an improvement, **we would really appreciate it if you woudl contact us about including the changes you've made**. We have designed the ALog library as a resource for the community, and the more of us who make it better, the bigger and better open-source field instrumentation grows!
+If you do add your sensor to our library or make an improvement, **we would really appreciate it if you would contact us about including the changes you've made**. We have designed the ALog library as a resource for the community, and the more of us who make it better, the bigger and better open-source field instrumentation grows!
 
 ```cpp
 void ALog::_sensor_function_template(uint8_t pin, float param1, float param2,
@@ -284,7 +284,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
 ### For the data logging exercises:
 
 *   **1x thermistor**
-    *   Our instructions are for the **CanTherm CWF1B103F3380** (available on [Digi-Key](https://www.digikey.com/product-detail/en/cantherm/CWF1B103F3380/317-1310-ND/1191085) or from us). This thermistor is 1 meter long and coated in epoxy, making it a good "out-of-the-box" tool, though we recommend calibration if you are going to try to make measurements with greater than factory precision (±1% of nominal resistance value, here 10 kiloohms (kΩ) at 25 °C).
+    *   Our instructions are for the **CanTherm CWF1B103F3380** (available on [Digi-Key](https://www.digikey.com/product-detail/en/cantherm/CWF1B103F3380/317-1310-ND/1191085) or from us). This thermistor is 1 meter long and coated in epoxy, making it a good "out-of-the-box" tool, though we recommend calibration if you are going to try to make measurements with greater than factory precision (±1% of nominal resistance value, here 10 kilo-ohms (kΩ) at 25 °C).
 *   **1x reference resistor**
     *   We typically use the **Vishay Dale PTF5610K000BYEB** for their high precision and temperature stability at a reasonable cost. Note that this factory precision is compounded with the precision of the thermistor when calculating error!
 *   **1x screwdriver**: Slotted. We recommend a 0.4 x 2 mm blade. Good options are [this one](https://www.digikey.com/product-detail/en/wiha/26020/431-1176-ND/510465) and its [ESD-safe version](https://www.digikey.com/product-detail/en/wiha/27220/431-1202-ND/512198).
@@ -306,7 +306,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     * Multimeter
     * Adjustable wrench (mine in the photo is larger than is needed)
     * Socket wrench (can be optional if you know that you won't need it)
-    * Hex wrenches (allen wrenches / church keys) (I have English and Metric sets, but don't always bring both)
+    * Hex wrenches (Allen wrenches / church keys) (I have English and Metric sets, but don't always bring both)
     * Portable soldering iron: battery-powered (you get maybe 15-20 minutes on a 4x AA model) or butane
     * Lead-free solder
     * Electrical tape
@@ -324,7 +324,7 @@ Are you new to the ALog, Arduino, and/or C/C++ programming? If so, this page is 
     *   Memory for storing programs and variables
     *   Metal "pins" to connect to and interact with other devices (see immediately below)
     *   An oscillator, such as the ALog BottleLogger's 8 MHz crystal, sets the speed of the microcontroller's computation. This means that the ALog BottleLogger is an 8 MHz computer.
-*   A **pin** is one of the "legs" on the microcontroller chip. Electrical power or signlas flow through these. Many of these are connected to the **screw terminals** on the ALog board.
+*   A **pin** is one of the "legs" on the microcontroller chip. Electrical power or signals flow through these. Many of these are connected to the **screw terminals** on the ALog board.
 *   `C` and `C++` are **programming languages**.
     *   Programs written in these languages must be **compiled**. This means that they are turned into bytes (1s and 0s) by another piece of software before being made executable and (in our case) uploaded to a small board.
 *   **Arduino** is a software and hardware standard for microcontroller projects.
@@ -350,7 +350,7 @@ The dimensions of the ALog BottleLogger are perfect to slip it into a Nalgene wa
 
 Yes, we use the big, chunky, old-school SD cards, USB ports, and barrel jack connectors. And we love 'em. Why? Have you ever tried to connect cables with mittens in Minnesota-frigid temperatures? Have you ever dropped a micro-SD card (or other object the size of your pinky nail) into a beautiful bed of colorful oak leaves, stand of prairie grasses, or a lake? You'd better hope that your missing item is as big and recognizable as possible. We call it designing for reality.
 
-(An update... while we love the old-schoool cool of the big USB A-B cable, we
+(An update... while we love the old-school cool of the big USB A-B cable, we
 couldn't help but notice that tons of us were traveling with A-micro-B cables
 thanks to Android phones, but had to make a special effort to remember to bring
 our A-B cables to the field. So we've made a recent (2017) update to the USB
@@ -358,7 +358,7 @@ port in our design.)
 
 ### What does it have?
 
-*   A teeny tiny computer running at 8MHz
+*   A teeny tiny computer running at 8 MHz
 *   An SD card to save data
 *   A real-time clock and its backup battery to save the time
 *   A USB port to upload programs and talk to the computer
@@ -370,7 +370,7 @@ port in our design.)
 
 The metal connections between the microcontroller (teeny tiny computer) and any external component of the system (e.g., power supply, sensors) are called "pins".
 
-You are not attaching anything directly to the pins on the integrated circuit, obviously; your interface to the ALog data logger will be primarily through the screw terminals (which in turn are discussed immediately below) at the edges of the board. I refer to each screw terminal as a "pin" or "port", or simly as a "screw terminal"; there is no hard-and-fast language for this, except insofar as only those microcontroller pins that are exposed to the outside world via screw terminals are called "ports" in this documentation.
+You are not attaching anything directly to the pins on the integrated circuit, obviously; your interface to the ALog data logger will be primarily through the screw terminals (which in turn are discussed immediately below) at the edges of the board. I refer to each screw terminal as a "pin" or "port", or simply as a "screw terminal"; there is no hard-and-fast language for this, except insofar as only those microcontroller pins that are exposed to the outside world via screw terminals are called "ports" in this documentation.
 
 The Alog BottleLogger follows the Arduino Uno convention for pin numbering.
 
@@ -411,13 +411,13 @@ When writing code, the analog pins can be referred to as A0, A1, A2, A3, A6, or 
 
 *The analog pins can be referred to by their base numeral (for the ALog BottleLogger, 0, 1, 2, 3, 6, or 7) in the `AnalogRead(analogPinNumber)` command that we'll see below; this is the legacy of early versions of Arduino. They must be elsewhere referred to as A0, A1, A2, A3, A6, or A7.*
 
-*A bit of advanced knowledge: "A0" maps to "14", "A1" maps to 15, and soforth until A7 maps to 21; this is because there are 14 digital pins (0-14), so the analog numbers come right after these. Therefore, while I find A0...A7 easier to remember, you may prefer to use the numbers >13, which is equally valid.*
+*A bit of advanced knowledge: "A0" maps to "14", "A1" maps to 15, and so forth until A7 maps to 21; this is because there are 14 digital pins (0-14), so the analog numbers come right after these. Therefore, while I find A0...A7 easier to remember, you may prefer to use the numbers >13, which is equally valid.*
 
 #### D3-INT1, D7, D8 (digital pins, ALog BottleLogger)
 
 These pins can read or write TRUE or FALSE values. For writing, TRUE means full power (VCC) is delivered. False means the pin goes to GND. Reading values with these pins tells you whether the observed voltage is closer to VCC or to GND.
 
-When programmin these pins, refer to them by their number alone, dropping the D (and anything after the number that immediately follows the D.
+When programming these pins, refer to them by their number alone, dropping the D (and anything after the number that immediately follows the D.
 
 ##### D3-INT1 (interrupt, ALog BottleLogger)
 
@@ -436,7 +436,7 @@ Pulse-width modulation. Actually, this isn't written on the board. It uses the a
 
 #### Rx and Tx
 
-Receive and transmit: these are your serial pins. Be careful: they are also attached to the USB port (to talk to your computer), so they must be shared. For the electronics-savvy: they are connected to the computer via 1Kohm in-series resistors, so external sensors will override USB communications. See "UART", below.
+Receive and transmit: these are your serial pins. Be careful: they are also attached to the USB port (to talk to your computer), so they must be shared. For the electronics-savvy: they are connected to the computer via 1 kΩ in-series resistors, so external sensors will override USB communications. See "UART", below.
 
 #### MOSI, MISO, SCK
 
@@ -484,8 +484,8 @@ Additional information on SPI and setting up additional SPI devices may be found
 
 I2C is a 2-wire communications protocol. It is used to communicate with the real-time-clock (RTC, model number DS3231), as well as many sensors. Each attached device has its own address, enabling **up to 128 sensors** to be attached to the same I2C port as the clock. But just be careful that your sensor code is good -- if it is not and halts the I2C system, it could affect the clock and therefore the entirety of the operations of the ALog!
 
-*   **Pin A4** (= pin 18): SDA (Serial DAta)
-*   **Pin A5** (= pin 19): SCL (Serial CLock)
+*   **Pin A4** (= pin 18): SDA (Serial Data)
+*   **Pin A5** (= pin 19): SCL (Serial Clock)
 
 ### Reference resistor headers
 
@@ -597,7 +597,7 @@ First, open the libraries manager.
 
 Then, look up each of the three core libraries:
 
-DE3231 (real-time clock):
+DS3231 (real-time clock):
 
 ![DS3231 library.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ArduinoScreenshots/libraryDS3231.png "DS3231 library.")
 @image latex ArduinoScreenshots/libraryDS3231.png "DS3231 library"
@@ -649,7 +649,7 @@ These are serious good. You can follow along with them! [https://learn.adafruit.
 *   Sense sensors
 *   Motor motors
 *   Blink blinky things
-*   Textt text via the serial monitor
+*   Text text via the serial monitor
 *   Type text onto a display screen
 *   More more more!
 
@@ -663,7 +663,7 @@ We're not kidding. We type things into our favorite search engine when we can't 
 
 ### Basic syntax of C programming
 
-Programming languages all have ways in which locial thoughts are placed into text that is entered into a computer. Here is a non-exhaustive list of these. It is not intended to be complete, but to give you some essential tools to start reading the code that appears below.
+Programming languages all have ways in which logical thoughts are placed into text that is entered into a computer. Here is a non-exhaustive list of these. It is not intended to be complete, but to give you some essential tools to start reading the code that appears below.
 
 #### Defining variables
 
@@ -685,7 +685,7 @@ Each of these goes: **variable_type variable_name = variable_value ;** For more 
 Ignore lines that start with:
 
 ```cpp
-// [compiler doensn't care what is here, but you can read it]
+// [compiler doesn't care what is here, but you can read it]
 ```
 
 And lines that are between
@@ -712,7 +712,7 @@ Basic arithmetic operators (`+, -, *, /`) work. Division of two integers results
 
 #### Loops and Statements
 
-These are ways to control the flow of a code. I'm afraid that this introduction to the ALog would be dilluted by the details of these. I point the interested reader to the main Arduino reference: [https://www.arduino.cc/en/Reference/HomePage](https://www.arduino.cc/en/Reference/HomePage).
+These are ways to control the flow of a code. I'm afraid that this introduction to the ALog would be diluted by the details of these. I point the interested reader to the main Arduino reference: [https://www.arduino.cc/en/Reference/HomePage](https://www.arduino.cc/en/Reference/HomePage).
 
 ## Connecting the ALog and Computer
 
@@ -751,7 +751,7 @@ void loop() {
 `setup()` and `loop()` are both **functions**. These are specific sets of code that are executed when their names are called in the code. These two functions are special in that:
 
 1.  Every Arduino program much have them.
-2.  They do not need to be called by code that you write: Arduino autmatically interprets and, indeed, requires that these be included.
+2.  They do not need to be called by code that you write: Arduino automatically interprets and, indeed, requires that these be included.
     *   Everything inside the curly braces after `setup()` is run once, when the data logger starts running
     *   Everything inside the curly braces after `loop()` is run continuously, after `setup()`.
 
@@ -766,7 +766,7 @@ Once your code is written -- either as a copy/paste of this or as your own -- sa
 
 ### Blink
 
-Let's make a blinky light turn on and off! On the ALog, **pin 8** is attached to a red indicator LED. Here is some code to create a synocpated blinky light.
+Let's make a blinky light turn on and off! On the ALog, **pin 8** is attached to a red indicator LED. Here is some code to create a syncopated blinky light.
 
 ```cpp
 // Syncopated LED blink
@@ -790,7 +790,7 @@ void loop() {
 }
 ```
 
-Look at the comments in the code for information on what each of the commands do; these are detailed more below in the USB/Serial communicatinos section.
+Look at the comments in the code for information on what each of the commands do; these are detailed more below in the USB/Serial communications section.
 
 ### USB/Serial communications
 
@@ -808,7 +808,7 @@ A second important piece of your work with the Arduino is to communicate with it
 
 ```cpp
 // Global variables
-// These variables are availalble to any function inside your code
+// These variables are available to any function inside your code
 int LEDpin = 8;
 
 void setup() {
@@ -833,7 +833,7 @@ Let's break this down a little bit:
 
 ```cpp
 // Global variables
-// These variables are availalble to any function inside your code
+// These variables are available to any function inside your code
 int LEDpin = 8;
 ```
 
@@ -851,9 +851,9 @@ void setup() {
 
 "**Serial**" is a library for USB-Serial communications between the computer and the attached Arduino. It is a core part of Arduino, and therefore does not have to be "included" at the top in the way the ALog library (farther below) must be. To view serial communications, you may open the serial monitor in the Arduino IDE (the figures immediately above describe how to do this).
 
-Within the `Serial.begin()` command, we set the **baud rate** to "38400"; this is in bits per second. *Techincal note: We choose this rate because it is closer to being integer-divisible by our 8MHz processor clock speed than other baud rates are.*
+Within the `Serial.begin()` command, we set the **baud rate** to "38400"; this is in bits per second. *Technical note: We choose this rate because it is closer to being integer-divisible by our 8 MHz processor clock speed than other baud rates are.*
 
-the **pinMode** command can be set to **input** or **output**; "input" means that the pin is ready to read an incoming signal; output means that it maximizes the amount of electrical current it can source to send a strong output signal that is also enough (40 mA absolute maxumim) to power basic devices.
+the **pinMode** command can be set to **input** or **output**; "input" means that the pin is ready to read an incoming signal; output means that it maximizes the amount of electrical current it can source to send a strong output signal that is also enough (40 mA absolute maximum) to power basic devices.
 
 #### Loop
 
@@ -872,7 +872,7 @@ void loop() {
 
 **delay** takes an argument in milliseconds that describes how long you would like the logger to do nothing but count time passing.
 
-**digitalWrite** turns an outpu tpin ON (HIGH) or OFF (LOW). When HIGH, the pin is sending current at a voltage corresponding to VCC (i.e., the positive voltage for the system). When low, it is sending current at a voltage corresponding to GND (ground / Earth).
+**digitalWrite** turns an output pin ON (HIGH) or OFF (LOW). When HIGH, the pin is sending current at a voltage corresponding to VCC (i.e., the positive voltage for the system). When low, it is sending current at a voltage corresponding to GND (ground / Earth).
 
 ## Using the ALog library
 
@@ -905,7 +905,7 @@ The utility code is the unseen backbone of the ALog library, and much of the rea
 
 ##### Sleeping and waking
 
-The sleep mode is the most important pice of the ALog data logger. It's the superlative of when you close the lid of a laptop computer: the ALog goes from drawing at least 6.7 milliamps to just 53 microamps -- that's 0.053 milliamps, for a **greater than 100x increase in power efficiency**, and therefore battery life.
+The sleep mode is the most important piece of the ALog data logger. It's the superlative of when you close the lid of a laptop computer: the ALog goes from drawing at least 6.7 milliamps to just 53 microamps -- that's 0.053 milliamps, for a **greater than 100x increase in power efficiency**, and therefore battery life.
 
 The internal sleep functions are activated by the end-user as part of this command:
 ```
@@ -949,7 +949,7 @@ Power to the SD card is cut between logging intervals to conserve energy. This i
 
 ##### Watchdog timer
 
-The watchdog timer will automatically reboot the ALog data logger if it stalls out while logging for more than 8 seconds. This can help to recover from any software errors, as well as any unforeseen circumstances arising in the field (e.g., jostled while logging causing a disruption of some connectinos). This can really save the day!
+The watchdog timer will automatically reboot the ALog data logger if it stalls out while logging for more than 8 seconds. This can help to recover from any software errors, as well as any unforeseen circumstances arising in the field (e.g., jostled while logging causing a disruption of some connections). This can really save the day!
 
 ##### LED messages
 
@@ -1018,7 +1018,7 @@ void setup(){
 
   // If you are using a standard Arduino board (i.e. not a full ALog data
   // logger) and are not using the Arduino shield, you will have to set the
-  // proper pins for the indicator LED (defualts to 9) and the SD card, RTC
+  // proper pins for the indicator LED (defaults to 9) and the SD card, RTC
   // power, and sensor or other external device power (default to -1).
   // The "-1" default ensures that no pins are affected by commands to switch
   // power to the SD card, RTC power, or sensor power. This is because the
@@ -1061,7 +1061,7 @@ void loop(){
 
   // CanTherm small bead
   //logger.thermistorB(10000, 3950, 10000, 25, 0);
-  // CanTherm expoxy bead: CWF1B103F3380
+  // CanTherm epoxy bead: CWF1B103F3380
   logger.thermistorB(10000, 3380, 10000, 25, 0);
 
   alog.sensorPowerOff();
@@ -1125,13 +1125,13 @@ int Log_Interval_Hours = 0; //Valid range is 0-23 hours
 bool external_interrupt = false;
 ```
 
-`dataLoggerName` is an identifier for the logger. I typicallly make it relate to the field site, the task of the logger, and a code number.
+`dataLoggerName` is an identifier for the logger. I typically make it relate to the field site, the task of the logger, and a code number.
 
 `fileName` is the name of the main data file to be logged to the SD card. (See SD card section, above, for information on all of the files that may be written to the SD card.) This is noted to be in 8.3 format, but doesn't strictly have to be following updates to the `SdFat` library.
 
 `Log_Interval_Seconds`, `Log_Interval_Minutes`, and `Log_Interval_Hours` all determine how often the logger will record data. Data recording is set to always occur on hours/minutes/seconds that are synchronous across all devices and are set to be referenced as much as possible to a the start of an hour/day/minute (more details in source code).
 
-`external_interrupt` is true if a device that triggers an instant response is attached, and false if it is not. As noted, this is most commonly a tipping-bucket rain gauge, but it could realliy be any sensor. The appropriate sensor functions will define the response to the interrupt; the simplest case (rain gauge) is that a time-stamp is recorded to a specific file.
+`external_interrupt` is true if a device that triggers an instant response is attached, and false if it is not. As noted, this is most commonly a tipping-bucket rain gauge, but it could really be any sensor. The appropriate sensor functions will define the response to the interrupt; the simplest case (rain gauge) is that a time-stamp is recorded to a specific file.
 
 ```cpp
 void setup(){
@@ -1145,7 +1145,7 @@ This is the start of the `setup()` step, which is run once when the logger turns
 ```cpp
   // If you are using a standard Arduino board (i.e. not a full ALog data logger)
   // and are not using the Arduino shield, you will have to set the proper pins for
-  // the indicator LED (defualts to 9) and the SD card and RTC power (default to -1
+  // the indicator LED (defaults to 9) and the SD card and RTC power (default to -1
   // if you are not programming an ALog data logger in order
   // to be inactive in the case that you are using the Arduino's 3V3 regulator to
   // power to run the RTC and SD card (as we do with the ALog shield); set these to the same
@@ -1176,7 +1176,7 @@ void loop(){
   // ************ DO NOT EDIT ABOVE THIS LINE ************
 ```
 
-This is the start of the loop, which repeates infinitely unless the ALog data logger is shut off or fails.
+This is the start of the loop, which repeats infinitely unless the ALog data logger is shut off or fails.
 
 Here, the comments are self-explanatory, mostly; a couple extra explanations:
 
@@ -1199,7 +1199,7 @@ Here, the comments are self-explanatory, mostly; a couple extra explanations:
 
   // CanTherm small bead
   //logger.thermistorB(10000, 3950, 10000, 25, 0);
-  // CanTherm expoxy bead: CWF1B103F3380
+  // CanTherm epoxy bead: CWF1B103F3380
   logger.thermistorB(10000, 3380, 10000, 25, 0);
 
   alog.sensorPowerOff();
@@ -1225,7 +1225,7 @@ Do you want to know more about these parameters? Look up the function-specific h
   // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! //
 ```
 
-We don't have any of these here, but examples would be sensors with their own power-supplies, and/or (not consistent wiht the comment above) sensors that are powered directly via the ALog BottleLogger's VCC. This is not included in the comment because it is generally not how we run sensors -- we like to be able to switch them off to conserve power!
+We don't have any of these here, but examples would be sensors with their own power-supplies, and/or (not consistent with the comment above) sensors that are powered directly via the ALog BottleLogger's VCC. This is not included in the comment because it is generally not how we run sensors -- we like to be able to switch them off to conserve power!
 
 ```cpp
   // NOTE: THE BUFFER SIZE IS 512 BYTES;
@@ -1235,7 +1235,7 @@ We don't have any of these here, but examples would be sensors with their own po
   // alog.bufferWrite()
 ```
 
-As it says: if you think you're in danger of overflowing the buffer, run this command! You'll need 512 characters in your line for this to happen though, and I've never appraoched this in my work. But hey, someone might!
+As it says: if you think you're in danger of overflowing the buffer, run this command! You'll need 512 characters in your line for this to happen though, and I've never approached this in my work. But hey, someone might!
 
 ```cpp
   // ************ DO NOT EDIT BELOW THIS LINE ************
@@ -1259,7 +1259,7 @@ Coming soon!
 
 ### Command-line
 
-The ALog's clock is a key component -- without it, all the data are sitting in an unreferenced time frame. This is why we have chosen the DS3231 real-time clock, which has the highest accuracy and stability of any commonly-available real-time clock that does not incorporate an absolute time referenge (e.g., with GPS). GPS would be great for some circumstances, and we're developing a logger with it, but this would not be the extreme low-power device that the ALog BottleLogger is.
+The ALog's clock is a key component -- without it, all the data are sitting in an unreferenced time frame. This is why we have chosen the DS3231 real-time clock, which has the highest accuracy and stability of any commonly-available real-time clock that does not incorporate an absolute time reference (e.g., with GPS). GPS would be great for some circumstances, and we're developing a logger with it, but this would not be the extreme low-power device that the ALog BottleLogger is.
 
 Enough with the background -- how do you set the clock?
 
@@ -1278,8 +1278,8 @@ python ALogClockSet.py
 
 Don't have Python? You probably will have figured it out when that failed Here are your options:
 
-1. Install Python 2.X; I recommmend getting the **anaconda** distribution
-2. Download an executable verison of **ALogClockSet.py**; email us if you can't find this (it's not always up-to-date due to the overhead required for making executables)
+1. Install Python 2.X; I recommend getting the **anaconda** distribution
+2. Download an executable version of **ALogClockSet.py**; email us if you can't find this (it's not always up-to-date due to the overhead required for making executables)
 
 #### After uploading a separate sketch
 
@@ -1362,7 +1362,7 @@ Using the screwdriver, open the screw terminal (lefty loosey), stick the end of 
 ![Attaching a wire (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/AttachWireScrew.png "Attaching a wire (photo R. Schulz)")
 @image latex AttachWireScrew.png "Attaching wire"
 
-### Rererence resistors (what are they good for?)
+### Reference resistors (what are they good for?)
 
 Two parallel rows of headers are designed to hold through-hole resistors that span one row to the other. Each of these is numbered to correspond to a particular analog port. Why are these here?
 
@@ -1398,7 +1398,7 @@ When your ALog (or Arduino) arrives, it has a bootloader on it -- a small progra
 
 Then, remove the SD card. The ISP on any standard Arduino uses the SPI interface. The SD card, which also uses the SPI interface, may interfere with bootloader burning.
 
-After this, go to the **Tools** menu. Make sure that you have selected the proper board (**Tools** > **Board**) and programmer (**Tools** > **Programmer: "[NAME OF YOUR CURRENTLY-SELECTED PROGRAMMER]"**). Then plug the ISP of your choice into the ISP header: simply holding a 6-pin header at an angle in the holes so the metal makes contact is enough for the ALog BottleLogger, but you may solder it if you choose. Once you have a good connection, go to **Tools** > **Burn Bootloader** and wait for the programmer to tell you that it has successfully complteted the task.
+After this, go to the **Tools** menu. Make sure that you have selected the proper board (**Tools** > **Board**) and programmer (**Tools** > **Programmer: "[NAME OF YOUR CURRENTLY-SELECTED PROGRAMMER]"**). Then plug the ISP of your choice into the ISP header: simply holding a 6-pin header at an angle in the holes so the metal makes contact is enough for the ALog BottleLogger, but you may solder it if you choose. Once you have a good connection, go to **Tools** > **Burn Bootloader** and wait for the programmer to tell you that it has successfully completed the task.
 
 If it doesn't work, the most common reason is because you have inserted the ISP backwards. Flip the ISP header around and try again.
 
@@ -1406,7 +1406,7 @@ If it doesn't work, the most common reason is because you have inserted the ISP 
 
 ### SD card
 
-Insert the SD card carefuly, and make sure that it is seated! The logger will reset constantly if it is not and it is v2.2.0+. Otherwise, it is imporatant to hit the "RESET" button and make sure that the LOOOOONG-short-short flash pattern occurs. This means that the logger is ready to go. Otherwise, no data will be recorded!
+Insert the SD card carefully, and make sure that it is seated! The logger will reset constantly if it is not and it is v2.2.0+. Otherwise, it is important to hit the "RESET" button and make sure that the LOOOOONG-short-short flash pattern occurs. This means that the logger is ready to go. Otherwise, no data will be recorded!
 
 ![Inserting SD card (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/InsertSD.png "Inserting SD card (photo R. Schulz)")
 @image latex InsertSD.png "Inserting SD card"
