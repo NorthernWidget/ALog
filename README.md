@@ -1436,4 +1436,24 @@ Solar charging system development is ongoing, and once complete, will allow long
 
 ### Deployment
 
->>>
+The last step is deployment! You have to think about how you will mount the logger box:
+* Bury it?
+* Attach it to a post?
+* Place it on the ground?
+
+![Field deployment on Chimborazo](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ChimborazoGS3.png "Field deployment on Chimborazo")
+@image latex ChimborazoGS3.png "Chimborazo"
+
+It also is important to consider how you will attach it: do you need:
+* Zip-ties
+* Hose clamps
+* U-bolts
+* Electrical tape
+* Bailing wire
+* Fence posts
+* Tools
+?
+
+It is really important to think through your deployment! Use common sense, test locally, and ask for advice!
+
+**So long, and good luck!**
