@@ -1432,10 +1432,31 @@ Solar charging system development is ongoing, and once complete, will allow long
 
 ### Housing and waterproofing
 
-![Housing, loggger, AA battery box, and cable gland (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/HousingSmall.png "Housing, loggger, AA battery box, and cable gland (photo R. Schulz)")
+![Housing, logger, AA battery box, and cable gland (photo R. Schulz)](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/HousingSmall.png "Housing, logger, AA battery box, and cable gland (photo R. Schulz)")
 @image latex HousingSmall.png "Housing"
 
->>>>
+ALog in a box. Note that here, the ALog is powered through its VCC and GND screw terminals; this demonstrates a non-standard but acceptable way of supplying power to the logger, and one that works well in a small enclosure like this one.
+
+#### Housing details
+* Manufacturer: Bud Industries
+* Ratings: IP66, NEMA 1, 2, 4, 4X, 12, 13
+* Description: Grey ABS plastic with a hinged door lid. Mounting hardware included.
+* Preferred sizes:
+    * Small (pictured above): Max exterior dimensions 150mm H X 100mm W X 70mm H, Wall thickness 3mm, Weight: 318g
+    * Large: Max exterior dimensions 270mm H X 100mm W X 70mm H, Wall thickness 3mm, Weight: 363g
+* Metal "feet" can swiveled and work with U-bolts, hose clamps, screws, cable ties, etc.
+
+#### Battery pack
+* Box with lid, connected to housing with hook-and-loop.
+
+#### ALog
+* Fixed in place with hook-and-loop.
+
+#### Cable gland
+* Nylon cable gland: NBR hermetic seal. Protection degree: IP68, 5 Bar, IP69K, UL f1. Working temperature: -40°C to 100°C in static state Instantaneous heat resistance up to 120°C -20°C to 80°C in dynamic state.  cable diameter range 0.11-0.26"
+
+#### Vent (if needed)
+* GORE VE80510 adhesive vent for pressure equalization. Vent offers reliable protection against water, salts, corrosive liquids and particulate with hydrophobic and oleophobic characteristics. This vent is made of GORE-TEX fabric to keep water out while permitting the passage of air.
 
 ### Deployment
 
@@ -1453,10 +1474,20 @@ It also is important to consider how you will attach it: do you need:
 * U-bolts
 * Electrical tape
 * Bailing wire
-* Fence posts
+* Fence posts (and fence post driver?)
+* Desiccant packets
 * Tools
-?
+* Specific tools for your installation?
 
-It is really important to think through your deployment! Use common sense, test locally, and ask for advice!
+There are so many ways to mount the loggers in the field that we can't cover all usage scenarios. But here are some important points:
+1. It is really important to think through your deployment! Use common sense, test locally, and ask for advice!
+2. Label the SD card, box, and the logger with an identifying code or name for the station.
+3. Ensure that your code that you have uploaded includes a unique filename and logger name.
+4. If you have cable glands, point them down if at all possible to prevent water from entering.
+5. Desiccant packs are your friends; make sure that you don't use the kind that fail catastrophically upon reaching 100% moisture content by turning into a liquid! (We had this happen in Ecuador...)
+6. Assess the greatest challenges. If weather, place your logger in a safe place (typically high and dry). If humans, hide it. (Bury it, even! But take a good GPS location and make note of landmarks.)
+7. Record the logger's name, its sensors, its serial number, and its GPS coordinates.
+8. Small rodents love chewing cables for reasons that are their own (but might have something to do with the taste of the insulation). Bury cables, keep them high, and/or surround them with conduit. (I've seen plastic conduit chewed through once as well...)
+9. The last thing before you leave an ALog installation should always be to push the "RESET" button and ensure that you see "LOOOONG short short" from the red LED (and only "LOOOONG short short")!
 
 **So long, and good luck!**
