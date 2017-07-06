@@ -10,6 +10,7 @@ cd ..
 doxygen doxygen_Logger.cfg
 cd doc/latex
 cp -r ../figures/* .
+cp ../ProgrammingCard.pdf .
 mv Arduino_Boards/Tools_Boards_NorthernWidget_ALog_BottleLogger_v2.png Arduino_Boards/Tv2.png	
 ./Make.sh
 
