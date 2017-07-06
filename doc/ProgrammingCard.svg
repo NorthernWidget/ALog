@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="5in"
+   height="3in"
+   viewBox="0 0 127 76.200002"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.1 r15371"
+   sodipodi:docname="ProgrammingCard.svg"
+   inkscape:export-filename="/home/awickert/Arduino/libraries/ALog/doc/figures/ProgrammingCard.png"
+   inkscape:export-xdpi="180.21025"
+   inkscape:export-ydpi="180.21025">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.8445543"
+     inkscape:cx="239.12465"
+     inkscape:cy="144.50333"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="in"
+     inkscape:snap-page="true"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1056"
+     inkscape:window-x="0"
+     inkscape:window-y="1048"
+     inkscape:window-maximized="1"
+     inkscape:snap-bbox-edge-midpoints="true" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-220.79998)">
+    <g
+       id="g5112"
+       transform="matrix(0.37933506,0,0,0.37933506,11.739634,139.63333)">
+      <g
+         id="g4556"
+         transform="matrix(-0.2822222,0,0,-0.2822222,43.434258,320.07289)">
+        <path
+           inkscape:connector-curvature="0"
+           id="path5123-7-2-3"
+           d="M 71.910781,310.76827 A 24.478029,15.163405 90 0 1 87.074185,286.29024 24.478029,15.163405 90 0 1 102.23759,310.76827 24.478029,15.163405 90 0 1 87.074185,335.24629 24.478029,15.163405 90 0 1 71.910781,310.76827 Z"
+           style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:2.12598443;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+        <path
+           inkscape:connector-curvature="0"
+           id="path5123-3-5-7-6"
+           d="M 76.809722,310.76827 A 16.569744,10.264462 90 0 1 87.074185,294.19853 16.569744,10.264462 90 0 1 97.338648,310.76827 16.569744,10.264462 90 0 1 87.074185,327.33801 16.569744,10.264462 90 0 1 76.809722,310.76827 Z"
+           style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.89714813;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+        <path
+           inkscape:connector-curvature="0"
+           id="path5123-6-3-0-7"
+           d="m 82.758446,310.76827 a 6.9668252,4.3157398 90 0 1 4.315739,-6.96682 6.9668252,4.3157398 90 0 1 4.315739,6.96682 6.9668252,4.3157398 90 0 1 -4.315739,6.96682 6.9668252,4.3157398 90 0 1 -4.315739,-6.96682 z"
+           style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:1.89714813;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate" />
+      </g>
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.60000002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 18.859988,225.45894 h -33.80533"
+         id="path4551"
+         inkscape:connector-curvature="0" />
+      <g
+         id="g4556-5"
+         transform="matrix(-0.2822222,0,0,-0.2822222,-2.0391441,324.74694)">
+        <path
+           inkscape:connector-curvature="0"
+           id="path5123-7-2-3-6"
+           d="m 46.66342,351.80785 c 8.374515,0 15.163401,-10.95918 15.163404,-24.47802 0,-13.51884 -6.788887,-24.47803 -15.163404,-24.47803"
+           style="color:#000000;display:inline;overflow:visible;visibility:visible;opacity:1;fill:none;fill-opacity:1;fill-rule:nonzero;stroke:#000000;stroke-width:2.12598443;stroke-linecap:square;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;marker:none;enable-background:accumulate"
+           sodipodi:nodetypes="csc" />
+      </g>
+      <path
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.60000002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         d="m 18.859988,239.27543 h -33.80533"
+         id="path4551-1"
+         inkscape:connector-curvature="0" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path4503-2-0-2"
+         d="m -11.515092,229.36862 c 0,0 -0.0339,-3.95184 -0.81451,-4.90574 -0.78057,-0.95388 -2.68111,-2.96387 -2.68111,-2.96387 l -0.74664,0.64728 c 0,0 0.78058,0.91983 1.59509,2.07812 0.81451,1.1583 1.08602,2.72541 1.08602,2.72541 l 0.40726,2.2144"
+         style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:0.80000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         sodipodi:nodetypes="ccccscc" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166698px;line-height:125%;font-family:'Gillius ADF';-inkscape-font-specification:'Gillius ADF';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="-11.9557"
+         y="235.01137"
+         id="text4629"><tspan
+           sodipodi:role="line"
+           id="tspan4627"
+           x="-11.9557"
+           y="235.01137"
+           style="font-weight:bold;font-size:11.28888893px;stroke-width:0.26458332px">ALog</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:5.29166651px;line-height:125%;font-family:'Gillius ADF';-inkscape-font-specification:'Gillius ADF';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="39.067207"
+       y="229.22424"
+       id="text5116"><tspan
+         sodipodi:role="line"
+         id="tspan5114"
+         x="39.067207"
+         y="229.22424"
+         style="font-weight:bold;stroke-width:0.26458332px">Programming guide</tspan></text>
+    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5118"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:125%;font-family:'Gillius ADF';-inkscape-font-specification:'Gillius ADF';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       transform="matrix(0.26458333,0,0,0.26458333,0,220.79998)"><flowRegion
+         id="flowRegion5120"><rect
+           id="rect5122"
+           width="480"
+           height="243.80952"
+           x="0"
+           y="44.190475" /></flowRegion><flowPara
+         id="flowPara5138"
+         style="font-size:16px" /></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5213"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:20px;line-height:125%;font-family:'Gillius ADF';-inkscape-font-specification:'Gillius ADF';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       transform="matrix(0.26458333,0,0,0.26458333,0,220.79998)"><flowRegion
+         id="flowRegion5215"><rect
+           id="rect5217"
+           width="480"
+           height="237.67595"
+           x="0"
+           y="50.324051" /></flowRegion><flowPara
+         id="flowPara5235"
+         style="font-size:16px;line-height:80.00000119%" /></flowRoot>    <flowRoot
+       xml:space="preserve"
+       id="flowRoot5281"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:16px;line-height:125%;font-family:'Gillius ADF';-inkscape-font-specification:'Gillius ADF';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       transform="matrix(0.26458333,0,0,0.26458333,5.2916666,224.50414)"><flowRegion
+         id="flowRegion5283"
+         style="font-size:16px"><rect
+           id="rect5285"
+           width="437.06491"
+           height="207.00809"
+           x="0"
+           y="41.123688"
+           style="font-size:16px" /></flowRegion><flowPara
+         id="flowPara5287"><flowSpan
+   style="font-weight:bold"
+   id="flowSpan5335">1.  </flowSpan>Launch Arduino software.</flowPara><flowPara
+         id="flowPara5289"><flowSpan
+   style="font-weight:bold"
+   id="flowSpan5337">2. </flowSpan>Open file that you would like to upload (File &gt; Open)</flowPara><flowPara
+         id="flowPara5291"><flowSpan
+   style="font-weight:bold"
+   id="flowSpan5339">3. </flowSpan>Select serial port for the ALog (Tools &gt; Port)</flowPara><flowPara
+         id="flowPara5293"><flowSpan
+   style="font-weight:bold"
+   id="flowSpan5341">4. </flowSpan>Check that the board is right (Tools &gt; Board)</flowPara><flowPara
+         id="flowPara5345"><flowSpan
+   style="font-weight:bold"
+   id="flowSpan5347">5. </flowSpan>Click the right-arrow &quot;upload&quot; button. Watch lights blink.</flowPara><flowPara
+         id="flowPara5349"><flowSpan
+   style="font-weight:bold"
+   id="flowSpan5351">6. </flowSpan>Open serial monitor (top right button). Check text.</flowPara><flowPara
+         id="flowPara5353"><flowSpan
+   style="font-weight:bold"
+   id="flowSpan5355">7. </flowSpan>Syncopated flash? Clock isn't set. Run &quot;ALogClockSet.py&quot;</flowPara><flowPara
+         id="flowPara5357"><flowSpan
+   style="font-weight:bold"
+   id="flowSpan5359">8. </flowSpan>LOOOONG short short? Logger is recording data.</flowPara><flowPara
+         id="flowPara5295" /><flowPara
+         id="flowPara5297" /><flowPara
+         id="flowPara5299" /><flowPara
+         id="flowPara5301" /><flowPara
+         id="flowPara5303" /></flowRoot>  </g>
+</svg>
