@@ -14,6 +14,13 @@ In addition to the README.md at [https://github.com/NorthernWidget/ALog](https:/
 
 * * *
 
+# Quick reference
+
+![Programming reference card.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ProgrammingCard.pdf "Programming reference card.")
+@image latex ProgrammingCard.pdf "Quick reference"
+
+* * *
+
 # Quick-start guide
 
 ***No-frills, no-pictures, as quick as possible. All the same material is covered in more detail in the*** **"Complete guide: from the basics onward,"** ***below; look there if you get stuck***
