@@ -16,7 +16,7 @@ In addition to the README.md at [https://github.com/NorthernWidget/ALog](https:/
 
 # Quick reference
 
-![Programming reference card.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ProgrammingCard.pdf "Programming reference card.")
+![Programming reference card.](https://github.com/NorthernWidget/ALog/raw/master/doc/figures/ProgrammingCard.png "Programming reference card.")
 @image latex ProgrammingCard.pdf "Quick reference"
 
 * * *
