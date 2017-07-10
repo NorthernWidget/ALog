@@ -1814,6 +1814,8 @@ void ALog::HM1500LF_humidity_with_external_temperature(uint8_t humidPin, \
   // I think it will -- though if it is ratiometric, I think it should.
 
   if (first_log_after_booting_up){
+    // headerfile.print("Relative humidity sensor voltage output [V]");
+    // headerfile.print(",");
     headerfile.print("Relative humidity [%]");
     headerfile.print(",");
     headerfile.sync();
@@ -1909,7 +1911,7 @@ void ALog::ultrasonicMB_analog_1cm(uint8_t nping, uint8_t Ex, uint8_t sonicPin,
                          // C is 0-indexed, hence the "-1"
     if (writeAll){
       if (first_log_after_booting_up){
-        headerfile.print("Distance [cm]");
+        headerfile.print("Ultrasonic distance to surface [cm]");
         headerfile.print(",");
         headerfile.sync();
       }
@@ -1942,9 +1944,9 @@ void ALog::ultrasonicMB_analog_1cm(uint8_t nping, uint8_t Ex, uint8_t sonicPin,
   delay(10);
 
   if (first_log_after_booting_up){
-    headerfile.print("Mean distance [cm]");
+    headerfile.print("Mean ultrasonic distance to surface [cm]");
     headerfile.print(",");
-    headerfile.print("Standard deviation distance [cm]");
+    headerfile.print("Standard deviation ultrasonic distance to surface [cm]");
     headerfile.print(",");
     headerfile.sync();
   }
@@ -2041,7 +2043,7 @@ void ALog::maxbotixHRXL_WR_analog(uint8_t nping, uint8_t sonicPin, uint8_t EX, \
                          // C is 0-indexed, hence the "-1"
     if (writeAll){
       if (first_log_after_booting_up){
-        headerfile.print("Distance [mm]");
+        headerfile.print("Ultrasonic distance to surface [mm]");
         headerfile.print(",");
         headerfile.sync();
       }
@@ -2072,9 +2074,9 @@ void ALog::maxbotixHRXL_WR_analog(uint8_t nping, uint8_t sonicPin, uint8_t EX, \
   ///////////////
 
   if (first_log_after_booting_up){
-    headerfile.print("Mean distance [mm]");
+    headerfile.print("Mean ultrasonic distance to surface [mm]");
     headerfile.print(",");
-    headerfile.print("Standard deviation distance [mm]");
+    headerfile.print("Standard deviation ultrasonic distance to surface [mm]");
     headerfile.print(",");
     headerfile.sync();
   }
@@ -2180,6 +2182,11 @@ float ALog::maxbotixHRXL_WR_Serial(uint8_t Ex, uint8_t npings, bool writeAll, \
   // Write all values if so desired
   if (writeAll){
     for (int i=0; i<npings; i++){
+      if (first_log_after_booting_up){
+        headerfile.print("Ultrasonic distance to surface [mm]");
+        headerfile.print(",");
+        headerfile.sync();
+      }
       datafile.print(myranges[i]);
       datafile.print(F(","));
       // Echo to serial
@@ -2194,9 +2201,9 @@ float ALog::maxbotixHRXL_WR_Serial(uint8_t Ex, uint8_t npings, bool writeAll, \
   ///////////////
 
   if (first_log_after_booting_up){
-    headerfile.print("Mean distance [mm]");
+    headerfile.print("Mean ultrasonic distance to surface [mm]");
     headerfile.print(",");
-    headerfile.print("Standard deviation distance [mm]");
+    headerfile.print("Standard deviation ultrasonic distance to surface [mm]");
     headerfile.print(",");
     headerfile.print("Number of readings with non-error returns");
     headerfile.print(",");
@@ -2495,9 +2502,9 @@ void ALog::Anemometer_reed_switch(uint8_t interrupt_pin_number, \
   ///////////////
 
   if (first_log_after_booting_up){
-    headerfile.print("Number of rotations");
+    headerfile.print("Number of anemometer rotations");
     headerfile.print(",");
-    headerfile.print("Rotation frequency [Hz]");
+    headerfile.print("Anemometer rotation frequency [Hz]");
     headerfile.print(",");
     headerfile.print("Wind speed [m/s]");
     headerfile.print(",");
@@ -2560,7 +2567,7 @@ void ALog::Wind_Vane_Inspeed(uint8_t vanePin){
   ///////////////
 
   // SD write
-  datafile.print(Wind_angle);
+  datafile.print("Wind azimuth [degrees]");
   datafile.print(F(","));
 
   // Echo to serial
@@ -2622,7 +2629,7 @@ void ALog::Pyranometer(uint8_t analogPin, float raw_mV_per_W_per_m2, \
   }
 
   // SD write
-  datafile.print(Radiation_W_m2, 4);
+  datafile.print("Solar Radiation [W/m^2]");
   datafile.print(F(","));
 
   // Echo to serial
@@ -3347,9 +3354,9 @@ void ALog::DecagonGS1(uint8_t pin, float Vref, uint8_t ADC_resolution_nbits){
   ///////////////
 
   if (first_log_after_booting_up){
-    headerfile.print("Voltage [V]");
+    headerfile.print("Sensor output voltage [V]");
     headerfile.print(",");
-    headerfile.print("Volumentric water content [-]");
+    headerfile.print("Volumetric water content [-]");
     headerfile.print(",");
     headerfile.sync();
   }
