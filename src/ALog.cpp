@@ -1437,6 +1437,160 @@ void ALog::endAnalog(){
 // SENSOR INTERFACE FUNCTIONS //
 ////////////////////////////////
 
+// Record User Data
+//////////////////////////////
+
+void ALog::record(int integer, String header, int base){
+
+  /**
+   * @brief
+   * Write user data to the SD card and desplay on serial monitor.
+   *
+   * @details
+   * Allows users to write there own data to the SD card.  This is part of an
+   * overloading function that accepts integer, float or charactor values.
+   *
+   * @param integer.  The integer value to be written into the SD card
+   *
+   * Example:
+   * ```
+   * alog.record(16,"wind reading", HEX);  
+   * ```
+   *
+   * Note that this function can record decimal numbers and any other base
+   * sestem.  For example HEX would be hexadecimal base 16.  No base input will
+   * default to base 10 decimal numbers.
+   *
+  */
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  if (first_log_after_booting_up){
+    headerfile.print(header);
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
+  // SD write
+  datafile.print(integer, base);
+  datafile.print(",");
+
+  // Echo to serial
+  Serial.print(integer, base);
+  Serial.print(",");
+
+}
+
+void ALog::record(int integer, String header){
+
+  /**
+   * @brief
+   * Write user data to the SD card and desplay on serial monitor.
+   *
+   * @details
+   * Allows users to write there own data to the SD card.  This is part of an
+   * overloading function that accepts integer, float or charactor values. 
+   *
+   * @param integer.  The integer value to be written into the SD card
+   *
+   * Example:
+   * ```
+   * alog.record(16,"wind reading");  
+   * ```
+   *
+   * This particular section default the integer value to base 10 if no base
+   * is given.
+   *
+  */
+
+  record(integer, header, DEC);  //Defalut to decimal if no base given.
+
+}
+
+void ALog::record(float floatingpoint, String header){
+
+  /**
+   * @brief
+   * Write user data to the SD card and desplay on serial monitor.
+   *
+   * @details
+   * Allows users to write there own data to the SD card.  This is part of an
+   * overloading function that accepts integer, float or charactor values.
+   *
+   * @param float.  The floating point value to be written into the SD card
+   *
+   * Example:
+   * ```
+   * alog.record(2.06,"wind reading");  
+   * ```
+   *
+   * This section accepts floating point number inputs.
+   *
+  */
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  if (first_log_after_booting_up){
+    headerfile.print(header);
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
+  // SD write
+  datafile.print(floatingpoint);
+  datafile.print(",");
+
+  // Echo to serial
+  Serial.print(floatingpoint);
+  Serial.print(",");
+
+}
+
+void ALog::record(String _string, String header){
+
+  /**
+   * @brief
+   * Write user data to the SD card and desplay on serial monitor.
+   *
+   * @details
+   * Allows users to write there own data to the SD card.  This is part of an
+   * overloading function that accepts integer, float or charactor values.
+   *
+   * @param string.  The string to be written into the SD card
+   *
+   * Example:
+   * ```
+   * alog.record("windy","wind reading");  
+   * ```
+   *
+   * This section accepts string type inputs.
+   *
+  */
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+  if (first_log_after_booting_up){
+    headerfile.print(header);
+    headerfile.print(",");
+    headerfile.sync();
+  }
+
+  // SD write
+  datafile.print(_string);
+  datafile.print(",");
+
+  // Echo to serial
+  Serial.print(_string);
+  Serial.print(",");
+
+}
+
 // Read analog pin
 //////////////////////////////
 

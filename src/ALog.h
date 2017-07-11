@@ -120,6 +120,11 @@ class ALog {
     float get_5V_measured_voltage();
 
     // Sensors - standard procedure (wake up, log, sleep)
+void record(int integer, String header, int base);
+void record(int integer, String header);
+void record(float floatingpoint, String header);
+void record(String _string, String header);
+
     float readPin(uint8_t pin);
     float readPinOversample(uint8_t pin, uint8_t adc_bits);
     float analogReadOversample(uint8_t pin, uint8_t adc_bits=10, \
