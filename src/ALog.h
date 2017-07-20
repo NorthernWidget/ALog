@@ -69,7 +69,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     // Serial number cannot be written here
                     // (This is for the program to configure each logger)
 #include <SoftwareSerial.h>
-#include <EEPROM.h>
 
 // Sensor-centric libraries
 #include <SFE_BMP180.h>
