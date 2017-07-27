@@ -14,8 +14,8 @@ ALog	KEYWORD1	ALog
 
 startAnalog	KEYWORD2
 endAnalog	KEYWORD2
-SensorPowerOn	KEYWORD2
-SensorPowerOff	KEYWORD2
+sensorPowerOn	KEYWORD2
+sensorPowerOff	KEYWORD2
 startLogging	KEYWORD2
 endLogging	KEYWORD2
 sleep		KEYWORD2
