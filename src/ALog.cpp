@@ -430,6 +430,7 @@ void ALog::setupLogger(){
   // and unpowered, they will drag down the signal from the RTC, and the
   // logger will not properly initialize
   digitalWrite(SensorPowerPin,HIGH);
+  SDon_RTCon();
 
   ////////////
   // SERIAL //
@@ -445,8 +446,6 @@ void ALog::setupLogger(){
 
   Wire.begin();
   Wire.setTimeout(100);
-
-  SDon_RTCon();
 
   /////////////////
   // CHECK CLOCK //
@@ -1285,8 +1284,6 @@ void ALog::startLogging(){
     }
   }
 
-  pinMode(SDpowerPin, OUTPUT); // Seemed to have forgotten between loops... ?
-
   // Callback to set date and time in SD card file metadata
   // Following: https://forum.arduino.cc/index.php?topic=348562.0
   // See: https://github.com/NorthernWidget/Logger/issues/6
@@ -1396,7 +1393,7 @@ void ALog::sensorPowerOn(){
    * This powers external devices.
    */
   digitalWrite(SensorPowerPin,HIGH);
-  delay(2);
+  delay(5);
 }
 
 void ALog::sensorPowerOff(){
@@ -1406,7 +1403,7 @@ void ALog::sensorPowerOff(){
    * This cuts 3V3 power to external devices.
    */
   digitalWrite(SensorPowerPin,LOW);
-  delay(2);
+  delay(5);
 }
 
 // DEPRECATED
@@ -3194,9 +3191,6 @@ void ALog::TippingBucketRainGage(){
 
   detachInterrupt(1);
 
-  pinMode(SDpowerPin,OUTPUT); // Seemed to have forgotten between loops... ?
-  // might want to use a digitalread for better incorporation into normal logging cycle
-
   // Callback to set date and time in SD card file metadata
   // Following: https://forum.arduino.cc/index.php?topic=348562.0
   // See: https://github.com/NorthernWidget/Logger/issues/6
@@ -3897,10 +3891,6 @@ bool ALog::establishContact_Rx(){
 }
 
 void ALog::startup_sequence(){
-  // Turn on power to all sensors: important for I2C sensors that may need
-  // power to not pull on clock
-  pinMode(SensorPowerPin, OUTPUT);
-  digitalWrite(SensorPowerPin, HIGH);
 
   bool connected_to_computer = false;
   //char handshake[4];
