@@ -1241,7 +1241,7 @@ void ALog::startLogging(){
    */
   // Wake up
 
-  delay(50);
+  //delay(50);
   //Serial.println("Rise and shine!");
 
   wdt_disable();
@@ -1392,8 +1392,15 @@ void ALog::sensorPowerOn(){
    * @details
    * This powers external devices.
    */
-  digitalWrite(SensorPowerPin,HIGH);
-  delay(5);
+
+  if (_use_sleep_mode){
+     digitalWrite(SensorPowerPin,HIGH);
+     delay(5);
+  }
+  else if (first_log_after_booting_up){
+     digitalWrite(SensorPowerPin,HIGH);
+     delay(5);
+  }
 }
 
 void ALog::sensorPowerOff(){
@@ -1402,8 +1409,10 @@ void ALog::sensorPowerOff(){
    * @details
    * This cuts 3V3 power to external devices.
    */
-  digitalWrite(SensorPowerPin,LOW);
-  delay(5);
+  if (_use_sleep_mode){
+     digitalWrite(SensorPowerPin,LOW);
+     //delay(5);
+  }
 }
 
 // DEPRECATED
@@ -2879,6 +2888,8 @@ float ALog::analogReadOversample(uint8_t pin, uint8_t adc_bits, \
   // Normalize to 10 bits for all of the stuff here that expects that
   float precision_above_ten = pow(2., adc_bits - 10.);
   analog_reading = avg_reading / precision_above_ten; // 0-1023, but float
+
+  end_logging_to_otherfile();
 
   return analog_reading;
 }
