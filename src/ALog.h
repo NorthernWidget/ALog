@@ -111,6 +111,9 @@ class ALog {
     bool get_use_sleep_mode();
     void set_LEDpin(int8_t _pin);
     void set_SDpowerPin(int8_t _pin);
+    void set_EXT_3V3(int8_t _pin);
+    void set_EXT_5V0(int8_t _pin);
+    void set_REF_1V8(int8_t _pin);
     void set_RTCpowerPin(int8_t _pin);
     void set_SensorPowerPin(int8_t _pin);
     // Important subset: EEPROM: Serial number and calibrations
@@ -125,6 +128,7 @@ void record(float floatingpoint, String header);
 void record(String _string, String header);
 
     float readPin(uint8_t pin);
+    void readPins();
     float readPinOversample(uint8_t pin, uint8_t adc_bits);
     float analogReadOversample(uint8_t pin, uint8_t adc_bits=10, \
           uint8_t nsamples=1, bool debug=false);

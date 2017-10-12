@@ -120,6 +120,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
 #endif
 
+#if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__)
+  // SD card: CSpin and protected pins
+  const int8_t SCKpin = 7;
+  const int8_t MISOpin = 6;
+  const int8_t MOSIpin = 5;
+  const int8_t CSpin = 4;
+  // Protected I2C pins
+  const int8_t SDApin = 17;
+  const int8_t SCLpin = 16;
+  // Sleep mode pins
+  const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
+  const int8_t manualWakePin = 23; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
+  int8_t SDpowerPin = 18; // Turns on voltage source to SD card
+  int8_t RTCpowerPin = 1; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+  // LED power switch
+  int8_t LEDpin = 0; // LED to tell user if logger is working properly
+  // External device power switch
+  int8_t SensorPowerPin = 4; //Not used for V3
+  int8_t EXT_3V3 = 22; // Activates voltage regulator to give power to sensors
+  int8_t EXT_5V0 = 20; // Activates voltage regulator to give power to sensors
+  // Voltage reference power
+  int8_t REF_1V8 = 19; // Activates precision voltage reference
+#endif
+
 /*
 #elif(_model == big_log)
   // SD card: CSpin and protected pins
@@ -244,7 +268,6 @@ DateTime now;
  * ```
  *
 */
-
 
 
 // Constructor
@@ -420,6 +443,9 @@ void ALog::setupLogger(){
   // Set the rest of the pins
   pinMode(CSpin,OUTPUT);
   pinMode(SensorPowerPin,OUTPUT);
+  pinMode(EXT_3V3,OUTPUT);
+  pinMode(EXT_5V0,OUTPUT);
+  pinMode(REF_1V8,OUTPUT);
   pinMode(LEDpin,OUTPUT);
   pinMode(SDpowerPin,OUTPUT);
   pinMode(RTCpowerPin,OUTPUT);
@@ -430,6 +456,9 @@ void ALog::setupLogger(){
   // and unpowered, they will drag down the signal from the RTC, and the
   // logger will not properly initialize
   digitalWrite(SensorPowerPin,HIGH);
+  digitalWrite(EXT_3V3,HIGH);
+  digitalWrite(EXT_5V0,HIGH);
+  //digitalWrite(1.8V,HIGH);
   SDon_RTCon();
 
   ////////////
@@ -610,6 +639,52 @@ void ALog::set_SensorPowerPin(int8_t _pin){
    SensorPowerPin = _pin;
 }
 
+void ALog::set_EXT_3V3(int8_t _pin){
+  /**
+   * @brief Set which pin activates the 3V3 regulator to power sensors and
+   * any other external 3V3 devices that receive power from the ALog's
+   * 3V3 regulator.
+   *
+   * @details
+   * * Set to -1 if not being used
+   * * Otherwise, set to the number of the pin controlling the 3V3 regulator
+   *   that goes to the sensors and other peripherals.
+   * Run this, if needed, before setupLogger()
+   */
+   EXT_3V3 = _pin;
+}
+
+void ALog::set_EXT_5V0(int8_t _pin){
+  /**
+   * @brief Set which pin activates the 3V3 regulator to power sensors and
+   * any other external 3V3 devices that receive power from the ALog's
+   * 3V3 regulator.
+   *
+   * @details
+   * * Set to -1 if not being used
+   * * Otherwise, set to the number of the pin controlling the 3V3 regulator
+   *   that goes to the sensors and other peripherals.
+   * Run this, if needed, before setupLogger()
+   */
+   EXT_5V0 = _pin;
+}
+
+void ALog::set_REF_1V8(int8_t _pin){
+  /**
+   * @brief Set which pin activates the 3V3 regulator to power sensors and
+   * any other external 3V3 devices that receive power from the ALog's
+   * 3V3 regulator.
+   *
+   * @details
+   * * Set to -1 if not being used
+   * * Otherwise, set to the number of the pin controlling the 3V3 regulator
+   *   that goes to the sensors and other peripherals.
+   * Run this, if needed, before setupLogger()
+   */
+   REF_1V8 = _pin;
+}
+
+
 
 /////////////////////////////////////////////////////////////////
 // EEPROM: SERIAL NUMBERS, MEASURED VOLTAGE REGULATOR VOLTAGES //
@@ -660,9 +735,9 @@ float ALog::get_5V_measured_voltage(){
 void ALog::pinUnavailable(uint8_t pin){
   int _errorFlag = 0;
 
-  char* _pinNameList_crit[9] = {"CSpin", "SensorPowerPin", "SDpowerPin", \
+  char* _pinNameList_crit[9] = {"CSpin", "SensorPowerPin", "EXT_3V3", "EXT_5V0", "REF_1V8", "SDpowerPin", \
                                 "RTCpowerPin", "LEDpin", "wakePin"};
-  int _pinList_crit[9] = {CSpin, SensorPowerPin, SDpowerPin, RTCpowerPin, \
+  int _pinList_crit[9] = {CSpin, SensorPowerPin, EXT_3V3, EXT_5V0, REF_1V8, SDpowerPin, RTCpowerPin, \
                           LEDpin, wakePin};
 
   char* _pinNameList[9] = {"MISOpin", "MOSIpin", "SCKpin", "SDApin", \
@@ -1395,10 +1470,16 @@ void ALog::sensorPowerOn(){
 
   if (_use_sleep_mode){
      digitalWrite(SensorPowerPin,HIGH);
+     digitalWrite(EXT_3V3,HIGH);
+     digitalWrite(EXT_5V0,HIGH);
+     digitalWrite(REF_1V8,HIGH);
      delay(5);
   }
   else if (first_log_after_booting_up){
      digitalWrite(SensorPowerPin,HIGH);
+     digitalWrite(EXT_3V3,HIGH);
+     digitalWrite(EXT_5V0,HIGH);
+     digitalWrite(REF_1V8,HIGH);
      delay(5);
   }
 }
@@ -1411,6 +1492,9 @@ void ALog::sensorPowerOff(){
    */
   if (_use_sleep_mode){
      digitalWrite(SensorPowerPin,LOW);
+     digitalWrite(EXT_3V3,LOW);
+     digitalWrite(EXT_5V0,LOW);
+     digitalWrite(REF_1V8,LOW);
      //delay(5);
   }
 }
@@ -1626,20 +1710,70 @@ float ALog::readPin(uint8_t pin){
   ///////////////
 
   if (first_log_after_booting_up){
-    headerfile.print("Analog pin value");
+    headerfile.print("Analog pin ");
+    headerfile.print(pin);
     headerfile.print(",");
     headerfile.sync();
   }
 
   // SD write
-  datafile.print(pinValue, 1);
+  datafile.print(pinValue);
   datafile.print(",");
 
   // Echo to serial
-  Serial.print(pinValue, 1);
+  Serial.print(pinValue);
   Serial.print(",");
 
   return pinValue;
+
+}
+
+void ALog::readPins(){
+
+  /**
+   * @brief Read the analog value of a pin.
+   *
+   * @details
+   * This function returns the analog to digital converter value (0 - 1023).
+   * Results are displayed on the serial monitor and saved onto the SD card.
+   *
+   * @param pin is the analog pin number to be read.
+   *
+   * Example:
+   * ```
+   * alog.readPin(2);
+   * ```
+   *
+   *
+  */
+
+  for(int i=0;i<=7;i++){
+
+   int pinValue = analogRead(i);
+
+
+  ///////////////
+  // SAVE DATA //
+  ///////////////
+
+
+  // SD write
+  datafile.print(pinValue);
+  datafile.print(",");
+
+  // Echo to serial
+  Serial.print(pinValue);
+  Serial.print(",");
+
+    if(i==3){
+      i=i+2;
+    }
+  }
+
+  if (first_log_after_booting_up){
+    headerfile.print(F("pin 0, pin 1, pin 2, pin 3, pin 6, pin 7,"));
+    headerfile.sync();
+  }
 
 }
 
@@ -1681,17 +1815,18 @@ float ALog::readPinOversample(uint8_t pin, uint8_t bits){
   ///////////////
 
   if (first_log_after_booting_up){
-    headerfile.print("Analog pin value");
+    headerfile.print("Analog pin ");
+    headerfile.print(pin);
     headerfile.print(",");
     headerfile.sync();
   }
 
   // SD write
-  datafile.print(pinValue,4);
+  datafile.print(pinValue,1);
   datafile.print(",");
 
   // Echo to serial
-  Serial.print(pinValue,4);
+  Serial.print(pinValue,1);
   Serial.print(",");
 
   return pinValue;
@@ -3297,7 +3432,7 @@ void ALog::end_logging_to_otherfile(){
   // Ends line and closes otherfile
   // Copied from endLine function
   otherfile.println();
-  Serial.println();
+//  Serial.println();
   // close the file: (This does the actual sync() step too - writes buffer)
   otherfile.close();
   delay(10);
@@ -4026,6 +4161,9 @@ void ALog::startup_sequence(){
   }
 
   digitalWrite(SensorPowerPin, LOW);
+  digitalWrite(EXT_3V3, LOW);
+  digitalWrite(EXT_5V0, LOW);
+  digitalWrite(REF_1V8, LOW);
 }
 
 void ALog::clockSet(){
