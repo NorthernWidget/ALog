@@ -87,6 +87,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     int8_t LEDpin = 8; // LED to tell user if logger is working properly
     // External device power switch
     int8_t SensorPowerPin = 4; // Activates voltage regulator to give power to sensors
+    int8_t EXT_3V3 = -1; // Activates voltage regulator to give power to sensors
+    int8_t EXT_5V0 = -1; // Activates voltage regulator to give power to sensors
+    // Voltage reference power
+    int8_t REF_1V8 = -1; // Activates precision voltage reference
   #elif defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_PRE_V200)
     // SD and RTC power switch
     int8_t SDpowerPin = 8; // Turns on voltage source to SD card
@@ -104,6 +108,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     int8_t RTCpowerPin = -1;
     // External device power switch
     int8_t SensorPowerPin = -1; // Activates voltage regulator to give power to sensors
+    int8_t EXT_3V3 = -1; // Activates voltage regulator to give power to sensors
+    int8_t EXT_5V0 = -1; // Activates voltage regulator to give power to sensors
+    // Voltage reference power
+    int8_t REF_1V8 = -1; // Activates precision voltage reference
   #endif
 #endif
 // True for all: MEGA (ATMega1280/2560)
@@ -381,6 +389,8 @@ void ALog::initialize(char* _logger_name, char* _datafilename, \
     Serial.println("e.g., Uno with or without ALog shield)");
   #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
     Serial.println("ATMega1280/2560 Arduino Mega");
+  #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__)
+    Serial.println("ALog BottleLogger v3.X.Y");
   #else
     Serial.println(F("Error: Arduino model not recognized by the ALog library."));
     Serial.println(F("Please add support for it and/or contact the developers."));
@@ -548,8 +558,8 @@ void ALog::setupLogger(){
   Serial.print(F("Initializing SD card..."));
   if (!sd.begin(CSpin, SPI_HALF_SPEED)){
     Serial.println(F("Card failed, or not present"));
-    LEDwarn(20); // 20 quick flashes of the LED
-    sd.initErrorHalt();
+//    LEDwarn(20); // 20 quick flashes of the LED
+//    sd.initErrorHalt();  //chad
   }
 
   Serial.println(F("card initialized."));
