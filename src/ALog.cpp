@@ -133,7 +133,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   const int8_t SCKpin = 7;
   const int8_t MISOpin = 6;
   const int8_t MOSIpin = 5;
-  const int8_t CSpin = 4;
+  const int8_t CSpin = 21;
   // Protected I2C pins
   const int8_t SDApin = 17;
   const int8_t SCLpin = 16;
