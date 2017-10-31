@@ -145,7 +145,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   // LED power switch
   int8_t LEDpin = 0; // LED to tell user if logger is working properly
   // External device power switch
-  int8_t SensorPowerPin = 4; //Not used for V3
+  int8_t SensorPowerPin = -1; //Not used for V3
   int8_t EXT_3V3 = 22; // Activates voltage regulator to give power to sensors
   int8_t EXT_5V0 = 20; // Activates voltage regulator to give power to sensors
   // Voltage reference power
@@ -862,12 +862,20 @@ void ALog::sleepNow()         // here we put the arduino to sleep
       attachInterrupt(digitalPinToInterrupt(3), wakeUpNow_tip, LOW);
     }
 
-    sleep_mode();            // here the device is actually put to sleep!!
+/*    sleep_mode();            // here the device is actually put to sleep!!
 
                             // THE PROGRAM CONTINUES FROM HERE AFTER WAKING UP.
 
     sleep_disable();         // first thing after waking from sleep:
                              // disable sleep...
+
+
+ */
+
+    sleep_bod_disable();
+    sei();
+    sleep_cpu();
+    sleep_disable();
 
     // detachInterrupt(1); // crude, but keeps interrupts from clashing. Need to improve this to allow both measurements types!
     // 06-11-2015: The above line commented to allow the rain gage to be read
@@ -1258,7 +1266,11 @@ float ALog::_vdivR(uint8_t pin, float Rref, uint8_t adc_bits, \
 
 void ALog::SDon_RTCon(){
   // Turn on power to clock and SD card
+  #if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__)
+  digitalWrite(SDpowerPin,LOW);
+  #else
   digitalWrite(SDpowerPin,HIGH); //Chad -- one model's pull-ups attached to SDpowerPin
+  #endif
   digitalWrite(RTCpowerPin,HIGH);
   delay(20);
 }
@@ -1270,7 +1282,11 @@ void ALog::SDoff_RTCsleep(){
   // This "tricks" it into turning off its I2C bus and saves power on the
   // board, but keeps its alarm functionality on.
   // (Idea to do this courtesy of Gerhard Oberforcher)
+  #if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__)
+  digitalWrite(SDpowerPin,HIGH);
+  #else
   digitalWrite(SDpowerPin,LOW); //Chad -- one model's pull-ups attached to SDpowerPin
+  #endif
   digitalWrite(RTCpowerPin,LOW);
   delay(2);
 }

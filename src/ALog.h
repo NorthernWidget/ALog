@@ -62,6 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <DS3231.h>
 #include <math.h>
 #include <avr/sleep.h>
+#include <avr/interrupt.h>
 #include <avr/wdt.h>
 #include <stdlib.h> // For turning incoming ASCII character
                     // strings into int with atol
