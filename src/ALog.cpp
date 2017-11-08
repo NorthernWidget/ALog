@@ -128,7 +128,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
 #endif
 
-#if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__)
+#if defined(AVR_ALOG_BOTTLELOGGER_V3) //temperarily adding non P varient
   // SD card: CSpin and protected pins
   const int8_t SCKpin = 7;
   const int8_t MISOpin = 6;
@@ -141,13 +141,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
   const int8_t manualWakePin = 23; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
   int8_t SDpowerPin = 18; // Turns on voltage source to SD card
-  int8_t RTCpowerPin = 1; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt)
+  int8_t RTCpowerPin = 1; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt), prototype was D1, new board does not shut down.
   // LED power switch
   int8_t LEDpin = 0; // LED to tell user if logger is working properly
   // External device power switch
   int8_t SensorPowerPin = -1; //Not used for V3
-  int8_t EXT_3V3 = 22; // Activates voltage regulator to give power to sensors
-  int8_t EXT_5V0 = 20; // Activates voltage regulator to give power to sensors
+  int8_t EXT_3V3 = 22; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_3V3 = 22, new board   int8_t EXT_3V3 = A2;
+  int8_t EXT_5V0 = 20; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_5V0 = 20, new board   int8_t EXT_5V0 = A3;
   // Voltage reference power
   int8_t REF_1V8 = 19; // Activates precision voltage reference
 #endif
@@ -389,7 +389,7 @@ void ALog::initialize(char* _logger_name, char* _datafilename, \
     Serial.println("e.g., Uno with or without ALog shield)");
   #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
     Serial.println("ATMega1280/2560 Arduino Mega");
-  #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__)
+  #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__) || (__AVR_ATmega644__) 
     Serial.println("ALog BottleLogger v3.X.Y");
   #else
     Serial.println(F("Error: Arduino model not recognized by the ALog library."));
@@ -453,9 +453,15 @@ void ALog::setupLogger(){
   // Set the rest of the pins
   pinMode(CSpin,OUTPUT);
   pinMode(SensorPowerPin,OUTPUT);
+  digitalWrite(SensorPowerPin,HIGH);
+  #if defined(AVR_ALOG_BOTTLELOGGER_V3)  
   pinMode(EXT_3V3,OUTPUT);
   pinMode(EXT_5V0,OUTPUT);
   pinMode(REF_1V8,OUTPUT);
+  digitalWrite(EXT_3V3,HIGH);
+  digitalWrite(EXT_5V0,HIGH);
+  digitalWrite(REF_1V8,HIGH);
+  #endif
   pinMode(LEDpin,OUTPUT);
   pinMode(SDpowerPin,OUTPUT);
   pinMode(RTCpowerPin,OUTPUT);
@@ -465,10 +471,7 @@ void ALog::setupLogger(){
   // Have Sensor Power set HIGH, because if any I2C sensors are attached
   // and unpowered, they will drag down the signal from the RTC, and the
   // logger will not properly initialize
-  digitalWrite(SensorPowerPin,HIGH);
-  digitalWrite(EXT_3V3,HIGH);
-  digitalWrite(EXT_5V0,HIGH);
-  //digitalWrite(1.8V,HIGH);
+
   SDon_RTCon();
 
   ////////////
@@ -1266,7 +1269,7 @@ float ALog::_vdivR(uint8_t pin, float Rref, uint8_t adc_bits, \
 
 void ALog::SDon_RTCon(){
   // Turn on power to clock and SD card
-  #if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__)
+  #if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__) || (__AVR_ATmega644__) 
   digitalWrite(SDpowerPin,LOW);
   #else
   digitalWrite(SDpowerPin,HIGH); //Chad -- one model's pull-ups attached to SDpowerPin
@@ -1282,7 +1285,7 @@ void ALog::SDoff_RTCsleep(){
   // This "tricks" it into turning off its I2C bus and saves power on the
   // board, but keeps its alarm functionality on.
   // (Idea to do this courtesy of Gerhard Oberforcher)
-  #if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__)
+  #if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__) || (__AVR_ATmega644__) 
   digitalWrite(SDpowerPin,HIGH);
   #else
   digitalWrite(SDpowerPin,LOW); //Chad -- one model's pull-ups attached to SDpowerPin
@@ -1496,16 +1499,20 @@ void ALog::sensorPowerOn(){
 
   if (_use_sleep_mode){
      digitalWrite(SensorPowerPin,HIGH);
-     digitalWrite(EXT_3V3,HIGH);
-     digitalWrite(EXT_5V0,HIGH);
-     digitalWrite(REF_1V8,HIGH);
+      #if defined(AVR_ALOG_BOTTLELOGGER_V3)  
+      digitalWrite(EXT_3V3,HIGH);
+      digitalWrite(EXT_5V0,HIGH);
+      digitalWrite(REF_1V8,HIGH);
+      #endif
      delay(5);
   }
   else if (first_log_after_booting_up){
      digitalWrite(SensorPowerPin,HIGH);
-     digitalWrite(EXT_3V3,HIGH);
-     digitalWrite(EXT_5V0,HIGH);
-     digitalWrite(REF_1V8,HIGH);
+      #if defined(AVR_ALOG_BOTTLELOGGER_V3)  
+      digitalWrite(EXT_3V3,HIGH);
+      digitalWrite(EXT_5V0,HIGH);
+      digitalWrite(REF_1V8,HIGH);
+      #endif
      delay(5);
   }
 }
@@ -1518,9 +1525,12 @@ void ALog::sensorPowerOff(){
    */
   if (_use_sleep_mode){
      digitalWrite(SensorPowerPin,LOW);
+
+#if defined(AVR_ALOG_BOTTLELOGGER_V3)     
      digitalWrite(EXT_3V3,LOW);
      digitalWrite(EXT_5V0,LOW);
      digitalWrite(REF_1V8,LOW);
+#endif
      //delay(5);
   }
 }
