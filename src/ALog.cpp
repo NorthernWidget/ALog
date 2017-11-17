@@ -128,7 +128,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
 #endif
 
-#if defined(AVR_ALOG_BOTTLELOGGER_V3) //temperarily adding non P varient
+#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3)
   // SD card: CSpin and protected pins
   const int8_t SCKpin = 7;
   const int8_t MISOpin = 6;
@@ -383,14 +383,14 @@ void ALog::initialize(char* _logger_name, char* _datafilename, \
     Serial.println("ALog BottleLogger pre-v2.0.0");
   #elif defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V2)
     Serial.println("ALog BottleLogger v2.X.Y");
+  #elif defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3)
+    Serial.println("ALog BottleLogger v3.X.Y");
   #elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) \
           || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
     Serial.print("ATMega168/328 Arduino ");
     Serial.println("e.g., Uno with or without ALog shield)");
   #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
     Serial.println("ATMega1280/2560 Arduino Mega");
-  #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__) || (__AVR_ATmega644__) 
-    Serial.println("ALog BottleLogger v3.X.Y");
   #else
     Serial.println(F("Error: Arduino model not recognized by the ALog library."));
     Serial.println(F("Please add support for it and/or contact the developers."));
@@ -2590,6 +2590,7 @@ int ALog::maxbotix_Serial_parse(uint8_t Ex){
   digitalWrite(Ex, HIGH);
   delay(1);
   digitalWrite(Ex, LOW);
+//  delay(150); //Chad, do I need a 150ms delay needed to make sure low at end of sample to get unfiltered readings?
   // Record the result of the ranging
   int i=0; // counter
   // Not sure if this will work - maybe loop around to the other end of the array?
