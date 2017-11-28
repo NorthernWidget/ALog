@@ -1499,9 +1499,7 @@ void ALog::sensorPowerOn(){
 
   if (_use_sleep_mode){
      digitalWrite(SensorPowerPin,HIGH);
-Serial.println("on");
       #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3)
-Serial.println("on");
       digitalWrite(EXT_3V3,LOW);
       digitalWrite(EXT_5V0,HIGH);
       digitalWrite(REF_1V8,HIGH);
@@ -1527,9 +1525,7 @@ void ALog::sensorPowerOff(){
    */
   if (_use_sleep_mode){
      digitalWrite(SensorPowerPin,LOW);
-Serial.println("");
 #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3) 
-Serial.println("off");   
      digitalWrite(EXT_3V3,HIGH);
      digitalWrite(EXT_5V0,LOW);
      digitalWrite(REF_1V8,LOW);
