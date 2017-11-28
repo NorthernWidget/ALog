@@ -146,8 +146,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   int8_t LEDpin = 0; // LED to tell user if logger is working properly
   // External device power switch
   int8_t SensorPowerPin = -1; //Not used for V3
-  int8_t EXT_3V3 = 22; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_3V3 = 22, new board   int8_t EXT_3V3 = A2;
-  int8_t EXT_5V0 = 20; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_5V0 = 20, new board   int8_t EXT_5V0 = A3;
+  int8_t EXT_3V3 = 26; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_3V3 = 22, new board   int8_t EXT_3V3 = A2;
+  int8_t EXT_5V0 = 27; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_5V0 = 20, new board   int8_t EXT_5V0 = A3;
   // Voltage reference power
   int8_t REF_1V8 = 19; // Activates precision voltage reference
 #endif
@@ -454,11 +454,11 @@ void ALog::setupLogger(){
   pinMode(CSpin,OUTPUT);
   pinMode(SensorPowerPin,OUTPUT);
   digitalWrite(SensorPowerPin,HIGH);
-  #if defined(AVR_ALOG_BOTTLELOGGER_V3)  
+  #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3) 
   pinMode(EXT_3V3,OUTPUT);
   pinMode(EXT_5V0,OUTPUT);
   pinMode(REF_1V8,OUTPUT);
-  digitalWrite(EXT_3V3,HIGH);
+  digitalWrite(EXT_3V3,LOW);
   digitalWrite(EXT_5V0,HIGH);
   digitalWrite(REF_1V8,HIGH);
   #endif
@@ -1499,8 +1499,10 @@ void ALog::sensorPowerOn(){
 
   if (_use_sleep_mode){
      digitalWrite(SensorPowerPin,HIGH);
-      #if defined(AVR_ALOG_BOTTLELOGGER_V3)  
-      digitalWrite(EXT_3V3,HIGH);
+Serial.println("on");
+      #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3)
+Serial.println("on");
+      digitalWrite(EXT_3V3,LOW);
       digitalWrite(EXT_5V0,HIGH);
       digitalWrite(REF_1V8,HIGH);
       #endif
@@ -1508,8 +1510,8 @@ void ALog::sensorPowerOn(){
   }
   else if (first_log_after_booting_up){
      digitalWrite(SensorPowerPin,HIGH);
-      #if defined(AVR_ALOG_BOTTLELOGGER_V3)  
-      digitalWrite(EXT_3V3,HIGH);
+      #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3)  
+      digitalWrite(EXT_3V3,LOW);
       digitalWrite(EXT_5V0,HIGH);
       digitalWrite(REF_1V8,HIGH);
       #endif
@@ -1525,9 +1527,10 @@ void ALog::sensorPowerOff(){
    */
   if (_use_sleep_mode){
      digitalWrite(SensorPowerPin,LOW);
-
-#if defined(AVR_ALOG_BOTTLELOGGER_V3)     
-     digitalWrite(EXT_3V3,LOW);
+Serial.println("");
+#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3) 
+Serial.println("off");   
+     digitalWrite(EXT_3V3,HIGH);
      digitalWrite(EXT_5V0,LOW);
      digitalWrite(REF_1V8,LOW);
 #endif
@@ -4198,7 +4201,7 @@ void ALog::startup_sequence(){
   }
 
   digitalWrite(SensorPowerPin, LOW);
-  digitalWrite(EXT_3V3, LOW);
+  digitalWrite(EXT_3V3, HIGH);
   digitalWrite(EXT_5V0, LOW);
   digitalWrite(REF_1V8, LOW);
 }
