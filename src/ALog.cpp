@@ -669,13 +669,13 @@ void ALog::set_EXT_3V3(int8_t _pin){
 
 void ALog::set_EXT_5V0(int8_t _pin){
   /**
-   * @brief Set which pin activates the 3V3 regulator to power sensors and
+   * @brief Set which pin activates the 5V0 regulator to power sensors and
    * any other external 3V3 devices that receive power from the ALog's
-   * 3V3 regulator.
+   * 5V0 regulator.
    *
    * @details
    * * Set to -1 if not being used
-   * * Otherwise, set to the number of the pin controlling the 3V3 regulator
+   * * Otherwise, set to the number of the pin controlling the 5V0 regulator
    *   that goes to the sensors and other peripherals.
    * Run this, if needed, before setupLogger()
    */
@@ -684,14 +684,11 @@ void ALog::set_EXT_5V0(int8_t _pin){
 
 void ALog::set_REF_1V8(int8_t _pin){
   /**
-   * @brief Set which pin activates the 3V3 regulator to power sensors and
-   * any other external 3V3 devices that receive power from the ALog's
-   * 3V3 regulator.
+   * @brief Set which pin activates the 1V8 regulator (analog reference).
    *
    * @details
    * * Set to -1 if not being used
-   * * Otherwise, set to the number of the pin controlling the 3V3 regulator
-   *   that goes to the sensors and other peripherals.
+   * * Otherwise, set to the number of the pin controlling the 1V8.
    * Run this, if needed, before setupLogger()
    */
    REF_1V8 = _pin;
