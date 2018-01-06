@@ -53,7 +53,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // INCLUDE LIBRARIES //
 ///////////////////////
 
-// Arduino 1.0 libraries now default; no if/else
+// Arduino 1.X libraries now default; no if/else
 #include <Arduino.h>
 
 // Standard libraries
