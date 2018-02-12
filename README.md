@@ -589,8 +589,6 @@ The ALog also relies on some custom software libraries. These are collections of
 
 #### Option 1: downloading and installing through the Arduino IDE
 
-***Currently not recommended, at least until all components can be downloaded this way***
-
 ***Stable versions, but outdated during times of rapid development***
 
 The Arduino IDE has a library manager! Here we will walk you through how to use it to obtain and install the requisite libraries. This uses the graphical interface, but can take longer than, "Option 2", below.
