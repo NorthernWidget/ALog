@@ -12,8 +12,13 @@ int led;
 void setup() {                
 // Pin 13 has an LED connected on most Arduino boards.
 // But Pin 9 (or 8, v 2.0.0) is used on the ALog BottleLogger
+// For the TLog, pin 20 is used, and for the ALog v 3.0.0 pin 0 is used
   #if defined ARDUINO_AVR_ALOG_BOTTLELOGGER_V2
     led=8;
+  #elif defined(TLOG_PINOUT)
+    led = 20;
+  #elif defined(ALOG_PINOUT)
+    led = 0;
   #else
     led=9;
   #endif
