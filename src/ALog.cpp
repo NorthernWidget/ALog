@@ -128,28 +128,52 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
 #endif
 
-#if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3)
-  // SD card: CSpin and protected pins
-  const int8_t SCKpin = 7;
-  const int8_t MISOpin = 6;
-  const int8_t MOSIpin = 5;
-  const int8_t CSpin = 21;
-  // Protected I2C pins
-  const int8_t SDApin = 17;
-  const int8_t SCLpin = 16;
-  // Sleep mode pins
-  const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
-  const int8_t manualWakePin = 23; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
-  int8_t SDpowerPin = 18; // Turns on voltage source to SD card
-  int8_t RTCpowerPin = 1; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt), prototype was D1, new board does not shut down.
-  // LED power switch
-  int8_t LEDpin = 0; // LED to tell user if logger is working properly
-  // External device power switch
-  int8_t SensorPowerPin = -1; //Not used for V3
-  int8_t EXT_3V3 = 26; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_3V3 = 22, new board   int8_t EXT_3V3 = A2;
-  int8_t EXT_5V0 = 27; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_5V0 = 20, new board   int8_t EXT_5V0 = A3;
-  // Voltage reference power
-  int8_t REF_1V8 = 19; // Activates precision voltage reference
+#if defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__) || (__AVR_ATmega644__)
+  #if defined(ARDUINO_AVR_ALOG_BOTTLELOGGER_V3)
+    // SD card: CSpin and protected pins
+    const int8_t SCKpin = 7;
+    const int8_t MISOpin = 6;
+    const int8_t MOSIpin = 5;
+    const int8_t CSpin = 21;
+    // Protected I2C pins
+    const int8_t SDApin = 17;
+    const int8_t SCLpin = 16;
+    // Sleep mode pins
+    const int8_t wakePin = 2; // interrupt pin used for waking up via the alarm
+    const int8_t manualWakePin = 23; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
+    int8_t SDpowerPin = 18; // Turns on voltage source to SD card
+    int8_t RTCpowerPin = 1; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt), prototype was D1, new board does not shut down.
+    // LED power switch
+    int8_t LEDpin = 0; // LED to tell user if logger is working properly
+    // External device power switch
+    int8_t SensorPowerPin = -1; //Not used for V3
+    int8_t EXT_3V3 = 26; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_3V3 = 22, new board   int8_t EXT_3V3 = A2;
+    int8_t EXT_5V0 = 27; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_5V0 = 20, new board   int8_t EXT_5V0 = A3;
+    // Voltage reference power
+    int8_t REF_1V8 = 19; // Activates precision voltage reference
+  #else
+    const int8_t SCKpin = -1;
+    const int8_t MISOpin = -1;
+    const int8_t MOSIpin = -1;
+    const int8_t CSpin = -1;
+    // Protected I2C pins
+    const int8_t SDApin = -1;
+    const int8_t SCLpin = -1;
+    // Sleep mode pins
+    const int8_t wakePin = -1; // interrupt pin used for waking up via the alarm
+    const int8_t manualWakePin = -1; // Wakes the logger with a manual button - overrides the "wait for right minute" commands
+    int8_t SDpowerPin = -1; // Turns on voltage source to SD card
+    int8_t RTCpowerPin = -1; // Activates voltage regulator to power the RTC (otherwise is on backup power from VCC or batt), prototype was D1, new board does not shut down.
+    // LED power switch
+    int8_t LEDpin = -1; // LED to tell user if logger is working properly
+    // External device power switch
+    int8_t SensorPowerPin = -1; //Not used for V3
+    int8_t EXT_3V3 = -1; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_3V3 = 22, new board   int8_t EXT_3V3 = A2;
+    int8_t EXT_5V0 = -1; // Activates voltage regulator to give power to sensors, prototype was  int8_t EXT_5V0 = 20, new board   int8_t EXT_5V0 = A3;
+    // Voltage reference power
+    int8_t REF_1V8 = -1; // Activates precision voltage reference
+  #endif
+
 #endif
 
 /*
@@ -389,7 +413,9 @@ void ALog::initialize(char* _logger_name, char* _datafilename, \
           || defined(__AVR_ATmega8__) || defined(__AVR_ATmega88__)
     Serial.print("ATMega168/328 Arduino ");
     Serial.println("e.g., Uno with or without ALog shield)");
-  #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+  #elif defined(__AVR_ATmega644P__) || defined(__AVR_ATmega1284p__) || (__AVR_ATmega644__)
+  Serial.print("ATMega644 or ATMega1284 ");
+    #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
     Serial.println("ATMega1280/2560 Arduino Mega");
   #else
     Serial.println(F("Error: Arduino model not recognized by the ALog library."));
