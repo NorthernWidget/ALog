@@ -6,7 +6,9 @@ This library is optimized to:
 1. handle all of the basic file, system, and power management behind-the-scenes, including power consumption reduction to minimal levels through the use of the sleep functions
 2. include and expose sensor functions as single-line calls, with a template for the addition of new sensors.
 
-If you use the ALog library (and/or data logger) in a publication, please cite:
+If you use the ALog library (and/or data logger) in a publication, please cite one or both of the following, as appropriate for your logger version and relevance to the article:
+
+**Wickert, A. D., C. T. Sandell, B. Schulz, and G.-H. Crystal Ng (2019), [Open-source Arduino-compatible data loggers designed for field research](https://www.hydrol-earth-syst-sci.net/23/2065/2019/), *Hydrol. Earth Syst. Sci.*, *23*, 2065–2076, doi:10.5194/hess-23-2065-2019.** 
 
 **Wickert, A. D. (2014), [The ALog: Inexpensive, Open-Source, Automated Data Collection in the Field](http://onlinelibrary.wiley.com/wol1/doi/10.1890/0012-9623-95.2.68/full), *Bull. Ecol. Soc. Am.*, *95*(2), 68–78, doi:10.1890/0012-9623-95.2.68.**
 
