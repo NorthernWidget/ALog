@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/12691723.svg)](https://zenodo.org/badge/latestdoi/12691723)
+
 # Deprecation / update notice
 
 The lovely ALog has a dear place in our hearts, but time flows by.
