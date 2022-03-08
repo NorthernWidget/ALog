@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this firmware, please cite it as below."
+authors:
+- family-names: "Wickert"
+  given-names: "Andrew D."
+  orcid: "https://orcid.org/0000-0002-9545-3365"
+- family-names: "Sandell"
+  given-names: "Chad T."
+- family-names: "Barnhart"
+  given-names: "Katherine R."
+  orcid: "https://orcid.org/0000-0001-5682-455X"
+- family-names: "Schulz"
+  given-names: "Bobby"
+title: "ALog"
+version: 1.0.0
+doi: 10.5281/zenodo.2008610
+date-released: 2018-12-07
+url: "https://github.com/NorthernWidget/T9602_Library"
